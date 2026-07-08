@@ -309,6 +309,44 @@ button {
   gap: 10px;
 }
 
+.compact-actions {
+  display: grid;
+  gap: 8px;
+  min-width: 116px;
+}
+
+.compact-actions .secondary,
+.compact-actions .danger {
+  min-height: 40px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.chip-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.chip {
+  flex: 0 0 auto;
+  min-height: 36px;
+  border-radius: 999px;
+  padding: 0 12px;
+  background: var(--input);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.chip.active {
+  color: white;
+  background: var(--selected);
+  border-color: var(--blue);
+}
+
 .search {
   position: sticky;
   top: 0;

@@ -3,6 +3,7 @@ const state = {
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
+  exerciseFilter: "all",
   selectedExerciseId: null,
   selectedSessionId: null,
   route: null
@@ -141,6 +142,27 @@ function lastCompletedExercise(exerciseId) {
     if (found) return { session, exercise: found };
   }
   return null;
+}
+
+function exerciseHistory(exerciseId) {
+  return [...storage.sessions]
+    .sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))
+    .flatMap((session) => session.completedExercises
+      .filter((exercise) => exercise.exerciseId === exerciseId)
+      .map((exercise) => ({ session, exercise })));
+}
+
+function bestWeightForExercise(exerciseId) {
+  const values = exerciseHistory(exerciseId)
+    .flatMap((item) => item.exercise.sets)
+    .map((set) => Number(set.actualWeightKg))
+    .filter((value) => Number.isFinite(value));
+  return values.length ? Math.max(...values) : null;
+}
+
+function bestVolumeForExercise(exerciseId) {
+  const values = exerciseHistory(exerciseId).map((item) => totalVolume(item.exercise));
+  return values.length ? Math.max(...values) : null;
 }
 
 function totalVolume(completedExercise) {
@@ -541,20 +563,38 @@ function renderPlans() {
 
 function renderExercises() {
   const needle = state.exerciseSearch.trim().toLowerCase();
+  const filters = [
+    ["all", "Alle"],
+    ["Brust", "Brust"],
+    ["Rücken", "Rücken"],
+    ["Beine", "Beine"],
+    ["Schulter", "Schulter"],
+    ["Core", "Core"],
+    ["lws", "LWS-freundlich"]
+  ];
   const exercises = state.seed.exercises.filter((exercise) => {
-    if (!needle) return true;
-    return `${exercise.displayName} ${exercise.aliases.join(" ")} ${exercise.primaryMuscleGroups.join(" ")}`.toLowerCase().includes(needle);
+    const haystack = `${exercise.displayName} ${exercise.aliases.join(" ")} ${exercise.primaryMuscleGroups.join(" ")} ${exercise.secondaryMuscleGroups.join(" ")} ${exercise.tags.join(" ")}`.toLowerCase();
+    const matchesSearch = !needle || haystack.includes(needle);
+    const matchesFilter = state.exerciseFilter === "all"
+      || (state.exerciseFilter === "lws" && exercise.lumbarDiscSuitability === "suitable")
+      || haystack.includes(state.exerciseFilter.toLowerCase());
+    return matchesSearch && matchesFilter;
   }).sort((a, b) => a.displayName.localeCompare(b.displayName, "de"));
   return `
     <section class="screen stack">
       <header><h1 class="title">Übungen</h1><p class="subtitle">${exercises.length} Einträge</p></header>
-      <div class="search"><input class="input" placeholder="Übung suchen" value="${htmlesc(state.exerciseSearch)}" data-search-exercise></div>
+      <div class="search stack">
+        <input class="input" placeholder="Übung suchen" value="${htmlesc(state.exerciseSearch)}" data-search-exercise>
+        <div class="chip-row">
+          ${filters.map(([id, label]) => `<button class="chip ${state.exerciseFilter === id ? "active" : ""}" data-exercise-filter="${htmlesc(id)}">${htmlesc(label)}</button>`).join("")}
+        </div>
+      </div>
       ${exercises.map((exercise) => `
         <button class="list-button" data-exercise-id="${htmlesc(exercise.id)}">
           <article class="card stack">
             <h3>${htmlesc(exercise.displayName)}</h3>
             <p class="muted">${htmlesc(exercise.primaryMuscleGroups.join(", "))} · ${htmlesc(exercise.equipment.join(", "))}</p>
-            ${lwsBadge(exercise.lumbarDiscSuitability)}
+            <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} ${bestWeightForExercise(exercise.id) ? `<span class="badge blue">Best: ${kg(bestWeightForExercise(exercise.id))}</span>` : ""}</div>
           </article>
         </button>
       `).join("")}
@@ -565,6 +605,7 @@ function renderExercises() {
 function renderExerciseDetail(id) {
   const exercise = exerciseById(id);
   const last = lastCompletedExercise(id);
+  const history = exerciseHistory(id);
   const alternatives = exercise.alternatives.map(exerciseById).filter(Boolean);
   return `
     <section class="screen stack">
@@ -576,9 +617,25 @@ function renderExerciseDetail(id) {
         ${lwsBadge(exercise.lumbarDiscSuitability)}
       </article>
       ${exerciseIsCritical(exercise) ? `<article class="card warning">${lwsWarning(exercise)}</article>` : ""}
+      <div class="grid">
+        ${metric(kg(bestWeightForExercise(id)), "Bestgewicht")}
+        ${metric(bestVolumeForExercise(id) ? `${Math.round(bestVolumeForExercise(id))} kg` : "-", "Bestes Volumen")}
+      </div>
       <article class="card stack"><h3>Ausführung</h3><p class="muted">${htmlesc(exercise.techniqueNotes || "Keine Technikhinweise hinterlegt.")}</p></article>
       <article class="card stack"><h3>Häufige Fehler</h3><ul class="small-list">${exercise.commonMistakes.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul></article>
       <article class="card stack"><h3>Letzte Leistung</h3>${last ? `<p class="muted">Letztes Mal am ${dateText(last.session.endedAt || last.session.startedAt)}</p><ul class="small-list">${last.exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}</li>`).join("")}</ul>` : `<p class="muted">Noch keine vorherige Leistung vorhanden.</p>`}</article>
+      <article class="card stack">
+        <h3>Verlauf</h3>
+        ${history.length ? history.slice(0, 3).map((item) => `
+          <div class="history-row">
+            <div>
+              <strong>${dateText(item.session.startedAt)}</strong>
+              <p class="muted">${item.exercise.sets.map((set) => `${kg(set.actualWeightKg)} x ${set.actualReps || "-"}`).join(" · ")}</p>
+            </div>
+            <span class="badge blue">${Math.round(totalVolume(item.exercise))} kg</span>
+          </div>
+        `).join("") : `<p class="muted">Noch kein Verlauf gespeichert.</p>`}
+      </article>
       <article class="card stack"><h3>Alternativen</h3>${alternatives.length ? alternatives.map((item) => `<p>${htmlesc(item.displayName)}</p>`).join("") : `<p class="muted">Keine Alternativen hinterlegt.</p>`}</article>
     </section>
   `;
@@ -603,7 +660,10 @@ function renderWeight() {
       ${entries.length ? entries.map((entry) => `
         <article class="card row">
           <div class="grow"><h3>${kg(entry.weightKg)}</h3><p class="muted">${dateText(entry.date)}</p></div>
-          <button class="danger" style="width:auto" data-delete-weight="${htmlesc(entry.id)}">Löschen</button>
+          <div class="compact-actions">
+            <button class="secondary" data-edit-weight="${htmlesc(entry.id)}">Bearbeiten</button>
+            <button class="danger" data-delete-weight="${htmlesc(entry.id)}">Löschen</button>
+          </div>
         </article>
       `).join("") : `<article class="card"><p class="muted">Noch kein Gewicht eingetragen.</p></article>`}
     </section>
@@ -796,6 +856,13 @@ function bindEvents() {
     render();
   });
 
+  document.querySelectorAll("[data-exercise-filter]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.exerciseFilter = button.dataset.exerciseFilter;
+      render();
+    });
+  });
+
   document.querySelectorAll("[data-exercise-id]").forEach((button) => {
     button.addEventListener("click", () => {
       state.selectedExerciseId = button.dataset.exerciseId;
@@ -849,6 +916,22 @@ function bindEvents() {
   document.querySelectorAll("[data-delete-weight]").forEach((button) => {
     button.addEventListener("click", () => {
       storage.weights = storage.weights.filter((entry) => entry.id !== button.dataset.deleteWeight);
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-edit-weight]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const entry = storage.weights.find((item) => item.id === button.dataset.editWeight);
+      if (!entry) return;
+      const value = prompt("Gewicht bearbeiten", String(entry.weightKg).replace(".", ","));
+      if (value === null) return;
+      const parsed = parseNumber(value);
+      if (!parsed || parsed <= 0) {
+        alert("Bitte gültiges Gewicht eingeben.");
+        return;
+      }
+      storage.weights = storage.weights.map((item) => item.id === entry.id ? { ...item, weightKg: parsed } : item);
       render();
     });
   });
