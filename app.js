@@ -4,6 +4,7 @@ const state = {
   activeWorkout: null,
   exerciseSearch: "",
   selectedExerciseId: null,
+  selectedSessionId: null,
   route: null
 };
 
@@ -113,6 +114,41 @@ function totalVolume(completedExercise) {
   return completedExercise.sets.reduce((sum, set) => sum + (Number(set.actualWeightKg) || 0) * (Number(set.actualReps) || 0), 0);
 }
 
+function sessionById(id) {
+  return storage.sessions.find((session) => session.id === id) || null;
+}
+
+function sessionVolume(session) {
+  return session.completedExercises.reduce((sum, exercise) => sum + totalVolume(exercise), 0);
+}
+
+function sessionSetCount(session) {
+  return session.completedExercises.reduce((sum, exercise) => sum + exercise.sets.length, 0);
+}
+
+function sessionDurationMinutes(session) {
+  const started = new Date(session.startedAt);
+  const ended = new Date(session.endedAt || session.startedAt);
+  return Math.max(1, Math.round((ended - started) / 60000));
+}
+
+function upperRepTarget(text) {
+  const numbers = String(text || "").match(/\d+/g)?.map(Number) || [];
+  return numbers.length ? Math.max(...numbers) : null;
+}
+
+function progressionHint(exercise, plannedReps, previousSets) {
+  if (exerciseIsCritical(exercise)) {
+    return "Nur schmerzfrei ausführen oder Alternative wählen.";
+  }
+  const target = upperRepTarget(plannedReps);
+  if (!target || !previousSets?.length) {
+    return "Sauber arbeiten und moderat starten.";
+  }
+  const allReached = previousSets.every((set) => Number(set.actualReps || 0) >= target);
+  return allReached ? "Letztes Mal Ziel erreicht. Beim nächsten Mal leicht steigern." : "Gewicht beibehalten und Technik priorisieren.";
+}
+
 function lwsBadge(value) {
   const map = {
     suitable: ["LWS geeignet", "green"],
@@ -138,6 +174,7 @@ function renderRoute() {
   if (!state.seed) return `<section class="screen"><h1 class="title">D-Coach</h1><p class="subtitle">Lade Daten...</p></section>`;
   if (state.activeWorkout) return renderWorkout();
   if (state.selectedExerciseId) return renderExerciseDetail(state.selectedExerciseId);
+  if (state.selectedSessionId) return renderSessionDetail(state.selectedSessionId);
   switch (state.tab) {
     case "training": return renderTraining();
     case "plans": return renderPlans();
@@ -154,9 +191,10 @@ function renderTabs() {
     ["training", "Training"],
     ["plans", "Pläne"],
     ["exercises", "Übungen"],
-    ["weight", "Gewicht"]
+    ["weight", "Gewicht"],
+    ["settings", "Setup"]
   ];
-  return `<nav class="tabs">${tabs.map(([id, label]) => `<button class="tab ${state.tab === id && !state.activeWorkout && !state.selectedExerciseId ? "active" : ""}" data-tab="${id}">${label}</button>`).join("")}</nav>`;
+  return `<nav class="tabs">${tabs.map(([id, label]) => `<button class="tab ${state.tab === id && !state.activeWorkout && !state.selectedExerciseId && !state.selectedSessionId ? "active" : ""}" data-tab="${id}">${label}</button>`).join("")}</nav>`;
 }
 
 function renderDashboard() {
@@ -164,6 +202,7 @@ function renderDashboard() {
   const latestWeight = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
   const session = lastSession();
   const nextDay = plan?.days?.[0]?.name || "-";
+  const latestSessions = [...storage.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).slice(0, 3);
   return `
     <section class="screen stack">
       <header><h1 class="title">D-Coach</h1><p class="subtitle">Heute sauber trainieren.</p></header>
@@ -182,6 +221,20 @@ function renderDashboard() {
       <article class="card">
         <h3>Hinweis</h3>
         <p class="muted">Bewerte nicht einzelne Tageswerte. Gewicht und Training zählen als Trend.</p>
+      </article>
+      <article class="card stack">
+        <h3>Letzte Trainings</h3>
+        ${latestSessions.length ? latestSessions.map((item) => `
+          <button class="list-button" data-session-id="${htmlesc(item.id)}">
+            <div class="history-row">
+              <div>
+                <strong>${htmlesc(item.dayName)}</strong>
+                <p class="muted">${dateText(item.startedAt)} · ${item.completedExercises.length} Übungen · ${sessionSetCount(item)} Sätze</p>
+              </div>
+              <span class="badge blue">${Math.round(sessionVolume(item))} kg</span>
+            </div>
+          </button>
+        `).join("") : `<p class="muted">Noch kein Training gespeichert.</p>`}
       </article>
     </section>
   `;
@@ -255,6 +308,7 @@ function renderWorkout() {
   const exercise = exerciseById(entry.exerciseId);
   const last = lastCompletedExercise(entry.exerciseId);
   const progress = Math.round(((workout.index + 1) / workout.entries.length) * 100);
+  const hint = progressionHint(exercise, entry.reps, last?.exercise?.sets || []);
   return `
     <section class="screen stack">
       <header>
@@ -275,6 +329,7 @@ function renderWorkout() {
           <ul class="small-list">${last.exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}</li>`).join("")}</ul>
           <p class="green">Volumen: ${Math.round(totalVolume(last.exercise) * 10) / 10} kg</p>
         ` : `<p class="muted">Noch keine vorherige Leistung vorhanden. Starte moderat.</p>`}
+        <div class="card info-card">${htmlesc(hint)}</div>
       </article>
       <article class="card stack">
         <div class="row"><h3 class="grow">Sätze</h3><span class="quiet">kg · Wdh. · RIR</span></div>
@@ -368,9 +423,45 @@ function finishOrNext() {
   };
   storage.sessions = [...storage.sessions, session];
   state.activeWorkout = null;
+  state.selectedSessionId = session.id;
   state.tab = "dashboard";
-  alert("Training gespeichert. Beim nächsten Training wird die letzte Leistung angezeigt.");
   render();
+}
+
+function renderSessionDetail(id) {
+  const session = sessionById(id);
+  if (!session) {
+    return `
+      <section class="screen stack">
+        <button class="secondary" data-back-dashboard>Zurück</button>
+        <article class="card"><p class="muted">Training nicht gefunden.</p></article>
+      </section>
+    `;
+  }
+  return `
+    <section class="screen stack">
+      <button class="secondary" data-back-dashboard>Zurück</button>
+      <header>
+        <h1 class="title">Auswertung</h1>
+        <p class="subtitle">${htmlesc(session.dayName)} · ${dateText(session.startedAt)}</p>
+      </header>
+      <div class="grid">
+        ${metric(String(sessionDurationMinutes(session)), "Minuten")}
+        ${metric(String(session.completedExercises.length), "Übungen")}
+        ${metric(String(sessionSetCount(session)), "Sätze")}
+        ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
+      </div>
+      ${session.completedExercises.sort((a, b) => a.sortOrder - b.sortOrder).map((exercise) => `
+        <article class="card stack">
+          <h3>${htmlesc(exercise.exerciseNameSnapshot)}</h3>
+          <ul class="small-list">
+            ${exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}${set.rir !== null && set.rir !== undefined ? ` · RIR ${set.rir}` : ""}</li>`).join("")}
+          </ul>
+          <p class="green">Volumen: ${Math.round(totalVolume(exercise))} kg</p>
+        </article>
+      `).join("")}
+    </section>
+  `;
 }
 
 function renderPlans() {
@@ -559,6 +650,7 @@ function bindEvents() {
       state.tab = button.dataset.tab;
       state.activeWorkout = null;
       state.selectedExerciseId = null;
+      state.selectedSessionId = null;
       render();
     });
   });
@@ -614,6 +706,20 @@ function bindEvents() {
   document.querySelector("[data-back-exercises]")?.addEventListener("click", () => {
     state.selectedExerciseId = null;
     state.tab = "exercises";
+    render();
+  });
+
+  document.querySelectorAll("[data-session-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedSessionId = button.dataset.sessionId;
+      state.selectedExerciseId = null;
+      render();
+    });
+  });
+
+  document.querySelector("[data-back-dashboard]")?.addEventListener("click", () => {
+    state.selectedSessionId = null;
+    state.tab = "dashboard";
     render();
   });
 

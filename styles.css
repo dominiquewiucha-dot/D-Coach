@@ -176,6 +176,25 @@ button {
   color: #fde68a;
 }
 
+.info-card {
+  border-color: var(--blue);
+  background: rgba(37,99,235,.12);
+  color: #bfdbfe;
+}
+
+.history-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.history-row:first-child {
+  border-top: 0;
+}
+
 .tabs {
   position: fixed;
   left: 0;
@@ -183,7 +202,7 @@ button {
   bottom: 0;
   z-index: 10;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 4px;
   padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
   background: rgba(7,10,15,.96);
@@ -196,7 +215,7 @@ button {
   border-radius: 12px;
   color: var(--quiet);
   background: transparent;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
 }
 
