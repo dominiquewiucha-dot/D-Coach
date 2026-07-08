@@ -6,6 +6,11 @@ const state = {
   exerciseFilter: "all",
   selectedExerciseId: null,
   selectedSessionId: null,
+  showAlternatives: false,
+  restTimer: {
+    remaining: 0,
+    running: false
+  },
   route: null
 };
 
@@ -63,7 +68,33 @@ async function boot() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
   }
+  startTimerLoop();
   render();
+}
+
+function startTimerLoop() {
+  if (window.dcoachTimerLoop) return;
+  window.dcoachTimerLoop = window.setInterval(() => {
+    if (!state.restTimer.running || state.restTimer.remaining <= 0) return;
+    state.restTimer.remaining -= 1;
+    if (state.restTimer.remaining <= 0) {
+      state.restTimer.remaining = 0;
+      state.restTimer.running = false;
+    }
+    if (state.activeWorkout) render();
+  }, 1000);
+}
+
+function startRestTimer(seconds) {
+  state.restTimer.remaining = Math.max(0, Number(seconds) || 0);
+  state.restTimer.running = state.restTimer.remaining > 0;
+}
+
+function restTimeText(seconds) {
+  const safe = Math.max(0, Number(seconds) || 0);
+  const minutes = Math.floor(safe / 60);
+  const rest = String(safe % 60).padStart(2, "0");
+  return `${minutes}:${rest}`;
 }
 
 function activePlan() {
@@ -336,6 +367,9 @@ function lastDayDate(dayName) {
 function startDay(dayName) {
   const plan = activePlan();
   const day = plan.days.find((item) => item.name === dayName);
+  state.showAlternatives = false;
+  state.restTimer.remaining = 0;
+  state.restTimer.running = false;
   state.activeWorkout = {
     planName: plan.planName,
     dayName: day.name,
@@ -372,6 +406,7 @@ function renderWorkout() {
   const last = lastCompletedExercise(entry.exerciseId);
   const progress = Math.round(((workout.index + 1) / workout.entries.length) * 100);
   const hint = progressionHint(exercise, entry.reps, last?.exercise?.sets || []);
+  const alternatives = exercise.alternatives.map(exerciseById).filter(Boolean);
   return `
     <section class="screen stack">
       <header>
@@ -398,12 +433,48 @@ function renderWorkout() {
         <div class="row"><h3 class="grow">Sätze</h3><span class="quiet">kg · Wdh. · RIR</span></div>
         ${entry.sets.map((set, index) => renderSetRow(set, index)).join("")}
       </article>
+      ${state.restTimer.remaining > 0 || state.restTimer.running ? renderRestTimer() : ""}
+      ${state.showAlternatives ? renderAlternativePicker(alternatives) : ""}
       <div class="actions">
-        <button class="secondary" data-alternatives>Alternative anzeigen</button>
+        <button class="secondary" data-toggle-alternatives>${state.showAlternatives ? "Alternativen ausblenden" : "Alternative anzeigen"}</button>
         <button class="primary" data-next-exercise>${workout.index < workout.entries.length - 1 ? "Nächste Übung" : "Training speichern"}</button>
         <button class="secondary" data-cancel-workout>Training abbrechen</button>
       </div>
     </section>
+  `;
+}
+
+function renderRestTimer() {
+  return `
+    <article class="card timer-card">
+      <div>
+        <p class="muted">Pause</p>
+        <strong>${restTimeText(state.restTimer.remaining)}</strong>
+      </div>
+      <div class="timer-actions">
+        <button class="secondary" data-pause-timer>${state.restTimer.running ? "Stop" : "Start"}</button>
+        <button class="secondary" data-reset-timer>Reset</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderAlternativePicker(alternatives) {
+  return `
+    <article class="card stack">
+      <h3>Alternativen</h3>
+      ${alternatives.length ? alternatives.map((item) => `
+        <button class="list-button" data-select-alternative="${htmlesc(item.id)}">
+          <div class="history-row">
+            <div>
+              <strong>${htmlesc(item.displayName)}</strong>
+              <p class="muted">${htmlesc(item.primaryMuscleGroups.join(", "))} · ${htmlesc(item.equipment.join(", "))}</p>
+            </div>
+            ${lwsBadge(item.lumbarDiscSuitability)}
+          </div>
+        </button>
+      `).join("") : `<p class="muted">Keine Alternative hinterlegt.</p>`}
+    </article>
   `;
 }
 
@@ -429,18 +500,10 @@ function lwsWarning(exercise) {
   return htmlesc(text);
 }
 
-function showAlternatives() {
+function selectAlternative(exerciseId) {
   const workout = state.activeWorkout;
   const entry = workout.entries[workout.index];
-  const exercise = exerciseById(entry.exerciseId);
-  const alternatives = exercise.alternatives.map(exerciseById).filter(Boolean);
-  if (!alternatives.length) {
-    alert("Keine Alternative hinterlegt.");
-    return;
-  }
-  const labels = alternatives.map((item, index) => `${index + 1}. ${item.displayName}`).join("\n");
-  const choice = prompt(`Alternative wählen:\n${labels}`);
-  const selected = alternatives[Number(choice) - 1];
+  const selected = exerciseById(exerciseId);
   if (!selected) return;
   entry.exerciseId = selected.id;
   const last = lastCompletedExercise(selected.id);
@@ -451,6 +514,7 @@ function showAlternatives() {
     set.rirText = "";
     set.completed = false;
   });
+  state.showAlternatives = false;
   render();
 }
 
@@ -458,6 +522,9 @@ function finishOrNext() {
   const workout = state.activeWorkout;
   if (workout.index < workout.entries.length - 1) {
     workout.index += 1;
+    state.showAlternatives = false;
+    state.restTimer.remaining = 0;
+    state.restTimer.running = false;
     render();
     return;
   }
@@ -486,6 +553,9 @@ function finishOrNext() {
   };
   storage.sessions = [...storage.sessions, session];
   state.activeWorkout = null;
+  state.showAlternatives = false;
+  state.restTimer.remaining = 0;
+  state.restTimer.running = false;
   state.selectedSessionId = session.id;
   state.tab = "dashboard";
   render();
@@ -795,15 +865,34 @@ function bindEvents() {
       const entry = state.activeWorkout.entries[state.activeWorkout.index];
       const set = entry.sets[Number(button.dataset.checkSet)];
       set.completed = !set.completed;
+      if (set.completed) startRestTimer(entry.restSeconds);
       render();
     });
   });
 
   document.querySelector("[data-next-exercise]")?.addEventListener("click", finishOrNext);
-  document.querySelector("[data-alternatives]")?.addEventListener("click", showAlternatives);
+  document.querySelector("[data-toggle-alternatives]")?.addEventListener("click", () => {
+    state.showAlternatives = !state.showAlternatives;
+    render();
+  });
+  document.querySelectorAll("[data-select-alternative]").forEach((button) => {
+    button.addEventListener("click", () => selectAlternative(button.dataset.selectAlternative));
+  });
+  document.querySelector("[data-pause-timer]")?.addEventListener("click", () => {
+    state.restTimer.running = !state.restTimer.running;
+    render();
+  });
+  document.querySelector("[data-reset-timer]")?.addEventListener("click", () => {
+    const entry = state.activeWorkout.entries[state.activeWorkout.index];
+    startRestTimer(entry.restSeconds);
+    render();
+  });
   document.querySelector("[data-cancel-workout]")?.addEventListener("click", () => {
     if (confirm("Training wirklich abbrechen?")) {
       state.activeWorkout = null;
+      state.showAlternatives = false;
+      state.restTimer.remaining = 0;
+      state.restTimer.running = false;
       render();
     }
   });

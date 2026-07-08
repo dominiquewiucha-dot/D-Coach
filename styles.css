@@ -195,6 +195,34 @@ button {
   border-top: 0;
 }
 
+.timer-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-color: var(--blue);
+  background: rgba(37,99,235,.12);
+}
+
+.timer-card strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.timer-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  min-width: 150px;
+}
+
+.timer-actions .secondary {
+  min-height: 42px;
+  padding: 0 10px;
+}
+
 .tabs {
   position: fixed;
   left: 0;
