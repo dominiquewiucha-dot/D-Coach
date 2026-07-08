@@ -1,0 +1,1639 @@
+{
+  "seedVersion": "1.1",
+  "app": "D-Coach",
+  "locale": "de-DE",
+  "description": "Komplette MVP-Seed-Datenbank für D-Coach: Übungen, LWS-Bewertung, Alternativen und 3er-Split Wiedereinstieg.",
+  "exercises": [
+    {
+      "id": "ex_chest_press_machine",
+      "displayName": "Brustpresse Maschine",
+      "aliases": [
+        "Brustpresse",
+        "Chest Press",
+        "Maschinenbankdrücken"
+      ],
+      "primaryMuscleGroups": [
+        "Brust"
+      ],
+      "secondaryMuscleGroups": [
+        "vordere Schulter",
+        "Trizeps"
+      ],
+      "movementPattern": "Horizontal Push",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Grundübung",
+      "difficulty": "einfach",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "techniqueNotes": "Schulterblätter stabil, Rücken am Polster, kontrolliert drücken.",
+      "commonMistakes": [
+        "Schultern nach vorne fallen lassen",
+        "zu kurze Bewegungsamplitude"
+      ],
+      "tags": [
+        "push",
+        "brust",
+        "maschine",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_incline_chest_press_machine",
+        "ex_dumbbell_bench_press",
+        "ex_cable_fly"
+      ]
+    },
+    {
+      "id": "ex_incline_chest_press_machine",
+      "displayName": "Schrägbank Brustpresse Maschine",
+      "aliases": [
+        "Schrägbank Maschine",
+        "Incline Chest Press"
+      ],
+      "primaryMuscleGroups": [
+        "Brust"
+      ],
+      "secondaryMuscleGroups": [
+        "vordere Schulter",
+        "Trizeps"
+      ],
+      "movementPattern": "Horizontal Push",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Grundübung",
+      "difficulty": "einfach",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "techniqueNotes": "Sitz so einstellen, dass die Griffe etwa auf oberer Brusthöhe starten.",
+      "commonMistakes": [
+        "zu hohe Griffposition",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "push",
+        "brust",
+        "maschine",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_chest_press_machine",
+        "ex_dumbbell_incline_press",
+        "ex_cable_fly"
+      ]
+    },
+    {
+      "id": "ex_dumbbell_bench_press",
+      "displayName": "Kurzhantel Bankdrücken",
+      "aliases": [
+        "KH Bankdrücken",
+        "Dumbbell Bench Press"
+      ],
+      "primaryMuscleGroups": [
+        "Brust"
+      ],
+      "secondaryMuscleGroups": [
+        "vordere Schulter",
+        "Trizeps"
+      ],
+      "movementPattern": "Horizontal Push",
+      "equipment": [
+        "Kurzhantel",
+        "Bank"
+      ],
+      "category": "Grundübung",
+      "difficulty": "mittel",
+      "spineLoadLevel": "medium",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 120,
+      "techniqueNotes": "Füße stabil, Schulterblätter zurück, Kurzhanteln kontrolliert führen.",
+      "commonMistakes": [
+        "zu starkes Hohlkreuz",
+        "Kurzhanteln kollidieren oben"
+      ],
+      "tags": [
+        "push",
+        "brust",
+        "kurzhantel"
+      ],
+      "alternatives": [
+        "ex_chest_press_machine",
+        "ex_incline_chest_press_machine"
+      ]
+    },
+    {
+      "id": "ex_dumbbell_incline_press",
+      "displayName": "Kurzhantel Schrägbankdrücken",
+      "aliases": [
+        "KH Schrägbankdrücken",
+        "Incline Dumbbell Press"
+      ],
+      "primaryMuscleGroups": [
+        "Brust"
+      ],
+      "secondaryMuscleGroups": [
+        "vordere Schulter",
+        "Trizeps"
+      ],
+      "movementPattern": "Horizontal Push",
+      "equipment": [
+        "Kurzhantel",
+        "Bank"
+      ],
+      "category": "Grundübung",
+      "difficulty": "mittel",
+      "spineLoadLevel": "medium",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 120,
+      "techniqueNotes": "Bank moderat einstellen, Schulterblätter stabil halten.",
+      "commonMistakes": [
+        "Bank zu steil",
+        "Schultern dominieren"
+      ],
+      "tags": [
+        "push",
+        "brust",
+        "kurzhantel"
+      ],
+      "alternatives": [
+        "ex_incline_chest_press_machine",
+        "ex_chest_press_machine"
+      ]
+    },
+    {
+      "id": "ex_shoulder_press_machine",
+      "displayName": "Schulterpresse Maschine",
+      "aliases": [
+        "Shoulder Press",
+        "Schulterdrücken Maschine"
+      ],
+      "primaryMuscleGroups": [
+        "vordere Schulter"
+      ],
+      "secondaryMuscleGroups": [
+        "seitliche Schulter",
+        "Trizeps"
+      ],
+      "movementPattern": "Vertical Push",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Grundübung",
+      "difficulty": "einfach",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "techniqueNotes": "Rücken am Polster lassen, nicht ins Hohlkreuz ausweichen.",
+      "commonMistakes": [
+        "Rücken überstrecken",
+        "Gewicht zu schwer"
+      ],
+      "tags": [
+        "push",
+        "schulter",
+        "maschine",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_lateral_raise",
+        "ex_cable_lateral_raise"
+      ]
+    },
+    {
+      "id": "ex_lateral_raise",
+      "displayName": "Seitheben",
+      "aliases": [
+        "Lateral Raise",
+        "Kurzhantel Seitheben"
+      ],
+      "primaryMuscleGroups": [
+        "seitliche Schulter"
+      ],
+      "secondaryMuscleGroups": [
+        "Trapez"
+      ],
+      "movementPattern": "Isolation",
+      "equipment": [
+        "Kurzhantel"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 60,
+      "techniqueNotes": "Leicht gebeugte Arme, kontrolliert bis Schulterhöhe.",
+      "commonMistakes": [
+        "Schwung holen",
+        "Schultern hochziehen"
+      ],
+      "tags": [
+        "push",
+        "schulter",
+        "isolation",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_cable_lateral_raise",
+        "ex_shoulder_press_machine"
+      ]
+    },
+    {
+      "id": "ex_cable_lateral_raise",
+      "displayName": "Seitheben am Kabel",
+      "aliases": [
+        "Cable Lateral Raise"
+      ],
+      "primaryMuscleGroups": [
+        "seitliche Schulter"
+      ],
+      "secondaryMuscleGroups": [
+        "Trapez"
+      ],
+      "movementPattern": "Isolation",
+      "equipment": [
+        "Kabelzug"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 60,
+      "techniqueNotes": "Kabel tief einstellen, Spannung konstant halten.",
+      "commonMistakes": [
+        "Oberkörper verdrehen",
+        "zu schwer wählen"
+      ],
+      "tags": [
+        "push",
+        "schulter",
+        "kabelzug",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_lateral_raise"
+      ]
+    },
+    {
+      "id": "ex_cable_fly",
+      "displayName": "Kabel-Flys",
+      "aliases": [
+        "Cable Fly",
+        "Kabelzug Fliegende"
+      ],
+      "primaryMuscleGroups": [
+        "Brust"
+      ],
+      "secondaryMuscleGroups": [
+        "vordere Schulter"
+      ],
+      "movementPattern": "Isolation",
+      "equipment": [
+        "Kabelzug"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 60,
+      "techniqueNotes": "Brust bewusst anspannen, Ellenbogen leicht gebeugt lassen.",
+      "commonMistakes": [
+        "zu viel Schulterbewegung",
+        "zu schwer"
+      ],
+      "tags": [
+        "push",
+        "brust",
+        "kabelzug",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_chest_press_machine",
+        "ex_pec_deck"
+      ]
+    },
+    {
+      "id": "ex_pec_deck",
+      "displayName": "Pec Deck",
+      "aliases": [
+        "Butterfly Maschine",
+        "Pec Fly"
+      ],
+      "primaryMuscleGroups": [
+        "Brust"
+      ],
+      "secondaryMuscleGroups": [
+        "vordere Schulter"
+      ],
+      "movementPattern": "Isolation",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 60,
+      "techniqueNotes": "Rücken am Polster, Brust aktiv zusammenführen.",
+      "commonMistakes": [
+        "zu weit nach hinten starten",
+        "Schultern hochziehen"
+      ],
+      "tags": [
+        "push",
+        "brust",
+        "maschine"
+      ],
+      "alternatives": [
+        "ex_cable_fly",
+        "ex_chest_press_machine"
+      ]
+    },
+    {
+      "id": "ex_triceps_pushdown",
+      "displayName": "Trizepsdrücken Kabel",
+      "aliases": [
+        "Pushdown",
+        "Trizeps Pushdown"
+      ],
+      "primaryMuscleGroups": [
+        "Trizeps"
+      ],
+      "secondaryMuscleGroups": [],
+      "movementPattern": "Isolation",
+      "equipment": [
+        "Kabelzug"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 60,
+      "techniqueNotes": "Ellenbogen nah am Körper, nur Unterarme bewegen.",
+      "commonMistakes": [
+        "Oberkörper mitbewegen",
+        "Ellenbogen wandern"
+      ],
+      "tags": [
+        "push",
+        "trizeps",
+        "kabelzug",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_overhead_triceps_extension"
+      ]
+    },
+    {
+      "id": "ex_overhead_triceps_extension",
+      "displayName": "Überkopf Trizepsdrücken Kabel",
+      "aliases": [
+        "Overhead Triceps Extension"
+      ],
+      "primaryMuscleGroups": [
+        "Trizeps"
+      ],
+      "secondaryMuscleGroups": [],
+      "movementPattern": "Isolation",
+      "equipment": [
+        "Kabelzug"
+      ],
+      "category": "Isolation",
+      "difficulty": "mittel",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 60,
+      "techniqueNotes": "Rumpf stabil, Rippen unten halten, nicht ins Hohlkreuz fallen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Ellenbogen zu weit außen"
+      ],
+      "tags": [
+        "push",
+        "trizeps"
+      ],
+      "alternatives": [
+        "ex_triceps_pushdown"
+      ]
+    },
+    {
+      "id": "ex_lat_pulldown",
+      "displayName": "Latziehen",
+      "aliases": [
+        "Latzug",
+        "Pulldown",
+        "Lat Pulldown"
+      ],
+      "primaryMuscleGroups": [
+        "Latissimus"
+      ],
+      "secondaryMuscleGroups": [
+        "Bizeps",
+        "oberer Rücken"
+      ],
+      "movementPattern": "Vertical Pull",
+      "equipment": [
+        "Kabelzug",
+        "Maschine"
+      ],
+      "category": "Grundübung",
+      "difficulty": "einfach",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "techniqueNotes": "Brust leicht raus, Ellbogen nach unten ziehen.",
+      "commonMistakes": [
+        "Schwung aus dem Rücken",
+        "Nacken ziehen"
+      ],
+      "tags": [
+        "pull",
+        "rücken",
+        "lat",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_assisted_pullup",
+        "ex_seated_row"
+      ]
+    },
+    {
+      "id": "ex_assisted_pullup",
+      "displayName": "Unterstützte Klimmzüge",
+      "aliases": [
+        "Assisted Pull-up",
+        "Klimmzug Maschine"
+      ],
+      "primaryMuscleGroups": [
+        "Latissimus"
+      ],
+      "secondaryMuscleGroups": [
+        "Bizeps",
+        "oberer Rücken"
+      ],
+      "movementPattern": "Vertical Pull",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Grundübung",
+      "difficulty": "mittel",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 120,
+      "techniqueNotes": "Kontrollierte volle Wiederholungen, Schulterblätter aktiv.",
+      "commonMistakes": [
+        "nur halbe Wiederholungen",
+        "Schwung"
+      ],
+      "tags": [
+        "pull",
+        "rücken",
+        "lat"
+      ],
+      "alternatives": [
+        "ex_lat_pulldown"
+      ]
+    },
+    {
+      "id": "ex_seated_row",
+      "displayName": "Rudern sitzend",
+      "aliases": [
+        "Kabelrudern",
+        "Seated Row"
+      ],
+      "primaryMuscleGroups": [
+        "oberer Rücken"
+      ],
+      "secondaryMuscleGroups": [
+        "Latissimus",
+        "Bizeps",
+        "hintere Schulter"
+      ],
+      "movementPattern": "Horizontal Pull",
+      "equipment": [
+        "Kabelzug",
+        "Maschine"
+      ],
+      "category": "Grundübung",
+      "difficulty": "einfach",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "techniqueNotes": "Oberkörper stabil, Griff zum Bauch ziehen.",
+      "commonMistakes": [
+        "Rundrücken",
+        "Schwung"
+      ],
+      "tags": [
+        "pull",
+        "rücken",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_chest_supported_row",
+        "ex_machine_row"
+      ]
+    },
+    {
+      "id": "ex_machine_row",
+      "displayName": "Rudermaschine",
+      "aliases": [
+        "Machine Row"
+      ],
+      "primaryMuscleGroups": [
+        "oberer Rücken"
+      ],
+      "secondaryMuscleGroups": [
+        "Latissimus",
+        "Bizeps"
+      ],
+      "movementPattern": "Horizontal Pull",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Grundübung",
+      "difficulty": "einfach",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "techniqueNotes": "Brustpolster nutzen, Schulterblätter zurückziehen.",
+      "commonMistakes": [
+        "Schulter hochziehen",
+        "zu kurze ROM"
+      ],
+      "tags": [
+        "pull",
+        "rücken",
+        "maschine"
+      ],
+      "alternatives": [
+        "ex_chest_supported_row",
+        "ex_seated_row"
+      ]
+    },
+    {
+      "id": "ex_chest_supported_row",
+      "displayName": "Brustgestütztes Rudern",
+      "aliases": [
+        "Chest Supported Row",
+        "Rudern brustgestützt"
+      ],
+      "primaryMuscleGroups": [
+        "oberer Rücken"
+      ],
+      "secondaryMuscleGroups": [
+        "Latissimus",
+        "hintere Schulter",
+        "Bizeps"
+      ],
+      "movementPattern": "Horizontal Pull",
+      "equipment": [
+        "Maschine",
+        "Kurzhantel",
+        "Bank"
+      ],
+      "category": "Grundübung",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "techniqueNotes": "Brust bleibt auf dem Polster, kein Schwung aus der LWS.",
+      "commonMistakes": [
+        "Kopf überstrecken",
+        "Gewicht reißen"
+      ],
+      "tags": [
+        "pull",
+        "rücken",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_machine_row",
+        "ex_seated_row"
+      ]
+    },
+    {
+      "id": "ex_reverse_pec_deck",
+      "displayName": "Reverse Butterfly",
+      "aliases": [
+        "Reverse Pec Deck",
+        "Reverse Fly Maschine"
+      ],
+      "primaryMuscleGroups": [
+        "hintere Schulter"
+      ],
+      "secondaryMuscleGroups": [
+        "oberer Rücken",
+        "Trapez"
+      ],
+      "movementPattern": "Horizontal Pull",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "12-15",
+      "defaultRestSeconds": 60,
+      "techniqueNotes": "Arme leicht gebeugt, hintere Schulter bewusst führen.",
+      "commonMistakes": [
+        "zu schwer",
+        "Trapez dominiert"
+      ],
+      "tags": [
+        "pull",
+        "hintere schulter",
+        "maschine"
+      ],
+      "alternatives": [
+        "ex_face_pull"
+      ]
+    },
+    {
+      "id": "ex_face_pull",
+      "displayName": "Face Pulls",
+      "aliases": [
+        "Face Pull"
+      ],
+      "primaryMuscleGroups": [
+        "hintere Schulter"
+      ],
+      "secondaryMuscleGroups": [
+        "oberer Rücken",
+        "Trapez"
+      ],
+      "movementPattern": "Horizontal Pull",
+      "equipment": [
+        "Kabelzug"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 60,
+      "techniqueNotes": "Seil Richtung Gesicht ziehen, Ellenbogen hoch, kontrolliert.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "zu schwer"
+      ],
+      "tags": [
+        "pull",
+        "hintere schulter",
+        "kabelzug"
+      ],
+      "alternatives": [
+        "ex_reverse_pec_deck"
+      ]
+    },
+    {
+      "id": "ex_cable_biceps_curl",
+      "displayName": "Bizepscurls Kabel",
+      "aliases": [
+        "Cable Curl",
+        "Kabelcurl"
+      ],
+      "primaryMuscleGroups": [
+        "Bizeps"
+      ],
+      "secondaryMuscleGroups": [
+        "Unterarme"
+      ],
+      "movementPattern": "Isolation",
+      "equipment": [
+        "Kabelzug"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 60,
+      "techniqueNotes": "Ellenbogen ruhig halten, volle Kontrolle.",
+      "commonMistakes": [
+        "Schwung",
+        "Ellenbogen wandern"
+      ],
+      "tags": [
+        "pull",
+        "bizeps",
+        "kabelzug"
+      ],
+      "alternatives": [
+        "ex_dumbbell_biceps_curl"
+      ]
+    },
+    {
+      "id": "ex_dumbbell_biceps_curl",
+      "displayName": "Kurzhantel Bizepscurls",
+      "aliases": [
+        "Dumbbell Curl",
+        "KH Curl"
+      ],
+      "primaryMuscleGroups": [
+        "Bizeps"
+      ],
+      "secondaryMuscleGroups": [
+        "Unterarme"
+      ],
+      "movementPattern": "Isolation",
+      "equipment": [
+        "Kurzhantel"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 60,
+      "techniqueNotes": "Aufrecht stehen oder sitzen, kein Schwung.",
+      "commonMistakes": [
+        "Rücken mitbewegen",
+        "zu schwer"
+      ],
+      "tags": [
+        "pull",
+        "bizeps"
+      ],
+      "alternatives": [
+        "ex_cable_biceps_curl"
+      ]
+    },
+    {
+      "id": "ex_leg_press",
+      "displayName": "Beinpresse",
+      "aliases": [
+        "Leg Press",
+        "45 Grad Beinpresse"
+      ],
+      "primaryMuscleGroups": [
+        "Quadrizeps"
+      ],
+      "secondaryMuscleGroups": [
+        "Gesäß",
+        "Beinbeuger"
+      ],
+      "movementPattern": "Squat Pattern",
+      "equipment": [
+        "Beinpresse"
+      ],
+      "category": "Grundübung",
+      "difficulty": "einfach",
+      "spineLoadLevel": "medium",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 120,
+      "techniqueNotes": "Rücken und Becken bleiben am Polster, nicht zu tief wenn LWS kippt.",
+      "commonMistakes": [
+        "Becken rollt unten ein",
+        "Knie komplett durchdrücken"
+      ],
+      "tags": [
+        "beine",
+        "maschine"
+      ],
+      "alternatives": [
+        "ex_hack_squat",
+        "ex_bulgarian_split_squat"
+      ]
+    },
+    {
+      "id": "ex_hack_squat",
+      "displayName": "Hackenschmidt",
+      "aliases": [
+        "Hack Squat"
+      ],
+      "primaryMuscleGroups": [
+        "Quadrizeps"
+      ],
+      "secondaryMuscleGroups": [
+        "Gesäß"
+      ],
+      "movementPattern": "Squat Pattern",
+      "equipment": [
+        "Hackenschmidt",
+        "Maschine"
+      ],
+      "category": "Grundübung",
+      "difficulty": "mittel",
+      "spineLoadLevel": "medium",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 120,
+      "techniqueNotes": "Rücken am Polster, kontrollierte Tiefe, schmerzfrei bleiben.",
+      "commonMistakes": [
+        "zu tief mit Beckenkippen",
+        "zu viel Gewicht"
+      ],
+      "tags": [
+        "beine",
+        "maschine"
+      ],
+      "alternatives": [
+        "ex_leg_press",
+        "ex_bulgarian_split_squat"
+      ]
+    },
+    {
+      "id": "ex_bulgarian_split_squat",
+      "displayName": "Bulgarian Split Squat",
+      "aliases": [
+        "Bulgarische Kniebeuge",
+        "Split Squat"
+      ],
+      "primaryMuscleGroups": [
+        "Quadrizeps"
+      ],
+      "secondaryMuscleGroups": [
+        "Gesäß",
+        "Beinbeuger"
+      ],
+      "movementPattern": "Lunge Pattern",
+      "equipment": [
+        "Kurzhantel",
+        "Körpergewicht",
+        "Bank"
+      ],
+      "category": "Grundübung",
+      "difficulty": "mittel",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 90,
+      "techniqueNotes": "Oberkörper stabil, moderates Gewicht, saubere Balance.",
+      "commonMistakes": [
+        "zu großer Schritt",
+        "Knie fällt nach innen"
+      ],
+      "tags": [
+        "beine",
+        "unilateral",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_leg_press",
+        "ex_step_up"
+      ]
+    },
+    {
+      "id": "ex_step_up",
+      "displayName": "Step Ups",
+      "aliases": [
+        "Box Step Up"
+      ],
+      "primaryMuscleGroups": [
+        "Quadrizeps"
+      ],
+      "secondaryMuscleGroups": [
+        "Gesäß"
+      ],
+      "movementPattern": "Lunge Pattern",
+      "equipment": [
+        "Körpergewicht",
+        "Kurzhantel",
+        "Bank"
+      ],
+      "category": "Grundübung",
+      "difficulty": "mittel",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 90,
+      "techniqueNotes": "Kontrolliert hochsteigen, Druck über ganzen Fuß.",
+      "commonMistakes": [
+        "Abstoßen mit hinterem Bein",
+        "Instabilität"
+      ],
+      "tags": [
+        "beine",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_bulgarian_split_squat",
+        "ex_leg_press"
+      ]
+    },
+    {
+      "id": "ex_seated_leg_curl",
+      "displayName": "Beinbeuger sitzend",
+      "aliases": [
+        "Seated Leg Curl",
+        "Leg Curl sitzend"
+      ],
+      "primaryMuscleGroups": [
+        "Beinbeuger"
+      ],
+      "secondaryMuscleGroups": [
+        "Waden"
+      ],
+      "movementPattern": "Knee Flexion",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 75,
+      "techniqueNotes": "Hüfte im Sitz halten, kontrolliert beugen und strecken.",
+      "commonMistakes": [
+        "Schwung",
+        "zu kurze ROM"
+      ],
+      "tags": [
+        "beine",
+        "beinbeuger",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_lying_leg_curl",
+        "ex_hip_thrust_machine"
+      ]
+    },
+    {
+      "id": "ex_lying_leg_curl",
+      "displayName": "Beinbeuger liegend",
+      "aliases": [
+        "Lying Leg Curl"
+      ],
+      "primaryMuscleGroups": [
+        "Beinbeuger"
+      ],
+      "secondaryMuscleGroups": [
+        "Waden"
+      ],
+      "movementPattern": "Knee Flexion",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 75,
+      "techniqueNotes": "Hüfte auf dem Polster halten, nicht ins Hohlkreuz drücken.",
+      "commonMistakes": [
+        "Hüfte hebt ab",
+        "Schwung"
+      ],
+      "tags": [
+        "beine",
+        "beinbeuger"
+      ],
+      "alternatives": [
+        "ex_seated_leg_curl"
+      ]
+    },
+    {
+      "id": "ex_leg_extension",
+      "displayName": "Beinstrecker",
+      "aliases": [
+        "Leg Extension"
+      ],
+      "primaryMuscleGroups": [
+        "Quadrizeps"
+      ],
+      "secondaryMuscleGroups": [],
+      "movementPattern": "Knee Extension",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 75,
+      "techniqueNotes": "Oberschenkel am Polster, kontrolliert strecken.",
+      "commonMistakes": [
+        "Schwung",
+        "oben hart einrasten"
+      ],
+      "tags": [
+        "beine",
+        "quadrizeps",
+        "maschine"
+      ],
+      "alternatives": [
+        "ex_leg_press",
+        "ex_hack_squat"
+      ]
+    },
+    {
+      "id": "ex_calf_raise_machine",
+      "displayName": "Wadenheben Maschine",
+      "aliases": [
+        "Calf Raise",
+        "Wadenheben"
+      ],
+      "primaryMuscleGroups": [
+        "Waden"
+      ],
+      "secondaryMuscleGroups": [],
+      "movementPattern": "Calf Raise",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-20",
+      "defaultRestSeconds": 60,
+      "techniqueNotes": "Volle Dehnung unten, bewusst hochdrücken.",
+      "commonMistakes": [
+        "zu schnelle Wiederholungen",
+        "keine volle ROM"
+      ],
+      "tags": [
+        "beine",
+        "waden"
+      ],
+      "alternatives": [
+        "ex_seated_calf_raise"
+      ]
+    },
+    {
+      "id": "ex_seated_calf_raise",
+      "displayName": "Wadenheben sitzend",
+      "aliases": [
+        "Seated Calf Raise"
+      ],
+      "primaryMuscleGroups": [
+        "Waden"
+      ],
+      "secondaryMuscleGroups": [],
+      "movementPattern": "Calf Raise",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Isolation",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-20",
+      "defaultRestSeconds": 60,
+      "techniqueNotes": "Kontrollierte Wiederholungen mit Pause unten und oben.",
+      "commonMistakes": [
+        "federn",
+        "zu schnell"
+      ],
+      "tags": [
+        "beine",
+        "waden"
+      ],
+      "alternatives": [
+        "ex_calf_raise_machine"
+      ]
+    },
+    {
+      "id": "ex_hip_thrust_machine",
+      "displayName": "Hip Thrust Maschine",
+      "aliases": [
+        "Hip Thrust",
+        "Glute Drive"
+      ],
+      "primaryMuscleGroups": [
+        "Gesäß"
+      ],
+      "secondaryMuscleGroups": [
+        "Beinbeuger"
+      ],
+      "movementPattern": "Hip Thrust / Hip Extension",
+      "equipment": [
+        "Maschine"
+      ],
+      "category": "Grundübung",
+      "difficulty": "einfach",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "techniqueNotes": "Becken kontrolliert strecken, Rippen unten, kein Überstrecken der LWS.",
+      "commonMistakes": [
+        "Hohlkreuz oben",
+        "zu wenig Hüftstreckung"
+      ],
+      "tags": [
+        "beine",
+        "gesäß",
+        "kreuzheben-alternative",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_glute_bridge",
+        "ex_cable_pull_through"
+      ]
+    },
+    {
+      "id": "ex_glute_bridge",
+      "displayName": "Glute Bridge",
+      "aliases": [
+        "Glute Bridge"
+      ],
+      "primaryMuscleGroups": [
+        "Gesäß"
+      ],
+      "secondaryMuscleGroups": [
+        "Beinbeuger"
+      ],
+      "movementPattern": "Hip Thrust / Hip Extension",
+      "equipment": [
+        "Körpergewicht",
+        "Langhantel"
+      ],
+      "category": "Grundübung",
+      "difficulty": "einfach",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 75,
+      "techniqueNotes": "Gesäß aktiv anspannen, LWS nicht überstrecken.",
+      "commonMistakes": [
+        "aus dem Rücken drücken",
+        "Füße zu weit weg"
+      ],
+      "tags": [
+        "beine",
+        "gesäß",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_hip_thrust_machine"
+      ]
+    },
+    {
+      "id": "ex_cable_pull_through",
+      "displayName": "Kabel Pull-Through",
+      "aliases": [
+        "Cable Pull Through",
+        "Pull Through"
+      ],
+      "primaryMuscleGroups": [
+        "Gesäß"
+      ],
+      "secondaryMuscleGroups": [
+        "Beinbeuger",
+        "unterer Rücken"
+      ],
+      "movementPattern": "Hip Hinge",
+      "equipment": [
+        "Kabelzug"
+      ],
+      "category": "Grundübung",
+      "difficulty": "mittel",
+      "spineLoadLevel": "low",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "techniqueNotes": "Hüfte nach hinten schieben, Rücken neutral, kontrolliert strecken.",
+      "commonMistakes": [
+        "Rundrücken",
+        "zu viel Kniebeuge statt Hüftknick"
+      ],
+      "tags": [
+        "beine",
+        "hip hinge",
+        "kreuzheben-alternative"
+      ],
+      "alternatives": [
+        "ex_hip_thrust_machine",
+        "ex_seated_leg_curl"
+      ]
+    },
+    {
+      "id": "ex_back_extension_45",
+      "displayName": "45° Hyperextension kontrolliert",
+      "aliases": [
+        "Rückenstrecker 45 Grad",
+        "Back Extension"
+      ],
+      "primaryMuscleGroups": [
+        "Gesäß",
+        "Beinbeuger",
+        "unterer Rücken"
+      ],
+      "secondaryMuscleGroups": [],
+      "movementPattern": "Hip Hinge",
+      "equipment": [
+        "Rückenstrecker"
+      ],
+      "category": "Grundübung",
+      "difficulty": "mittel",
+      "spineLoadLevel": "medium",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 75,
+      "techniqueNotes": "Nur schmerzfrei, Bewegung aus der Hüfte, neutraler Rücken.",
+      "commonMistakes": [
+        "Überstrecken oben",
+        "Rundrücken unten"
+      ],
+      "tags": [
+        "beine",
+        "rücken",
+        "vorsichtig"
+      ],
+      "alternatives": [
+        "ex_hip_thrust_machine",
+        "ex_cable_pull_through"
+      ]
+    },
+    {
+      "id": "ex_deadlift",
+      "displayName": "Kreuzheben klassisch",
+      "aliases": [
+        "Deadlift",
+        "Konventionelles Kreuzheben"
+      ],
+      "primaryMuscleGroups": [
+        "Gesäß",
+        "Beinbeuger",
+        "unterer Rücken"
+      ],
+      "secondaryMuscleGroups": [
+        "oberer Rücken",
+        "Unterarme"
+      ],
+      "movementPattern": "Hip Hinge",
+      "equipment": [
+        "Langhantel"
+      ],
+      "category": "Grundübung",
+      "difficulty": "schwer",
+      "spineLoadLevel": "veryHigh",
+      "lumbarDiscSuitability": "avoidInitially",
+      "defaultSets": 2,
+      "defaultRepRange": "5-8",
+      "defaultRestSeconds": 180,
+      "techniqueNotes": "Im Wiedereinstieg mit LWS-Vorgeschichte nicht als Hauptübung einplanen.",
+      "commonMistakes": [
+        "Rundrücken",
+        "zu schwer",
+        "fehlende Spannung"
+      ],
+      "tags": [
+        "lws-kritisch",
+        "hip hinge"
+      ],
+      "alternatives": [
+        "ex_hip_thrust_machine",
+        "ex_cable_pull_through",
+        "ex_seated_leg_curl",
+        "ex_back_extension_45"
+      ]
+    },
+    {
+      "id": "ex_pallof_press",
+      "displayName": "Pallof Press",
+      "aliases": [
+        "Anti-Rotation Kabel",
+        "Pallof"
+      ],
+      "primaryMuscleGroups": [
+        "Core"
+      ],
+      "secondaryMuscleGroups": [
+        "Bauch"
+      ],
+      "movementPattern": "Core Anti-Rotation",
+      "equipment": [
+        "Kabelzug",
+        "Widerstandsband"
+      ],
+      "category": "Core",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15 je Seite",
+      "defaultRestSeconds": 45,
+      "techniqueNotes": "Becken stabil, Rotation widerstehen, langsam drücken.",
+      "commonMistakes": [
+        "Oberkörper verdreht",
+        "zu schwer"
+      ],
+      "tags": [
+        "core",
+        "anti-rotation",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_side_plank",
+        "ex_plank"
+      ]
+    },
+    {
+      "id": "ex_plank",
+      "displayName": "Plank",
+      "aliases": [
+        "Unterarmstütz"
+      ],
+      "primaryMuscleGroups": [
+        "Core"
+      ],
+      "secondaryMuscleGroups": [
+        "Bauch",
+        "Gesäß"
+      ],
+      "movementPattern": "Core Anti-Extension",
+      "equipment": [
+        "Körpergewicht"
+      ],
+      "category": "Core",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "30-60 Sekunden",
+      "defaultRestSeconds": 45,
+      "techniqueNotes": "Rippen unten, Gesäß anspannen, neutraler Rücken.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Po zu hoch"
+      ],
+      "tags": [
+        "core",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_pallof_press",
+        "ex_side_plank"
+      ]
+    },
+    {
+      "id": "ex_side_plank",
+      "displayName": "Side Plank",
+      "aliases": [
+        "Seitstütz"
+      ],
+      "primaryMuscleGroups": [
+        "Core"
+      ],
+      "secondaryMuscleGroups": [
+        "Bauch",
+        "Abduktoren"
+      ],
+      "movementPattern": "Core Anti-Lateral-Flexion",
+      "equipment": [
+        "Körpergewicht"
+      ],
+      "category": "Core",
+      "difficulty": "einfach",
+      "spineLoadLevel": "veryLow",
+      "lumbarDiscSuitability": "suitable",
+      "defaultSets": 2,
+      "defaultRepRange": "20-45 Sekunden je Seite",
+      "defaultRestSeconds": 45,
+      "techniqueNotes": "Körper gerade, Hüfte nicht absinken lassen.",
+      "commonMistakes": [
+        "Hüfte hängt",
+        "Schulter instabil"
+      ],
+      "tags": [
+        "core",
+        "lws-freundlich"
+      ],
+      "alternatives": [
+        "ex_plank",
+        "ex_pallof_press"
+      ]
+    }
+  ],
+  "trainingPlans": [
+    {
+      "version": 1,
+      "type": "training_plan",
+      "planName": "3er Split Wiedereinstieg LWS-schonend",
+      "description": "Moderater Wiedereinstieg, maximal 60 Minuten, 2 Arbeitssätze, ohne schweres Kreuzheben.",
+      "goal": "Muskelaufbau Wiedereinstieg",
+      "maxDurationMinutes": 60,
+      "days": [
+        {
+          "name": "Push",
+          "maxDurationMinutes": 60,
+          "exercises": [
+            {
+              "exerciseId": "ex_chest_press_machine",
+              "sets": 2,
+              "reps": "8-12",
+              "restSeconds": 90,
+              "priority": "required",
+              "sortOrder": 1
+            },
+            {
+              "exerciseId": "ex_incline_chest_press_machine",
+              "sets": 2,
+              "reps": "8-12",
+              "restSeconds": 90,
+              "priority": "required",
+              "sortOrder": 2
+            },
+            {
+              "exerciseId": "ex_shoulder_press_machine",
+              "sets": 2,
+              "reps": "8-12",
+              "restSeconds": 90,
+              "priority": "required",
+              "sortOrder": 3
+            },
+            {
+              "exerciseId": "ex_lateral_raise",
+              "sets": 2,
+              "reps": "12-20",
+              "restSeconds": 60,
+              "priority": "important",
+              "sortOrder": 4
+            },
+            {
+              "exerciseId": "ex_triceps_pushdown",
+              "sets": 2,
+              "reps": "10-15",
+              "restSeconds": 60,
+              "priority": "important",
+              "sortOrder": 5
+            },
+            {
+              "exerciseId": "ex_cable_fly",
+              "sets": 2,
+              "reps": "10-15",
+              "restSeconds": 60,
+              "priority": "optional",
+              "sortOrder": 6
+            }
+          ]
+        },
+        {
+          "name": "Pull",
+          "maxDurationMinutes": 60,
+          "exercises": [
+            {
+              "exerciseId": "ex_lat_pulldown",
+              "sets": 2,
+              "reps": "8-12",
+              "restSeconds": 90,
+              "priority": "required",
+              "sortOrder": 1
+            },
+            {
+              "exerciseId": "ex_seated_row",
+              "sets": 2,
+              "reps": "8-12",
+              "restSeconds": 90,
+              "priority": "required",
+              "sortOrder": 2
+            },
+            {
+              "exerciseId": "ex_chest_supported_row",
+              "sets": 2,
+              "reps": "8-12",
+              "restSeconds": 90,
+              "priority": "required",
+              "sortOrder": 3
+            },
+            {
+              "exerciseId": "ex_reverse_pec_deck",
+              "sets": 2,
+              "reps": "12-15",
+              "restSeconds": 60,
+              "priority": "important",
+              "sortOrder": 4
+            },
+            {
+              "exerciseId": "ex_cable_biceps_curl",
+              "sets": 2,
+              "reps": "10-15",
+              "restSeconds": 60,
+              "priority": "important",
+              "sortOrder": 5
+            },
+            {
+              "exerciseId": "ex_face_pull",
+              "sets": 2,
+              "reps": "12-20",
+              "restSeconds": 60,
+              "priority": "optional",
+              "sortOrder": 6
+            }
+          ]
+        },
+        {
+          "name": "Beine + Core",
+          "maxDurationMinutes": 60,
+          "exercises": [
+            {
+              "exerciseId": "ex_leg_press",
+              "sets": 2,
+              "reps": "10-15",
+              "restSeconds": 120,
+              "priority": "required",
+              "sortOrder": 1
+            },
+            {
+              "exerciseId": "ex_bulgarian_split_squat",
+              "sets": 2,
+              "reps": "8-12 je Seite",
+              "restSeconds": 90,
+              "priority": "required",
+              "sortOrder": 2
+            },
+            {
+              "exerciseId": "ex_seated_leg_curl",
+              "sets": 2,
+              "reps": "10-15",
+              "restSeconds": 75,
+              "priority": "required",
+              "sortOrder": 3
+            },
+            {
+              "exerciseId": "ex_leg_extension",
+              "sets": 2,
+              "reps": "10-15",
+              "restSeconds": 75,
+              "priority": "important",
+              "sortOrder": 4
+            },
+            {
+              "exerciseId": "ex_calf_raise_machine",
+              "sets": 2,
+              "reps": "10-20",
+              "restSeconds": 60,
+              "priority": "important",
+              "sortOrder": 5
+            },
+            {
+              "exerciseId": "ex_pallof_press",
+              "sets": 2,
+              "reps": "10-15 je Seite",
+              "restSeconds": 45,
+              "priority": "required",
+              "sortOrder": 6
+            },
+            {
+              "exerciseId": "ex_plank",
+              "sets": 2,
+              "reps": "30-60 Sekunden",
+              "restSeconds": 45,
+              "priority": "optional",
+              "sortOrder": 7
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

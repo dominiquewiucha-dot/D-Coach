@@ -1,0 +1,576 @@
+const state = {
+  seed: null,
+  tab: "dashboard",
+  activeWorkout: null,
+  exerciseSearch: "",
+  selectedExerciseId: null,
+  route: null
+};
+
+const storage = {
+  get sessions() {
+    return readJson("dcoach.sessions", []);
+  },
+  set sessions(value) {
+    writeJson("dcoach.sessions", value);
+  },
+  get weights() {
+    return readJson("dcoach.weights", []);
+  },
+  set weights(value) {
+    writeJson("dcoach.weights", value);
+  },
+  get activePlanName() {
+    return localStorage.getItem("dcoach.activePlanName") || null;
+  },
+  set activePlanName(value) {
+    localStorage.setItem("dcoach.activePlanName", value);
+  }
+};
+
+function readJson(key, fallback) {
+  try {
+    return JSON.parse(localStorage.getItem(key)) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeJson(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+async function boot() {
+  state.seed = await fetch("./seed_training_database.json").then((response) => response.json());
+  if (!storage.activePlanName && state.seed.trainingPlans[0]) {
+    storage.activePlanName = state.seed.trainingPlans[0].planName;
+  }
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  }
+  render();
+}
+
+function activePlan() {
+  return state.seed.trainingPlans.find((plan) => plan.planName === storage.activePlanName) || state.seed.trainingPlans[0];
+}
+
+function exerciseById(id) {
+  return state.seed.exercises.find((exercise) => exercise.id === id);
+}
+
+function htmlesc(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function kg(value) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return "-";
+  const rounded = Math.round(Number(value) * 10) / 10;
+  return `${String(rounded).replace(".", ",")} kg`;
+}
+
+function parseNumber(value) {
+  const parsed = Number(String(value ?? "").replace(",", "."));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parseInteger(value) {
+  const parsed = Number.parseInt(String(value ?? ""), 10);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function dateText(value) {
+  return new Intl.DateTimeFormat("de-DE", { dateStyle: "short" }).format(new Date(value));
+}
+
+function averageWeight(days) {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - days + 1);
+  const values = storage.weights.filter((entry) => new Date(entry.date) >= start).map((entry) => Number(entry.weightKg));
+  if (!values.length) return null;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function lastSession() {
+  return [...storage.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0] || null;
+}
+
+function lastCompletedExercise(exerciseId) {
+  const sessions = [...storage.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
+  for (const session of sessions) {
+    const found = [...session.completedExercises].sort((a, b) => a.sortOrder - b.sortOrder).find((item) => item.exerciseId === exerciseId);
+    if (found) return { session, exercise: found };
+  }
+  return null;
+}
+
+function totalVolume(completedExercise) {
+  return completedExercise.sets.reduce((sum, set) => sum + (Number(set.actualWeightKg) || 0) * (Number(set.actualReps) || 0), 0);
+}
+
+function lwsBadge(value) {
+  const map = {
+    suitable: ["LWS geeignet", "green"],
+    conditionallySuitable: ["LWS vorsichtig", "amber"],
+    notRecommended: ["Nicht empfohlen", "red"],
+    avoidInitially: ["Anfangs vermeiden", "red"]
+  };
+  const [label, color] = map[value] || [value, "amber"];
+  return `<span class="badge ${color}">${htmlesc(label)}</span>`;
+}
+
+function render() {
+  document.getElementById("app").innerHTML = `
+    <main class="app">
+      ${renderRoute()}
+      ${renderTabs()}
+    </main>
+  `;
+  bindEvents();
+}
+
+function renderRoute() {
+  if (!state.seed) return `<section class="screen"><h1 class="title">D-Coach</h1><p class="subtitle">Lade Daten...</p></section>`;
+  if (state.activeWorkout) return renderWorkout();
+  if (state.selectedExerciseId) return renderExerciseDetail(state.selectedExerciseId);
+  switch (state.tab) {
+    case "training": return renderTraining();
+    case "plans": return renderPlans();
+    case "exercises": return renderExercises();
+    case "weight": return renderWeight();
+    case "settings": return renderSettings();
+    default: return renderDashboard();
+  }
+}
+
+function renderTabs() {
+  const tabs = [
+    ["dashboard", "Dashboard"],
+    ["training", "Training"],
+    ["plans", "Pläne"],
+    ["exercises", "Übungen"],
+    ["weight", "Gewicht"]
+  ];
+  return `<nav class="tabs">${tabs.map(([id, label]) => `<button class="tab ${state.tab === id && !state.activeWorkout && !state.selectedExerciseId ? "active" : ""}" data-tab="${id}">${label}</button>`).join("")}</nav>`;
+}
+
+function renderDashboard() {
+  const plan = activePlan();
+  const latestWeight = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  const session = lastSession();
+  const nextDay = plan?.days?.[0]?.name || "-";
+  return `
+    <section class="screen stack">
+      <header><h1 class="title">D-Coach</h1><p class="subtitle">Heute sauber trainieren.</p></header>
+      <article class="card stack">
+        <p class="muted">Aktiver Plan</p>
+        <h2>${htmlesc(plan.planName)}</h2>
+        <p class="muted">Nächstes Training: ${htmlesc(nextDay)}</p>
+        <button class="primary" data-tab="training">Training starten</button>
+      </article>
+      <div class="grid">
+        ${metric(kg(latestWeight?.weightKg), "Aktuelles Gewicht")}
+        ${metric(kg(averageWeight(7)), "7-Tage-Schnitt")}
+        ${metric(session?.dayName || "-", "Letztes Training")}
+        ${metric(String(storage.sessions.length), "Gespeicherte Einheiten")}
+      </div>
+      <article class="card">
+        <h3>Hinweis</h3>
+        <p class="muted">Bewerte nicht einzelne Tageswerte. Gewicht und Training zählen als Trend.</p>
+      </article>
+    </section>
+  `;
+}
+
+function metric(value, label) {
+  return `<article class="card metric"><span class="metric-value">${htmlesc(value)}</span><span class="metric-label">${htmlesc(label)}</span></article>`;
+}
+
+function renderTraining() {
+  const plan = activePlan();
+  return `
+    <section class="screen stack">
+      <header><h1 class="title">Training</h1><p class="subtitle">${htmlesc(plan.planName)}</p></header>
+      ${plan.days.map((day) => `
+        <button class="list-button" data-start-day="${htmlesc(day.name)}">
+          <article class="card row">
+            <div class="grow">
+              <h2>${htmlesc(day.name)}</h2>
+              <p class="muted">${day.exercises.length} Übungen · ${day.maxDurationMinutes} Minuten</p>
+              <p class="quiet">${lastDayDate(day.name) || "Noch nicht trainiert"}</p>
+            </div>
+            <span class="badge blue">Start</span>
+          </article>
+        </button>
+      `).join("")}
+    </section>
+  `;
+}
+
+function lastDayDate(dayName) {
+  const session = storage.sessions.filter((item) => item.dayName === dayName).sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
+  return session ? `Letztes Mal: ${dateText(session.startedAt)}` : null;
+}
+
+function startDay(dayName) {
+  const plan = activePlan();
+  const day = plan.days.find((item) => item.name === dayName);
+  state.activeWorkout = {
+    planName: plan.planName,
+    dayName: day.name,
+    startedAt: new Date().toISOString(),
+    index: 0,
+    entries: day.exercises.sort((a, b) => a.sortOrder - b.sortOrder).map((planned) => {
+      const last = lastCompletedExercise(planned.exerciseId);
+      return {
+        exerciseId: planned.exerciseId,
+        reps: planned.reps,
+        restSeconds: planned.restSeconds,
+        priority: planned.priority,
+        sortOrder: planned.sortOrder,
+        sets: Array.from({ length: Math.max(planned.sets, 1) }, (_, index) => {
+          const previous = last?.exercise?.sets?.find((set) => set.setNumber === index + 1);
+          return {
+            setNumber: index + 1,
+            weightText: previous?.actualWeightKg ? String(previous.actualWeightKg).replace(".", ",") : "",
+            repsText: "",
+            rirText: "",
+            completed: false
+          };
+        })
+      };
+    })
+  };
+  render();
+}
+
+function renderWorkout() {
+  const workout = state.activeWorkout;
+  const entry = workout.entries[workout.index];
+  const exercise = exerciseById(entry.exerciseId);
+  const last = lastCompletedExercise(entry.exerciseId);
+  const progress = Math.round(((workout.index + 1) / workout.entries.length) * 100);
+  return `
+    <section class="screen stack">
+      <header>
+        <h1 class="title">${htmlesc(workout.dayName)}</h1>
+        <p class="subtitle">Übung ${workout.index + 1} von ${workout.entries.length}</p>
+      </header>
+      <div class="progress"><span style="width:${progress}%"></span></div>
+      <article class="card stack">
+        <h2>${htmlesc(exercise.displayName)}</h2>
+        <p class="muted">${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].slice(0, 3).join(" · "))}</p>
+        <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} <span class="badge blue">${htmlesc(entry.reps)} Wdh.</span> <span class="badge">${entry.restSeconds} s Pause</span></div>
+        ${exerciseIsCritical(exercise) ? `<div class="card warning">${lwsWarning(exercise)}</div>` : ""}
+      </article>
+      <article class="card stack">
+        <h3>Letzte Leistung</h3>
+        ${last ? `
+          <p class="muted">Letztes Mal am ${dateText(last.session.endedAt || last.session.startedAt)}</p>
+          <ul class="small-list">${last.exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}</li>`).join("")}</ul>
+          <p class="green">Volumen: ${Math.round(totalVolume(last.exercise) * 10) / 10} kg</p>
+        ` : `<p class="muted">Noch keine vorherige Leistung vorhanden. Starte moderat.</p>`}
+      </article>
+      <article class="card stack">
+        <div class="row"><h3 class="grow">Sätze</h3><span class="quiet">kg · Wdh. · RIR</span></div>
+        ${entry.sets.map((set, index) => renderSetRow(set, index)).join("")}
+      </article>
+      <div class="actions">
+        <button class="secondary" data-alternatives>Alternative anzeigen</button>
+        <button class="primary" data-next-exercise>${workout.index < workout.entries.length - 1 ? "Nächste Übung" : "Training speichern"}</button>
+        <button class="secondary" data-cancel-workout>Training abbrechen</button>
+      </div>
+    </section>
+  `;
+}
+
+function renderSetRow(set, index) {
+  return `
+    <div class="set-row ${set.completed ? "done" : ""}">
+      <strong>${set.setNumber}</strong>
+      <input inputmode="decimal" placeholder="kg" value="${htmlesc(set.weightText)}" data-set="${index}" data-field="weightText">
+      <input inputmode="numeric" placeholder="Wdh." value="${htmlesc(set.repsText)}" data-set="${index}" data-field="repsText">
+      <input inputmode="numeric" placeholder="RIR" value="${htmlesc(set.rirText)}" data-set="${index}" data-field="rirText">
+      <button class="check ${set.completed ? "done" : ""}" data-check-set="${index}">${set.completed ? "✓" : ""}</button>
+    </div>
+  `;
+}
+
+function exerciseIsCritical(exercise) {
+  return ["conditionallySuitable", "notRecommended", "avoidInitially"].includes(exercise.lumbarDiscSuitability);
+}
+
+function lwsWarning(exercise) {
+  let text = "Diese Übung kann die Lendenwirbelsäule stärker belasten. Wenn du Schmerzen hast, wähle eine Alternative.";
+  if (exercise.lumbarDiscSuitability === "avoidInitially") text += " Für den Wiedereinstieg zunächst besser vermeiden.";
+  return htmlesc(text);
+}
+
+function showAlternatives() {
+  const workout = state.activeWorkout;
+  const entry = workout.entries[workout.index];
+  const exercise = exerciseById(entry.exerciseId);
+  const alternatives = exercise.alternatives.map(exerciseById).filter(Boolean);
+  if (!alternatives.length) {
+    alert("Keine Alternative hinterlegt.");
+    return;
+  }
+  const labels = alternatives.map((item, index) => `${index + 1}. ${item.displayName}`).join("\n");
+  const choice = prompt(`Alternative wählen:\n${labels}`);
+  const selected = alternatives[Number(choice) - 1];
+  if (!selected) return;
+  entry.exerciseId = selected.id;
+  const last = lastCompletedExercise(selected.id);
+  entry.sets.forEach((set) => {
+    const previous = last?.exercise?.sets?.find((item) => item.setNumber === set.setNumber);
+    set.weightText = previous?.actualWeightKg ? String(previous.actualWeightKg).replace(".", ",") : "";
+    set.repsText = "";
+    set.rirText = "";
+    set.completed = false;
+  });
+  render();
+}
+
+function finishOrNext() {
+  const workout = state.activeWorkout;
+  if (workout.index < workout.entries.length - 1) {
+    workout.index += 1;
+    render();
+    return;
+  }
+  const session = {
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+    planName: workout.planName,
+    dayName: workout.dayName,
+    startedAt: workout.startedAt,
+    endedAt: new Date().toISOString(),
+    completedExercises: workout.entries.map((entry) => {
+      const exercise = exerciseById(entry.exerciseId);
+      return {
+        exerciseId: entry.exerciseId,
+        exerciseNameSnapshot: exercise?.displayName || entry.exerciseId,
+        sortOrder: entry.sortOrder,
+        sets: entry.sets.map((set) => ({
+          setNumber: set.setNumber,
+          actualWeightKg: parseNumber(set.weightText),
+          plannedReps: entry.reps,
+          actualReps: parseInteger(set.repsText),
+          rir: parseInteger(set.rirText),
+          completed: set.completed
+        }))
+      };
+    })
+  };
+  storage.sessions = [...storage.sessions, session];
+  state.activeWorkout = null;
+  state.tab = "dashboard";
+  alert("Training gespeichert. Beim nächsten Training wird die letzte Leistung angezeigt.");
+  render();
+}
+
+function renderPlans() {
+  return `
+    <section class="screen stack">
+      <header><h1 class="title">Pläne</h1><p class="subtitle">Aktiver Plan und Bibliothek.</p></header>
+      ${state.seed.trainingPlans.map((plan) => `
+        <article class="card stack">
+          <h2>${htmlesc(plan.planName)}</h2>
+          <p class="muted">${htmlesc(plan.description)}</p>
+          <p>${plan.days.length} Tage · ${Math.max(...plan.days.map((day) => day.maxDurationMinutes))} Minuten</p>
+          <span class="badge ${storage.activePlanName === plan.planName ? "green" : ""}">${storage.activePlanName === plan.planName ? "Aktiv" : "Bibliothek"}</span>
+          <button class="secondary" data-activate-plan="${htmlesc(plan.planName)}">Aktivieren</button>
+        </article>
+      `).join("")}
+    </section>
+  `;
+}
+
+function renderExercises() {
+  const needle = state.exerciseSearch.trim().toLowerCase();
+  const exercises = state.seed.exercises.filter((exercise) => {
+    if (!needle) return true;
+    return `${exercise.displayName} ${exercise.aliases.join(" ")} ${exercise.primaryMuscleGroups.join(" ")}`.toLowerCase().includes(needle);
+  }).sort((a, b) => a.displayName.localeCompare(b.displayName, "de"));
+  return `
+    <section class="screen stack">
+      <header><h1 class="title">Übungen</h1><p class="subtitle">${exercises.length} Einträge</p></header>
+      <div class="search"><input class="input" placeholder="Übung suchen" value="${htmlesc(state.exerciseSearch)}" data-search-exercise></div>
+      ${exercises.map((exercise) => `
+        <button class="list-button" data-exercise-id="${htmlesc(exercise.id)}">
+          <article class="card stack">
+            <h3>${htmlesc(exercise.displayName)}</h3>
+            <p class="muted">${htmlesc(exercise.primaryMuscleGroups.join(", "))} · ${htmlesc(exercise.equipment.join(", "))}</p>
+            ${lwsBadge(exercise.lumbarDiscSuitability)}
+          </article>
+        </button>
+      `).join("")}
+    </section>
+  `;
+}
+
+function renderExerciseDetail(id) {
+  const exercise = exerciseById(id);
+  const last = lastCompletedExercise(id);
+  const alternatives = exercise.alternatives.map(exerciseById).filter(Boolean);
+  return `
+    <section class="screen stack">
+      <button class="secondary" data-back-exercises>Zurück</button>
+      <header><h1 class="title">${htmlesc(exercise.displayName)}</h1><p class="subtitle">${htmlesc(exercise.movementPattern)}</p></header>
+      <article class="card stack">
+        <p>${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].join(" · "))}</p>
+        <p class="muted">${htmlesc(exercise.equipment.join(" · "))}</p>
+        ${lwsBadge(exercise.lumbarDiscSuitability)}
+      </article>
+      ${exerciseIsCritical(exercise) ? `<article class="card warning">${lwsWarning(exercise)}</article>` : ""}
+      <article class="card stack"><h3>Ausführung</h3><p class="muted">${htmlesc(exercise.techniqueNotes || "Keine Technikhinweise hinterlegt.")}</p></article>
+      <article class="card stack"><h3>Häufige Fehler</h3><ul class="small-list">${exercise.commonMistakes.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul></article>
+      <article class="card stack"><h3>Letzte Leistung</h3>${last ? `<p class="muted">Letztes Mal am ${dateText(last.session.endedAt || last.session.startedAt)}</p><ul class="small-list">${last.exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}</li>`).join("")}</ul>` : `<p class="muted">Noch keine vorherige Leistung vorhanden.</p>`}</article>
+      <article class="card stack"><h3>Alternativen</h3>${alternatives.length ? alternatives.map((item) => `<p>${htmlesc(item.displayName)}</p>`).join("") : `<p class="muted">Keine Alternativen hinterlegt.</p>`}</article>
+    </section>
+  `;
+}
+
+function renderWeight() {
+  const entries = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date));
+  return `
+    <section class="screen stack">
+      <header><h1 class="title">Gewicht</h1><p class="subtitle">Trend statt Tagesrauschen.</p></header>
+      <div class="grid">
+        ${metric(kg(entries[0]?.weightKg), "Aktuell")}
+        ${metric(kg(averageWeight(7)), "7-Tage-Schnitt")}
+        ${metric(kg(averageWeight(30)), "30-Tage-Schnitt")}
+        ${metric(String(entries.length), "Einträge")}
+      </div>
+      <article class="card stack">
+        <h3>Heutiges Gewicht</h3>
+        <input class="input big" inputmode="decimal" placeholder="kg" data-weight-input>
+        <button class="primary" data-save-weight>Gewicht speichern</button>
+      </article>
+      ${entries.length ? entries.map((entry) => `
+        <article class="card row">
+          <div class="grow"><h3>${kg(entry.weightKg)}</h3><p class="muted">${dateText(entry.date)}</p></div>
+          <button class="danger" style="width:auto" data-delete-weight="${htmlesc(entry.id)}">Löschen</button>
+        </article>
+      `).join("") : `<article class="card"><p class="muted">Noch kein Gewicht eingetragen.</p></article>`}
+    </section>
+  `;
+}
+
+function renderSettings() {
+  return `
+    <section class="screen stack">
+      <header><h1 class="title">Einstellungen</h1><p class="subtitle">Lokale Offline-Daten.</p></header>
+      <article class="card stack">
+        <h3>Aktiver Plan</h3>
+        <p class="muted">${htmlesc(storage.activePlanName || "-")}</p>
+      </article>
+      <article class="card stack">
+        <h3>Daten</h3>
+        <button class="danger" data-reset-app>App-Daten zurücksetzen</button>
+      </article>
+    </section>
+  `;
+}
+
+function bindEvents() {
+  document.querySelectorAll("[data-tab]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.tab = button.dataset.tab;
+      state.activeWorkout = null;
+      state.selectedExerciseId = null;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-start-day]").forEach((button) => {
+    button.addEventListener("click", () => startDay(button.dataset.startDay));
+  });
+
+  document.querySelectorAll("[data-set]").forEach((input) => {
+    input.addEventListener("input", () => {
+      const entry = state.activeWorkout.entries[state.activeWorkout.index];
+      entry.sets[Number(input.dataset.set)][input.dataset.field] = input.value;
+    });
+  });
+
+  document.querySelectorAll("[data-check-set]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const entry = state.activeWorkout.entries[state.activeWorkout.index];
+      const set = entry.sets[Number(button.dataset.checkSet)];
+      set.completed = !set.completed;
+      render();
+    });
+  });
+
+  document.querySelector("[data-next-exercise]")?.addEventListener("click", finishOrNext);
+  document.querySelector("[data-alternatives]")?.addEventListener("click", showAlternatives);
+  document.querySelector("[data-cancel-workout]")?.addEventListener("click", () => {
+    if (confirm("Training wirklich abbrechen?")) {
+      state.activeWorkout = null;
+      render();
+    }
+  });
+
+  document.querySelectorAll("[data-activate-plan]").forEach((button) => {
+    button.addEventListener("click", () => {
+      storage.activePlanName = button.dataset.activatePlan;
+      render();
+    });
+  });
+
+  document.querySelector("[data-search-exercise]")?.addEventListener("input", (event) => {
+    state.exerciseSearch = event.target.value;
+    render();
+  });
+
+  document.querySelectorAll("[data-exercise-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedExerciseId = button.dataset.exerciseId;
+      render();
+    });
+  });
+
+  document.querySelector("[data-back-exercises]")?.addEventListener("click", () => {
+    state.selectedExerciseId = null;
+    state.tab = "exercises";
+    render();
+  });
+
+  document.querySelector("[data-save-weight]")?.addEventListener("click", () => {
+    const input = document.querySelector("[data-weight-input]");
+    const value = parseNumber(input.value);
+    if (!value || value <= 0) {
+      alert("Bitte gültiges Gewicht eingeben.");
+      return;
+    }
+    const today = new Date();
+    const todayKey = today.toISOString().slice(0, 10);
+    const entries = storage.weights.filter((entry) => String(entry.date).slice(0, 10) !== todayKey);
+    entries.push({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), date: today.toISOString(), weightKg: value });
+    storage.weights = entries;
+    render();
+  });
+
+  document.querySelectorAll("[data-delete-weight]").forEach((button) => {
+    button.addEventListener("click", () => {
+      storage.weights = storage.weights.filter((entry) => entry.id !== button.dataset.deleteWeight);
+      render();
+    });
+  });
+
+  document.querySelector("[data-reset-app]")?.addEventListener("click", () => {
+    if (!confirm("Alle Trainings- und Gewichtsdaten löschen?")) return;
+    storage.sessions = [];
+    storage.weights = [];
+    render();
+  });
+}
+
+boot().catch((error) => {
+  document.getElementById("app").innerHTML = `<section class="screen"><h1 class="title">D-Coach</h1><p class="subtitle">Fehler: ${htmlesc(error.message)}</p></section>`;
+});
