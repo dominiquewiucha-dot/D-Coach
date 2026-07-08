@@ -183,8 +183,27 @@ function exerciseHistory(exerciseId) {
       .map((exercise) => ({ session, exercise })));
 }
 
+function exerciseHistoryBefore(exerciseId, sessionId) {
+  const current = sessionById(sessionId);
+  const currentDate = current ? new Date(current.startedAt) : new Date();
+  return exerciseHistory(exerciseId)
+    .filter((item) => item.session.id !== sessionId && new Date(item.session.startedAt) < currentDate);
+}
+
+function previousExerciseBefore(exerciseId, sessionId) {
+  return exerciseHistoryBefore(exerciseId, sessionId)[0] || null;
+}
+
 function bestWeightForExercise(exerciseId) {
   const values = exerciseHistory(exerciseId)
+    .flatMap((item) => item.exercise.sets)
+    .map((set) => Number(set.actualWeightKg))
+    .filter((value) => Number.isFinite(value));
+  return values.length ? Math.max(...values) : null;
+}
+
+function bestWeightBeforeExercise(exerciseId, sessionId) {
+  const values = exerciseHistoryBefore(exerciseId, sessionId)
     .flatMap((item) => item.exercise.sets)
     .map((set) => Number(set.actualWeightKg))
     .filter((value) => Number.isFinite(value));
@@ -216,6 +235,35 @@ function sessionDurationMinutes(session) {
   const started = new Date(session.startedAt);
   const ended = new Date(session.endedAt || session.startedAt);
   return Math.max(1, Math.round((ended - started) / 60000));
+}
+
+function sessionsSince(days) {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - days + 1);
+  return storage.sessions.filter((session) => new Date(session.startedAt) >= start);
+}
+
+function weeklyVolume() {
+  return sessionsSince(7).reduce((sum, session) => sum + sessionVolume(session), 0);
+}
+
+function sessionImprovements(session) {
+  return session.completedExercises
+    .map((exercise) => {
+      const previous = previousExerciseBefore(exercise.exerciseId, session.id);
+      const currentVolume = totalVolume(exercise);
+      const previousVolume = previous ? totalVolume(previous.exercise) : 0;
+      const bestBefore = bestWeightBeforeExercise(exercise.exerciseId, session.id);
+      const currentBest = exercise.sets
+        .map((set) => Number(set.actualWeightKg))
+        .filter((value) => Number.isFinite(value))
+        .reduce((max, value) => Math.max(max, value), 0);
+      const isRecord = currentBest > 0 && (!bestBefore || currentBest > bestBefore);
+      const delta = previous ? currentVolume - previousVolume : null;
+      return { exercise, previous, currentVolume, previousVolume, delta, isRecord, currentBest };
+    })
+    .filter((item) => item.isRecord || item.delta > 0);
 }
 
 function upperRepTarget(text) {
@@ -306,6 +354,10 @@ function renderDashboard() {
         ${metric(kg(latestWeight?.weightKg), "Aktuelles Gewicht")}
         ${metric(kg(averageWeight(7)), "7-Tage-Schnitt")}
         ${metric(session?.dayName || "-", "Letztes Training")}
+        ${metric(`${Math.round(weeklyVolume())} kg`, "7-Tage-Volumen")}
+      </div>
+      <div class="grid">
+        ${metric(String(sessionsSince(7).length), "Trainings diese Woche")}
         ${metric(String(storage.sessions.length), "Gespeicherte Einheiten")}
       </div>
       <article class="card">
@@ -571,6 +623,7 @@ function renderSessionDetail(id) {
       </section>
     `;
   }
+  const improvements = sessionImprovements(session);
   return `
     <section class="screen stack">
       <button class="secondary" data-back-dashboard>Zurück</button>
@@ -584,6 +637,18 @@ function renderSessionDetail(id) {
         ${metric(String(sessionSetCount(session)), "Sätze")}
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
+      <article class="card stack">
+        <h3>Verbesserungen</h3>
+        ${improvements.length ? improvements.map((item) => `
+          <div class="history-row">
+            <div>
+              <strong>${htmlesc(item.exercise.exerciseNameSnapshot)}</strong>
+              <p class="muted">${item.isRecord ? `Neues Bestgewicht: ${kg(item.currentBest)}` : `Volumen: +${Math.round(item.delta)} kg`}</p>
+            </div>
+            <span class="badge ${item.isRecord ? "green" : "blue"}">${item.isRecord ? "Rekord" : "Plus"}</span>
+          </div>
+        `).join("") : `<p class="muted">Keine Verbesserung gegenüber der letzten gespeicherten Ausführung erkannt.</p>`}
+      </article>
       ${session.completedExercises.sort((a, b) => a.sortOrder - b.sortOrder).map((exercise) => `
         <article class="card stack">
           <h3>${htmlesc(exercise.exerciseNameSnapshot)}</h3>
@@ -591,6 +656,7 @@ function renderSessionDetail(id) {
             ${exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}${set.rir !== null && set.rir !== undefined ? ` · RIR ${set.rir}` : ""}</li>`).join("")}
           </ul>
           <p class="green">Volumen: ${Math.round(totalVolume(exercise))} kg</p>
+          ${previousExerciseBefore(exercise.exerciseId, session.id) ? `<p class="muted">Vorher: ${Math.round(totalVolume(previousExerciseBefore(exercise.exerciseId, session.id).exercise))} kg</p>` : `<p class="muted">Erste gespeicherte Ausführung.</p>`}
         </article>
       `).join("")}
       <button class="danger" data-delete-session="${htmlesc(session.id)}">Training löschen</button>
