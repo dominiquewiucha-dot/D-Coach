@@ -303,6 +303,12 @@ button {
   gap: 12px;
 }
 
+.button-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
 .search {
   position: sticky;
   top: 0;

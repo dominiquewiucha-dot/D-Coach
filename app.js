@@ -26,6 +26,18 @@ const storage = {
   },
   set activePlanName(value) {
     localStorage.setItem("dcoach.activePlanName", value);
+  },
+  get archivedPlanNames() {
+    return readJson("dcoach.archivedPlanNames", []);
+  },
+  set archivedPlanNames(value) {
+    writeJson("dcoach.archivedPlanNames", value);
+  },
+  get deletedPlanNames() {
+    return readJson("dcoach.deletedPlanNames", []);
+  },
+  set deletedPlanNames(value) {
+    writeJson("dcoach.deletedPlanNames", value);
   }
 };
 
@@ -43,8 +55,9 @@ function writeJson(key, value) {
 
 async function boot() {
   state.seed = await fetch("./seed_training_database.json").then((response) => response.json());
-  if (!storage.activePlanName && state.seed.trainingPlans[0]) {
-    storage.activePlanName = state.seed.trainingPlans[0].planName;
+  const plan = activePlan();
+  if (plan && storage.activePlanName !== plan.planName) {
+    storage.activePlanName = plan.planName;
   }
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
@@ -53,7 +66,27 @@ async function boot() {
 }
 
 function activePlan() {
-  return state.seed.trainingPlans.find((plan) => plan.planName === storage.activePlanName) || state.seed.trainingPlans[0];
+  const plans = availablePlans().filter((plan) => !isPlanArchived(plan.planName));
+  return plans.find((plan) => plan.planName === storage.activePlanName) || plans[0] || null;
+}
+
+function availablePlans() {
+  return state.seed.trainingPlans.filter((plan) => !storage.deletedPlanNames.includes(plan.planName));
+}
+
+function isPlanArchived(planName) {
+  return storage.archivedPlanNames.includes(planName);
+}
+
+function planStatus(plan) {
+  if (isPlanArchived(plan.planName)) return "Archiviert";
+  if (activePlan()?.planName === plan.planName) return "Aktiv";
+  return "Bibliothek";
+}
+
+function ensureActivePlan() {
+  const plan = activePlan();
+  storage.activePlanName = plan?.planName || "";
 }
 
 function exerciseById(id) {
@@ -206,12 +239,16 @@ function renderDashboard() {
   return `
     <section class="screen stack">
       <header><h1 class="title">D-Coach</h1><p class="subtitle">Heute sauber trainieren.</p></header>
-      <article class="card stack">
+      ${plan ? `<article class="card stack">
         <p class="muted">Aktiver Plan</p>
         <h2>${htmlesc(plan.planName)}</h2>
         <p class="muted">Nächstes Training: ${htmlesc(nextDay)}</p>
         <button class="primary" data-tab="training">Training starten</button>
-      </article>
+      </article>` : `<article class="card stack">
+        <h2>Kein aktiver Plan</h2>
+        <p class="muted">Aktiviere oder stelle einen Plan im Tab Pläne wieder her.</p>
+        <button class="secondary" data-tab="plans">Zu den Plänen</button>
+      </article>`}
       <div class="grid">
         ${metric(kg(latestWeight?.weightKg), "Aktuelles Gewicht")}
         ${metric(kg(averageWeight(7)), "7-Tage-Schnitt")}
@@ -248,8 +285,8 @@ function renderTraining() {
   const plan = activePlan();
   return `
     <section class="screen stack">
-      <header><h1 class="title">Training</h1><p class="subtitle">${htmlesc(plan.planName)}</p></header>
-      ${plan.days.map((day) => `
+      <header><h1 class="title">Training</h1><p class="subtitle">${plan ? htmlesc(plan.planName) : "Kein aktiver Plan"}</p></header>
+      ${plan ? plan.days.map((day) => `
         <button class="list-button" data-start-day="${htmlesc(day.name)}">
           <article class="card row">
             <div class="grow">
@@ -260,7 +297,11 @@ function renderTraining() {
             <span class="badge blue">Start</span>
           </article>
         </button>
-      `).join("")}
+      `).join("") : `<article class="card stack">
+        <h2>Kein Training verfügbar</h2>
+        <p class="muted">Aktiviere zuerst einen Plan.</p>
+        <button class="secondary" data-tab="plans">Plan auswählen</button>
+      </article>`}
     </section>
   `;
 }
@@ -460,23 +501,40 @@ function renderSessionDetail(id) {
           <p class="green">Volumen: ${Math.round(totalVolume(exercise))} kg</p>
         </article>
       `).join("")}
+      <button class="danger" data-delete-session="${htmlesc(session.id)}">Training löschen</button>
     </section>
   `;
 }
 
 function renderPlans() {
+  const plans = availablePlans();
+  const deletedCount = storage.deletedPlanNames.length;
   return `
     <section class="screen stack">
       <header><h1 class="title">Pläne</h1><p class="subtitle">Aktiver Plan und Bibliothek.</p></header>
-      ${state.seed.trainingPlans.map((plan) => `
+      ${plans.length ? plans.map((plan) => `
         <article class="card stack">
           <h2>${htmlesc(plan.planName)}</h2>
           <p class="muted">${htmlesc(plan.description)}</p>
           <p>${plan.days.length} Tage · ${Math.max(...plan.days.map((day) => day.maxDurationMinutes))} Minuten</p>
-          <span class="badge ${storage.activePlanName === plan.planName ? "green" : ""}">${storage.activePlanName === plan.planName ? "Aktiv" : "Bibliothek"}</span>
-          <button class="secondary" data-activate-plan="${htmlesc(plan.planName)}">Aktivieren</button>
+          <span class="badge ${planStatus(plan) === "Aktiv" ? "green" : isPlanArchived(plan.planName) ? "amber" : ""}">${planStatus(plan)}</span>
+          <div class="button-row">
+            ${!isPlanArchived(plan.planName) ? `<button class="secondary" data-activate-plan="${htmlesc(plan.planName)}">Aktivieren</button>` : ""}
+            ${isPlanArchived(plan.planName)
+              ? `<button class="secondary" data-unarchive-plan="${htmlesc(plan.planName)}">Wiederherstellen</button>`
+              : `<button class="secondary" data-archive-plan="${htmlesc(plan.planName)}">Archivieren</button>`}
+          </div>
+          <button class="danger" data-delete-plan="${htmlesc(plan.planName)}">Plan löschen</button>
         </article>
-      `).join("")}
+      `).join("") : `<article class="card stack">
+        <h2>Keine Pläne</h2>
+        <p class="muted">Alle Pläne wurden gelöscht. Trainingshistorie bleibt erhalten.</p>
+      </article>`}
+      ${deletedCount ? `<article class="card stack">
+        <h3>Gelöschte Pläne</h3>
+        <p class="muted">${deletedCount} Plan/Pläne ausgeblendet.</p>
+        <button class="secondary" data-restore-plans>Gelöschte Pläne wiederherstellen</button>
+      </article>` : ""}
     </section>
   `;
 }
@@ -558,7 +616,8 @@ function renderSettings() {
       <header><h1 class="title">Einstellungen</h1><p class="subtitle">Lokale Offline-Daten.</p></header>
       <article class="card stack">
         <h3>Aktiver Plan</h3>
-        <p class="muted">${htmlesc(storage.activePlanName || "-")}</p>
+        <p class="muted">${htmlesc(activePlan()?.planName || "Kein aktiver Plan")}</p>
+        <button class="secondary" data-reset-plan-library>Planbibliothek wiederherstellen</button>
       </article>
       <article class="card stack">
         <h3>Backup</h3>
@@ -585,7 +644,9 @@ function createBackup() {
     exportedAt: new Date().toISOString(),
     activePlanName: storage.activePlanName,
     sessions: storage.sessions,
-    weights: storage.weights
+    weights: storage.weights,
+    archivedPlanNames: storage.archivedPlanNames,
+    deletedPlanNames: storage.deletedPlanNames
   };
 }
 
@@ -634,7 +695,10 @@ function importBackupFile(file) {
       if (!confirm(message)) return;
       storage.sessions = backup.sessions;
       storage.weights = backup.weights;
+      storage.archivedPlanNames = Array.isArray(backup.archivedPlanNames) ? backup.archivedPlanNames : [];
+      storage.deletedPlanNames = Array.isArray(backup.deletedPlanNames) ? backup.deletedPlanNames : [];
       if (backup.activePlanName) storage.activePlanName = backup.activePlanName;
+      ensureActivePlan();
       alert("Backup importiert.");
       render();
     } catch {
@@ -686,9 +750,45 @@ function bindEvents() {
 
   document.querySelectorAll("[data-activate-plan]").forEach((button) => {
     button.addEventListener("click", () => {
+      storage.archivedPlanNames = storage.archivedPlanNames.filter((name) => name !== button.dataset.activatePlan);
       storage.activePlanName = button.dataset.activatePlan;
       render();
     });
+  });
+
+  document.querySelectorAll("[data-archive-plan]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const planName = button.dataset.archivePlan;
+      storage.archivedPlanNames = [...new Set([...storage.archivedPlanNames, planName])];
+      if (storage.activePlanName === planName) ensureActivePlan();
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-unarchive-plan]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const planName = button.dataset.unarchivePlan;
+      storage.archivedPlanNames = storage.archivedPlanNames.filter((name) => name !== planName);
+      if (!activePlan()) storage.activePlanName = planName;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-delete-plan]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const planName = button.dataset.deletePlan;
+      if (!confirm("Trainingsplan wirklich löschen? Deine gespeicherten Trainingseinheiten bleiben erhalten.")) return;
+      storage.deletedPlanNames = [...new Set([...storage.deletedPlanNames, planName])];
+      storage.archivedPlanNames = storage.archivedPlanNames.filter((name) => name !== planName);
+      if (storage.activePlanName === planName) ensureActivePlan();
+      render();
+    });
+  });
+
+  document.querySelector("[data-restore-plans]")?.addEventListener("click", () => {
+    storage.deletedPlanNames = [];
+    ensureActivePlan();
+    render();
   });
 
   document.querySelector("[data-search-exercise]")?.addEventListener("input", (event) => {
@@ -723,6 +823,14 @@ function bindEvents() {
     render();
   });
 
+  document.querySelector("[data-delete-session]")?.addEventListener("click", (event) => {
+    if (!confirm("Training wirklich löschen?")) return;
+    storage.sessions = storage.sessions.filter((session) => session.id !== event.currentTarget.dataset.deleteSession);
+    state.selectedSessionId = null;
+    state.tab = "dashboard";
+    render();
+  });
+
   document.querySelector("[data-save-weight]")?.addEventListener("click", () => {
     const input = document.querySelector("[data-weight-input]");
     const value = parseNumber(input.value);
@@ -751,6 +859,13 @@ function bindEvents() {
     const file = event.target.files?.[0];
     if (file) importBackupFile(file);
     event.target.value = "";
+  });
+
+  document.querySelector("[data-reset-plan-library]")?.addEventListener("click", () => {
+    storage.archivedPlanNames = [];
+    storage.deletedPlanNames = [];
+    ensureActivePlan();
+    render();
   });
 
   document.querySelector("[data-reset-app]")?.addEventListener("click", () => {
