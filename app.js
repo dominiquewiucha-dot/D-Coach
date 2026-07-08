@@ -470,11 +470,87 @@ function renderSettings() {
         <p class="muted">${htmlesc(storage.activePlanName || "-")}</p>
       </article>
       <article class="card stack">
-        <h3>Daten</h3>
+        <h3>Backup</h3>
+        <p class="muted">Exportiere regelmäßig deine Trainingsdaten. GitHub speichert deine Fortschritte nicht.</p>
+        <button class="primary" data-export-backup>Backup exportieren</button>
+        <label class="secondary file-label">
+          Backup importieren
+          <input type="file" accept="application/json,.json" data-import-backup>
+        </label>
+      </article>
+      <article class="card stack">
+        <h3>Zurücksetzen</h3>
+        <p class="muted">Löscht nur die lokalen Trainings- und Gewichtsdaten auf diesem Gerät.</p>
         <button class="danger" data-reset-app>App-Daten zurücksetzen</button>
       </article>
     </section>
   `;
+}
+
+function createBackup() {
+  return {
+    app: "D-Coach",
+    schemaVersion: 1,
+    exportedAt: new Date().toISOString(),
+    activePlanName: storage.activePlanName,
+    sessions: storage.sessions,
+    weights: storage.weights
+  };
+}
+
+function exportBackup() {
+  const backup = createBackup();
+  const json = JSON.stringify(backup, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const date = new Date().toISOString().slice(0, 10);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `d-coach-backup-${date}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function validateBackup(backup) {
+  if (!backup || typeof backup !== "object") return "Backup-Datei ist ungültig.";
+  if (backup.app !== "D-Coach") return "Diese Datei ist kein D-Coach-Backup.";
+  if (backup.schemaVersion !== 1) return "Diese Backup-Version wird nicht unterstützt.";
+  if (!Array.isArray(backup.sessions)) return "Backup enthält keine gültigen Trainingsdaten.";
+  if (!Array.isArray(backup.weights)) return "Backup enthält keine gültigen Gewichtsdaten.";
+  return null;
+}
+
+function importBackupFile(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const backup = JSON.parse(String(reader.result || ""));
+      const error = validateBackup(backup);
+      if (error) {
+        alert(error);
+        return;
+      }
+      const message = [
+        "Backup importieren?",
+        "",
+        `Trainings: ${backup.sessions.length}`,
+        `Gewichtseinträge: ${backup.weights.length}`,
+        "",
+        "Die lokalen Daten auf diesem Gerät werden ersetzt."
+      ].join("\n");
+      if (!confirm(message)) return;
+      storage.sessions = backup.sessions;
+      storage.weights = backup.weights;
+      if (backup.activePlanName) storage.activePlanName = backup.activePlanName;
+      alert("Backup importiert.");
+      render();
+    } catch {
+      alert("Backup konnte nicht gelesen werden.");
+    }
+  };
+  reader.readAsText(file);
 }
 
 function bindEvents() {
@@ -561,6 +637,14 @@ function bindEvents() {
       storage.weights = storage.weights.filter((entry) => entry.id !== button.dataset.deleteWeight);
       render();
     });
+  });
+
+  document.querySelector("[data-export-backup]")?.addEventListener("click", exportBackup);
+
+  document.querySelector("[data-import-backup]")?.addEventListener("change", (event) => {
+    const file = event.target.files?.[0];
+    if (file) importBackupFile(file);
+    event.target.value = "";
   });
 
   document.querySelector("[data-reset-app]")?.addEventListener("click", () => {

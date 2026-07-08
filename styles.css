@@ -132,6 +132,20 @@ button {
 }
 .danger { background: var(--red); }
 
+.file-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-label input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .row {
   display: flex;
   align-items: center;
