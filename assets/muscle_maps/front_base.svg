@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="640" viewBox="0 0 360 640">
+<rect width="360" height="640" fill="#0B0F14"/>
+<text x="180" y="32" fill="#A7B0BE" font-size="18" text-anchor="middle">D-Coach Muscle Map Front</text>
+<circle cx="180" cy="80" r="34" fill="#18202B" stroke="#2A3442" stroke-width="3"/>
+<path d="M130 125 Q180 105 230 125 L250 265 Q230 350 220 440 L205 590 L175 590 L165 445 L155 590 L125 590 L140 440 Q130 350 110 265 Z" fill="#121821" stroke="#2A3442" stroke-width="4"/>
+<path d="M130 145 L70 260 L90 275 L145 180 Z" fill="#121821" stroke="#2A3442" stroke-width="4"/>
+<path d="M230 145 L290 260 L270 275 L215 180 Z" fill="#121821" stroke="#2A3442" stroke-width="4"/>
+<text x="180" y="620" fill="#6B7280" font-size="12" text-anchor="middle">schematischer Platzhalter</text>
+</svg>

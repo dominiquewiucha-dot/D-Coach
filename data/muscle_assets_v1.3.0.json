@@ -1,0 +1,126 @@
+{
+  "version": "1.3.0",
+  "type": "muscle_assets",
+  "locale": "de-DE",
+  "baseMaps": {
+    "front": "assets/muscle_maps/front_base.svg",
+    "back": "assets/muscle_maps/back_base.svg"
+  },
+  "muscles": [
+    {
+      "muscleId": "mg_abductors",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_abductors.svg",
+      "view": "back"
+    },
+    {
+      "muscleId": "mg_abs",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_abs.svg",
+      "view": "front"
+    },
+    {
+      "muscleId": "mg_adductors",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_adductors.svg",
+      "view": "front"
+    },
+    {
+      "muscleId": "mg_biceps",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_biceps.svg",
+      "view": "front"
+    },
+    {
+      "muscleId": "mg_calves",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_calves.svg",
+      "view": "front"
+    },
+    {
+      "muscleId": "mg_chest_middle",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_chest_middle.svg",
+      "view": "front"
+    },
+    {
+      "muscleId": "mg_chest_upper",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_chest_upper.svg",
+      "view": "front"
+    },
+    {
+      "muscleId": "mg_deep_core",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_deep_core.svg",
+      "view": "back"
+    },
+    {
+      "muscleId": "mg_erectors",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_erectors.svg",
+      "view": "back"
+    },
+    {
+      "muscleId": "mg_forearms",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_forearms.svg",
+      "view": "back"
+    },
+    {
+      "muscleId": "mg_front_delts",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_front_delts.svg",
+      "view": "front"
+    },
+    {
+      "muscleId": "mg_glutes",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_glutes.svg",
+      "view": "back"
+    },
+    {
+      "muscleId": "mg_hamstrings",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_hamstrings.svg",
+      "view": "back"
+    },
+    {
+      "muscleId": "mg_lats",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_lats.svg",
+      "view": "back"
+    },
+    {
+      "muscleId": "mg_obliques",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_obliques.svg",
+      "view": "front"
+    },
+    {
+      "muscleId": "mg_quads",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_quads.svg",
+      "view": "front"
+    },
+    {
+      "muscleId": "mg_rear_delts",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_rear_delts.svg",
+      "view": "back"
+    },
+    {
+      "muscleId": "mg_rhomboids",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_rhomboids.svg",
+      "view": "back"
+    },
+    {
+      "muscleId": "mg_rotator_cuff",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_rotator_cuff.svg",
+      "view": "back"
+    },
+    {
+      "muscleId": "mg_side_delts",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_side_delts.svg",
+      "view": "front"
+    },
+    {
+      "muscleId": "mg_traps",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_traps.svg",
+      "view": "back"
+    },
+    {
+      "muscleId": "mg_triceps",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_triceps.svg",
+      "view": "front"
+    },
+    {
+      "muscleId": "mg_upper_back",
+      "asset": "assets/muscle_maps/muscle_overlay_mg_upper_back.svg",
+      "view": "back"
+    }
+  ]
+}

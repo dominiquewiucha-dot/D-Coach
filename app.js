@@ -12,6 +12,11 @@ const state = {
   journalSchema: null,
   importExportSchema: null,
   machineSettingsSchema: null,
+  muscleAssets: null,
+  coachingTexts: null,
+  warmupCooldownRules: null,
+  userProfileSchema: null,
+  exerciseScoringRules: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -28,8 +33,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v14";
-const STORAGE_SCHEMA_VERSION = "1.2.0";
+const APP_VERSION = "pwa-v15";
+const STORAGE_SCHEMA_VERSION = "1.3.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -38,6 +43,7 @@ const STORAGE_KEYS = [
   { key: "dcoach.activePlanName", label: "Aktiver Plan", type: "string" },
   { key: "dcoach.archivedPlanNames", label: "Archivierte Plaene", type: "array" },
   { key: "dcoach.deletedPlanNames", label: "Geloeschte Plaene", type: "array" },
+  { key: "dcoach.customPlans", label: "Eigene Plaene", type: "array" },
   { key: "dcoach.activeWorkoutDraft", label: "Trainingsentwurf", type: "object" },
   { key: "dcoach.lastBackupAt", label: "Letztes Backup", type: "string" },
   { key: "dcoach.storageVersion", label: "Speicherversion", type: "string" },
@@ -87,6 +93,12 @@ const storage = {
   },
   set deletedPlanNames(value) {
     writeJson("dcoach.deletedPlanNames", value);
+  },
+  get customPlans() {
+    return readJson("dcoach.customPlans", []);
+  },
+  set customPlans(value) {
+    writeJson("dcoach.customPlans", value);
   },
   get activeWorkoutDraft() {
     return readJson("dcoach.activeWorkoutDraft", null);
@@ -235,6 +247,105 @@ function mergeById(existing, incoming) {
   return [...map.values()];
 }
 
+function mergeByKey(existing = [], incoming = [], key) {
+  const map = new Map();
+  existing.forEach((item) => map.set(item[key], item));
+  incoming.forEach((item) => map.set(item[key], { ...(map.get(item[key]) || {}), ...item }));
+  return [...map.values()];
+}
+
+function uniqueValues(...lists) {
+  return [...new Set(lists.flat().filter(Boolean))];
+}
+
+function normalizeExercise(raw, existing = null) {
+  const primaryMuscleGroups = raw.primaryMuscleGroups || existing?.primaryMuscleGroups || [];
+  const secondaryMuscleGroups = raw.secondaryMuscleGroups || existing?.secondaryMuscleGroups || [];
+  const equipmentName = raw.equipment || (raw.equipmentId ? [equipmentNameById(raw.equipmentId)] : existing?.equipment || []);
+  return {
+    ...raw,
+    ...existing,
+    englishName: raw.englishName || existing?.englishName || "",
+    aliases: uniqueValues(existing?.aliases || [], raw.aliases || [], raw.englishName ? [raw.englishName] : []),
+    primaryMuscleGroups,
+    secondaryMuscleGroups,
+    movementPattern: raw.movementPattern || existing?.movementPattern || "Allgemein",
+    equipment: uniqueValues(equipmentName),
+    category: raw.category || existing?.category || "Uebung",
+    difficulty: raw.difficulty || existing?.difficulty || "mittel",
+    spineLoadLevel: raw.spineLoadLevel || existing?.spineLoadLevel || "medium",
+    lumbarDiscSuitability: raw.lumbarDiscSuitability || existing?.lumbarDiscSuitability || "conditionallySuitable",
+    defaultSets: raw.defaultSets || existing?.defaultSets || 2,
+    defaultRepRange: raw.defaultRepRange || existing?.defaultRepRange || "8-12",
+    defaultRestSeconds: raw.defaultRestSeconds || existing?.defaultRestSeconds || 90,
+    techniqueNotes: raw.techniqueNotes || existing?.techniqueNotes || "",
+    commonMistakes: raw.commonMistakes || existing?.commonMistakes || [],
+    tags: uniqueValues(existing?.tags || [], raw.tags || []),
+    alternatives: uniqueValues(existing?.alternatives || [], raw.alternatives || [])
+  };
+}
+
+function mergeExercises(existing = [], incoming = []) {
+  const map = new Map(existing.map((exercise) => [exercise.id, exercise]));
+  incoming.forEach((exercise) => {
+    map.set(exercise.id, normalizeExercise(exercise, map.get(exercise.id) || null));
+  });
+  return [...map.values()];
+}
+
+function normalizePlanPreset(plan) {
+  return {
+    version: 1,
+    type: "training_plan",
+    id: plan.id,
+    planName: plan.name || plan.planName,
+    description: plan.description || plan.goal || "Trainingsplan",
+    goal: plan.goal || "",
+    maxDurationMinutes: plan.maxDurationMinutes || 60,
+    days: (plan.days || []).map((day) => ({
+      name: day.name,
+      maxDurationMinutes: day.maxDurationMinutes || plan.maxDurationMinutes || 60,
+      exercises: (day.exercises || []).map((item, index) => {
+        const exerciseId = typeof item === "string" ? item : item.exerciseId;
+        const exercise = exerciseById(exerciseId) || {};
+        return {
+          exerciseId,
+          sets: item.sets || exercise.defaultSets || 2,
+          reps: item.reps || exercise.defaultRepRange || "8-12",
+          restSeconds: item.restSeconds || exercise.defaultRestSeconds || 90,
+          priority: item.priority || (index < 4 ? "required" : "important"),
+          sortOrder: item.sortOrder || index + 1
+        };
+      })
+    }))
+  };
+}
+
+function mergeTrainingPlans(existing = [], incoming = []) {
+  const map = new Map(existing.map((plan) => [plan.id || plan.planName, plan]));
+  incoming.map(normalizePlanPreset).forEach((plan) => {
+    const key = plan.id || plan.planName;
+    map.set(key, { ...(map.get(key) || {}), ...plan });
+  });
+  return [...map.values()];
+}
+
+function mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets }) {
+  if (knowledgeExercises?.exercises?.length) {
+    state.seed.exercises = mergeExercises(state.seed.exercises, knowledgeExercises.exercises);
+  }
+  if (knowledgeMuscleMap?.mappings?.length) {
+    state.exerciseMuscleMap = {
+      ...(state.exerciseMuscleMap || {}),
+      version: knowledgeMuscleMap.version,
+      mappings: mergeByKey(state.exerciseMuscleMap?.mappings || [], knowledgeMuscleMap.mappings, "exerciseId")
+    };
+  }
+  if (trainingPlanPresets?.plans?.length) {
+    state.seed.trainingPlans = mergeTrainingPlans(state.seed.trainingPlans, trainingPlanPresets.plans);
+  }
+}
+
 async function fetchOptionalJson(path) {
   try {
     const response = await fetch(path);
@@ -264,7 +375,15 @@ async function boot() {
     recoveryRules,
     journalSchema,
     importExportSchema,
-    machineSettingsSchema
+    machineSettingsSchema,
+    knowledgeExercises,
+    knowledgeMuscleMap,
+    muscleAssets,
+    trainingPlanPresets,
+    coachingTexts,
+    warmupCooldownRules,
+    userProfileSchema,
+    exerciseScoringRules
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -281,7 +400,15 @@ async function boot() {
     fetchOptionalJson("./data/recovery_rules_v1.2.0.json"),
     fetchOptionalJson("./data/journal_schema_v1.2.0.json"),
     fetchOptionalJson("./data/import_export_schema_v1.2.0.json"),
-    fetchOptionalJson("./data/machine_settings_schema_v1.2.0.json")
+    fetchOptionalJson("./data/machine_settings_schema_v1.2.0.json"),
+    fetchOptionalJson("./data/exercises_knowledge_v1.3.0.json"),
+    fetchOptionalJson("./data/exercise_muscle_mapping_v1.3.0.json"),
+    fetchOptionalJson("./data/muscle_assets_v1.3.0.json"),
+    fetchOptionalJson("./data/training_plan_presets_v1.3.0.json"),
+    fetchOptionalJson("./data/coaching_texts_v1.3.0.json"),
+    fetchOptionalJson("./data/warmup_cooldown_rules_v1.3.0.json"),
+    fetchOptionalJson("./data/user_profile_schema_v1.3.0.json"),
+    fetchOptionalJson("./data/exercise_scoring_rules_v1.3.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -295,6 +422,12 @@ async function boot() {
   state.journalSchema = journalSchema;
   state.importExportSchema = importExportSchema;
   state.machineSettingsSchema = machineSettingsSchema;
+  state.muscleAssets = muscleAssets;
+  state.coachingTexts = coachingTexts;
+  state.warmupCooldownRules = warmupCooldownRules;
+  state.userProfileSchema = userProfileSchema;
+  state.exerciseScoringRules = exerciseScoringRules;
+  mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   runStorageMigrations();
   const plan = activePlan();
   if (plan && storage.activePlanName !== plan.planName) {
@@ -382,7 +515,7 @@ function activePlan() {
 }
 
 function availablePlans() {
-  return state.seed.trainingPlans.filter((plan) => !storage.deletedPlanNames.includes(plan.planName));
+  return [...state.seed.trainingPlans, ...storage.customPlans].filter((plan) => !storage.deletedPlanNames.includes(plan.planName));
 }
 
 function isPlanArchived(planName) {
@@ -398,6 +531,25 @@ function planStatus(plan) {
 function ensureActivePlan() {
   const plan = activePlan();
   storage.activePlanName = plan?.planName || "";
+}
+
+function duplicatePlan(planName) {
+  const plan = availablePlans().find((item) => item.planName === planName);
+  if (!plan) return;
+  const copyName = `${plan.planName} Kopie`;
+  const usedNames = new Set(availablePlans().map((item) => item.planName));
+  let nextName = copyName;
+  let index = 2;
+  while (usedNames.has(nextName)) {
+    nextName = `${copyName} ${index}`;
+    index += 1;
+  }
+  const copy = JSON.parse(JSON.stringify(plan));
+  copy.id = `${plan.id || plan.planName}-copy-${Date.now()}`;
+  copy.planName = nextName;
+  copy.description = `${plan.description || ""} Lokale Kopie.`.trim();
+  storage.customPlans = [...storage.customPlans, copy];
+  storage.activePlanName = copy.planName;
 }
 
 function exerciseById(id) {
@@ -496,6 +648,7 @@ function performanceForExercise(exercise) {
 }
 
 function progressionForEntry(entry, previous) {
+  const texts = coachingTexts();
   const current = {
     sets: entry.sets.map((set) => ({
       completed: set.completed,
@@ -509,12 +662,12 @@ function progressionForEntry(entry, previous) {
   const topTarget = upperRepTarget(entry.reps);
   const allTop = topTarget && currentPerf.sets.length && currentPerf.sets.every((set) => Number(set.actualReps || 0) >= topTarget);
   const critical = exerciseIsCritical(exerciseById(entry.exerciseId));
-  if (!currentPerf.sets.length) return { color: "amber", text: "Noch keine abgeschlossenen Saetze." };
-  if (critical && allTop) return { color: "amber", text: "Stark, aber LWS-vorsichtig: erst Technik stabil halten, dann klein steigern." };
-  if (allTop) return { color: "green", text: "Alle Saetze stark. Naechstes Mal leicht erhoehen." };
-  if (previousPerf && currentPerf.volume > previousPerf.volume) return { color: "green", text: "Staerker als letztes Mal." };
-  if (previousPerf && currentPerf.volume < previousPerf.volume * 0.85) return { color: "amber", text: "Heute schwaecher. Regeneration pruefen." };
-  return { color: "blue", text: "Gewicht halten und Wiederholungen sammeln." };
+  if (!currentPerf.sets.length) return { color: "amber", text: texts.noHistory || "Noch keine abgeschlossenen Saetze." };
+  if (critical && allTop) return { color: "amber", text: texts.lwsCaution || "Stark, aber LWS-vorsichtig: erst Technik stabil halten, dann klein steigern." };
+  if (allTop) return { color: "green", text: texts.increaseSuggested || "Alle Saetze stark. Naechstes Mal leicht erhoehen." };
+  if (previousPerf && currentPerf.volume > previousPerf.volume) return { color: "green", text: texts.sameWeightMoreReps || "Staerker als letztes Mal." };
+  if (previousPerf && currentPerf.volume < previousPerf.volume * 0.85) return { color: "amber", text: texts.performanceDrop || "Heute schwaecher. Regeneration pruefen." };
+  return { color: "blue", text: texts.holdWeight || "Gewicht halten und Wiederholungen sammeln." };
 }
 
 function machineSettingsForExercise(exerciseId) {
@@ -635,15 +788,16 @@ function upperRepTarget(text) {
 }
 
 function progressionHint(exercise, plannedReps, previousSets) {
+  const texts = coachingTexts();
   if (exerciseIsCritical(exercise)) {
-    return "Nur schmerzfrei ausführen oder Alternative wählen.";
+    return texts.lwsCaution || "Nur schmerzfrei ausführen oder Alternative wählen.";
   }
   const target = upperRepTarget(plannedReps);
   if (!target || !previousSets?.length) {
-    return "Sauber arbeiten und moderat starten.";
+    return texts.noHistory || "Sauber arbeiten und moderat starten.";
   }
   const allReached = previousSets.every((set) => Number(set.actualReps || 0) >= target);
-  return allReached ? "Letztes Mal Ziel erreicht. Beim nächsten Mal leicht steigern." : "Gewicht beibehalten und Technik priorisieren.";
+  return allReached ? (texts.increaseSuggested || "Letztes Mal Ziel erreicht. Beim nächsten Mal leicht steigern.") : (texts.holdWeight || "Gewicht beibehalten und Technik priorisieren.");
 }
 
 function lwsBadge(value) {
@@ -673,6 +827,28 @@ function muscleName(id) {
 
 function muscleMappingForExercise(exerciseId) {
   return state.exerciseMuscleMap?.mappings?.find((mapping) => mapping.exerciseId === exerciseId) || null;
+}
+
+function coachingTexts() {
+  return state.coachingTexts?.texts || {};
+}
+
+function muscleAssetFor(muscleId) {
+  return state.muscleAssets?.muscles?.find((item) => item.muscleId === muscleId) || null;
+}
+
+function warmupRulesForDay(day) {
+  const rules = state.warmupCooldownRules?.warmup || [];
+  const exercises = day?.exercises?.map((item) => exerciseById(item.exerciseId)).filter(Boolean) || [];
+  const hasLegOrCore = exercises.some((exercise) => {
+    const text = `${exercise.category} ${exercise.movementPattern} ${exercise.primaryMuscleGroups.join(" ")} ${exercise.secondaryMuscleGroups.join(" ")}`.toLowerCase();
+    return text.includes("bein") || text.includes("core") || text.includes("squat") || text.includes("hinge");
+  });
+  return rules.filter((rule) => rule.id !== "lws_leg_day" || hasLegOrCore);
+}
+
+function cooldownRules() {
+  return state.warmupCooldownRules?.cooldown || [];
 }
 
 function extendedExerciseById(id) {
@@ -834,6 +1010,43 @@ function muscleRoleCards(exercise) {
   `;
 }
 
+function muscleMapSources(exercise) {
+  const mapping = muscleMappingForExercise(exercise.id);
+  if (!mapping || !state.muscleAssets) return [];
+  const primary = muscleAssetFor(mapping.primaryMuscle);
+  const secondary = (mapping.secondaryMuscles || []).map((item) => muscleAssetFor(item.muscleId)).filter(Boolean);
+  const stabilizers = (mapping.stabilizers || []).map((item) => muscleAssetFor(item.muscleId)).filter(Boolean);
+  return [
+    primary ? { ...primary, role: "primary" } : null,
+    ...secondary.map((item) => ({ ...item, role: "secondary" })),
+    ...stabilizers.map((item) => ({ ...item, role: "stabilizer" }))
+  ].filter(Boolean);
+}
+
+function renderMuscleMap(exercise) {
+  const sources = muscleMapSources(exercise);
+  if (!sources.length) return `<article class="card"><p class="muted">Keine Muskelkarte hinterlegt.</p></article>`;
+  const views = ["front", "back"].filter((view) => sources.some((item) => item.view === view));
+  return `
+    <article class="card stack">
+      <h3>Muskelkarte</h3>
+      <div class="body-map-grid">
+        ${views.map((view) => `
+          <div class="body-map">
+            ${state.muscleAssets?.baseMaps?.[view] ? `<img src="${htmlesc(state.muscleAssets.baseMaps[view])}" alt="${view === "front" ? "Vorderseite" : "Rueckseite"}">` : ""}
+            ${sources.filter((item) => item.view === view).map((item) => `<img class="${item.role}" src="${htmlesc(item.asset)}" alt="">`).join("")}
+          </div>
+        `).join("")}
+      </div>
+      <div class="chip-row">
+        <span class="muscle-chip"><small>Ziel</small> stark</span>
+        <span class="muscle-chip"><small>Hilfe</small> dezent</span>
+        <span class="muscle-chip"><small>Stabil</small> leicht</span>
+      </div>
+    </article>
+  `;
+}
+
 function exerciseKnowledge(exercise) {
   const roles = exerciseMuscleRoles(exercise);
   const extended = extendedExerciseById(exercise.id);
@@ -972,6 +1185,7 @@ function renderTraining() {
               <h2>${htmlesc(day.name)}</h2>
               <p class="muted">${day.exercises.length} Übungen · ${day.maxDurationMinutes} Minuten</p>
               <p class="quiet">${lastDayDate(day.name) || "Noch nicht trainiert"}</p>
+              ${renderWarmupHint(day)}
             </div>
             <span class="badge blue">Start</span>
           </article>
@@ -988,6 +1202,34 @@ function renderTraining() {
 function lastDayDate(dayName) {
   const session = storage.sessions.filter((item) => item.dayName === dayName).sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
   return session ? `Letztes Mal: ${dateText(session.startedAt)}` : null;
+}
+
+function renderWarmupHint(day) {
+  const rules = warmupRulesForDay(day);
+  if (!rules.length) return "";
+  return `<p class="quiet">${htmlesc(rules[0].text)}</p>`;
+}
+
+function renderWarmupCard(day) {
+  const rules = warmupRulesForDay(day);
+  if (!rules.length) return "";
+  return `
+    <article class="card stack info-card">
+      <h3>Warm-up</h3>
+      <ul class="small-list">${rules.map((rule) => `<li>${htmlesc(rule.text)}</li>`).join("")}</ul>
+    </article>
+  `;
+}
+
+function renderCooldownCard() {
+  const rules = cooldownRules();
+  if (!rules.length) return "";
+  return `
+    <article class="card stack info-card">
+      <h3>Cooldown</h3>
+      <ul class="small-list">${rules.map((rule) => `<li>${htmlesc(rule.text)}</li>`).join("")}</ul>
+    </article>
+  `;
 }
 
 function startDay(dayName) {
@@ -1030,6 +1272,7 @@ function renderWorkout() {
   const workout = state.activeWorkout;
   const entry = workout.entries[workout.index];
   const exercise = exerciseById(entry.exerciseId);
+  const day = activePlan()?.days?.find((item) => item.name === workout.dayName);
   const last = lastCompletedExercise(entry.exerciseId);
   const progress = Math.round(((workout.index + 1) / workout.entries.length) * 100);
   const hint = progressionHint(exercise, entry.reps, last?.exercise?.sets || []);
@@ -1043,6 +1286,7 @@ function renderWorkout() {
         <p class="subtitle">Übung ${workout.index + 1} von ${workout.entries.length}</p>
       </header>
       <div class="progress"><span style="width:${progress}%"></span></div>
+      ${workout.index === 0 ? renderWarmupCard(day) : ""}
       <article class="card stack">
         <h2>${htmlesc(exercise.displayName)}</h2>
         <p class="muted">${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].slice(0, 3).join(" · "))}</p>
@@ -1068,6 +1312,7 @@ function renderWorkout() {
         <p class="muted">${htmlesc(recommendation.text)}</p>
       </article>
       <p class="quiet">Dieses Training wird automatisch auf diesem Gerät gesichert.</p>
+      ${workout.index === workout.entries.length - 1 ? renderCooldownCard() : ""}
       ${state.restTimer.remaining > 0 || state.restTimer.running ? renderRestTimer() : ""}
       ${state.showAlternatives ? renderAlternativePicker(alternatives) : ""}
       <div class="actions">
@@ -1280,6 +1525,7 @@ function renderPlans() {
               ? `<button class="secondary" data-unarchive-plan="${htmlesc(plan.planName)}">Wiederherstellen</button>`
               : `<button class="secondary" data-archive-plan="${htmlesc(plan.planName)}">Archivieren</button>`}
           </div>
+          <button class="secondary" data-duplicate-plan="${htmlesc(plan.planName)}">Plan duplizieren</button>
           <button class="danger" data-delete-plan="${htmlesc(plan.planName)}">Plan löschen</button>
         </article>
       `).join("") : `<article class="card stack">
@@ -1355,6 +1601,7 @@ function renderExerciseDetail(id) {
         ${muscleRoleCards(exercise)}
         <p class="muted">${htmlesc(exerciseKindText(exercise))}</p>
       </article>
+      ${renderMuscleMap(exercise)}
       <article class="card stack">
         <p>${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].join(" · "))}</p>
         <p class="muted">${htmlesc(exercise.equipment.join(" · "))}</p>
@@ -1381,7 +1628,7 @@ function renderExerciseDetail(id) {
         <ul class="small-list">${exerciseKnowledge(exercise).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
       </article>
       <article class="card stack"><h3>Ausführung</h3><p class="muted">${htmlesc(exercise.techniqueNotes || "Keine Technikhinweise hinterlegt.")}</p></article>
-      <article class="card stack"><h3>Häufige Fehler</h3><ul class="small-list">${exercise.commonMistakes.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul></article>
+      <article class="card stack"><h3>Häufige Fehler</h3>${exercise.commonMistakes?.length ? `<ul class="small-list">${exercise.commonMistakes.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : `<p class="muted">Keine Fehlerhinweise hinterlegt.</p>`}</article>
       <article class="card stack"><h3>Letzte Leistung</h3>${last ? `<p class="muted">Letztes Mal am ${dateText(last.session.endedAt || last.session.startedAt)}</p><ul class="small-list">${last.exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}</li>`).join("")}</ul>` : `<p class="muted">Noch keine vorherige Leistung vorhanden.</p>`}</article>
       <article class="card stack">
         <h3>Verlauf</h3>
@@ -1578,7 +1825,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "1.2.0",
+    backupVersion: "1.3.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),
@@ -1590,6 +1837,7 @@ function createBackup() {
     weights: storage.weights,
     journalEntries: storage.journalEntries,
     machineSettings: storage.machineSettings,
+    customPlans: storage.customPlans,
     archivedPlanNames: storage.archivedPlanNames,
     deletedPlanNames: storage.deletedPlanNames,
     activeWorkoutDraft: storage.activeWorkoutDraft
@@ -1656,6 +1904,7 @@ function importBackupFile(file) {
       storage.weights = mergeById(storage.weights, backup.weights);
       storage.journalEntries = mergeById(storage.journalEntries, Array.isArray(backup.journalEntries) ? backup.journalEntries : []);
       storage.machineSettings = mergeById(storage.machineSettings, Array.isArray(backup.machineSettings) ? backup.machineSettings : []);
+      storage.customPlans = mergeById(storage.customPlans, Array.isArray(backup.customPlans) ? backup.customPlans : []);
       storage.migrationLog = mergeById(storage.migrationLog, Array.isArray(backup.migrationLog) ? backup.migrationLog : []);
       if (!storage.storageVersion && backup.storageVersion) storage.storageVersion = backup.storageVersion;
       storage.archivedPlanNames = Array.isArray(backup.archivedPlanNames) ? backup.archivedPlanNames : [];
@@ -1760,6 +2009,13 @@ function bindEvents() {
       const planName = button.dataset.unarchivePlan;
       storage.archivedPlanNames = storage.archivedPlanNames.filter((name) => name !== planName);
       if (!activePlan()) storage.activePlanName = planName;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-duplicate-plan]").forEach((button) => {
+    button.addEventListener("click", () => {
+      duplicatePlan(button.dataset.duplicatePlan);
       render();
     });
   });
@@ -1948,6 +2204,7 @@ function bindEvents() {
     storage.weights = [];
     storage.journalEntries = [];
     storage.machineSettings = [];
+    storage.customPlans = [];
     clearWorkoutDraft();
     storage.lastBackupAt = null;
     state.activeWorkout = null;

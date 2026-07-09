@@ -1,0 +1,41 @@
+{
+  "version": "1.3.0",
+  "type": "user_profile_schema",
+  "fields": [
+    {
+      "name": "trainingExperience",
+      "type": "string",
+      "default": "advanced"
+    },
+    {
+      "name": "availableMinutes",
+      "type": "number",
+      "default": 60
+    },
+    {
+      "name": "preferredSplit",
+      "type": "string",
+      "default": "3er Split"
+    },
+    {
+      "name": "lumbarDiscHistory",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "name": "preferredStudio",
+      "type": "string",
+      "default": ""
+    },
+    {
+      "name": "excludedExerciseIds",
+      "type": "array",
+      "default": []
+    },
+    {
+      "name": "favoriteExerciseIds",
+      "type": "array",
+      "default": []
+    }
+  ]
+}

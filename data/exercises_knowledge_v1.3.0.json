@@ -1,0 +1,3864 @@
+{
+  "version": "1.3.0",
+  "type": "exercises_knowledge",
+  "locale": "de-DE",
+  "exercises": [
+    {
+      "id": "ex_chest_press_machine",
+      "displayName": "Brustpresse Maschine",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_incline_chest_press_machine",
+      "displayName": "Schrägbank Brustpresse Maschine",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_decline_chest_press_machine",
+      "displayName": "Negative Brustpresse Maschine",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_barbell_bench_press",
+      "displayName": "Langhantel Bankdrücken",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_dumbbell_bench_press",
+      "displayName": "Kurzhantel Bankdrücken",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_dumbbell_incline_press",
+      "displayName": "Kurzhantel Schrägbankdrücken",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_smith_bench_press",
+      "displayName": "Smith Bankdrücken",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_smith",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_push_up",
+      "displayName": "Liegestütze",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_bodyweight",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_cable_fly",
+      "displayName": "Kabel-Flys",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_low_to_high_cable_fly",
+      "displayName": "Kabel-Flys tief nach hoch",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_pec_deck",
+      "displayName": "Pec Deck",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_machine_dip",
+      "displayName": "Dip Maschine",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "vertical_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_dips",
+      "displayName": "Dips",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_bodyweight",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "6-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "vertical_push",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_shoulder_press_machine",
+      "displayName": "Schulterpresse Maschine",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "vertical_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_dumbbell_shoulder_press",
+      "displayName": "Kurzhantel Schulterdrücken",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "vertical_push",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_smith_shoulder_press",
+      "displayName": "Smith Schulterdrücken",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_smith",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "vertical_push",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_lateral_raise",
+      "displayName": "Seitheben",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_cable_lateral_raise",
+      "displayName": "Seitheben am Kabel",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_machine_lateral_raise",
+      "displayName": "Seitheben Maschine",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_front_raise",
+      "displayName": "Frontheben",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_triceps_pushdown",
+      "displayName": "Trizepsdrücken Kabel",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_rope_pushdown",
+      "displayName": "Trizepsdrücken Seil",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_overhead_triceps_extension",
+      "displayName": "Überkopf Trizepsdrücken Kabel",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_skullcrusher",
+      "displayName": "Skullcrusher SZ",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_close_grip_bench",
+      "displayName": "Enges Bankdrücken",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_lat_pulldown",
+      "displayName": "Latziehen",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "vertical_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_close_grip_pulldown",
+      "displayName": "Enger Latzug",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "vertical_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_neutral_grip_pulldown",
+      "displayName": "Neutraler Latzug",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "vertical_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_straight_arm_pulldown",
+      "displayName": "Überzüge Kabel",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Shoulder Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "shoulder_extension",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_assisted_pullup",
+      "displayName": "Unterstützte Klimmzüge",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_pullup",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "vertical_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_pullup",
+      "displayName": "Klimmzüge",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_pullup",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "5-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "vertical_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_seated_row",
+      "displayName": "Rudern sitzend",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_machine_row",
+      "displayName": "Rudermaschine",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_chest_supported_row",
+      "displayName": "Brustgestütztes Rudern",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_one_arm_cable_row",
+      "displayName": "Einarmiges Kabelrudern",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_one_arm_dumbbell_row",
+      "displayName": "Einarmiges Kurzhantelrudern",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_bent_over_row",
+      "displayName": "Vorgebeugtes Rudern",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "high",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "avoidInitially"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_t_bar_row_supported",
+      "displayName": "T-Bar Rudern brustgestützt",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_reverse_pec_deck",
+      "displayName": "Reverse Butterfly",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_face_pull",
+      "displayName": "Face Pulls",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_cable_reverse_fly",
+      "displayName": "Reverse Fly am Kabel",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_cable_biceps_curl",
+      "displayName": "Bizepscurls Kabel",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_dumbbell_biceps_curl",
+      "displayName": "Kurzhantel Bizepscurls",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_hammer_curl",
+      "displayName": "Hammer Curls",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_preacher_curl_machine",
+      "displayName": "Preacher Curl Maschine",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_concentration_curl",
+      "displayName": "Konzentrationscurl",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_leg_press",
+      "displayName": "Beinpresse",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_leg_press",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "squat_pattern",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_hack_squat",
+      "displayName": "Hackenschmidt",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "squat_pattern",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_bulgarian_split_squat",
+      "displayName": "Bulgarian Split Squat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Lunge Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "lunge_pattern",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_step_up",
+      "displayName": "Step Ups",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Lunge Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "lunge_pattern",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_goblet_squat",
+      "displayName": "Goblet Squat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "squat_pattern",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_barbell_back_squat",
+      "displayName": "Kniebeuge Langhantel",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "high",
+      "defaultSets": 2,
+      "defaultRepRange": "5-8",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "squat_pattern",
+        "avoidInitially"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_front_squat",
+      "displayName": "Frontkniebeuge",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "high",
+      "defaultSets": 2,
+      "defaultRepRange": "5-8",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "squat_pattern",
+        "avoidInitially"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_smith_squat",
+      "displayName": "Multipresse Kniebeuge",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_smith",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "squat_pattern",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_leg_extension",
+      "displayName": "Beinstrecker",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Knee Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "knee_extension",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_seated_leg_curl",
+      "displayName": "Beinbeuger sitzend",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Knee Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "knee_flexion",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_lying_leg_curl",
+      "displayName": "Beinbeuger liegend",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Knee Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "knee_flexion",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_standing_leg_curl",
+      "displayName": "Beinbeuger stehend",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Knee Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "knee_flexion",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_hip_thrust_machine",
+      "displayName": "Hip Thrust Maschine",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Hip Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "hip_extension",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_barbell_hip_thrust",
+      "displayName": "Langhantel Hip Thrust",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Hip Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "hip_extension",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_glute_bridge",
+      "displayName": "Glute Bridge",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_bodyweight",
+      "movementPattern": "Hip Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "hip_extension",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_cable_pull_through",
+      "displayName": "Kabel Pull-Through",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "hip_hinge",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_back_extension_45",
+      "displayName": "45° Hyperextension kontrolliert",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "hip_hinge",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_deadlift",
+      "displayName": "Kreuzheben klassisch",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "veryHigh",
+      "defaultSets": 2,
+      "defaultRepRange": "5-8",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "hip_hinge",
+        "avoidInitially"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_sumo_deadlift",
+      "displayName": "Sumo Kreuzheben",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "high",
+      "defaultSets": 2,
+      "defaultRepRange": "5-8",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "hip_hinge",
+        "avoidInitially"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_romanian_deadlift",
+      "displayName": "Rumänisches Kreuzheben",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "high",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "hip_hinge",
+        "avoidInitially"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_calf_raise_machine",
+      "displayName": "Wadenheben Maschine",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Calf Raise",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "calf_raise",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_seated_calf_raise",
+      "displayName": "Wadenheben sitzend",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Calf Raise",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "calf_raise",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_adductor_machine",
+      "displayName": "Adduktoren Maschine",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_abductor_machine",
+      "displayName": "Abduktoren Maschine",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_pallof_press",
+      "displayName": "Pallof Press",
+      "englishName": "",
+      "category": "Core",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Core Anti-Rotation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15 je Seite",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "tags": [
+        "core",
+        "core_anti-rotation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_plank",
+      "displayName": "Plank",
+      "englishName": "",
+      "category": "Core",
+      "equipmentId": "eq_bodyweight",
+      "movementPattern": "Core Anti-Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "30-60 Sekunden",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "tags": [
+        "core",
+        "core_anti-extension",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_side_plank",
+      "displayName": "Side Plank",
+      "englishName": "",
+      "category": "Core",
+      "equipmentId": "eq_bodyweight",
+      "movementPattern": "Core Anti-Lateral-Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "20-45 Sekunden je Seite",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "tags": [
+        "core",
+        "core_anti-lateral-flexion",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_dead_bug",
+      "displayName": "Dead Bug",
+      "englishName": "",
+      "category": "Core",
+      "equipmentId": "eq_bodyweight",
+      "movementPattern": "Core Anti-Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "tags": [
+        "core",
+        "core_anti-extension",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_bird_dog",
+      "displayName": "Bird Dog",
+      "englishName": "",
+      "category": "Core",
+      "equipmentId": "eq_bodyweight",
+      "movementPattern": "Core Stability",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "tags": [
+        "core",
+        "core_stability",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_cable_crunch",
+      "displayName": "Cable Crunch",
+      "englishName": "",
+      "category": "Core",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Spinal Flexion",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 45,
+      "difficulty": "mittel",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "tags": [
+        "core",
+        "spinal_flexion",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_hanging_knee_raise",
+      "displayName": "Hanging Knee Raise",
+      "englishName": "",
+      "category": "Core",
+      "equipmentId": "eq_pullup",
+      "movementPattern": "Hip Flexion/Core",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-15",
+      "defaultRestSeconds": 45,
+      "difficulty": "mittel",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "tags": [
+        "core",
+        "hip_flexion/core",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_reverse_crunch",
+      "displayName": "Reverse Crunch",
+      "englishName": "",
+      "category": "Core",
+      "equipmentId": "eq_bodyweight",
+      "movementPattern": "Core",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 45,
+      "difficulty": "mittel",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "tags": [
+        "core",
+        "core",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_farmer_walk",
+      "displayName": "Farmer Walk",
+      "englishName": "",
+      "category": "Core",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Carry",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "20-40 m",
+      "defaultRestSeconds": 45,
+      "difficulty": "mittel",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "tags": [
+        "core",
+        "carry",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_sled_push",
+      "displayName": "Schlitten schieben",
+      "englishName": "",
+      "category": "Conditioning",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Conditioning",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 1,
+      "defaultRepRange": "10-30 m",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Sauber und kontrolliert arbeiten, nicht maximal starten.",
+      "commonMistakes": [
+        "zu hart starten",
+        "Pausen ignorieren"
+      ],
+      "tags": [
+        "conditioning",
+        "conditioning",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_bike",
+      "displayName": "Fahrradergometer",
+      "englishName": "",
+      "category": "Cardio",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Cardio",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 1,
+      "defaultRepRange": "10-20 Minuten",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Moderate Intensität wählen, Atmung ruhig halten.",
+      "commonMistakes": [
+        "zu schnell starten",
+        "Technik vernachlässigen"
+      ],
+      "tags": [
+        "cardio",
+        "cardio",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_treadmill_walk",
+      "displayName": "Laufband Gehen",
+      "englishName": "",
+      "category": "Cardio",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Cardio",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 1,
+      "defaultRepRange": "10-20 Minuten",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Moderate Intensität wählen, Atmung ruhig halten.",
+      "commonMistakes": [
+        "zu schnell starten",
+        "Technik vernachlässigen"
+      ],
+      "tags": [
+        "cardio",
+        "cardio",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_rower_machine",
+      "displayName": "Ruderergometer",
+      "englishName": "",
+      "category": "Cardio",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Cardio",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 1,
+      "defaultRepRange": "5-15 Minuten",
+      "defaultRestSeconds": 45,
+      "difficulty": "mittel",
+      "techniqueNotes": "Moderate Intensität wählen, Atmung ruhig halten.",
+      "commonMistakes": [
+        "zu schnell starten",
+        "Technik vernachlässigen"
+      ],
+      "tags": [
+        "cardio",
+        "cardio",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_chest_press_machine_tempo",
+      "displayName": "Brustpresse Maschine langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_incline_chest_press_machine_tempo",
+      "displayName": "Schrägbank Brustpresse Maschine langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_decline_chest_press_machine_tempo",
+      "displayName": "Negative Brustpresse Maschine langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_barbell_bench_press_tempo",
+      "displayName": "Langhantel Bankdrücken langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_dumbbell_bench_press_tempo",
+      "displayName": "Kurzhantel Bankdrücken langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_dumbbell_incline_press_tempo",
+      "displayName": "Kurzhantel Schrägbankdrücken langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_smith_bench_press_tempo",
+      "displayName": "Smith Bankdrücken langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_smith",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_push_up_tempo",
+      "displayName": "Liegestütze langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_bodyweight",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_cable_fly_tempo",
+      "displayName": "Kabel-Flys langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_low_to_high_cable_fly_tempo",
+      "displayName": "Kabel-Flys tief nach hoch langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_pec_deck_tempo",
+      "displayName": "Pec Deck langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_machine_dip_tempo",
+      "displayName": "Dip Maschine langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "vertical_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_dips_tempo",
+      "displayName": "Dips langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_bodyweight",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "6-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "vertical_push",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_shoulder_press_machine_tempo",
+      "displayName": "Schulterpresse Maschine langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "vertical_push",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_dumbbell_shoulder_press_tempo",
+      "displayName": "Kurzhantel Schulterdrücken langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "vertical_push",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_smith_shoulder_press_tempo",
+      "displayName": "Smith Schulterdrücken langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_smith",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "vertical_push",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_lateral_raise_tempo",
+      "displayName": "Seitheben langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_cable_lateral_raise_tempo",
+      "displayName": "Seitheben am Kabel langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_machine_lateral_raise_tempo",
+      "displayName": "Seitheben Maschine langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_front_raise_tempo",
+      "displayName": "Frontheben langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_triceps_pushdown_tempo",
+      "displayName": "Trizepsdrücken Kabel langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_rope_pushdown_tempo",
+      "displayName": "Trizepsdrücken Seil langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_overhead_triceps_extension_tempo",
+      "displayName": "Überkopf Trizepsdrücken Kabel langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_skullcrusher_tempo",
+      "displayName": "Skullcrusher SZ langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "isolation",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_close_grip_bench_tempo",
+      "displayName": "Enges Bankdrücken langsam kontrolliert",
+      "englishName": "",
+      "category": "Push",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrollierte Wiederholungen, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schulter nach vorne fallen lassen",
+        "zu viel Schwung"
+      ],
+      "tags": [
+        "push",
+        "horizontal_push",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_lat_pulldown_tempo",
+      "displayName": "Latziehen langsam kontrolliert",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "vertical_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_close_grip_pulldown_tempo",
+      "displayName": "Enger Latzug langsam kontrolliert",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "vertical_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_neutral_grip_pulldown_tempo",
+      "displayName": "Neutraler Latzug langsam kontrolliert",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "vertical_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_straight_arm_pulldown_tempo",
+      "displayName": "Überzüge Kabel langsam kontrolliert",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Shoulder Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "shoulder_extension",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_assisted_pullup_tempo",
+      "displayName": "Unterstützte Klimmzüge langsam kontrolliert",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_pullup",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "vertical_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_pullup_light",
+      "displayName": "Klimmzüge leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_pullup",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "5-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "vertical_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_seated_row_light",
+      "displayName": "Rudern sitzend leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_machine_row_light",
+      "displayName": "Rudermaschine leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_chest_supported_row_light",
+      "displayName": "Brustgestütztes Rudern leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_one_arm_cable_row_light",
+      "displayName": "Einarmiges Kabelrudern leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_one_arm_dumbbell_row_light",
+      "displayName": "Einarmiges Kurzhantelrudern leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_bent_over_row_light",
+      "displayName": "Vorgebeugtes Rudern leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_t_bar_row_supported_light",
+      "displayName": "T-Bar Rudern brustgestützt leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_reverse_pec_deck_light",
+      "displayName": "Reverse Butterfly leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_face_pull_light",
+      "displayName": "Face Pulls leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "horizontal_pull",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_cable_reverse_fly_light",
+      "displayName": "Reverse Fly am Kabel leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_cable_biceps_curl_light",
+      "displayName": "Bizepscurls Kabel leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_dumbbell_biceps_curl_light",
+      "displayName": "Kurzhantel Bizepscurls leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_hammer_curl_light",
+      "displayName": "Hammer Curls leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_preacher_curl_machine_light",
+      "displayName": "Preacher Curl Maschine leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_concentration_curl_light",
+      "displayName": "Konzentrationscurl leicht/moderat",
+      "englishName": "",
+      "category": "Pull",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, Zug aus Rücken/Armen kontrollieren, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schulter hochziehen"
+      ],
+      "tags": [
+        "pull",
+        "isolation",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_leg_press_light",
+      "displayName": "Beinpresse leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_leg_press",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "squat_pattern",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_hack_squat_light",
+      "displayName": "Hackenschmidt leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "squat_pattern",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_bulgarian_split_squat_light",
+      "displayName": "Bulgarian Split Squat leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Lunge Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "lunge_pattern",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_step_up_light",
+      "displayName": "Step Ups leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Lunge Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "lunge_pattern",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_goblet_squat_light",
+      "displayName": "Goblet Squat leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_dumbbell",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "squat_pattern",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_barbell_back_squat_light",
+      "displayName": "Kniebeuge Langhantel leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "5-8",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "squat_pattern",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_front_squat_light",
+      "displayName": "Frontkniebeuge leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "5-8",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "squat_pattern",
+        "conditionallySuitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_smith_squat_light",
+      "displayName": "Multipresse Kniebeuge leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_smith",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "squat_pattern",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_leg_extension_light",
+      "displayName": "Beinstrecker leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Knee Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "knee_extension",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_seated_leg_curl_light",
+      "displayName": "Beinbeuger sitzend leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Knee Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "knee_flexion",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_lying_leg_curl_light",
+      "displayName": "Beinbeuger liegend leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Knee Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "knee_flexion",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_standing_leg_curl_light",
+      "displayName": "Beinbeuger stehend leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Knee Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "knee_flexion",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_hip_thrust_machine_light",
+      "displayName": "Hip Thrust Maschine leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "movementPattern": "Hip Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "hip_extension",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    },
+    {
+      "id": "ex_barbell_hip_thrust_light",
+      "displayName": "Langhantel Hip Thrust leicht/moderat",
+      "englishName": "",
+      "category": "Legs",
+      "equipmentId": "eq_barbell",
+      "movementPattern": "Hip Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "tags": [
+        "legs",
+        "hip_extension",
+        "suitable"
+      ],
+      "isCustom": false,
+      "isArchived": false
+    }
+  ]
+}

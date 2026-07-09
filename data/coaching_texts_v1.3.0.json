@@ -1,0 +1,17 @@
+{
+  "version": "1.3.0",
+  "type": "coaching_texts",
+  "locale": "de-DE",
+  "texts": {
+    "noHistory": "Noch keine vorherige Leistung vorhanden. Starte moderat.",
+    "sameWeightMoreReps": "Stark. Gleiches Gewicht, mehr Wiederholungen als letztes Mal.",
+    "increaseSuggested": "Alle Sätze stark. Nächstes Mal leicht erhöhen.",
+    "holdWeight": "Gewicht halten und Wiederholungen sammeln.",
+    "performanceDrop": "Heute schwächer. Regeneration prüfen und nichts erzwingen.",
+    "lwsCaution": "LWS-Hinweis: kontrolliert und schmerzfrei arbeiten.",
+    "lwsAvoid": "Für den Wiedereinstieg besser eine Alternative wählen.",
+    "trainingComplete": "Training abgeschlossen.",
+    "warmupDefault": "5–8 Minuten locker aufwärmen und die erste Hauptübung mit 1–2 leichten Sätzen vorbereiten.",
+    "cooldownDefault": "Optional: 2–5 Minuten locker auslaufen oder Mobility."
+  }
+}

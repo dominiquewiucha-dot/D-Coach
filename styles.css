@@ -240,6 +240,34 @@ button {
   font-size: 10px;
 }
 
+.body-map-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.body-map {
+  position: relative;
+  min-height: 220px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--input);
+  overflow: hidden;
+}
+
+.body-map img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+}
+
+.body-map img.primary { opacity: .95; }
+.body-map img.secondary { opacity: .52; }
+.body-map img.stabilizer { opacity: .32; }
+
 .role-label {
   color: var(--blue);
   font-size: 11px;
@@ -538,6 +566,7 @@ button {
   .screen { padding-left: 12px; padding-right: 12px; }
   .title { font-size: 30px; }
   .muscle-grid { grid-template-columns: 1fr; }
+  .body-map-grid { grid-template-columns: 1fr; }
   .mini-grid { grid-template-columns: 1fr; }
   .set-row { grid-template-columns: 24px 1fr 1fr 54px 38px; gap: 6px; }
 }

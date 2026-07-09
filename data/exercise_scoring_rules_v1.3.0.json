@@ -1,0 +1,34 @@
+{
+  "version": "1.3.0",
+  "type": "exercise_scoring_rules",
+  "alternativeScore": [
+    {
+      "criterion": "samePrimaryMuscle",
+      "weight": 50
+    },
+    {
+      "criterion": "sameMovementPattern",
+      "weight": 25
+    },
+    {
+      "criterion": "lowerSpineLoad",
+      "weight": 30
+    },
+    {
+      "criterion": "sameEquipment",
+      "weight": 10
+    },
+    {
+      "criterion": "hasHistory",
+      "weight": 10
+    },
+    {
+      "criterion": "userFavorite",
+      "weight": 10
+    },
+    {
+      "criterion": "userExcluded",
+      "weight": -999
+    }
+  ]
+}

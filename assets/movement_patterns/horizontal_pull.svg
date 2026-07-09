@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+<rect width="640" height="360" rx="24" fill="#0B0F14"/>
+<rect x="32" y="32" width="576" height="296" rx="20" fill="#121821" stroke="#2A3442" stroke-width="3"/>
+<text x="60" y="80" fill="#3B82F6" font-size="30" font-family="Arial" font-weight="700">Horizontal Pull</text>
+<circle cx="250" cy="165" r="34" fill="none" stroke="#F3F4F6" stroke-width="8"/>
+<line x1="250" y1="200" x2="250" y2="270" stroke="#F3F4F6" stroke-width="8"/>
+<line x1="250" y1="220" x2="170" y2="245" stroke="#F3F4F6" stroke-width="8"/>
+<line x1="250" y1="220" x2="330" y2="245" stroke="#F3F4F6" stroke-width="8"/>
+<text x="425" y="205" fill="#FF6600" font-size="84" font-family="Arial" font-weight="700">←</text>
+<text x="60" y="310" fill="#A7B0BE" font-size="22" font-family="Arial">Ziehen zum Körper</text>
+</svg>
