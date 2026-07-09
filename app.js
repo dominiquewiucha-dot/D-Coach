@@ -1,5 +1,7 @@
 const state = {
   seed: null,
+  muscles: null,
+  exerciseMuscleMap: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -75,8 +77,25 @@ function writeJson(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
+async function fetchOptionalJson(path) {
+  try {
+    const response = await fetch(path);
+    if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+    return await response.json();
+  } catch (error) {
+    console.warn(`Optionale D-Coach Daten konnten nicht geladen werden: ${path}`, error);
+    return null;
+  }
+}
+
 async function boot() {
   state.seed = await fetch("./seed_training_database.json").then((response) => response.json());
+  const [muscles, exerciseMuscleMap] = await Promise.all([
+    fetchOptionalJson("./data/muscles.json"),
+    fetchOptionalJson("./data/exercise_muscle_mapping.json")
+  ]);
+  state.muscles = muscles;
+  state.exerciseMuscleMap = exerciseMuscleMap;
   const plan = activePlan();
   if (plan && storage.activePlanName !== plan.planName) {
     storage.activePlanName = plan.planName;
@@ -376,6 +395,76 @@ function exerciseKind(exercise) {
   return "Mehrgelenk";
 }
 
+function muscleById(id) {
+  return state.muscles?.muscleGroups?.find((muscle) => muscle.id === id) || null;
+}
+
+function muscleName(id) {
+  return muscleById(id)?.name || id;
+}
+
+function muscleMappingForExercise(exerciseId) {
+  return state.exerciseMuscleMap?.mappings?.find((mapping) => mapping.exerciseId === exerciseId) || null;
+}
+
+function muscleRoleItem(name, intensityWeight = null) {
+  return { name, intensityWeight };
+}
+
+function mappedMuscleItems(items = []) {
+  return items.map((item) => muscleRoleItem(muscleName(item.muscleId), item.intensityWeight));
+}
+
+function exerciseMuscleRoles(exercise) {
+  const mapping = muscleMappingForExercise(exercise.id);
+  if (mapping) {
+    return {
+      hasMapping: true,
+      primary: [muscleRoleItem(muscleName(mapping.primaryMuscle), 1)],
+      secondary: mappedMuscleItems(mapping.secondaryMuscles),
+      stabilizers: mappedMuscleItems(mapping.stabilizers)
+    };
+  }
+  return {
+    hasMapping: false,
+    primary: exercise.primaryMuscleGroups.map((name) => muscleRoleItem(name)),
+    secondary: exercise.secondaryMuscleGroups.map((name) => muscleRoleItem(name)),
+    stabilizers: []
+  };
+}
+
+function intensityText(value) {
+  return Number.isFinite(Number(value)) ? `${Math.round(Number(value) * 100)}%` : "";
+}
+
+function muscleItemsText(items, fallback = "-") {
+  if (!items.length) return fallback;
+  return items.map((item) => item.name).join(", ");
+}
+
+function exerciseMuscleSearchText(exercise) {
+  const roles = exerciseMuscleRoles(exercise);
+  return [...roles.primary, ...roles.secondary, ...roles.stabilizers].map((item) => item.name).join(" ");
+}
+
+function exerciseListMuscleText(exercise) {
+  const roles = exerciseMuscleRoles(exercise);
+  const target = muscleItemsText(roles.primary, "-");
+  const helper = muscleItemsText(roles.secondary, "-");
+  const stabilizers = muscleItemsText(roles.stabilizers, "");
+  return `Ziel: ${target} | Hilfe: ${helper}${stabilizers ? ` | Stabil: ${stabilizers}` : ""}`;
+}
+
+function renderMuscleItems(items, fallback) {
+  if (!items.length) return `<span class="muted">${htmlesc(fallback)}</span>`;
+  return items.map((item) => `
+    <span class="muscle-chip">
+      ${htmlesc(item.name)}
+      ${intensityText(item.intensityWeight) ? `<small>${intensityText(item.intensityWeight)}</small>` : ""}
+    </span>
+  `).join("");
+}
+
 function exerciseKindText(exercise) {
   if (exerciseKind(exercise) === "Isolation") {
     return "Belastet vor allem den Zielmuskel. Hilfsmuskeln spielen nur eine kleine Rolle.";
@@ -384,32 +473,39 @@ function exerciseKindText(exercise) {
 }
 
 function muscleRoleCards(exercise) {
-  const primary = exercise.primaryMuscleGroups.length ? exercise.primaryMuscleGroups : ["Nicht hinterlegt"];
-  const secondary = exercise.secondaryMuscleGroups.length ? exercise.secondaryMuscleGroups : ["Keine wesentlichen Hilfsmuskeln"];
+  const roles = exerciseMuscleRoles(exercise);
   return `
     <div class="muscle-grid">
       <article class="muscle-role">
         <span class="role-label">Zielmuskel</span>
-        <strong>${htmlesc(primary.join(", "))}</strong>
+        <div class="muscle-chip-row">${renderMuscleItems(roles.primary, "Nicht hinterlegt")}</div>
         <p class="muted">Hauptarbeit der Uebung.</p>
       </article>
       <article class="muscle-role">
         <span class="role-label">Hilfsmuskel</span>
-        <strong>${htmlesc(secondary.join(", "))}</strong>
+        <div class="muscle-chip-row">${renderMuscleItems(roles.secondary, "Keine wesentlichen Hilfsmuskeln")}</div>
         <p class="muted">Unterstuetzt Bewegung oder Stabilitaet.</p>
+      </article>
+      <article class="muscle-role">
+        <span class="role-label">Stabilisatoren</span>
+        <div class="muscle-chip-row">${renderMuscleItems(roles.stabilizers, "Nicht gesondert hinterlegt")}</div>
+        <p class="muted">Halten Position und Koerperspannung.</p>
       </article>
     </div>
   `;
 }
 
 function exerciseKnowledge(exercise) {
-  const primary = exercise.primaryMuscleGroups.join(", ") || "Zielmuskel nicht hinterlegt";
-  const secondary = exercise.secondaryMuscleGroups.join(", ");
+  const roles = exerciseMuscleRoles(exercise);
+  const primary = muscleItemsText(roles.primary, "Zielmuskel nicht hinterlegt");
+  const secondary = muscleItemsText(roles.secondary, "");
+  const stabilizers = muscleItemsText(roles.stabilizers, "");
   const equipment = exercise.equipment.join(", ") || "Geraet nicht hinterlegt";
   return [
     `${exerciseKind(exercise)}: ${exerciseKindText(exercise)}`,
     `Primaer: ${primary}.`,
     secondary ? `Sekundaer: ${secondary}.` : "Sekundaer: keine wesentlichen Hilfsmuskeln hinterlegt.",
+    stabilizers ? `Stabilisatoren: ${stabilizers}.` : "Stabilisatoren: nicht gesondert hinterlegt.",
     `Geraet: ${equipment}.`
   ];
 }
@@ -842,7 +938,7 @@ function renderExercises() {
     ["lws", "LWS-freundlich"]
   ];
   const exercises = state.seed.exercises.filter((exercise) => {
-    const haystack = `${exercise.displayName} ${exercise.aliases.join(" ")} ${exercise.primaryMuscleGroups.join(" ")} ${exercise.secondaryMuscleGroups.join(" ")} ${exercise.tags.join(" ")}`.toLowerCase();
+    const haystack = `${exercise.displayName} ${exercise.aliases.join(" ")} ${exercise.primaryMuscleGroups.join(" ")} ${exercise.secondaryMuscleGroups.join(" ")} ${exerciseMuscleSearchText(exercise)} ${exercise.tags.join(" ")}`.toLowerCase();
     const matchesSearch = !needle || haystack.includes(needle);
     const matchesFilter = state.exerciseFilter === "all"
       || (state.exerciseFilter === "lws" && exercise.lumbarDiscSuitability === "suitable")
@@ -862,7 +958,7 @@ function renderExercises() {
         <button class="list-button" data-exercise-id="${htmlesc(exercise.id)}">
           <article class="card stack">
             <h3>${htmlesc(exercise.displayName)}</h3>
-            <p class="quiet">Ziel: ${htmlesc(exercise.primaryMuscleGroups.join(", ") || "-")} | Hilfe: ${htmlesc(exercise.secondaryMuscleGroups.join(", ") || "-")}</p>
+            <p class="quiet">${htmlesc(exerciseListMuscleText(exercise))}</p>
             <p class="muted">${htmlesc(exercise.primaryMuscleGroups.join(", "))} · ${htmlesc(exercise.equipment.join(", "))}</p>
             <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} ${bestWeightForExercise(exercise.id) ? `<span class="badge blue">Best: ${kg(bestWeightForExercise(exercise.id))}</span>` : ""}</div>
           </article>

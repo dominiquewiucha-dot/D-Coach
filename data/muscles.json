@@ -1,0 +1,247 @@
+{
+  "version": "1.0.0",
+  "type": "muscle_group_database",
+  "locale": "de-DE",
+  "muscleGroups": [
+    {
+      "id": "mg_chest",
+      "name": "Brust",
+      "englishName": "Chest",
+      "category": "upper_body",
+      "parentId": null,
+      "sortOrder": 10
+    },
+    {
+      "id": "mg_chest_upper",
+      "name": "obere Brust",
+      "englishName": "Upper Chest",
+      "category": "upper_body",
+      "parentId": "mg_chest",
+      "sortOrder": 11
+    },
+    {
+      "id": "mg_chest_middle",
+      "name": "mittlere Brust",
+      "englishName": "Middle Chest",
+      "category": "upper_body",
+      "parentId": "mg_chest",
+      "sortOrder": 12
+    },
+    {
+      "id": "mg_chest_lower",
+      "name": "untere Brust",
+      "englishName": "Lower Chest",
+      "category": "upper_body",
+      "parentId": "mg_chest",
+      "sortOrder": 13
+    },
+    {
+      "id": "mg_back",
+      "name": "Rücken",
+      "englishName": "Back",
+      "category": "upper_body",
+      "parentId": null,
+      "sortOrder": 20
+    },
+    {
+      "id": "mg_lats",
+      "name": "Latissimus",
+      "englishName": "Latissimus Dorsi",
+      "category": "upper_body",
+      "parentId": "mg_back",
+      "sortOrder": 21
+    },
+    {
+      "id": "mg_upper_back",
+      "name": "oberer Rücken",
+      "englishName": "Upper Back",
+      "category": "upper_body",
+      "parentId": "mg_back",
+      "sortOrder": 22
+    },
+    {
+      "id": "mg_rhomboids",
+      "name": "Rhomboiden",
+      "englishName": "Rhomboids",
+      "category": "upper_body",
+      "parentId": "mg_back",
+      "sortOrder": 23
+    },
+    {
+      "id": "mg_traps",
+      "name": "Trapez",
+      "englishName": "Trapezius",
+      "category": "upper_body",
+      "parentId": "mg_back",
+      "sortOrder": 24
+    },
+    {
+      "id": "mg_erectors",
+      "name": "Rückenstrecker",
+      "englishName": "Erector Spinae",
+      "category": "core",
+      "parentId": "mg_back",
+      "sortOrder": 25
+    },
+    {
+      "id": "mg_shoulders",
+      "name": "Schultern",
+      "englishName": "Shoulders",
+      "category": "upper_body",
+      "parentId": null,
+      "sortOrder": 30
+    },
+    {
+      "id": "mg_front_delts",
+      "name": "vordere Schulter",
+      "englishName": "Anterior Deltoid",
+      "category": "upper_body",
+      "parentId": "mg_shoulders",
+      "sortOrder": 31
+    },
+    {
+      "id": "mg_side_delts",
+      "name": "seitliche Schulter",
+      "englishName": "Lateral Deltoid",
+      "category": "upper_body",
+      "parentId": "mg_shoulders",
+      "sortOrder": 32
+    },
+    {
+      "id": "mg_rear_delts",
+      "name": "hintere Schulter",
+      "englishName": "Posterior Deltoid",
+      "category": "upper_body",
+      "parentId": "mg_shoulders",
+      "sortOrder": 33
+    },
+    {
+      "id": "mg_rotator_cuff",
+      "name": "Rotatorenmanschette",
+      "englishName": "Rotator Cuff",
+      "category": "upper_body",
+      "parentId": "mg_shoulders",
+      "sortOrder": 34
+    },
+    {
+      "id": "mg_arms",
+      "name": "Arme",
+      "englishName": "Arms",
+      "category": "upper_body",
+      "parentId": null,
+      "sortOrder": 40
+    },
+    {
+      "id": "mg_biceps",
+      "name": "Bizeps",
+      "englishName": "Biceps",
+      "category": "upper_body",
+      "parentId": "mg_arms",
+      "sortOrder": 41
+    },
+    {
+      "id": "mg_triceps",
+      "name": "Trizeps",
+      "englishName": "Triceps",
+      "category": "upper_body",
+      "parentId": "mg_arms",
+      "sortOrder": 42
+    },
+    {
+      "id": "mg_forearms",
+      "name": "Unterarme",
+      "englishName": "Forearms",
+      "category": "upper_body",
+      "parentId": "mg_arms",
+      "sortOrder": 43
+    },
+    {
+      "id": "mg_legs",
+      "name": "Beine",
+      "englishName": "Legs",
+      "category": "lower_body",
+      "parentId": null,
+      "sortOrder": 50
+    },
+    {
+      "id": "mg_quads",
+      "name": "Quadrizeps",
+      "englishName": "Quadriceps",
+      "category": "lower_body",
+      "parentId": "mg_legs",
+      "sortOrder": 51
+    },
+    {
+      "id": "mg_hamstrings",
+      "name": "Beinbeuger",
+      "englishName": "Hamstrings",
+      "category": "lower_body",
+      "parentId": "mg_legs",
+      "sortOrder": 52
+    },
+    {
+      "id": "mg_glutes",
+      "name": "Gesäß",
+      "englishName": "Glutes",
+      "category": "lower_body",
+      "parentId": "mg_legs",
+      "sortOrder": 53
+    },
+    {
+      "id": "mg_adductors",
+      "name": "Adduktoren",
+      "englishName": "Adductors",
+      "category": "lower_body",
+      "parentId": "mg_legs",
+      "sortOrder": 54
+    },
+    {
+      "id": "mg_abductors",
+      "name": "Abduktoren",
+      "englishName": "Abductors",
+      "category": "lower_body",
+      "parentId": "mg_legs",
+      "sortOrder": 55
+    },
+    {
+      "id": "mg_calves",
+      "name": "Waden",
+      "englishName": "Calves",
+      "category": "lower_body",
+      "parentId": "mg_legs",
+      "sortOrder": 56
+    },
+    {
+      "id": "mg_core",
+      "name": "Core",
+      "englishName": "Core",
+      "category": "core",
+      "parentId": null,
+      "sortOrder": 60
+    },
+    {
+      "id": "mg_abs",
+      "name": "Bauch",
+      "englishName": "Abdominals",
+      "category": "core",
+      "parentId": "mg_core",
+      "sortOrder": 61
+    },
+    {
+      "id": "mg_obliques",
+      "name": "seitliche Bauchmuskulatur",
+      "englishName": "Obliques",
+      "category": "core",
+      "parentId": "mg_core",
+      "sortOrder": 62
+    },
+    {
+      "id": "mg_deep_core",
+      "name": "tiefe Rumpfmuskulatur",
+      "englishName": "Deep Core",
+      "category": "core",
+      "parentId": "mg_core",
+      "sortOrder": 63
+    }
+  ]
+}
