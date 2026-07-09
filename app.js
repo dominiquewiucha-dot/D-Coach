@@ -31,6 +31,12 @@ const state = {
   muscleCoverageVisualMapping: null,
   muscleCoverageDetailSchema: null,
   muscleCoverageCoachTexts: null,
+  performanceScoreRules: null,
+  coachDecisionRules: null,
+  personalRecordRules: null,
+  smartNotesRules: null,
+  confidenceScoreRules: null,
+  whyExplanationSchema: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -51,8 +57,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v21";
-const STORAGE_SCHEMA_VERSION = "2.4.0";
+const APP_VERSION = "pwa-v22";
+const STORAGE_SCHEMA_VERSION = "2.5.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -603,7 +609,13 @@ async function boot() {
     studioContext,
     muscleCoverageVisualMapping,
     muscleCoverageDetailSchema,
-    muscleCoverageCoachTexts
+    muscleCoverageCoachTexts,
+    performanceScoreRules,
+    coachDecisionRules,
+    personalRecordRules,
+    smartNotesRules,
+    confidenceScoreRules,
+    whyExplanationSchema
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -647,7 +659,13 @@ async function boot() {
     fetchOptionalJson("./data/studio_context_v2.2.0.json"),
     fetchOptionalJson("./data/muscle_coverage_visual_mapping_v2.4.0.json"),
     fetchOptionalJson("./data/muscle_coverage_detail_schema_v2.4.0.json"),
-    fetchOptionalJson("./data/muscle_coverage_coach_texts_v2.4.0.json")
+    fetchOptionalJson("./data/muscle_coverage_coach_texts_v2.4.0.json"),
+    fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
+    fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
+    fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
+    fetchOptionalJson("./data/smart_notes_rules_v2.5.0.json"),
+    fetchOptionalJson("./data/confidence_score_rules_v2.5.0.json"),
+    fetchOptionalJson("./data/why_explanation_schema_v2.5.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -680,6 +698,12 @@ async function boot() {
   state.muscleCoverageVisualMapping = muscleCoverageVisualMapping;
   state.muscleCoverageDetailSchema = muscleCoverageDetailSchema;
   state.muscleCoverageCoachTexts = muscleCoverageCoachTexts;
+  state.performanceScoreRules = performanceScoreRules;
+  state.coachDecisionRules = coachDecisionRules;
+  state.personalRecordRules = personalRecordRules;
+  state.smartNotesRules = smartNotesRules;
+  state.confidenceScoreRules = confidenceScoreRules;
+  state.whyExplanationSchema = whyExplanationSchema;
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
@@ -1348,6 +1372,116 @@ function sessionImprovements(session) {
     .filter((item) => item.isRecord || item.delta > 0);
 }
 
+function setRepTotal(completedExercise) {
+  return (completedExercise.sets || []).reduce((sum, set) => sum + (Number(set.actualReps) || 0), 0);
+}
+
+function completedSetRatio(completedExercise) {
+  const planned = Number(completedExercise.plannedSets) || completedExercise.sets?.length || 0;
+  if (!planned) return 0;
+  return Math.min(1, (Number(completedExercise.completedSets) || completedExercise.sets?.filter((set) => set.completed !== false).length || 0) / planned);
+}
+
+function performanceDelta(current, previous) {
+  const currentVolume = totalVolume(current);
+  const previousVolume = previous ? totalVolume(previous) : 0;
+  const volumeDelta = previousVolume ? ((currentVolume - previousVolume) / previousVolume) * 100 : null;
+  const repDelta = previous ? setRepTotal(current) - setRepTotal(previous) : null;
+  const currentBest = Math.max(0, ...(current.sets || []).map((set) => Number(set.actualWeightKg) || 0));
+  const previousBest = previous ? Math.max(0, ...(previous.sets || []).map((set) => Number(set.actualWeightKg) || 0)) : 0;
+  const loadDelta = previousBest ? ((currentBest - previousBest) / previousBest) * 100 : null;
+  const classification = volumeDelta === null ? "no_history" : volumeDelta >= 5 ? "strong_progress" : volumeDelta > 1 ? "small_progress" : volumeDelta < -1 ? "drop" : "stable";
+  return { currentVolume, previousVolume, volumeDelta, repDelta, currentBest, previousBest, loadDelta, classification };
+}
+
+function personalRecordsForExercise(completedExercise, session) {
+  const before = exerciseHistoryBefore(completedExercise.exerciseId, session.id).map((item) => item.exercise);
+  const bestWeightBefore = before.flatMap((item) => item.sets || []).reduce((max, set) => Math.max(max, Number(set.actualWeightKg) || 0), 0);
+  const currentBestWeight = (completedExercise.sets || []).reduce((max, set) => Math.max(max, Number(set.actualWeightKg) || 0), 0);
+  const bestVolumeBefore = before.reduce((max, item) => Math.max(max, totalVolume(item)), 0);
+  const currentVolume = totalVolume(completedExercise);
+  const records = [];
+  if (currentBestWeight > 0 && currentBestWeight > bestWeightBefore) records.push("Hoechstes Gewicht");
+  if (currentVolume > 0 && currentVolume > bestVolumeBefore) records.push("Hoechstes Uebungsvolumen");
+  (completedExercise.sets || []).forEach((set) => {
+    const weight = Number(set.actualWeightKg) || 0;
+    const reps = Number(set.actualReps) || 0;
+    if (!weight || !reps) return;
+    const bestRepsBefore = before.flatMap((item) => item.sets || [])
+      .filter((item) => Number(item.actualWeightKg) === weight)
+      .reduce((max, item) => Math.max(max, Number(item.actualReps) || 0), 0);
+    if (reps > bestRepsBefore) records.push(`Beste Wiederholungen bei ${kg(weight)}`);
+  });
+  return [...new Set(records)];
+}
+
+function confidenceBand(percent) {
+  return state.confidenceScoreRules?.bands?.find((band) => percent >= band.min && percent <= band.max)?.label || "mittlere Sicherheit";
+}
+
+function coachDecisionForExercise(completedExercise, session) {
+  const exercise = exerciseById(completedExercise.exerciseId);
+  const previous = previousExerciseBefore(completedExercise.exerciseId, session.id);
+  const delta = performanceDelta(completedExercise, previous?.exercise || null);
+  const target = upperRepTarget(completedExercise.plannedReps);
+  const topTargetReached = target ? (completedExercise.sets || []).filter((set) => set.completed !== false).every((set) => Number(set.actualReps) >= target) : false;
+  const readiness = readinessForJournal(session.readinessSnapshot || journalEntryForDate(todayIsoDate()) || latestJournalEntry());
+  const profile = currentPersonalProfile();
+  const lwsConflict = !!profile.lumbarDiscHistory && exercise?.lumbarDiscSuitability === "avoidInitially";
+  const painNote = String(session.readinessSnapshot?.painNote || "").trim();
+  const historyDepth = exerciseHistoryBefore(completedExercise.exerciseId, session.id).length;
+  let decisionId = "hold_weight";
+
+  if (lwsConflict) decisionId = "choose_lws_alternative";
+  else if (delta.classification === "drop" && (readiness.color === "red" || painNote)) decisionId = "reduce_or_deload";
+  else if (topTargetReached && ["small_progress", "strong_progress", "stable"].includes(delta.classification) && readiness.color !== "red") decisionId = "increase_weight";
+  else if (delta.classification === "drop") decisionId = "hold_weight";
+
+  const decision = state.coachDecisionRules?.decisions?.find((item) => item.id === decisionId) || {};
+  const completeness = Math.round(completedSetRatio(completedExercise) * 100);
+  const confidence = Math.max(35, Math.min(95,
+    Math.round((Number(decision.confidenceBase) || 0.65) * 100)
+    + Math.min(10, historyDepth * 3)
+    + (completeness >= 95 ? 5 : 0)
+    - (lwsConflict || painNote ? 8 : 0)
+  ));
+  const evidence = [];
+  if (previous) evidence.push(`${delta.volumeDelta >= 0 ? "+" : ""}${Math.round(delta.volumeDelta)}% Volumen gegenueber letzter Einheit`);
+  else evidence.push("Noch keine Vergleichsdaten vorhanden.");
+  if (delta.repDelta !== null) evidence.push(`${delta.repDelta >= 0 ? "+" : ""}${delta.repDelta} Wiederholungen`);
+  if (delta.loadDelta !== null && Math.abs(delta.loadDelta) >= 1) evidence.push(`${delta.loadDelta >= 0 ? "+" : ""}${Math.round(delta.loadDelta)}% Last`);
+  if (lwsConflict) evidence.push("LWS-Profil spricht gegen diese Uebung.");
+
+  return {
+    decisionId,
+    label: decision.label || "Gewicht halten",
+    recommendationText: decision.recommendation || "Gewicht halten und Wiederholungen sammeln.",
+    confidencePercent: confidence,
+    confidenceLabel: confidenceBand(confidence),
+    evidence,
+    whyBullets: decision.why || [],
+    performance: delta,
+    records: personalRecordsForExercise(completedExercise, session)
+  };
+}
+
+function smartNoteForInsight(insight) {
+  const templates = state.smartNotesRules?.templates || [];
+  const findTemplate = (id, fallback) => templates.find((item) => item.id === id)?.text || fallback;
+  if (insight.decisionId === "choose_lws_alternative") return findTemplate("lws_caution", "LWS-Hinweis beruecksichtigt. Saubere Technik hatte Prioritaet.");
+  if (insight.performance.classification === "strong_progress") return findTemplate("strong_progress", "Starker Fortschritt. Naechstes Mal kleine Steigerung pruefen.");
+  if (insight.performance.classification === "small_progress") return findTemplate("small_progress", "Leichte Leistungssteigerung gegenueber der letzten vergleichbaren Einheit.");
+  if (insight.performance.classification === "drop") return findTemplate("performance_drop", "Heute etwas schwaecher. Regeneration pruefen und nichts erzwingen.");
+  return findTemplate("stable_good", "Solide Einheit. Gewicht halten und sauber weiter steigern.");
+}
+
+function performanceInsightsForSession(session) {
+  return (session?.completedExercises || []).map((exercise) => {
+    const insight = coachDecisionForExercise(exercise, session);
+    return { exercise, insight, smartNote: smartNoteForInsight(insight) };
+  });
+}
+
 function upperRepTarget(text) {
   const numbers = String(text || "").match(/\d+/g)?.map(Number) || [];
   return numbers.length ? Math.max(...numbers) : null;
@@ -1774,6 +1908,35 @@ function renderCoverageTrend() {
   `;
 }
 
+function renderPerformanceCoachCard(session) {
+  const insights = performanceInsightsForSession(session);
+  if (!insights.length) return "";
+  return `
+    <article class="card stack">
+      <div class="row">
+        <h3 class="grow">Performance Coach</h3>
+        <span class="badge blue">v2.5</span>
+      </div>
+      ${insights.slice(0, 5).map(({ exercise, insight, smartNote }) => `
+        <div class="coach-insight">
+          <div class="row">
+            <strong class="grow">${htmlesc(exercise.exerciseNameSnapshot)}</strong>
+            <span class="badge ${insight.records.length ? "green" : insight.performance.classification === "drop" ? "amber" : "blue"}">${htmlesc(insight.records[0] || insight.label)}</span>
+          </div>
+          <p class="muted">${htmlesc(smartNote)}</p>
+          <p class="quiet">${htmlesc(insight.recommendationText)} · ${insight.confidencePercent}% ${htmlesc(insight.confidenceLabel)}</p>
+          <details>
+            <summary>Warum?</summary>
+            <ul class="small-list">
+              ${[...insight.evidence, ...insight.whyBullets].map((item) => `<li>${htmlesc(item)}</li>`).join("")}
+            </ul>
+          </details>
+        </div>
+      `).join("")}
+    </article>
+  `;
+}
+
 function renderDashboard() {
   const plan = activePlan();
   const latestWeight = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
@@ -1863,6 +2026,7 @@ function renderCoach() {
         <div class="row"><h3 class="grow">Recovery</h3><span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span></div>
         <p class="muted">${htmlesc(readiness.hint)}</p>
       </article>
+      ${renderPerformanceCoachCard(session)}
       <article class="card stack">
         <h3>Coverage Coach</h3>
         ${coverageHints.length ? `<ul class="small-list">${coverageHints.map((hint) => `<li>${htmlesc(hint)}</li>`).join("")}</ul>` : `<p class="muted">Die Wochenabdeckung wirkt aktuell ausgeglichen.</p>`}
@@ -2212,6 +2376,7 @@ function renderSessionDetail(id) {
         ${metric(String(sessionSetCount(session)), "Sätze")}
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
+      ${renderPerformanceCoachCard(session)}
       <article class="card stack">
         <h3>Verbesserungen</h3>
         ${improvements.length ? improvements.map((item) => `
@@ -2636,7 +2801,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "2.4.0",
+    backupVersion: "2.5.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

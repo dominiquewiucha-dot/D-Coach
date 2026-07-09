@@ -1,0 +1,65 @@
+{
+  "version": "2.5.0",
+  "type": "coach_decision_rules",
+  "decisions": [
+    {
+      "id": "increase_weight",
+      "label": "Gewicht erhöhen",
+      "conditions": [
+        "all working sets reached top target reps",
+        "performance stable or improving",
+        "readiness not red",
+        "no LWS conflict"
+      ],
+      "recommendation": "Nächstes Mal kleinste sinnvolle Gewichtssteigerung testen.",
+      "why": [
+        "Zielwiederholungen erreicht",
+        "Leistung stabil oder besser",
+        "keine aktive Warnregel"
+      ],
+      "confidenceBase": 0.75
+    },
+    {
+      "id": "hold_weight",
+      "label": "Gewicht halten",
+      "conditions": [
+        "within target range but not top target",
+        "performance stable"
+      ],
+      "recommendation": "Gewicht halten und Wiederholungen sammeln.",
+      "why": [
+        "Zielbereich noch nicht voll ausgeschöpft",
+        "saubere Progression über Wiederholungen sinnvoll"
+      ],
+      "confidenceBase": 0.7
+    },
+    {
+      "id": "reduce_or_deload",
+      "label": "Reduzieren oder Deload prüfen",
+      "conditions": [
+        "performance drop in comparable sessions",
+        "readiness red or pain note"
+      ],
+      "recommendation": "Gewicht oder Volumen reduzieren und konservativer planen.",
+      "why": [
+        "Leistung fällt",
+        "Regeneration oder Schmerznotiz spricht gegen Progression"
+      ],
+      "confidenceBase": 0.65
+    },
+    {
+      "id": "choose_lws_alternative",
+      "label": "LWS-freundliche Alternative wählen",
+      "conditions": [
+        "lumbarDiscHistory true",
+        "exercise avoidInitially"
+      ],
+      "recommendation": "Alternative mit geringerer LWS-Belastung wählen.",
+      "why": [
+        "persönliches LWS-Profil aktiv",
+        "Übung ist für Wiedereinstieg markiert"
+      ],
+      "confidenceBase": 0.85
+    }
+  ]
+}

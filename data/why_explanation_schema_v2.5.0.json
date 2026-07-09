@@ -1,0 +1,22 @@
+{
+  "version": "2.5.0",
+  "type": "why_explanation_schema",
+  "schema": {
+    "decisionId": "string",
+    "recommendationText": "string",
+    "confidencePercent": "number",
+    "evidence": "array",
+    "whyBullets": "array",
+    "fallbackText": "string"
+  },
+  "example": {
+    "decisionId": "increase_weight",
+    "recommendationText": "Nächstes Mal +2,5 kg testen.",
+    "confidencePercent": 82,
+    "whyBullets": [
+      "Zielwiederholungen wiederholt erreicht",
+      "Leistung stabil oder besser",
+      "keine persönliche Warnregel spricht dagegen"
+    ]
+  }
+}

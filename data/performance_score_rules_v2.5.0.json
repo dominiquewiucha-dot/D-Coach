@@ -1,0 +1,49 @@
+{
+  "version": "2.5.0",
+  "type": "performance_score_rules",
+  "metrics": [
+    {
+      "id": "volume_score",
+      "label": "Volumen",
+      "calculation": "sum(weightKg * reps)"
+    },
+    {
+      "id": "rep_progress_score",
+      "label": "Wiederholungsfortschritt",
+      "calculation": "more reps at same/similar weight"
+    },
+    {
+      "id": "load_progress_score",
+      "label": "Gewichtsfortschritt",
+      "calculation": "more weight with reps still in target range"
+    },
+    {
+      "id": "consistency_score",
+      "label": "Konstanz",
+      "calculation": "completed planned sets / planned sets"
+    }
+  ],
+  "classification": [
+    {
+      "id": "strong_progress",
+      "label": "starker Fortschritt",
+      "threshold": "+5%"
+    },
+    {
+      "id": "small_progress",
+      "label": "leichter Fortschritt",
+      "threshold": "+1%"
+    },
+    {
+      "id": "stable",
+      "label": "stabil",
+      "threshold": "-1% to +1%"
+    },
+    {
+      "id": "drop",
+      "label": "Rückgang",
+      "threshold": "below -1%"
+    }
+  ],
+  "trainingFirstRule": "Quick Training zeigt nur kompakt: z. B. '+1 Wdh. gegenüber letztem Mal'."
+}

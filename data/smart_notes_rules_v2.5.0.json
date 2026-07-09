@@ -1,0 +1,32 @@
+{
+  "version": "2.5.0",
+  "type": "smart_notes_rules",
+  "templates": [
+    {
+      "id": "small_progress",
+      "trigger": "small_progress",
+      "text": "Leichte Leistungssteigerung gegenüber der letzten vergleichbaren Einheit."
+    },
+    {
+      "id": "strong_progress",
+      "trigger": "strong_progress",
+      "text": "Starker Fortschritt. Nächstes Mal kleine Steigerung prüfen."
+    },
+    {
+      "id": "stable_good",
+      "trigger": "stable and all planned sets completed",
+      "text": "Solide Einheit. Gewicht halten und sauber weiter steigern."
+    },
+    {
+      "id": "performance_drop",
+      "trigger": "drop",
+      "text": "Heute etwas schwächer. Regeneration prüfen und nichts erzwingen."
+    },
+    {
+      "id": "lws_caution",
+      "trigger": "LWS caution used",
+      "text": "LWS-Hinweis berücksichtigt. Saubere Technik hatte Priorität."
+    }
+  ],
+  "displayRule": "Smart Notes nach Training oder im Coach Mode."
+}

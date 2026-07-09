@@ -1,0 +1,27 @@
+{
+  "version": "2.5.0",
+  "type": "personal_record_rules",
+  "recordTypes": [
+    {
+      "id": "max_weight",
+      "label": "Höchstes Gewicht",
+      "rule": "highest weightKg for exerciseId"
+    },
+    {
+      "id": "max_reps_at_weight",
+      "label": "Beste Wiederholungen bei Gewicht",
+      "rule": "highest reps at same weightKg"
+    },
+    {
+      "id": "max_session_volume",
+      "label": "Höchstes Übungsvolumen",
+      "rule": "highest sum(weightKg*reps) per exercise session"
+    },
+    {
+      "id": "muscle_coverage_best_week",
+      "label": "Beste Muskel-Woche",
+      "rule": "highest weekly coverage percent per muscle"
+    }
+  ],
+  "displayRule": "PRs in Coach Mode, Übungsdetails und Zusammenfassung; nicht im Satzscreen."
+}
