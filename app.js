@@ -36,6 +36,7 @@ const state = {
   selectedSessionId: null,
   planImportText: "",
   showAlternatives: false,
+  coverageMode: "week",
   isOnline: navigator.onLine,
   deferredInstallPrompt: null,
   restTimer: {
@@ -45,8 +46,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v19";
-const STORAGE_SCHEMA_VERSION = "2.2.0";
+const APP_VERSION = "pwa-v20";
+const STORAGE_SCHEMA_VERSION = "2.3.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -1141,6 +1142,99 @@ function weeklyVolume() {
   return sessionsSince(7).reduce((sum, session) => sum + sessionVolume(session), 0);
 }
 
+function sessionsForToday() {
+  const today = todayIsoDate();
+  return storage.sessions.filter((session) => String(session.startedAt || "").slice(0, 10) === today);
+}
+
+function sessionsBetween(start, end) {
+  return storage.sessions.filter((session) => {
+    const date = new Date(session.startedAt);
+    return date >= start && date < end;
+  });
+}
+
+function activePlanTargetMuscles() {
+  const plan = activePlan();
+  const ids = new Set();
+  plan?.days?.forEach((day) => {
+    day.exercises.forEach((planned) => {
+      const mapping = muscleMappingForExercise(planned.exerciseId);
+      if (!mapping) return;
+      if (mapping.primaryMuscle) ids.add(mapping.primaryMuscle);
+      (mapping.secondaryMuscles || []).forEach((item) => ids.add(item.muscleId));
+    });
+  });
+  return ids;
+}
+
+function completedSetCoverageFactor(set) {
+  if (set.completed === false) return 0;
+  const reps = Number(set.actualReps) || 10;
+  const weight = Number(set.actualWeightKg) || 0;
+  const repsFactor = Math.min(1.4, Math.max(0.6, reps / 10));
+  const weightFactor = weight > 0 ? 1 + Math.min(0.08, Math.log10(weight + 1) * 0.03) : 1;
+  return repsFactor * weightFactor;
+}
+
+function coverageForSessions(sessions) {
+  const points = new Map();
+  const targetMuscles = activePlanTargetMuscles();
+  const add = (muscleId, value) => {
+    if (!muscleId || !Number.isFinite(value) || value <= 0) return;
+    points.set(muscleId, (points.get(muscleId) || 0) + value);
+  };
+
+  sessions.forEach((session) => {
+    (session.completedExercises || []).forEach((completedExercise) => {
+      const mapping = muscleMappingForExercise(completedExercise.exerciseId);
+      if (!mapping) return;
+      const setPoints = (completedExercise.sets || []).reduce((sum, set) => sum + completedSetCoverageFactor(set), 0);
+      add(mapping.primaryMuscle, setPoints);
+      (mapping.secondaryMuscles || []).forEach((item) => add(item.muscleId, setPoints * (Number(item.intensityWeight) || 0)));
+      (mapping.stabilizers || []).forEach((item) => add(item.muscleId, setPoints * (Number(item.intensityWeight) || 0) * 0.5));
+    });
+  });
+
+  targetMuscles.forEach((muscleId) => {
+    if (!points.has(muscleId)) points.set(muscleId, 0);
+  });
+
+  return [...points.entries()].map(([muscleId, value]) => ({
+    muscleId,
+    name: muscleName(muscleId),
+    points: value,
+    percent: Math.round((value / 8) * 100),
+    isTarget: targetMuscles.has(muscleId)
+  })).sort((a, b) => Number(b.isTarget) - Number(a.isTarget) || b.percent - a.percent || a.name.localeCompare(b.name));
+}
+
+function coverageCoachHints(items) {
+  return items.filter((item) => item.isTarget).map((item) => {
+    if (item.percent > 120) return `${item.name}: Diese Muskelgruppe wurde diese Woche bereits ueberdurchschnittlich belastet.`;
+    if (item.percent === 0) return `${item.name}: Noch nicht trainiert.`;
+    if (item.percent < 70 && sessionsSince(7).length >= 2) return `${item.name}: Diese Muskelgruppe wurde diese Woche wenig trainiert.`;
+    return null;
+  }).filter(Boolean).slice(0, 3);
+}
+
+function coverageTrendWeeks() {
+  const weeks = [];
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const targetMuscles = activePlanTargetMuscles();
+  for (let index = 7; index >= 0; index -= 1) {
+    const start = new Date(now);
+    start.setDate(start.getDate() - (index * 7) - 6);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 7);
+    const items = coverageForSessions(sessionsBetween(start, end)).filter((item) => !targetMuscles.size || item.isTarget);
+    const average = items.length ? Math.round(items.reduce((sum, item) => sum + Math.min(item.percent, 140), 0) / items.length) : 0;
+    weeks.push({ label: `${start.getDate()}.${start.getMonth() + 1}.`, percent: average });
+  }
+  return weeks;
+}
+
 function sessionImprovements(session) {
   return session.completedExercises
     .map((exercise) => {
@@ -1487,6 +1581,58 @@ function renderTabs() {
   return `<nav class="tabs">${tabs.map(([id, label]) => `<button class="tab ${state.tab === id && !state.activeWorkout && !state.selectedExerciseId && !state.selectedSessionId ? "active" : ""}" data-tab="${id}">${label}</button>`).join("")}</nav>`;
 }
 
+function renderCoverageCard() {
+  const mode = state.coverageMode || "week";
+  const items = mode === "today" ? coverageForSessions(sessionsForToday()) : coverageForSessions(sessionsSince(7));
+  const visibleItems = items.slice(0, 8);
+  const hints = coverageCoachHints(coverageForSessions(sessionsSince(7)));
+  return `
+    <article class="card stack">
+      <div class="row">
+        <h3 class="grow">Muscle Coverage</h3>
+        <span class="badge blue">${mode === "today" ? "Heute" : mode === "trend" ? "Trend" : "Woche"}</span>
+      </div>
+      <div class="coverage-switch">
+        ${[
+          ["today", "Heute"],
+          ["week", "Woche"],
+          ["trend", "Trend"]
+        ].map(([id, label]) => `<button class="${mode === id ? "active" : ""}" data-coverage-mode="${id}">${label}</button>`).join("")}
+      </div>
+      ${mode === "trend" ? renderCoverageTrend() : `
+        <div class="coverage-list">
+          ${visibleItems.length ? visibleItems.map(renderCoverageRow).join("") : `<p class="muted">Noch keine Trainingsdaten fuer diese Ansicht.</p>`}
+        </div>
+        ${hints.length && mode === "week" ? `<ul class="small-list">${hints.map((hint) => `<li>${htmlesc(hint)}</li>`).join("")}</ul>` : ""}
+      `}
+    </article>
+  `;
+}
+
+function renderCoverageRow(item) {
+  const color = item.percent > 120 ? "over" : item.percent === 0 ? "empty" : item.percent < 70 ? "low" : "ok";
+  const width = Math.min(item.percent, 140);
+  return `
+    <div class="coverage-row ${color}">
+      <div class="row">
+        <strong class="grow">${htmlesc(item.name)}</strong>
+        <span>${item.percent}%</span>
+      </div>
+      <div class="coverage-bar"><span style="width:${width}%"></span></div>
+    </div>
+  `;
+}
+
+function renderCoverageTrend() {
+  const weeks = coverageTrendWeeks();
+  return `
+    <div class="trend-bars coverage-trend">
+      ${weeks.map((week) => `<div class="trend-item"><span style="height:${Math.max(16, Math.min(120, week.percent))}px"></span><small>${htmlesc(week.label)}</small></div>`).join("")}
+    </div>
+    <p class="quiet">Durchschnittliche Wochenabdeckung der Zielmuskeln.</p>
+  `;
+}
+
 function renderDashboard() {
   const plan = activePlan();
   const latestWeight = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
@@ -1517,6 +1663,7 @@ function renderDashboard() {
         ${metric(String(sessionsSince(7).length), "Trainings diese Woche")}
         ${metric(String(storage.sessions.length), "Gespeicherte Einheiten")}
       </div>
+      ${renderCoverageCard()}
       <article class="card">
         <h3>Hinweis</h3>
         <p class="muted">Bewerte nicht einzelne Tageswerte. Gewicht und Training zählen als Trend.</p>
@@ -1561,6 +1708,7 @@ function renderCoach() {
     `;
   }
   const improvements = sessionImprovements(session);
+  const coverageHints = coverageCoachHints(coverageForSessions(sessionsSince(7)));
   return `
     <section class="screen stack">
       <header><h1 class="title">Coach</h1><p class="subtitle">${htmlesc(session.dayName)} · ${dateText(session.startedAt)}</p></header>
@@ -1573,6 +1721,10 @@ function renderCoach() {
       <article class="card stack">
         <div class="row"><h3 class="grow">Recovery</h3><span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span></div>
         <p class="muted">${htmlesc(readiness.hint)}</p>
+      </article>
+      <article class="card stack">
+        <h3>Coverage Coach</h3>
+        ${coverageHints.length ? `<ul class="small-list">${coverageHints.map((hint) => `<li>${htmlesc(hint)}</li>`).join("")}</ul>` : `<p class="muted">Die Wochenabdeckung wirkt aktuell ausgeglichen.</p>`}
       </article>
       <article class="card stack">
         <h3>Verbesserungen</h3>
@@ -2343,7 +2495,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "2.2.0",
+    backupVersion: "2.3.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),
@@ -2462,6 +2614,13 @@ function bindEvents() {
 
   document.querySelectorAll("[data-start-day]").forEach((button) => {
     button.addEventListener("click", () => startDay(button.dataset.startDay));
+  });
+
+  document.querySelectorAll("[data-coverage-mode]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.coverageMode = button.dataset.coverageMode;
+      render();
+    });
   });
 
   document.querySelector("[data-resume-workout]")?.addEventListener("click", resumeWorkoutDraft);

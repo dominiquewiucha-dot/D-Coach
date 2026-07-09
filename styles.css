@@ -469,6 +469,67 @@ select:focus-visible {
   font-size: 10px;
 }
 
+.coverage-switch {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--input);
+}
+
+.coverage-switch button {
+  min-height: 36px;
+  border-radius: 8px;
+  color: var(--muted);
+  background: transparent;
+}
+
+.coverage-switch button.active {
+  color: white;
+  background: var(--blue);
+}
+
+.coverage-list {
+  display: grid;
+  gap: 12px;
+}
+
+.coverage-row {
+  display: grid;
+  gap: 6px;
+}
+
+.coverage-row span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.coverage-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--input);
+  overflow: hidden;
+}
+
+.coverage-bar > span {
+  display: block;
+  max-width: 100%;
+  height: 100%;
+  background: var(--blue);
+}
+
+.coverage-row.ok .coverage-bar > span { background: var(--green); }
+.coverage-row.low .coverage-bar > span { background: var(--amber); }
+.coverage-row.empty .coverage-bar > span { background: var(--red); }
+.coverage-row.over .coverage-bar > span { background: var(--amber); }
+
+.coverage-trend .trend-item span {
+  background: var(--green);
+}
+
 .set-row {
   display: grid;
   grid-template-columns: 30px 1fr 1fr 64px 42px;
