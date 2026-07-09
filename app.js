@@ -44,6 +44,13 @@ const storage = {
   },
   set deletedPlanNames(value) {
     writeJson("dcoach.deletedPlanNames", value);
+  },
+  get activeWorkoutDraft() {
+    return readJson("dcoach.activeWorkoutDraft", null);
+  },
+  set activeWorkoutDraft(value) {
+    if (value) writeJson("dcoach.activeWorkoutDraft", value);
+    else localStorage.removeItem("dcoach.activeWorkoutDraft");
   }
 };
 
@@ -68,8 +75,31 @@ async function boot() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
   }
+  restoreWorkoutDraft();
   startTimerLoop();
   render();
+}
+
+function restoreWorkoutDraft() {
+  const draft = storage.activeWorkoutDraft;
+  if (!draft || typeof draft !== "object") return;
+  if (!draft.planName || !draft.dayName || !Array.isArray(draft.entries)) return;
+  if (!Number.isInteger(draft.index) || draft.index < 0 || draft.index >= draft.entries.length) return;
+  state.activeWorkout = draft;
+  state.tab = "training";
+}
+
+function persistWorkoutDraft() {
+  if (state.activeWorkout) storage.activeWorkoutDraft = state.activeWorkout;
+}
+
+function clearWorkoutDraft() {
+  storage.activeWorkoutDraft = null;
+}
+
+function resumeWorkoutDraft() {
+  restoreWorkoutDraft();
+  if (state.activeWorkout) render();
 }
 
 function startTimerLoop() {
@@ -388,9 +418,17 @@ function metric(value, label) {
 
 function renderTraining() {
   const plan = activePlan();
+  const draft = storage.activeWorkoutDraft;
   return `
     <section class="screen stack">
       <header><h1 class="title">Training</h1><p class="subtitle">${plan ? htmlesc(plan.planName) : "Kein aktiver Plan"}</p></header>
+      ${draft ? `
+        <article class="card stack">
+          <h2>Training fortsetzen</h2>
+          <p class="muted">${htmlesc(draft.dayName || "Offenes Training")} wurde lokal gesichert.</p>
+          <button class="primary" data-resume-workout>Fortsetzen</button>
+        </article>
+      ` : ""}
       ${plan ? plan.days.map((day) => `
         <button class="list-button" data-start-day="${htmlesc(day.name)}">
           <article class="card row">
@@ -448,6 +486,7 @@ function startDay(dayName) {
       };
     })
   };
+  persistWorkoutDraft();
   render();
 }
 
@@ -485,6 +524,7 @@ function renderWorkout() {
         <div class="row"><h3 class="grow">Sätze</h3><span class="quiet">kg · Wdh. · RIR</span></div>
         ${entry.sets.map((set, index) => renderSetRow(set, index)).join("")}
       </article>
+      <p class="quiet">Dieses Training wird automatisch auf diesem Gerät gesichert.</p>
       ${state.restTimer.remaining > 0 || state.restTimer.running ? renderRestTimer() : ""}
       ${state.showAlternatives ? renderAlternativePicker(alternatives) : ""}
       <div class="actions">
@@ -567,6 +607,7 @@ function selectAlternative(exerciseId) {
     set.completed = false;
   });
   state.showAlternatives = false;
+  persistWorkoutDraft();
   render();
 }
 
@@ -577,6 +618,7 @@ function finishOrNext() {
     state.showAlternatives = false;
     state.restTimer.remaining = 0;
     state.restTimer.running = false;
+    persistWorkoutDraft();
     render();
     return;
   }
@@ -604,6 +646,7 @@ function finishOrNext() {
     })
   };
   storage.sessions = [...storage.sessions, session];
+  clearWorkoutDraft();
   state.activeWorkout = null;
   state.showAlternatives = false;
   state.restTimer.remaining = 0;
@@ -842,7 +885,8 @@ function createBackup() {
     sessions: storage.sessions,
     weights: storage.weights,
     archivedPlanNames: storage.archivedPlanNames,
-    deletedPlanNames: storage.deletedPlanNames
+    deletedPlanNames: storage.deletedPlanNames,
+    activeWorkoutDraft: storage.activeWorkoutDraft
   };
 }
 
@@ -893,7 +937,9 @@ function importBackupFile(file) {
       storage.weights = backup.weights;
       storage.archivedPlanNames = Array.isArray(backup.archivedPlanNames) ? backup.archivedPlanNames : [];
       storage.deletedPlanNames = Array.isArray(backup.deletedPlanNames) ? backup.deletedPlanNames : [];
+      storage.activeWorkoutDraft = backup.activeWorkoutDraft || null;
       if (backup.activePlanName) storage.activePlanName = backup.activePlanName;
+      restoreWorkoutDraft();
       ensureActivePlan();
       alert("Backup importiert.");
       render();
@@ -907,6 +953,7 @@ function importBackupFile(file) {
 function bindEvents() {
   document.querySelectorAll("[data-tab]").forEach((button) => {
     button.addEventListener("click", () => {
+      persistWorkoutDraft();
       state.tab = button.dataset.tab;
       state.activeWorkout = null;
       state.selectedExerciseId = null;
@@ -919,10 +966,13 @@ function bindEvents() {
     button.addEventListener("click", () => startDay(button.dataset.startDay));
   });
 
+  document.querySelector("[data-resume-workout]")?.addEventListener("click", resumeWorkoutDraft);
+
   document.querySelectorAll("[data-set]").forEach((input) => {
     input.addEventListener("input", () => {
       const entry = state.activeWorkout.entries[state.activeWorkout.index];
       entry.sets[Number(input.dataset.set)][input.dataset.field] = input.value;
+      persistWorkoutDraft();
     });
   });
 
@@ -932,6 +982,7 @@ function bindEvents() {
       const set = entry.sets[Number(button.dataset.checkSet)];
       set.completed = !set.completed;
       if (set.completed) startRestTimer(entry.restSeconds);
+      persistWorkoutDraft();
       render();
     });
   });
@@ -955,6 +1006,7 @@ function bindEvents() {
   });
   document.querySelector("[data-cancel-workout]")?.addEventListener("click", () => {
     if (confirm("Training wirklich abbrechen?")) {
+      clearWorkoutDraft();
       state.activeWorkout = null;
       state.showAlternatives = false;
       state.restTimer.remaining = 0;
@@ -1110,6 +1162,8 @@ function bindEvents() {
     if (!confirm("Alle Trainings- und Gewichtsdaten löschen?")) return;
     storage.sessions = [];
     storage.weights = [];
+    clearWorkoutDraft();
+    state.activeWorkout = null;
     render();
   });
 }
