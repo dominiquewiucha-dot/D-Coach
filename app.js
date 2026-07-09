@@ -370,6 +370,50 @@ function lwsBadge(value) {
   return `<span class="badge ${color}">${htmlesc(label)}</span>`;
 }
 
+function exerciseKind(exercise) {
+  if (exercise.movementPattern === "Isolation") return "Isolation";
+  if (exercise.primaryMuscleGroups.length === 1 && !exercise.secondaryMuscleGroups.length) return "Isolation";
+  return "Mehrgelenk";
+}
+
+function exerciseKindText(exercise) {
+  if (exerciseKind(exercise) === "Isolation") {
+    return "Belastet vor allem den Zielmuskel. Hilfsmuskeln spielen nur eine kleine Rolle.";
+  }
+  return "Trainiert den Zielmuskel und nutzt Hilfsmuskeln fuer Stabilitaet und Kraftuebertragung.";
+}
+
+function muscleRoleCards(exercise) {
+  const primary = exercise.primaryMuscleGroups.length ? exercise.primaryMuscleGroups : ["Nicht hinterlegt"];
+  const secondary = exercise.secondaryMuscleGroups.length ? exercise.secondaryMuscleGroups : ["Keine wesentlichen Hilfsmuskeln"];
+  return `
+    <div class="muscle-grid">
+      <article class="muscle-role">
+        <span class="role-label">Zielmuskel</span>
+        <strong>${htmlesc(primary.join(", "))}</strong>
+        <p class="muted">Hauptarbeit der Uebung.</p>
+      </article>
+      <article class="muscle-role">
+        <span class="role-label">Hilfsmuskel</span>
+        <strong>${htmlesc(secondary.join(", "))}</strong>
+        <p class="muted">Unterstuetzt Bewegung oder Stabilitaet.</p>
+      </article>
+    </div>
+  `;
+}
+
+function exerciseKnowledge(exercise) {
+  const primary = exercise.primaryMuscleGroups.join(", ") || "Zielmuskel nicht hinterlegt";
+  const secondary = exercise.secondaryMuscleGroups.join(", ");
+  const equipment = exercise.equipment.join(", ") || "Geraet nicht hinterlegt";
+  return [
+    `${exerciseKind(exercise)}: ${exerciseKindText(exercise)}`,
+    `Primaer: ${primary}.`,
+    secondary ? `Sekundaer: ${secondary}.` : "Sekundaer: keine wesentlichen Hilfsmuskeln hinterlegt.",
+    `Geraet: ${equipment}.`
+  ];
+}
+
 function render() {
   document.getElementById("app").innerHTML = `
     <main class="app">
@@ -818,6 +862,7 @@ function renderExercises() {
         <button class="list-button" data-exercise-id="${htmlesc(exercise.id)}">
           <article class="card stack">
             <h3>${htmlesc(exercise.displayName)}</h3>
+            <p class="quiet">Ziel: ${htmlesc(exercise.primaryMuscleGroups.join(", ") || "-")} | Hilfe: ${htmlesc(exercise.secondaryMuscleGroups.join(", ") || "-")}</p>
             <p class="muted">${htmlesc(exercise.primaryMuscleGroups.join(", "))} · ${htmlesc(exercise.equipment.join(", "))}</p>
             <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} ${bestWeightForExercise(exercise.id) ? `<span class="badge blue">Best: ${kg(bestWeightForExercise(exercise.id))}</span>` : ""}</div>
           </article>
@@ -837,6 +882,14 @@ function renderExerciseDetail(id) {
       <button class="secondary" data-back-exercises>Zurück</button>
       <header><h1 class="title">${htmlesc(exercise.displayName)}</h1><p class="subtitle">${htmlesc(exercise.movementPattern)}</p></header>
       <article class="card stack">
+        <div class="row">
+          <span class="badge blue">${exerciseKind(exercise)}</span>
+          ${lwsBadge(exercise.lumbarDiscSuitability)}
+        </div>
+        ${muscleRoleCards(exercise)}
+        <p class="muted">${htmlesc(exerciseKindText(exercise))}</p>
+      </article>
+      <article class="card stack">
         <p>${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].join(" · "))}</p>
         <p class="muted">${htmlesc(exercise.equipment.join(" · "))}</p>
         ${lwsBadge(exercise.lumbarDiscSuitability)}
@@ -846,6 +899,10 @@ function renderExerciseDetail(id) {
         ${metric(kg(bestWeightForExercise(id)), "Bestgewicht")}
         ${metric(bestVolumeForExercise(id) ? `${Math.round(bestVolumeForExercise(id))} kg` : "-", "Bestes Volumen")}
       </div>
+      <article class="card stack">
+        <h3>Wissenswertes</h3>
+        <ul class="small-list">${exerciseKnowledge(exercise).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
+      </article>
       <article class="card stack"><h3>Ausführung</h3><p class="muted">${htmlesc(exercise.techniqueNotes || "Keine Technikhinweise hinterlegt.")}</p></article>
       <article class="card stack"><h3>Häufige Fehler</h3><ul class="small-list">${exercise.commonMistakes.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul></article>
       <article class="card stack"><h3>Letzte Leistung</h3>${last ? `<p class="muted">Letztes Mal am ${dateText(last.session.endedAt || last.session.startedAt)}</p><ul class="small-list">${last.exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}</li>`).join("")}</ul>` : `<p class="muted">Noch keine vorherige Leistung vorhanden.</p>`}</article>
