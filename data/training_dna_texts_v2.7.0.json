@@ -1,0 +1,17 @@
+{
+  "version": "2.7.0",
+  "type": "training_dna_texts",
+  "locale": "de-DE",
+  "texts": {
+    "not_enough_data": "Noch nicht genug Daten für eine belastbare Auswertung.",
+    "rep_range_best": "Du machst aktuell die besten Fortschritte im Bereich {repRange}.",
+    "machine_preference": "Maschinenübungen scheinen für dich besonders gut zu funktionieren.",
+    "cable_preference": "Kabelübungen liefern bei dir gute konstante Fortschritte.",
+    "stagnation_detected": "Diese Übung stagniert seit mehreren vergleichbaren Einheiten.",
+    "coverage_consistent": "Diese Muskelgruppe wurde über mehrere Wochen konstant im Zielbereich trainiert.",
+    "coverage_undertrained": "Diese Muskelgruppe bleibt in den letzten Wochen häufig unter dem Ziel.",
+    "missed_day_pattern": "Dieser Trainingstag wird häufiger ausgelassen.",
+    "best_training_time": "In diesem Zeitfenster trainierst du besonders konstant.",
+    "coach_memory_milestone": "Vor einiger Zeit lag deine Leistung hier deutlich niedriger – starker langfristiger Fortschritt."
+  }
+}

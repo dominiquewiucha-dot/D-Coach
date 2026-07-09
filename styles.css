@@ -664,6 +664,30 @@ select:focus-visible {
   font-size: 20px;
 }
 
+.dna-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.dna-grid div {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--input);
+}
+
+.dna-grid span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.dna-grid strong {
+  font-size: 20px;
+}
+
 .set-row {
   display: grid;
   grid-template-columns: 30px 1fr 1fr 64px 42px;

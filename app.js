@@ -41,6 +41,11 @@ const state = {
   exerciseRatingRules: null,
   exerciseRatingsSeed: null,
   alternativeExplanationRules: null,
+  trainingDnaSchema: null,
+  personalAnalyticsRules: null,
+  trainingDnaTexts: null,
+  performanceTimelineSchema: null,
+  coachMemoryRules: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -61,8 +66,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v24";
-const STORAGE_SCHEMA_VERSION = "2.6.0";
+const APP_VERSION = "pwa-v25";
+const STORAGE_SCHEMA_VERSION = "2.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -623,7 +628,12 @@ async function boot() {
     exerciseRatingSchema,
     exerciseRatingRules,
     exerciseRatingsSeed,
-    alternativeExplanationRules
+    alternativeExplanationRules,
+    trainingDnaSchema,
+    personalAnalyticsRules,
+    trainingDnaTexts,
+    performanceTimelineSchema,
+    coachMemoryRules
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -677,7 +687,12 @@ async function boot() {
     fetchOptionalJson("./data/exercise_rating_schema_v2.6.0.json"),
     fetchOptionalJson("./data/exercise_rating_rules_v2.6.0.json"),
     fetchOptionalJson("./data/exercise_ratings_seed_v2.6.0.json"),
-    fetchOptionalJson("./data/alternative_explanation_rules_v2.6.0.json")
+    fetchOptionalJson("./data/alternative_explanation_rules_v2.6.0.json"),
+    fetchOptionalJson("./data/training_dna_schema_v2.7.0.json"),
+    fetchOptionalJson("./data/personal_analytics_rules_v2.7.0.json"),
+    fetchOptionalJson("./data/training_dna_texts_v2.7.0.json"),
+    fetchOptionalJson("./data/personal_performance_timeline_schema_v2.7.0.json"),
+    fetchOptionalJson("./data/coach_memory_rules_v2.7.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -720,6 +735,11 @@ async function boot() {
   state.exerciseRatingRules = exerciseRatingRules;
   state.exerciseRatingsSeed = exerciseRatingsSeed;
   state.alternativeExplanationRules = alternativeExplanationRules;
+  state.trainingDnaSchema = trainingDnaSchema;
+  state.personalAnalyticsRules = personalAnalyticsRules;
+  state.trainingDnaTexts = trainingDnaTexts;
+  state.performanceTimelineSchema = performanceTimelineSchema;
+  state.coachMemoryRules = coachMemoryRules;
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
@@ -1498,6 +1518,130 @@ function performanceInsightsForSession(session) {
   });
 }
 
+function trainingDnaText(key, fallback) {
+  return state.trainingDnaTexts?.texts?.[key] || fallback;
+}
+
+function completedWorkingSets() {
+  return storage.sessions.flatMap((session) => (session.completedExercises || []).flatMap((exercise) => (exercise.sets || [])
+    .filter((set) => set.completed !== false && Number(set.actualReps) > 0)
+    .map((set) => ({ session, exercise, set }))));
+}
+
+function repBucket(reps) {
+  const value = Number(reps) || 0;
+  if (value <= 5) return "1-5";
+  if (value <= 8) return "6-8";
+  if (value <= 12) return "8-12";
+  if (value <= 15) return "12-15";
+  if (value <= 20) return "15-20";
+  return "20+";
+}
+
+function trainingWeekKey(dateValue) {
+  const date = new Date(dateValue);
+  const monday = new Date(date);
+  monday.setHours(0, 0, 0, 0);
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  return monday.toISOString().slice(0, 10);
+}
+
+function trainingDnaSummary() {
+  const sessions = [...storage.sessions].sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt));
+  const sets = completedWorkingSets();
+  const weeks = new Set(sessions.map((session) => trainingWeekKey(session.startedAt)));
+  const enough = sessions.length >= 3 && sets.length >= 20;
+  const repCounts = sets.reduce((map, item) => {
+    const key = repBucket(item.set.actualReps);
+    map.set(key, (map.get(key) || 0) + 1);
+    return map;
+  }, new Map());
+  const topRepRange = [...repCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+  const exerciseAffinity = allExercises().map((exercise) => {
+    const history = exerciseHistory(exercise.id);
+    if (history.length < 3) return null;
+    const progress = history.length > 1 ? totalVolume(history[0].exercise) - totalVolume(history[history.length - 1].exercise) : 0;
+    return { exercise, count: history.length, score: history.length * 10 + Math.max(0, progress / 100) };
+  }).filter(Boolean).sort((a, b) => b.score - a.score).slice(0, 3);
+  const stagnating = allExercises().map((exercise) => {
+    const history = exerciseHistory(exercise.id).slice(0, 4);
+    if (history.length < 4) return null;
+    const newest = totalVolume(history[0].exercise);
+    const oldest = totalVolume(history[history.length - 1].exercise);
+    const change = oldest ? ((newest - oldest) / oldest) * 100 : 0;
+    return Math.abs(change) <= 1 ? { exercise, change } : null;
+  }).filter(Boolean).slice(0, 3);
+  const coverage = coverageForSessions(sessionsSince(28)).filter((item) => item.isTarget);
+  return {
+    enough,
+    sessionCount: sessions.length,
+    setCount: sets.length,
+    weekCount: weeks.size,
+    averageSessionDurationMinutes: sessions.length ? Math.round(sessions.reduce((sum, session) => sum + sessionDurationMinutes(session), 0) / sessions.length) : null,
+    topRepRange,
+    exerciseAffinity,
+    stagnating,
+    undertrainedMuscles: coverage.filter((item) => item.percent < 70).slice(0, 3),
+    strongestMuscles: coverage.filter((item) => item.percent >= 70).sort((a, b) => b.percent - a.percent).slice(0, 3)
+  };
+}
+
+function timelineEvents() {
+  const sessions = [...storage.sessions].sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt));
+  const events = [];
+  const first = sessions[0];
+  if (first) {
+    events.push({
+      id: `first-${first.id}`,
+      date: String(first.startedAt).slice(0, 10),
+      type: "first_workout",
+      title: "Erstes gespeichertes Training",
+      description: first.dayName || "Training gespeichert.",
+      confidence: 100
+    });
+  }
+  sessions.forEach((session, index) => {
+    const previous = sessions[index - 1];
+    if (previous && (new Date(session.startedAt) - new Date(previous.startedAt)) / 86400000 > 21) {
+      events.push({
+        id: `return-${session.id}`,
+        date: String(session.startedAt).slice(0, 10),
+        type: "return_after_break",
+        title: "Wiedereinstieg nach Pause",
+        description: "Konservativer Start sinnvoll.",
+        confidence: 85
+      });
+    }
+    performanceInsightsForSession(session).forEach(({ exercise, insight }) => {
+      if (!insight.records.length) return;
+      events.push({
+        id: `pr-${session.id}-${exercise.exerciseId}`,
+        date: String(session.startedAt).slice(0, 10),
+        type: "new_pr",
+        title: insight.records[0],
+        description: exercise.exerciseNameSnapshot,
+        relatedExerciseId: exercise.exerciseId,
+        confidence: insight.confidencePercent
+      });
+    });
+  });
+  return events.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+}
+
+function coachMemoryItems() {
+  const sessions = [...storage.sessions].sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt));
+  const items = [];
+  for (let index = 1; index < sessions.length; index += 1) {
+    if ((new Date(sessions[index].startedAt) - new Date(sessions[index - 1].startedAt)) / 86400000 > 21) {
+      items.push("Wiedereinstieg nach Pause erkannt. Konservativer Start sinnvoll.");
+      break;
+    }
+  }
+  const weeks = new Set(sessions.map((session) => trainingWeekKey(session.startedAt)));
+  if (weeks.size >= 8) items.push("Du trainierst seit mehreren Wochen konstant - gute Basis fuer planbare Progression.");
+  return items.slice(0, 3);
+}
+
 function upperRepTarget(text) {
   const numbers = String(text || "").match(/\d+/g)?.map(Number) || [];
   return numbers.length ? Math.max(...numbers) : null;
@@ -2023,6 +2167,41 @@ function renderPerformanceCoachCard(session) {
   `;
 }
 
+function renderTrainingDnaCard() {
+  const dna = trainingDnaSummary();
+  const memory = coachMemoryItems();
+  const events = timelineEvents();
+  if (!dna.enough) {
+    return `
+      <article class="card stack">
+        <div class="row">
+          <h3 class="grow">Training-DNA</h3>
+          <span class="badge amber">${dna.sessionCount} Einheiten</span>
+        </div>
+        <p class="muted">${htmlesc(trainingDnaText("not_enough_data", "Noch nicht genug Daten fuer eine belastbare Auswertung."))}</p>
+        <p class="quiet">Aktuell: ${dna.setCount} aus mindestens 20 verwertbaren Saetzen.</p>
+      </article>
+    `;
+  }
+  return `
+    <article class="card stack">
+      <div class="row">
+        <h3 class="grow">Training-DNA</h3>
+        <span class="badge blue">${dna.weekCount} Wochen</span>
+      </div>
+      <div class="dna-grid">
+        <div><span>Rep-Bereich</span><strong>${htmlesc(dna.topRepRange || "-")}</strong></div>
+        <div><span>Ø Dauer</span><strong>${dna.averageSessionDurationMinutes || "-"} min</strong></div>
+      </div>
+      ${dna.exerciseAffinity.length ? `<div class="stack"><h4>Hohe Uebungs-Affinitaet</h4>${dna.exerciseAffinity.map((item) => `<p class="quiet">${htmlesc(item.exercise.displayName)} · ${item.count} Einheiten</p>`).join("")}</div>` : ""}
+      ${dna.stagnating.length ? `<div class="stack"><h4>Stagnation moeglich</h4>${dna.stagnating.map((item) => `<p class="quiet">${htmlesc(item.exercise.displayName)} · ${trainingDnaText("stagnation_detected", "Diese Uebung stagniert seit mehreren vergleichbaren Einheiten.")}</p>`).join("")}</div>` : ""}
+      ${dna.undertrainedMuscles.length ? `<div class="stack"><h4>Unter Ziel</h4>${dna.undertrainedMuscles.map((item) => `<p class="quiet">${htmlesc(item.name)} · ${item.percent}%</p>`).join("")}</div>` : ""}
+      ${memory.length ? `<ul class="small-list">${memory.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
+      ${events.length ? `<details><summary>Timeline</summary><ul class="small-list">${events.map((event) => `<li>${dateText(event.date)}: ${htmlesc(event.title)} - ${htmlesc(event.description)}</li>`).join("")}</ul></details>` : ""}
+    </article>
+  `;
+}
+
 function renderExerciseRatingCard(exercise) {
   const rating = ratingForExercise(exercise);
   const quality = personalExerciseQualityScore(exercise);
@@ -2143,6 +2322,7 @@ function renderCoach() {
         <p class="muted">${htmlesc(readiness.hint)}</p>
       </article>
       ${renderPerformanceCoachCard(session)}
+      ${renderTrainingDnaCard()}
       <article class="card stack">
         <h3>Coverage Coach</h3>
         ${coverageHints.length ? `<ul class="small-list">${coverageHints.map((hint) => `<li>${htmlesc(hint)}</li>`).join("")}</ul>` : `<p class="muted">Die Wochenabdeckung wirkt aktuell ausgeglichen.</p>`}
@@ -2921,7 +3101,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "2.6.0",
+    backupVersion: "2.7.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

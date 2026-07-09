@@ -1,0 +1,28 @@
+{
+  "version": "2.7.0",
+  "type": "coach_memory_rules",
+  "locale": "de-DE",
+  "rules": [
+    {
+      "id": "one_year_progress_memory",
+      "trigger": "same exercise has data around 12 months ago and today",
+      "text": "Vor ungefähr einem Jahr lag deine Leistung hier bei {oldValue}. Heute bist du bei {newValue}."
+    },
+    {
+      "id": "return_after_break_memory",
+      "trigger": "gap between sessions > 21 days",
+      "text": "Wiedereinstieg nach Pause erkannt. Konservativer Start sinnvoll."
+    },
+    {
+      "id": "long_term_consistency_memory",
+      "trigger": "training completed for 8+ weeks with regular frequency",
+      "text": "Du trainierst seit mehreren Wochen konstant – gute Basis für planbare Progression."
+    },
+    {
+      "id": "coverage_streak_memory",
+      "trigger": "muscle coverage 70-120 percent for 6+ weeks",
+      "text": "Diese Muskelgruppe wurde über mehrere Wochen konstant im Zielbereich trainiert."
+    }
+  ],
+  "displayRule": "Coach Memory nur im Coach Mode, Timeline oder Übungsdetail anzeigen."
+}

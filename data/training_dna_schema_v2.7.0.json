@@ -1,0 +1,59 @@
+{
+  "version": "2.7.0",
+  "type": "training_dna_schema",
+  "locale": "de-DE",
+  "description": "Training-DNA beschreibt persönliche Muster aus der Trainingshistorie.",
+  "fields": [
+    {
+      "key": "averageSessionDurationMinutes",
+      "label": "Ø Trainingsdauer",
+      "source": "workout sessions"
+    },
+    {
+      "key": "averageRestSeconds",
+      "label": "Ø Satzpause",
+      "source": "set timestamps/rest timer"
+    },
+    {
+      "key": "preferredRepRanges",
+      "label": "bevorzugte Wiederholungsbereiche",
+      "source": "completed sets"
+    },
+    {
+      "key": "bestProgressionRepRanges",
+      "label": "beste Progressionsbereiche",
+      "source": "performance trends"
+    },
+    {
+      "key": "preferredExerciseCategories",
+      "label": "bevorzugte Übungskategorien",
+      "source": "exercise usage"
+    },
+    {
+      "key": "mostSkippedWorkoutDays",
+      "label": "häufig ausgelassene Trainingstage",
+      "source": "plan vs completed sessions"
+    },
+    {
+      "key": "strongestMuscleCoverageGroups",
+      "label": "stärkste Muskelgruppen-Abdeckung",
+      "source": "muscle coverage"
+    },
+    {
+      "key": "undertrainedMuscleCoverageGroups",
+      "label": "unterversorgte Muskelgruppen",
+      "source": "muscle coverage"
+    },
+    {
+      "key": "bestPerformingExercises",
+      "label": "beste persönliche Übungen",
+      "source": "performance and consistency"
+    },
+    {
+      "key": "stagnatingExercises",
+      "label": "stagnierende Übungen",
+      "source": "performance trend"
+    }
+  ],
+  "displayRule": "Nur Coach Mode / Analytics. Nicht im Quick Training Mode."
+}

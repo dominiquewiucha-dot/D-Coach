@@ -1,0 +1,43 @@
+{
+  "version": "2.7.0",
+  "type": "personal_analytics_rules",
+  "locale": "de-DE",
+  "rules": [
+    {
+      "id": "preferred_rep_range_detection",
+      "label": "Bevorzugter Wiederholungsbereich",
+      "logic": "group completed working sets into rep buckets 1-5, 6-8, 8-12, 12-15, 15-20, 20+ and rank by frequency and progress",
+      "minData": "at least 20 completed sets"
+    },
+    {
+      "id": "exercise_affinity_score",
+      "label": "Übungs-Affinität",
+      "logic": "combine usage frequency, completion rate, progress trend and user favorites",
+      "minData": "at least 3 sessions with exercise"
+    },
+    {
+      "id": "stagnation_detection",
+      "label": "Stagnation erkennen",
+      "logic": "no meaningful improvement across 4-6 comparable sessions",
+      "minData": "at least 4 comparable sessions"
+    },
+    {
+      "id": "muscle_coverage_consistency",
+      "label": "Muskel-Konstanz",
+      "logic": "compare weekly coverage percent against target over 4-8 weeks",
+      "minData": "at least 4 weeks"
+    },
+    {
+      "id": "session_time_pattern",
+      "label": "Trainingszeit-Muster",
+      "logic": "detect average start time and best performance windows",
+      "minData": "at least 10 sessions"
+    },
+    {
+      "id": "missed_split_pattern",
+      "label": "Ausgelassene Split-Tage",
+      "logic": "compare planned workout days to completed sessions and count skipped push/pull/legs",
+      "minData": "at least 3 weeks"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "version": "2.7.0",
+  "type": "personal_performance_timeline_schema",
+  "locale": "de-DE",
+  "description": "Persönliche Trainingschronik aus automatisch erkannten Meilensteinen.",
+  "eventTypes": [
+    {
+      "id": "first_workout",
+      "label": "erstes Training"
+    },
+    {
+      "id": "new_pr",
+      "label": "neue Bestleistung"
+    },
+    {
+      "id": "coverage_goal_streak",
+      "label": "Muskelabdeckung konstant erreicht"
+    },
+    {
+      "id": "bodyweight_milestone",
+      "label": "Gewichtsmeilenstein"
+    },
+    {
+      "id": "training_streak",
+      "label": "Trainingsserie"
+    },
+    {
+      "id": "return_after_break",
+      "label": "Wiedereinstieg nach Pause"
+    },
+    {
+      "id": "exercise_progress_milestone",
+      "label": "Übungsfortschritt"
+    },
+    {
+      "id": "year_summary",
+      "label": "Jahreszusammenfassung"
+    }
+  ],
+  "eventSchema": {
+    "id": "string",
+    "date": "YYYY-MM-DD",
+    "type": "eventType",
+    "title": "string",
+    "description": "string",
+    "relatedExerciseId": "string|null",
+    "relatedMuscleId": "string|null",
+    "confidence": "number"
+  }
+}
