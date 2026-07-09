@@ -1,0 +1,37 @@
+{
+  "version": "2.2.0",
+  "type": "personal_coach_rules",
+  "locale": "de-DE",
+  "rules": [
+    {
+      "id": "hold_if_lws_and_low_readiness",
+      "trigger": "LWS caution exercise AND readiness not green",
+      "message": "Heute konservativ bleiben: Gewicht halten und sauber arbeiten.",
+      "mode": "coach_later"
+    },
+    {
+      "id": "silent_coach_last_weight",
+      "trigger": "exercise has previous performance",
+      "message": "Letztes Gewicht übernommen.",
+      "mode": "quick_training_compact"
+    },
+    {
+      "id": "increase_candidate",
+      "trigger": "target reps reached in last two sessions AND readiness green",
+      "message": "Nächstes Mal kleine Steigerung prüfen.",
+      "mode": "post_exercise_or_coach"
+    },
+    {
+      "id": "lws_alternative_prompt",
+      "trigger": "exercise.lumbarDiscSuitability == avoidInitially",
+      "message": "LWS-Hinweis: Für den Wiedereinstieg besser eine Alternative wählen.",
+      "mode": "quick_training_compact"
+    },
+    {
+      "id": "lunch_break_time_guard",
+      "trigger": "elapsedTime close to maxSessionMinutes AND optional exercises remain",
+      "message": "Zeit knapp: optionale Übungen überspringen?",
+      "mode": "quick_training_compact"
+    }
+  ]
+}

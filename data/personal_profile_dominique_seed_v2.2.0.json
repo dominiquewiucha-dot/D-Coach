@@ -1,0 +1,55 @@
+{
+  "version": "2.2.0",
+  "type": "personal_profile_seed",
+  "locale": "de-DE",
+  "profileId": "profile_dominique_default",
+  "displayName": "Dominique",
+  "trainingExperience": "advanced",
+  "trainingGoal": "hypertrophy_reentry",
+  "maxSessionMinutes": 60,
+  "preferredSplit": "3er Split",
+  "preferredTrainingWindow": "Mittagspause",
+  "constraints": {
+    "lumbarDiscHistory": true,
+    "lumbarRegion": "LWS",
+    "trainingApproach": "moderater Wiedereinstieg, saubere Technik, keine Maximalversuche",
+    "avoidInitially": [
+      "schweres Kreuzheben",
+      "vorgebeugtes Langhantelrudern",
+      "schwere freie Kniebeugen",
+      "aggressive Hip-Hinge-Progression"
+    ]
+  },
+  "preferredStudios": [
+    {
+      "name": "Speed Fitness",
+      "type": "gym"
+    }
+  ],
+  "preferences": {
+    "quickTrainingMode": true,
+    "showRirOptional": true,
+    "showRpeOptional": false,
+    "defaultRestSeconds": 90,
+    "preferMachinesAndCablesForLws": true,
+    "preferChestSupportedBackExercises": true,
+    "avoidOverloadedWorkoutScreen": true
+  },
+  "preferredExerciseIds": [
+    "ex_chest_press_machine",
+    "ex_incline_chest_press_machine",
+    "ex_chest_supported_row_machine",
+    "ex_lat_pulldown_neutral",
+    "ex_leg_press_horizontal",
+    "ex_hip_thrust_machine",
+    "ex_pallof_press_cable",
+    "ex_plank_forearm"
+  ],
+  "avoidExerciseIds": [
+    "ex_deadlift_barbell",
+    "ex_bent_over_row_barbell",
+    "ex_romanian_deadlift_dumbbell",
+    "ex_barbell_back_squat",
+    "ex_front_squat"
+  ]
+}

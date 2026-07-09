@@ -1,0 +1,45 @@
+{
+  "version": "2.2.0",
+  "type": "studio_context_seed",
+  "locale": "de-DE",
+  "studios": [
+    {
+      "id": "studio_speed_fitness_generic",
+      "name": "Speed Fitness",
+      "status": "user_preferred_generic_profile",
+      "note": "Noch kein exakter Gerätekatalog. Platzhalter für späteres Studio- und Gerätemapping.",
+      "machineMatchingStrategy": [
+        "match by primaryMuscle",
+        "match by movementPattern",
+        "prefer lower spineLoadLevel",
+        "prefer exercise with user history"
+      ],
+      "fallbackRules": [
+        {
+          "ifPlannedExerciseMissing": "ex_chest_press_machine",
+          "suggest": [
+            "ex_incline_chest_press_machine",
+            "ex_pec_deck",
+            "ex_cable_fly_mid"
+          ]
+        },
+        {
+          "ifPlannedExerciseMissing": "ex_bent_over_row_barbell",
+          "suggest": [
+            "ex_chest_supported_row_machine",
+            "ex_machine_row_neutral",
+            "ex_seated_cable_row"
+          ]
+        },
+        {
+          "ifPlannedExerciseMissing": "ex_deadlift_barbell",
+          "suggest": [
+            "ex_hip_thrust_machine",
+            "ex_glute_bridge_bodyweight",
+            "ex_seated_leg_curl_machine"
+          ]
+        }
+      ]
+    }
+  ]
+}

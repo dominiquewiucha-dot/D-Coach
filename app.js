@@ -23,6 +23,11 @@ const state = {
   debugTestData: null,
   appTexts: null,
   releaseAcceptanceCriteria: null,
+  personalProfileSchema: null,
+  personalProfileSeed: null,
+  personalizationRules: null,
+  personalCoachRules: null,
+  studioContext: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -40,8 +45,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v18";
-const STORAGE_SCHEMA_VERSION = "2.1.0";
+const APP_VERSION = "pwa-v19";
+const STORAGE_SCHEMA_VERSION = "2.2.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -53,6 +58,7 @@ const STORAGE_KEYS = [
   { key: "dcoach.customPlans", label: "Eigene Plaene", type: "array" },
   { key: "dcoach.customExercises", label: "Eigene Uebungen", type: "array" },
   { key: "dcoach.userSettings", label: "Einstellungen", type: "object" },
+  { key: "dcoach.personalProfile", label: "Profil", type: "object" },
   { key: "dcoach.lastErrors", label: "Fehlerlog", type: "array" },
   { key: "dcoach.activeWorkoutDraft", label: "Trainingsentwurf", type: "object" },
   { key: "dcoach.lastBackupAt", label: "Letztes Backup", type: "string" },
@@ -121,6 +127,13 @@ const storage = {
   },
   set userSettings(value) {
     writeJson("dcoach.userSettings", value);
+  },
+  get personalProfile() {
+    return readJson("dcoach.personalProfile", null);
+  },
+  set personalProfile(value) {
+    if (value) writeJson("dcoach.personalProfile", value);
+    else localStorage.removeItem("dcoach.personalProfile");
   },
   get lastErrors() {
     return readJson("dcoach.lastErrors", []);
@@ -399,6 +412,28 @@ function currentUserSettings() {
   return { ...defaultUserSettings(), ...storage.userSettings };
 }
 
+function defaultPersonalProfile() {
+  const profile = {};
+  (state.personalProfileSchema?.profileFields || []).forEach((item) => {
+    profile[item.key] = item.default ?? null;
+  });
+  return profile;
+}
+
+function currentPersonalProfile() {
+  return { ...defaultPersonalProfile(), ...(storage.personalProfile || {}) };
+}
+
+function importSeedProfile() {
+  if (!state.personalProfileSeed) throw new Error("Seed-Profil fehlt.");
+  if (storage.personalProfile && !confirm("Bestehendes Profil ersetzen?")) return;
+  storage.personalProfile = {
+    ...defaultPersonalProfile(),
+    ...state.personalProfileSeed,
+    importedAt: new Date().toISOString()
+  };
+}
+
 function updateUserSetting(key, value) {
   storage.userSettings = { ...currentUserSettings(), [key]: value };
 }
@@ -463,9 +498,16 @@ function importPlanPayload(text) {
 }
 
 function generatePlanCandidate() {
+  const profile = currentPersonalProfile();
+  const avoidIds = new Set(profile.avoidExerciseIds || []);
+  const preferredIds = new Set(profile.preferredExerciseIds || []);
   const exercises = allExercises()
-    .filter((exercise) => !exercise.isArchived && exercise.lumbarDiscSuitability !== "avoidInitially")
-    .sort((a, b) => lwsRank(a.lumbarDiscSuitability) - lwsRank(b.lumbarDiscSuitability));
+    .filter((exercise) => !exercise.isArchived && !avoidIds.has(exercise.id) && exercise.lumbarDiscSuitability !== "avoidInitially")
+    .sort((a, b) => {
+      const preferredDelta = Number(preferredIds.has(b.id)) - Number(preferredIds.has(a.id));
+      if (preferredDelta) return preferredDelta;
+      return lwsRank(a.lumbarDiscSuitability) - lwsRank(b.lumbarDiscSuitability);
+    });
   const groups = [
     ["Push", ["push", "brust", "schulter", "trizeps"]],
     ["Pull", ["pull", "ruecken", "rücken", "bizeps"]],
@@ -547,7 +589,12 @@ async function boot() {
     releaseAcceptanceCriteria,
     exerciseCoreV21,
     muscleMappingV21,
-    alternativesV21
+    alternativesV21,
+    personalProfileSchema,
+    personalProfileSeed,
+    personalizationRules,
+    personalCoachRules,
+    studioContext
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -583,7 +630,12 @@ async function boot() {
     fetchOptionalJson("./data/release_acceptance_criteria_v1.4.0.json"),
     fetchOptionalJson("./data/exercise_core_v2.1.0.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping_v2.1.0.json"),
-    fetchOptionalJson("./data/exercise_alternatives_v2.1.0.json")
+    fetchOptionalJson("./data/exercise_alternatives_v2.1.0.json"),
+    fetchOptionalJson("./data/personal_profile_schema_v2.2.0.json"),
+    fetchOptionalJson("./data/personal_profile_dominique_seed_v2.2.0.json"),
+    fetchOptionalJson("./data/personalization_rules_v2.2.0.json"),
+    fetchOptionalJson("./data/personal_coach_rules_v2.2.0.json"),
+    fetchOptionalJson("./data/studio_context_v2.2.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -608,6 +660,11 @@ async function boot() {
   state.debugTestData = debugTestData;
   state.appTexts = appTexts;
   state.releaseAcceptanceCriteria = releaseAcceptanceCriteria;
+  state.personalProfileSchema = personalProfileSchema;
+  state.personalProfileSeed = personalProfileSeed;
+  state.personalizationRules = personalizationRules;
+  state.personalCoachRules = personalCoachRules;
+  state.studioContext = studioContext;
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
@@ -1266,16 +1323,19 @@ function renderMuscleItems(items, fallback) {
 
 function alternativeCandidatesForExercise(exercise) {
   const rule = alternativeRuleForExercise(exercise.id);
+  const profile = currentPersonalProfile();
+  const avoidIds = new Set(profile.avoidExerciseIds || []);
+  const preferredIds = new Set(profile.preferredExerciseIds || []);
   const byId = new Map();
 
   if (rule) {
     rule.alternatives.forEach((item) => {
       const candidate = exerciseById(item.exerciseId);
-      if (!candidate) return;
+      if (!candidate || avoidIds.has(candidate.id)) return;
       byId.set(candidate.id, {
         exercise: candidate,
-        score: Number(item.matchScore) || 0,
-        note: item.note || "",
+        score: (Number(item.matchScore) || 0) + (preferredIds.has(candidate.id) ? 0.2 : 0),
+        note: item.note || item.reason || "",
         reason: rule.reason || "",
         source: "rule"
       });
@@ -1283,10 +1343,11 @@ function alternativeCandidatesForExercise(exercise) {
   }
 
   exercise.alternatives.map(exerciseById).filter(Boolean).forEach((candidate) => {
+    if (avoidIds.has(candidate.id)) return;
     if (byId.has(candidate.id)) return;
     byId.set(candidate.id, {
       exercise: candidate,
-      score: 0,
+      score: preferredIds.has(candidate.id) ? 0.2 : 0,
       note: "",
       reason: "",
       source: "fallback"
@@ -2232,6 +2293,14 @@ function renderSettings() {
       </article>
       <article class="card stack">
         <div class="row">
+          <h3 class="grow">Persoenliche Schicht</h3>
+          <span class="badge ${storage.personalProfile ? "green" : "amber"}">${storage.personalProfile ? "Aktiv" : "Leer"}</span>
+        </div>
+        <p class="muted">${storage.personalProfile ? htmlesc(currentPersonalProfile().displayName || "Profil aktiv") : "Optionales Profil importieren. Bestehende Trainingsdaten bleiben erhalten."}</p>
+        <button class="secondary" data-import-seed-profile>Dominique-Profil importieren</button>
+      </article>
+      <article class="card stack">
+        <div class="row">
           <h3 class="grow">Debug</h3>
           <span class="badge blue">${APP_VERSION}</span>
         </div>
@@ -2274,7 +2343,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "2.1.0",
+    backupVersion: "2.2.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),
@@ -2288,6 +2357,7 @@ function createBackup() {
     machineSettings: storage.machineSettings,
     customPlans: storage.customPlans,
     customExercises: storage.customExercises,
+    personalProfile: storage.personalProfile,
     userSettings: currentUserSettings(),
     lastErrors: storage.lastErrors,
     archivedPlanNames: storage.archivedPlanNames,
@@ -2358,6 +2428,7 @@ function importBackupFile(file) {
       storage.machineSettings = mergeById(storage.machineSettings, Array.isArray(backup.machineSettings) ? backup.machineSettings : []);
       storage.customPlans = mergeById(storage.customPlans, Array.isArray(backup.customPlans) ? backup.customPlans : []);
       storage.customExercises = mergeById(storage.customExercises, Array.isArray(backup.customExercises) ? backup.customExercises : []);
+      if (!storage.personalProfile && backup.personalProfile && typeof backup.personalProfile === "object") storage.personalProfile = backup.personalProfile;
       storage.userSettings = { ...currentUserSettings(), ...(backup.userSettings && typeof backup.userSettings === "object" ? backup.userSettings : {}) };
       storage.lastErrors = mergeById(storage.lastErrors, Array.isArray(backup.lastErrors) ? backup.lastErrors : []);
       storage.migrationLog = mergeById(storage.migrationLog, Array.isArray(backup.migrationLog) ? backup.migrationLog : []);
@@ -2716,6 +2787,15 @@ function bindEvents() {
     event.target.value = "";
   });
 
+  document.querySelector("[data-import-seed-profile]")?.addEventListener("click", () => {
+    try {
+      importSeedProfile();
+      render();
+    } catch (error) {
+      alert(error.message || "Profil konnte nicht importiert werden.");
+    }
+  });
+
   document.querySelector("[data-reset-plan-library]")?.addEventListener("click", () => {
     storage.archivedPlanNames = [];
     storage.deletedPlanNames = [];
@@ -2731,6 +2811,7 @@ function bindEvents() {
     storage.machineSettings = [];
     storage.customPlans = [];
     storage.customExercises = [];
+    storage.personalProfile = null;
     storage.lastErrors = [];
     clearWorkoutDraft();
     storage.lastBackupAt = null;

@@ -1,0 +1,49 @@
+{
+  "version": "2.2.0",
+  "type": "personalization_rules",
+  "locale": "de-DE",
+  "rules": [
+    {
+      "id": "lws_prefer_low_spine_load",
+      "priority": 100,
+      "if": "lumbarDiscHistory == true",
+      "then": "prefer veryLow or low spineLoadLevel"
+    },
+    {
+      "id": "lws_avoid_initially",
+      "priority": 100,
+      "if": "lumbarDiscHistory == true",
+      "then": "exclude or warn for lumbarDiscSuitability avoidInitially"
+    },
+    {
+      "id": "lws_prefer_chest_supported_rows",
+      "priority": 90,
+      "if": "Pull exercise",
+      "then": "rank chest-supported and machine rows above bent-over rows"
+    },
+    {
+      "id": "lunch_break_limit",
+      "priority": 80,
+      "if": "maxSessionMinutes <= 60",
+      "then": "limit workouts to 5-7 exercises"
+    },
+    {
+      "id": "advanced_but_reentry",
+      "priority": 75,
+      "if": "advanced + reentry",
+      "then": "moderate volume and conservative progression"
+    },
+    {
+      "id": "quick_mode_default",
+      "priority": 100,
+      "if": "quickTrainingMode == true",
+      "then": "show only workout-critical information during training"
+    },
+    {
+      "id": "rir_optional",
+      "priority": 60,
+      "if": "showRirOptional == true",
+      "then": "make RIR optional behind expanded controls"
+    }
+  ]
+}

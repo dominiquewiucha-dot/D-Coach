@@ -1,0 +1,60 @@
+{
+  "version": "2.2.0",
+  "type": "personal_profile_schema",
+  "locale": "de-DE",
+  "description": "Persönliche Schicht für D-Coach.",
+  "profileFields": [
+    {
+      "key": "trainingExperience",
+      "type": "string",
+      "default": "advanced"
+    },
+    {
+      "key": "trainingGoal",
+      "type": "string",
+      "default": "hypertrophy_reentry"
+    },
+    {
+      "key": "maxSessionMinutes",
+      "type": "number",
+      "default": 60
+    },
+    {
+      "key": "preferredSplit",
+      "type": "string",
+      "default": "3er Split"
+    },
+    {
+      "key": "preferredTrainingWindow",
+      "type": "string",
+      "default": "Mittagspause"
+    },
+    {
+      "key": "lumbarDiscHistory",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "key": "preferredStudios",
+      "type": "array",
+      "default": [
+        "Speed Fitness"
+      ]
+    },
+    {
+      "key": "avoidExerciseIds",
+      "type": "array",
+      "default": []
+    },
+    {
+      "key": "preferredExerciseIds",
+      "type": "array",
+      "default": []
+    },
+    {
+      "key": "quickTrainingModeDefault",
+      "type": "boolean",
+      "default": true
+    }
+  ]
+}
