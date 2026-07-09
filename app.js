@@ -40,8 +40,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v16";
-const STORAGE_SCHEMA_VERSION = "1.4.0";
+const APP_VERSION = "pwa-v17";
+const STORAGE_SCHEMA_VERSION = "2.0.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -955,6 +955,24 @@ function progressionForEntry(entry, previous) {
   return { color: "blue", text: texts.holdWeight || "Gewicht halten und Wiederholungen sammeln." };
 }
 
+function progressionForCompletedExercise(exercise, previous, sessionId) {
+  const texts = coachingTexts();
+  if (!previous) return { color: "blue", text: texts.noHistory || "Neue Uebung in deiner Historie." };
+  const currentVolume = totalVolume(exercise);
+  const previousVolume = totalVolume(previous.exercise);
+  const bestBefore = bestWeightBeforeExercise(exercise.exerciseId, sessionId);
+  const currentBest = exercise.sets
+    .map((set) => Number(set.actualWeightKg))
+    .filter((value) => Number.isFinite(value))
+    .reduce((max, value) => Math.max(max, value), 0);
+  if (currentBest > 0 && (!bestBefore || currentBest > bestBefore)) {
+    return { color: "green", text: "Neues Bestgewicht. Naechstes Training kontrolliert bestaetigen." };
+  }
+  if (currentVolume > previousVolume) return { color: "green", text: texts.sameWeightMoreReps || "Mehr Volumen als letztes Mal." };
+  if (currentVolume < previousVolume * 0.85) return { color: "amber", text: texts.performanceDrop || "Schwaecher als zuletzt. Regeneration pruefen." };
+  return { color: "blue", text: texts.holdWeight || "Gewicht halten und Wiederholungen sammeln." };
+}
+
 function machineSettingsForExercise(exerciseId) {
   return storage.machineSettings.filter((item) => item.exerciseId === exerciseId).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 }
@@ -1362,11 +1380,12 @@ function render() {
 
 function renderRoute() {
   if (!state.seed) return `<section class="screen"><h1 class="title">D-Coach</h1><p class="subtitle">Lade Daten...</p></section>`;
-  if (state.activeWorkout) return renderWorkout();
   if (state.selectedExerciseId) return renderExerciseDetail(state.selectedExerciseId);
+  if (state.activeWorkout) return renderWorkout();
   if (state.selectedSessionId) return renderSessionDetail(state.selectedSessionId);
   switch (state.tab) {
     case "training": return renderTraining();
+    case "coach": return renderCoach();
     case "plans": return renderPlans();
     case "exercises": return renderExercises();
     case "weight": return renderWeight();
@@ -1380,6 +1399,7 @@ function renderTabs() {
   const tabs = [
     ["dashboard", "Dashboard"],
     ["training", "Training"],
+    ["coach", "Coach"],
     ["plans", "Pläne"],
     ["exercises", "Übungen"],
     ["weight", "Gewicht"],
@@ -1442,6 +1462,73 @@ function renderDashboard() {
           </button>
         `).join("") : `<p class="muted">Noch kein Training gespeichert.</p>`}
       </article>
+    </section>
+  `;
+}
+
+function renderCoach() {
+  const session = lastSession();
+  const readiness = readinessForJournal(journalEntryForDate(todayIsoDate()) || latestJournalEntry());
+  const weightEntries = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date));
+  if (!session) {
+    return `
+      <section class="screen stack">
+        <header><h1 class="title">Coach</h1><p class="subtitle">Auswertung nach dem Training.</p></header>
+        <article class="card stack">
+          <h2>Noch keine Trainingsdaten</h2>
+          <p class="muted">Speichere dein erstes Training, dann erscheinen hier Fortschritt, Volumen und Empfehlungen.</p>
+          <button class="primary" data-tab="training">Training starten</button>
+        </article>
+      </section>
+    `;
+  }
+  const improvements = sessionImprovements(session);
+  return `
+    <section class="screen stack">
+      <header><h1 class="title">Coach</h1><p class="subtitle">${htmlesc(session.dayName)} · ${dateText(session.startedAt)}</p></header>
+      <div class="grid">
+        ${metric(String(sessionDurationMinutes(session)), "Minuten")}
+        ${metric(String(session.completedExercises.length), "Uebungen")}
+        ${metric(String(sessionSetCount(session)), "Saetze")}
+        ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
+      </div>
+      <article class="card stack">
+        <div class="row"><h3 class="grow">Recovery</h3><span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span></div>
+        <p class="muted">${htmlesc(readiness.hint)}</p>
+      </article>
+      <article class="card stack">
+        <h3>Verbesserungen</h3>
+        ${improvements.length ? improvements.map((item) => `
+          <div class="history-row">
+            <div>
+              <strong>${htmlesc(item.exercise.exerciseNameSnapshot)}</strong>
+              <p class="muted">${item.isRecord ? `Neues Bestgewicht: ${kg(item.currentBest)}` : `Volumen: +${Math.round(item.delta)} kg`}</p>
+            </div>
+            <span class="badge ${item.isRecord ? "green" : "blue"}">${item.isRecord ? "Rekord" : "Plus"}</span>
+          </div>
+        `).join("") : `<p class="muted">Keine Verbesserung gegenueber der letzten gespeicherten Ausfuehrung erkannt.</p>`}
+      </article>
+      <article class="card stack">
+        <h3>Gewichtstrend</h3>
+        ${renderWeightTrend(weightEntries)}
+      </article>
+      <article class="card stack">
+        <h3>Letzte Uebungen</h3>
+        ${session.completedExercises.sort((a, b) => a.sortOrder - b.sortOrder).map((exercise) => {
+          const previous = previousExerciseBefore(exercise.exerciseId, session.id);
+          const recommendation = progressionForCompletedExercise(exercise, previous, session.id);
+          return `
+            <div class="history-row">
+              <div>
+                <strong>${htmlesc(exercise.exerciseNameSnapshot)}</strong>
+                <p class="muted">${htmlesc(recommendation.text)}</p>
+              </div>
+              <span class="badge ${recommendation.color}">${Math.round(totalVolume(exercise))} kg</span>
+            </div>
+          `;
+        }).join("")}
+      </article>
+      <button class="secondary" data-session-id="${htmlesc(session.id)}">Auswertung im Detail</button>
     </section>
   `;
 }
@@ -1557,12 +1644,9 @@ function renderWorkout() {
   const workout = state.activeWorkout;
   const entry = workout.entries[workout.index];
   const exercise = exerciseById(entry.exerciseId);
-  const day = activePlan()?.days?.find((item) => item.name === workout.dayName);
   const last = lastCompletedExercise(entry.exerciseId);
   const progress = Math.round(((workout.index + 1) / workout.entries.length) * 100);
-  const hint = progressionHint(exercise, entry.reps, last?.exercise?.sets || []);
   const alternatives = alternativeCandidatesForExercise(exercise);
-  const recommendation = progressionForEntry(entry, last);
   const machineSetting = latestMachineSetting(exercise.id);
   return `
     <section class="screen stack">
@@ -1571,33 +1655,25 @@ function renderWorkout() {
         <p class="subtitle">Übung ${workout.index + 1} von ${workout.entries.length}</p>
       </header>
       <div class="progress"><span style="width:${progress}%"></span></div>
-      ${workout.index === 0 ? renderWarmupCard(day) : ""}
       <article class="card stack">
         <h2>${htmlesc(exercise.displayName)}</h2>
         <p class="muted">${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].slice(0, 3).join(" · "))}</p>
         <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} <span class="badge blue">${htmlesc(entry.reps)} Wdh.</span> <span class="badge">${entry.restSeconds} s Pause</span></div>
-        ${machineSetting ? `<div class="card info-card"><strong>Deine Einstellung</strong><p>Sitz ${htmlesc(machineSetting.seatPosition || "-")} · Griff ${htmlesc(machineSetting.handlePosition || "-")} · Ruecken ${htmlesc(machineSetting.backrestPosition || "-")}</p></div>` : ""}
-        ${exerciseIsCritical(exercise) ? `<div class="card warning">${lwsWarning(exercise)}</div>` : ""}
+        ${machineSetting ? `<p class="quiet">Setup: Sitz ${htmlesc(machineSetting.seatPosition || "-")} · Griff ${htmlesc(machineSetting.handlePosition || "-")} · Ruecken ${htmlesc(machineSetting.backrestPosition || "-")}</p>` : ""}
+        ${exerciseIsCritical(exercise) ? `<p class="warning compact-warning">${lwsWarning(exercise)}</p>` : ""}
+        <button class="secondary" data-workout-exercise-detail="${htmlesc(exercise.id)}">Details ansehen</button>
       </article>
       <article class="card stack">
         <h3>Letzte Leistung</h3>
         ${last ? `
-          <p class="muted">Letztes Mal am ${dateText(last.session.endedAt || last.session.startedAt)}</p>
-          <ul class="small-list">${last.exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}</li>`).join("")}</ul>
-          <p class="green">Volumen: ${Math.round(totalVolume(last.exercise) * 10) / 10} kg</p>
+          <p class="last-performance">${last.exercise.sets.map((set) => `${kg(set.actualWeightKg)} x ${set.actualReps || "-"}`).join(" / ")}</p>
         ` : `<p class="muted">Noch keine vorherige Leistung vorhanden. Starte moderat.</p>`}
-        <div class="card info-card">${htmlesc(hint)}</div>
       </article>
       <article class="card stack">
         <div class="row"><h3 class="grow">Sätze</h3><span class="quiet">kg · Wdh. · RIR</span></div>
         ${entry.sets.map((set, index) => renderSetRow(set, index)).join("")}
       </article>
-      <article class="card stack">
-        <div class="row"><h3 class="grow">Empfehlung</h3><span class="badge ${recommendation.color}">Heute</span></div>
-        <p class="muted">${htmlesc(recommendation.text)}</p>
-      </article>
       <p class="quiet">Dieses Training wird automatisch auf diesem Gerät gesichert.</p>
-      ${workout.index === workout.entries.length - 1 ? renderCooldownCard() : ""}
       ${state.restTimer.remaining > 0 || state.restTimer.running ? renderRestTimer() : ""}
       ${state.showAlternatives ? renderAlternativePicker(alternatives) : ""}
       <div class="actions">
@@ -1736,8 +1812,8 @@ function finishOrNext() {
   state.showAlternatives = false;
   state.restTimer.remaining = 0;
   state.restTimer.running = false;
-  state.selectedSessionId = session.id;
-  state.tab = "dashboard";
+  state.selectedSessionId = null;
+  state.tab = "coach";
   render();
 }
 
@@ -2181,7 +2257,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "1.3.0",
+    backupVersion: "2.0.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),
@@ -2322,6 +2398,11 @@ function bindEvents() {
   });
 
   document.querySelector("[data-next-exercise]")?.addEventListener("click", finishOrNext);
+  document.querySelector("[data-workout-exercise-detail]")?.addEventListener("click", (event) => {
+    persistWorkoutDraft();
+    state.selectedExerciseId = event.currentTarget.dataset.workoutExerciseDetail;
+    render();
+  });
   document.querySelector("[data-toggle-alternatives]")?.addEventListener("click", () => {
     state.showAlternatives = !state.showAlternatives;
     render();

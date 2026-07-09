@@ -357,12 +357,25 @@ select:focus-visible {
   bottom: 0;
   z-index: 10;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(8, 1fr);
   gap: 4px;
   padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
   background: rgba(7,10,15,.96);
   border-top: 1px solid var(--border);
   backdrop-filter: blur(16px);
+}
+
+.last-performance {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.compact-warning {
+  margin: 0;
+  border-radius: 12px;
+  padding: 10px 12px;
 }
 
 .tab {

@@ -1,0 +1,14 @@
+{
+  "project": "D-Coach",
+  "foundationVersion": "2.0.0",
+  "status": "Stable",
+  "date": "2026-07-09",
+  "replacesWorkflow": "v1.0.0-v1.4.0",
+  "corePrinciple": "Training First",
+  "activeSprints": [
+    31,
+    32,
+    33
+  ],
+  "codexMustStopAfterSprint": 33
+}
