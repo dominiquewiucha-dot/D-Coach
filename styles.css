@@ -260,6 +260,32 @@ button {
   border-top: 0;
 }
 
+.storage-table {
+  display: grid;
+  gap: 8px;
+}
+
+.storage-table div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.storage-table div:last-child {
+  border-bottom: 0;
+}
+
+.storage-table span {
+  min-width: 0;
+  color: var(--muted);
+}
+
+.storage-table strong {
+  flex-shrink: 0;
+}
+
 .timer-card {
   display: flex;
   align-items: center;

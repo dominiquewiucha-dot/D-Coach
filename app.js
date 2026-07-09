@@ -28,6 +28,23 @@ const state = {
   route: null
 };
 
+const APP_VERSION = "pwa-v14";
+const STORAGE_SCHEMA_VERSION = "1.2.0";
+const STORAGE_KEYS = [
+  { key: "dcoach.sessions", label: "Trainings", type: "array" },
+  { key: "dcoach.weights", label: "Gewicht", type: "array" },
+  { key: "dcoach.journalEntries", label: "Journal", type: "array" },
+  { key: "dcoach.machineSettings", label: "Geraete", type: "array" },
+  { key: "dcoach.activePlanName", label: "Aktiver Plan", type: "string" },
+  { key: "dcoach.archivedPlanNames", label: "Archivierte Plaene", type: "array" },
+  { key: "dcoach.deletedPlanNames", label: "Geloeschte Plaene", type: "array" },
+  { key: "dcoach.activeWorkoutDraft", label: "Trainingsentwurf", type: "object" },
+  { key: "dcoach.lastBackupAt", label: "Letztes Backup", type: "string" },
+  { key: "dcoach.storageVersion", label: "Speicherversion", type: "string" },
+  { key: "dcoach.migrationLog", label: "Migrationen", type: "array" },
+  { key: "dcoach.indexedDbReady", label: "IndexedDB vorbereitet", type: "boolean" }
+];
+
 const storage = {
   get sessions() {
     return readJson("dcoach.sessions", []);
@@ -84,6 +101,25 @@ const storage = {
   set lastBackupAt(value) {
     if (value) localStorage.setItem("dcoach.lastBackupAt", value);
     else localStorage.removeItem("dcoach.lastBackupAt");
+  },
+  get storageVersion() {
+    return localStorage.getItem("dcoach.storageVersion") || null;
+  },
+  set storageVersion(value) {
+    if (value) localStorage.setItem("dcoach.storageVersion", value);
+    else localStorage.removeItem("dcoach.storageVersion");
+  },
+  get migrationLog() {
+    return readJson("dcoach.migrationLog", []);
+  },
+  set migrationLog(value) {
+    writeJson("dcoach.migrationLog", value);
+  },
+  get indexedDbReady() {
+    return localStorage.getItem("dcoach.indexedDbReady") === "true";
+  },
+  set indexedDbReady(value) {
+    localStorage.setItem("dcoach.indexedDbReady", value ? "true" : "false");
   }
 };
 
@@ -97,6 +133,99 @@ function readJson(key, fallback) {
 
 function writeJson(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
+}
+
+function storageValueSummary(key, type) {
+  const raw = localStorage.getItem(key);
+  if (raw === null) return { exists: false, count: 0, bytes: 0, valueLabel: "leer" };
+  if (type === "array") {
+    const value = readJson(key, []);
+    return { exists: true, count: Array.isArray(value) ? value.length : 0, bytes: raw.length, valueLabel: `${Array.isArray(value) ? value.length : 0}` };
+  }
+  if (type === "object") {
+    const value = readJson(key, null);
+    return { exists: !!value, count: value ? 1 : 0, bytes: raw.length, valueLabel: value ? "vorhanden" : "leer" };
+  }
+  if (type === "boolean") {
+    return { exists: true, count: raw === "true" ? 1 : 0, bytes: raw.length, valueLabel: raw === "true" ? "ja" : "nein" };
+  }
+  return { exists: true, count: raw ? 1 : 0, bytes: raw.length, valueLabel: raw || "leer" };
+}
+
+function storageManifest() {
+  const entries = STORAGE_KEYS.map((item) => ({
+    ...item,
+    ...storageValueSummary(item.key, item.type)
+  }));
+  return {
+    version: storage.storageVersion,
+    targetVersion: STORAGE_SCHEMA_VERSION,
+    entries,
+    totalBytes: entries.reduce((sum, item) => sum + item.bytes, 0)
+  };
+}
+
+function appendMigrationLog(entry) {
+  const id = entry.id || `migration-${Date.now()}`;
+  const next = [...storage.migrationLog.filter((item) => item.id !== id), { ...entry, id }];
+  storage.migrationLog = next;
+}
+
+function runStorageMigrations() {
+  const currentVersion = storage.storageVersion;
+  if (currentVersion === STORAGE_SCHEMA_VERSION) return;
+  appendMigrationLog({
+    id: `storage-${currentVersion || "unknown"}-to-${STORAGE_SCHEMA_VERSION}`,
+    from: currentVersion || "unknown",
+    to: STORAGE_SCHEMA_VERSION,
+    at: new Date().toISOString(),
+    action: "metadata-only",
+    destructive: false
+  });
+  storage.storageVersion = STORAGE_SCHEMA_VERSION;
+}
+
+function indexedDbSupported() {
+  return "indexedDB" in window;
+}
+
+function indexedDbStatusText() {
+  if (!indexedDbSupported()) return "Nicht unterstuetzt";
+  return storage.indexedDbReady ? "Vorbereitet" : "Nicht vorbereitet";
+}
+
+function openDCoachIndexedDb() {
+  return new Promise((resolve, reject) => {
+    if (!indexedDbSupported()) {
+      reject(new Error("IndexedDB wird von diesem Browser nicht unterstuetzt."));
+      return;
+    }
+    const request = indexedDB.open("DCoachLocal", 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      ["sessions", "weights", "journalEntries", "machineSettings", "meta"].forEach((name) => {
+        if (!db.objectStoreNames.contains(name)) {
+          db.createObjectStore(name, { keyPath: "id" });
+        }
+      });
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("IndexedDB konnte nicht geoeffnet werden."));
+  });
+}
+
+async function prepareIndexedDb() {
+  const db = await openDCoachIndexedDb();
+  db.close();
+  storage.indexedDbReady = true;
+  appendMigrationLog({
+    id: "indexeddb-prepared-v1",
+    from: storage.storageVersion || "unknown",
+    to: storage.storageVersion || STORAGE_SCHEMA_VERSION,
+    at: new Date().toISOString(),
+    action: "indexeddb-structure-prepared",
+    destructive: false
+  });
 }
 
 function mergeById(existing, incoming) {
@@ -166,6 +295,7 @@ async function boot() {
   state.journalSchema = journalSchema;
   state.importExportSchema = importExportSchema;
   state.machineSettingsSchema = machineSettingsSchema;
+  runStorageMigrations();
   const plan = activePlan();
   if (plan && storage.activePlanName !== plan.planName) {
     storage.activePlanName = plan.planName;
@@ -1387,6 +1517,9 @@ function renderSettings() {
   const backupAge = daysSince(lastBackupAt);
   const needsBackup = !lastBackupAt || backupAge >= 7;
   const standalone = isStandaloneApp();
+  const manifest = storageManifest();
+  const migrationLog = storage.migrationLog;
+  const lastMigration = migrationLog[migrationLog.length - 1];
   return `
     <section class="screen stack">
       <header><h1 class="title">Einstellungen</h1><p class="subtitle">Lokale Offline-Daten.</p></header>
@@ -1417,6 +1550,21 @@ function renderSettings() {
         </label>
       </article>
       <article class="card stack">
+        <div class="row">
+          <h3 class="grow">Speicherstatus</h3>
+          <span class="badge ${manifest.version === manifest.targetVersion ? "green" : "amber"}">v${htmlesc(manifest.version || "unbekannt")}</span>
+        </div>
+        <div class="storage-table">
+          ${manifest.entries.slice(0, 9).map((item) => `
+            <div><span>${htmlesc(item.label)}</span><strong>${htmlesc(item.valueLabel)}</strong></div>
+          `).join("")}
+        </div>
+        <p class="quiet">IndexedDB: ${indexedDbStatusText()} | Zielversion: ${htmlesc(manifest.targetVersion)} | LocalStorage: ${manifest.totalBytes} Zeichen</p>
+        <p class="quiet">Letzte Migration: ${lastMigration ? `${htmlesc(lastMigration.action)} (${dateTimeText(lastMigration.at)})` : "Keine"}</p>
+        <button class="secondary" data-export-backup>Backup vor Migration exportieren</button>
+        <button class="secondary" data-prepare-indexeddb>IndexedDB vorbereiten</button>
+      </article>
+      <article class="card stack">
         <h3>Zurücksetzen</h3>
         <p class="muted">Löscht nur die lokalen Trainings- und Gewichtsdaten auf diesem Gerät.</p>
         <button class="danger" data-reset-app>App-Daten zurücksetzen</button>
@@ -1429,10 +1577,14 @@ function createBackup() {
   return {
     app: "D-Coach",
     schemaVersion: 1,
-    appVersion: "pwa-v13",
+    appVersion: APP_VERSION,
     backupVersion: "1.2.0",
+    storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),
+    storageManifest: storageManifest(),
+    migrationLog: storage.migrationLog,
+    indexedDbReady: storage.indexedDbReady,
     activePlanName: storage.activePlanName,
     sessions: storage.sessions,
     weights: storage.weights,
@@ -1504,6 +1656,8 @@ function importBackupFile(file) {
       storage.weights = mergeById(storage.weights, backup.weights);
       storage.journalEntries = mergeById(storage.journalEntries, Array.isArray(backup.journalEntries) ? backup.journalEntries : []);
       storage.machineSettings = mergeById(storage.machineSettings, Array.isArray(backup.machineSettings) ? backup.machineSettings : []);
+      storage.migrationLog = mergeById(storage.migrationLog, Array.isArray(backup.migrationLog) ? backup.migrationLog : []);
+      if (!storage.storageVersion && backup.storageVersion) storage.storageVersion = backup.storageVersion;
       storage.archivedPlanNames = Array.isArray(backup.archivedPlanNames) ? backup.archivedPlanNames : [];
       storage.deletedPlanNames = Array.isArray(backup.deletedPlanNames) ? backup.deletedPlanNames : [];
       storage.activeWorkoutDraft = backup.activeWorkoutDraft || null;
@@ -1759,8 +1913,21 @@ function bindEvents() {
     render();
   });
 
-  document.querySelector("[data-export-backup]")?.addEventListener("click", exportBackup);
+  document.querySelectorAll("[data-export-backup]").forEach((button) => {
+    button.addEventListener("click", exportBackup);
+  });
   document.querySelector("[data-install-pwa]")?.addEventListener("click", installPwa);
+
+  document.querySelector("[data-prepare-indexeddb]")?.addEventListener("click", async () => {
+    if (!storage.lastBackupAt && !confirm("Noch kein Backup vorhanden. Trotzdem IndexedDB vorbereiten?")) return;
+    try {
+      await prepareIndexedDb();
+      alert("IndexedDB wurde vorbereitet. Deine Daten bleiben weiter in localStorage.");
+      render();
+    } catch (error) {
+      alert(error.message || "IndexedDB konnte nicht vorbereitet werden.");
+    }
+  });
 
   document.querySelector("[data-import-backup]")?.addEventListener("change", (event) => {
     const file = event.target.files?.[0];
