@@ -32,8 +32,12 @@ body {
   padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
 }
 
-button, input {
+button, input, textarea {
   font: inherit;
+}
+
+textarea {
+  resize: vertical;
 }
 
 button {
@@ -68,6 +72,7 @@ button {
 
 .stack { display: grid; gap: 14px; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .muscle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 .card {
@@ -290,7 +295,7 @@ button {
   bottom: 0;
   z-index: 10;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 4px;
   padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
   background: rgba(7,10,15,.96);
@@ -334,6 +339,53 @@ button {
 .input.big {
   font-size: 28px;
   font-weight: 800;
+}
+
+.area {
+  min-height: 92px;
+  padding-top: 12px;
+}
+
+.range-field {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.range-field input {
+  width: 100%;
+  accent-color: var(--blue);
+}
+
+.trend-bars {
+  display: flex;
+  align-items: end;
+  gap: 7px;
+  min-height: 132px;
+  overflow-x: auto;
+  padding-top: 10px;
+}
+
+.trend-item {
+  display: grid;
+  align-items: end;
+  gap: 6px;
+  min-width: 28px;
+  height: 120px;
+}
+
+.trend-item span {
+  display: block;
+  min-height: 16px;
+  border-radius: 8px 8px 3px 3px;
+  background: var(--blue);
+}
+
+.trend-item small {
+  color: var(--quiet);
+  font-size: 10px;
 }
 
 .set-row {
@@ -460,5 +512,6 @@ button {
   .screen { padding-left: 12px; padding-right: 12px; }
   .title { font-size: 30px; }
   .muscle-grid { grid-template-columns: 1fr; }
+  .mini-grid { grid-template-columns: 1fr; }
   .set-row { grid-template-columns: 24px 1fr 1fr 54px 38px; gap: 6px; }
 }

@@ -1,0 +1,18 @@
+{
+  "version": "1.2.0",
+  "type": "import_export_schema",
+  "backupRoot": {
+    "app": "D-Coach",
+    "backupVersion": "1.2.0",
+    "exportedAt": "ISO-8601",
+    "data": [
+      "workouts",
+      "bodyweight",
+      "journal",
+      "plans",
+      "customExercises",
+      "settings",
+      "machineSettings"
+    ]
+  }
+}

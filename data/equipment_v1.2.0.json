@@ -1,0 +1,66 @@
+{
+  "version": "1.2.0",
+  "type": "equipment_database",
+  "equipment": [
+    {
+      "id": "eq_machine",
+      "name": "Maschine",
+      "category": "gym"
+    },
+    {
+      "id": "eq_cable",
+      "name": "Kabelzug",
+      "category": "gym"
+    },
+    {
+      "id": "eq_dumbbell",
+      "name": "Kurzhantel",
+      "category": "free_weight"
+    },
+    {
+      "id": "eq_barbell",
+      "name": "Langhantel",
+      "category": "free_weight"
+    },
+    {
+      "id": "eq_bodyweight",
+      "name": "Körpergewicht",
+      "category": "bodyweight"
+    },
+    {
+      "id": "eq_leg_press",
+      "name": "Beinpresse",
+      "category": "machine"
+    },
+    {
+      "id": "eq_bench",
+      "name": "Bank",
+      "category": "gym"
+    },
+    {
+      "id": "eq_multipress",
+      "name": "Multipresse",
+      "category": "machine"
+    },
+    {
+      "id": "eq_pullup",
+      "name": "Klimmzugstation",
+      "category": "gym"
+    },
+    {
+      "id": "eq_band",
+      "name": "Widerstandsband",
+      "category": "accessory"
+    },
+    {
+      "id": "eq_kettlebell",
+      "name": "Kettlebell",
+      "category": "free_weight"
+    },
+    {
+      "id": "eq_smith",
+      "name": "Smith Machine",
+      "category": "machine"
+    }
+  ]
+}

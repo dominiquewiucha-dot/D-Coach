@@ -7,6 +7,11 @@ const state = {
   alternativeRules: null,
   statisticsRules: null,
   planLibrary: null,
+  progressionRules: null,
+  recoveryRules: null,
+  journalSchema: null,
+  importExportSchema: null,
+  machineSettingsSchema: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -35,6 +40,18 @@ const storage = {
   },
   set weights(value) {
     writeJson("dcoach.weights", value);
+  },
+  get journalEntries() {
+    return readJson("dcoach.journalEntries", []);
+  },
+  set journalEntries(value) {
+    writeJson("dcoach.journalEntries", value);
+  },
+  get machineSettings() {
+    return readJson("dcoach.machineSettings", []);
+  },
+  set machineSettings(value) {
+    writeJson("dcoach.machineSettings", value);
   },
   get activePlanName() {
     return localStorage.getItem("dcoach.activePlanName") || null;
@@ -82,6 +99,13 @@ function writeJson(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
+function mergeById(existing, incoming) {
+  const map = new Map();
+  existing.forEach((item) => map.set(item.id || JSON.stringify(item), item));
+  incoming.forEach((item) => map.set(item.id || JSON.stringify(item), item));
+  return [...map.values()];
+}
+
 async function fetchOptionalJson(path) {
   try {
     const response = await fetch(path);
@@ -95,22 +119,53 @@ async function fetchOptionalJson(path) {
 
 async function boot() {
   state.seed = await fetch("./seed_training_database.json").then((response) => response.json());
-  const [muscles, exerciseMuscleMap, equipment, extendedExercises, alternativeRules, statisticsRules, planLibrary] = await Promise.all([
+  const [
+    muscles,
+    exerciseMuscleMap,
+    muscleMapLarge,
+    equipment,
+    equipmentLarge,
+    extendedExercises,
+    largeExercises,
+    alternativeRules,
+    statisticsRules,
+    planLibrary,
+    planLibraryFull,
+    progressionRules,
+    recoveryRules,
+    journalSchema,
+    importExportSchema,
+    machineSettingsSchema
+  ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
+    fetchOptionalJson("./data/muscle_mapping_large_v1.2.0.json"),
     fetchOptionalJson("./data/equipment_v1.1.0.json"),
+    fetchOptionalJson("./data/equipment_v1.2.0.json"),
     fetchOptionalJson("./data/exercises_extended_v1.1.0.json"),
+    fetchOptionalJson("./data/exercises_large_v1.2.0.json"),
     fetchOptionalJson("./data/alternative_rules_v1.1.0.json"),
     fetchOptionalJson("./data/statistics_rules_v1.1.0.json"),
-    fetchOptionalJson("./data/training_plans_library_v1.1.0.json")
+    fetchOptionalJson("./data/training_plans_library_v1.1.0.json"),
+    fetchOptionalJson("./data/training_plans_full_v1.2.0.json"),
+    fetchOptionalJson("./data/progression_rules_v1.2.0.json"),
+    fetchOptionalJson("./data/recovery_rules_v1.2.0.json"),
+    fetchOptionalJson("./data/journal_schema_v1.2.0.json"),
+    fetchOptionalJson("./data/import_export_schema_v1.2.0.json"),
+    fetchOptionalJson("./data/machine_settings_schema_v1.2.0.json")
   ]);
   state.muscles = muscles;
-  state.exerciseMuscleMap = exerciseMuscleMap;
-  state.equipment = equipment;
-  state.extendedExercises = extendedExercises;
+  state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
+  state.equipment = equipmentLarge || equipment;
+  state.extendedExercises = largeExercises || extendedExercises;
   state.alternativeRules = alternativeRules;
   state.statisticsRules = statisticsRules;
-  state.planLibrary = planLibrary;
+  state.planLibrary = planLibraryFull || planLibrary;
+  state.progressionRules = progressionRules;
+  state.recoveryRules = recoveryRules;
+  state.journalSchema = journalSchema;
+  state.importExportSchema = importExportSchema;
+  state.machineSettingsSchema = machineSettingsSchema;
   const plan = activePlan();
   if (plan && storage.activePlanName !== plan.planName) {
     storage.activePlanName = plan.planName;
@@ -247,6 +302,10 @@ function dateText(value) {
   return new Intl.DateTimeFormat("de-DE", { dateStyle: "short" }).format(new Date(value));
 }
 
+function todayIsoDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 function dateTimeText(value) {
   if (!value) return "Noch nie";
   return new Intl.DateTimeFormat("de-DE", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
@@ -270,6 +329,70 @@ function averageWeight(days) {
   const values = storage.weights.filter((entry) => new Date(entry.date) >= start).map((entry) => Number(entry.weightKg));
   if (!values.length) return null;
   return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function latestJournalEntry() {
+  return [...storage.journalEntries].sort((a, b) => new Date(b.date) - new Date(a.date))[0] || null;
+}
+
+function journalEntryForDate(date) {
+  return storage.journalEntries.find((entry) => entry.date === date) || null;
+}
+
+function readinessForJournal(entry) {
+  if (!entry) return { color: "amber", label: "Nicht erfasst", score: null, hint: "Tagesform noch nicht eingetragen." };
+  const sleep = Number(entry.sleepQuality || 0);
+  const energy = Number(entry.energy || 0);
+  const mood = Number(entry.mood || 0);
+  const stress = Number(entry.stress || 0);
+  const soreness = Number(entry.soreness || 0);
+  const base = (sleep + energy + mood) / 3;
+  const score = Math.max(1, Math.min(5, base - Math.max(0, stress - 3) * 0.45 - Math.max(0, soreness - 3) * 0.35));
+  if (score >= 3.7) return { color: "green", label: "Gut", score, hint: "Heute normal trainieren." };
+  if (score >= 2.6) return { color: "amber", label: "Moderat", score, hint: "Heute moderat starten." };
+  return { color: "red", label: "Leicht", score, hint: "Heute leichter trainieren und Regeneration beachten." };
+}
+
+function completedSetsOnly(exercise) {
+  return exercise?.sets?.filter((set) => set.completed && Number(set.actualReps) > 0) || [];
+}
+
+function performanceForExercise(exercise) {
+  const sets = completedSetsOnly(exercise);
+  const reps = sets.reduce((sum, set) => sum + Number(set.actualReps || 0), 0);
+  const volume = totalVolume({ sets });
+  const bestWeight = sets.map((set) => Number(set.actualWeightKg)).filter(Number.isFinite).reduce((max, value) => Math.max(max, value), 0);
+  return { sets, reps, volume, bestWeight };
+}
+
+function progressionForEntry(entry, previous) {
+  const current = {
+    sets: entry.sets.map((set) => ({
+      completed: set.completed,
+      actualWeightKg: parseNumber(set.weightText),
+      actualReps: parseInteger(set.repsText),
+      rir: parseInteger(set.rirText)
+    }))
+  };
+  const currentPerf = performanceForExercise(current);
+  const previousPerf = previous ? performanceForExercise(previous.exercise) : null;
+  const topTarget = upperRepTarget(entry.reps);
+  const allTop = topTarget && currentPerf.sets.length && currentPerf.sets.every((set) => Number(set.actualReps || 0) >= topTarget);
+  const critical = exerciseIsCritical(exerciseById(entry.exerciseId));
+  if (!currentPerf.sets.length) return { color: "amber", text: "Noch keine abgeschlossenen Saetze." };
+  if (critical && allTop) return { color: "amber", text: "Stark, aber LWS-vorsichtig: erst Technik stabil halten, dann klein steigern." };
+  if (allTop) return { color: "green", text: "Alle Saetze stark. Naechstes Mal leicht erhoehen." };
+  if (previousPerf && currentPerf.volume > previousPerf.volume) return { color: "green", text: "Staerker als letztes Mal." };
+  if (previousPerf && currentPerf.volume < previousPerf.volume * 0.85) return { color: "amber", text: "Heute schwaecher. Regeneration pruefen." };
+  return { color: "blue", text: "Gewicht halten und Wiederholungen sammeln." };
+}
+
+function machineSettingsForExercise(exerciseId) {
+  return storage.machineSettings.filter((item) => item.exerciseId === exerciseId).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+}
+
+function latestMachineSetting(exerciseId) {
+  return machineSettingsForExercise(exerciseId)[0] || null;
 }
 
 function lastSession() {
@@ -619,6 +742,7 @@ function renderRoute() {
     case "plans": return renderPlans();
     case "exercises": return renderExercises();
     case "weight": return renderWeight();
+    case "journal": return renderJournal();
     case "settings": return renderSettings();
     default: return renderDashboard();
   }
@@ -631,6 +755,7 @@ function renderTabs() {
     ["plans", "Pläne"],
     ["exercises", "Übungen"],
     ["weight", "Gewicht"],
+    ["journal", "Journal"],
     ["settings", "Setup"]
   ];
   return `<nav class="tabs">${tabs.map(([id, label]) => `<button class="tab ${state.tab === id && !state.activeWorkout && !state.selectedExerciseId && !state.selectedSessionId ? "active" : ""}" data-tab="${id}">${label}</button>`).join("")}</nav>`;
@@ -642,6 +767,7 @@ function renderDashboard() {
   const session = lastSession();
   const nextDay = plan?.days?.[0]?.name || "-";
   const latestSessions = [...storage.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).slice(0, 3);
+  const readiness = readinessForJournal(journalEntryForDate(todayIsoDate()) || latestJournalEntry());
   return `
     <section class="screen stack">
       <header><h1 class="title">D-Coach</h1><p class="subtitle">Heute sauber trainieren.</p></header>
@@ -668,6 +794,11 @@ function renderDashboard() {
       <article class="card">
         <h3>Hinweis</h3>
         <p class="muted">Bewerte nicht einzelne Tageswerte. Gewicht und Training zählen als Trend.</p>
+      </article>
+      <article class="card stack">
+        <div class="row"><h3 class="grow">Readiness</h3><span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span></div>
+        <p class="muted">${htmlesc(readiness.hint)}</p>
+        <button class="secondary" data-tab="journal">Journal öffnen</button>
       </article>
       <article class="card stack">
         <h3>Letzte Trainings</h3>
@@ -773,6 +904,8 @@ function renderWorkout() {
   const progress = Math.round(((workout.index + 1) / workout.entries.length) * 100);
   const hint = progressionHint(exercise, entry.reps, last?.exercise?.sets || []);
   const alternatives = alternativeCandidatesForExercise(exercise);
+  const recommendation = progressionForEntry(entry, last);
+  const machineSetting = latestMachineSetting(exercise.id);
   return `
     <section class="screen stack">
       <header>
@@ -784,6 +917,7 @@ function renderWorkout() {
         <h2>${htmlesc(exercise.displayName)}</h2>
         <p class="muted">${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].slice(0, 3).join(" · "))}</p>
         <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} <span class="badge blue">${htmlesc(entry.reps)} Wdh.</span> <span class="badge">${entry.restSeconds} s Pause</span></div>
+        ${machineSetting ? `<div class="card info-card"><strong>Deine Einstellung</strong><p>Sitz ${htmlesc(machineSetting.seatPosition || "-")} · Griff ${htmlesc(machineSetting.handlePosition || "-")} · Ruecken ${htmlesc(machineSetting.backrestPosition || "-")}</p></div>` : ""}
         ${exerciseIsCritical(exercise) ? `<div class="card warning">${lwsWarning(exercise)}</div>` : ""}
       </article>
       <article class="card stack">
@@ -798,6 +932,10 @@ function renderWorkout() {
       <article class="card stack">
         <div class="row"><h3 class="grow">Sätze</h3><span class="quiet">kg · Wdh. · RIR</span></div>
         ${entry.sets.map((set, index) => renderSetRow(set, index)).join("")}
+      </article>
+      <article class="card stack">
+        <div class="row"><h3 class="grow">Empfehlung</h3><span class="badge ${recommendation.color}">Heute</span></div>
+        <p class="muted">${htmlesc(recommendation.text)}</p>
       </article>
       <p class="quiet">Dieses Training wird automatisch auf diesem Gerät gesichert.</p>
       ${state.restTimer.remaining > 0 || state.restTimer.running ? renderRestTimer() : ""}
@@ -903,15 +1041,23 @@ function finishOrNext() {
   }
   const session = {
     id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+    planId: activePlan()?.id || workout.planName,
     planName: workout.planName,
+    planNameSnapshot: workout.planName,
     dayName: workout.dayName,
+    dayNameSnapshot: workout.dayName,
     startedAt: workout.startedAt,
     endedAt: new Date().toISOString(),
+    completedAt: new Date().toISOString(),
+    readinessSnapshot: journalEntryForDate(todayIsoDate()) || null,
     completedExercises: workout.entries.map((entry) => {
       const exercise = exerciseById(entry.exerciseId);
+      const completedSets = entry.sets.filter((set) => set.completed).length;
       return {
         exerciseId: entry.exerciseId,
         exerciseNameSnapshot: exercise?.displayName || entry.exerciseId,
+        plannedSets: entry.sets.length,
+        completedSets,
         sortOrder: entry.sortOrder,
         sets: entry.sets.map((set) => ({
           setNumber: set.setNumber,
@@ -1066,6 +1212,7 @@ function renderExerciseDetail(id) {
   const last = lastCompletedExercise(id);
   const history = exerciseHistory(id);
   const alternatives = alternativeCandidatesForExercise(exercise);
+  const machineSetting = latestMachineSetting(id) || {};
   return `
     <section class="screen stack">
       <button class="secondary" data-back-exercises>Zurück</button>
@@ -1082,6 +1229,17 @@ function renderExerciseDetail(id) {
         <p>${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].join(" · "))}</p>
         <p class="muted">${htmlesc(exercise.equipment.join(" · "))}</p>
         ${lwsBadge(exercise.lumbarDiscSuitability)}
+      </article>
+      <article class="card stack">
+        <h3>Geräteeinstellung</h3>
+        <input class="input" placeholder="Maschinenname / Studio" value="${htmlesc(machineSetting.machineName || "")}" data-machine-field="machineName" data-machine-exercise="${htmlesc(id)}">
+        <div class="mini-grid">
+          <input class="input" placeholder="Sitz" value="${htmlesc(machineSetting.seatPosition || "")}" data-machine-field="seatPosition" data-machine-exercise="${htmlesc(id)}">
+          <input class="input" placeholder="Griff" value="${htmlesc(machineSetting.handlePosition || "")}" data-machine-field="handlePosition" data-machine-exercise="${htmlesc(id)}">
+          <input class="input" placeholder="Ruecken" value="${htmlesc(machineSetting.backrestPosition || "")}" data-machine-field="backrestPosition" data-machine-exercise="${htmlesc(id)}">
+        </div>
+        <textarea class="input area" placeholder="Notiz" data-machine-field="note" data-machine-exercise="${htmlesc(id)}">${htmlesc(machineSetting.note || "")}</textarea>
+        <button class="secondary" data-save-machine-setting="${htmlesc(id)}">Einstellung speichern</button>
       </article>
       ${exerciseIsCritical(exercise) ? `<article class="card warning">${lwsWarning(exercise)}</article>` : ""}
       <div class="grid">
@@ -1127,6 +1285,23 @@ function renderExerciseDetail(id) {
   `;
 }
 
+function renderWeightTrend(entries) {
+  const points = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date)).slice(-14);
+  if (points.length < 2) return `<p class="muted">Mindestens zwei Eintraege fuer Trendanzeige noetig.</p>`;
+  const values = points.map((entry) => Number(entry.weightKg)).filter(Number.isFinite);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = Math.max(max - min, 1);
+  return `
+    <div class="trend-bars">
+      ${points.map((entry) => {
+        const height = 28 + ((Number(entry.weightKg) - min) / range) * 72;
+        return `<div class="trend-item"><span style="height:${height}%"></span><small>${dateText(entry.date).slice(0, 5)}</small></div>`;
+      }).join("")}
+    </div>
+  `;
+}
+
 function renderWeight() {
   const entries = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date));
   return `
@@ -1138,6 +1313,10 @@ function renderWeight() {
         ${metric(kg(averageWeight(30)), "30-Tage-Schnitt")}
         ${metric(String(entries.length), "Einträge")}
       </div>
+      <article class="card stack">
+        <h3>Trend</h3>
+        ${renderWeightTrend(entries)}
+      </article>
       <article class="card stack">
         <h3>Heutiges Gewicht</h3>
         <input class="input big" inputmode="decimal" placeholder="kg" data-weight-input>
@@ -1152,6 +1331,53 @@ function renderWeight() {
           </div>
         </article>
       `).join("") : `<article class="card"><p class="muted">Noch kein Gewicht eingetragen.</p></article>`}
+    </section>
+  `;
+}
+
+function renderRatingInput(id, label, value = 3) {
+  return `
+    <label class="range-field">
+      <span>${label}</span>
+      <input type="range" min="1" max="5" value="${htmlesc(value)}" data-journal-field="${id}">
+    </label>
+  `;
+}
+
+function renderJournal() {
+  const today = todayIsoDate();
+  const entry = journalEntryForDate(today) || {};
+  const latest = latestJournalEntry();
+  const readiness = readinessForJournal(journalEntryForDate(today) || latest);
+  const history = [...storage.journalEntries].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 7);
+  return `
+    <section class="screen stack">
+      <header><h1 class="title">Journal</h1><p class="subtitle">Tagesform und Regeneration.</p></header>
+      <article class="card stack">
+        <div class="row">
+          <h3 class="grow">Readiness</h3>
+          <span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span>
+        </div>
+        <p class="muted">${htmlesc(readiness.hint)}</p>
+      </article>
+      <article class="card stack">
+        <h3>Heute</h3>
+        ${renderRatingInput("sleepQuality", "Schlaf", entry.sleepQuality || 3)}
+        ${renderRatingInput("energy", "Energie", entry.energy || 3)}
+        ${renderRatingInput("stress", "Stress", entry.stress || 3)}
+        ${renderRatingInput("soreness", "Muskelkater", entry.soreness || 3)}
+        ${renderRatingInput("mood", "Stimmung", entry.mood || 3)}
+        <textarea class="input area" placeholder="Schmerznotiz" data-journal-text="painNote">${htmlesc(entry.painNote || "")}</textarea>
+        <textarea class="input area" placeholder="Ernaehrung / Notiz" data-journal-text="nutritionNote">${htmlesc(entry.nutritionNote || "")}</textarea>
+        <button class="primary" data-save-journal>Journal speichern</button>
+      </article>
+      <article class="card stack">
+        <h3>Letzte Eintraege</h3>
+        ${history.length ? history.map((item) => {
+          const itemReadiness = readinessForJournal(item);
+          return `<div class="history-row"><div><strong>${dateText(item.date)}</strong><p class="muted">${htmlesc(itemReadiness.hint)}</p></div><span class="badge ${itemReadiness.color}">${htmlesc(itemReadiness.label)}</span></div>`;
+        }).join("") : `<p class="muted">Noch kein Journal gespeichert.</p>`}
+      </article>
     </section>
   `;
 }
@@ -1203,10 +1429,15 @@ function createBackup() {
   return {
     app: "D-Coach",
     schemaVersion: 1,
+    appVersion: "pwa-v13",
+    backupVersion: "1.2.0",
     exportedAt: new Date().toISOString(),
+    exportDate: new Date().toISOString(),
     activePlanName: storage.activePlanName,
     sessions: storage.sessions,
     weights: storage.weights,
+    journalEntries: storage.journalEntries,
+    machineSettings: storage.machineSettings,
     archivedPlanNames: storage.archivedPlanNames,
     deletedPlanNames: storage.deletedPlanNames,
     activeWorkoutDraft: storage.activeWorkoutDraft
@@ -1263,12 +1494,16 @@ function importBackupFile(file) {
         "",
         `Trainings: ${backup.sessions.length}`,
         `Gewichtseinträge: ${backup.weights.length}`,
+        `Journal: ${Array.isArray(backup.journalEntries) ? backup.journalEntries.length : 0}`,
+        `Geraeteeinstellungen: ${Array.isArray(backup.machineSettings) ? backup.machineSettings.length : 0}`,
         "",
-        "Die lokalen Daten auf diesem Gerät werden ersetzt."
+        "Die lokalen Daten werden zusammengefuehrt. Duplikate werden vermieden."
       ].join("\n");
       if (!confirm(message)) return;
-      storage.sessions = backup.sessions;
-      storage.weights = backup.weights;
+      storage.sessions = mergeById(storage.sessions, backup.sessions);
+      storage.weights = mergeById(storage.weights, backup.weights);
+      storage.journalEntries = mergeById(storage.journalEntries, Array.isArray(backup.journalEntries) ? backup.journalEntries : []);
+      storage.machineSettings = mergeById(storage.machineSettings, Array.isArray(backup.machineSettings) ? backup.machineSettings : []);
       storage.archivedPlanNames = Array.isArray(backup.archivedPlanNames) ? backup.archivedPlanNames : [];
       storage.deletedPlanNames = Array.isArray(backup.deletedPlanNames) ? backup.deletedPlanNames : [];
       storage.activeWorkoutDraft = backup.activeWorkoutDraft || null;
@@ -1477,6 +1712,53 @@ function bindEvents() {
     });
   });
 
+  document.querySelector("[data-save-journal]")?.addEventListener("click", () => {
+    const today = todayIsoDate();
+    const current = journalEntryForDate(today);
+    const entry = {
+      id: current?.id || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+      date: today,
+      sleepQuality: 3,
+      energy: 3,
+      stress: 3,
+      soreness: 3,
+      mood: 3,
+      painNote: "",
+      nutritionNote: "",
+      notes: "",
+      updatedAt: new Date().toISOString()
+    };
+    document.querySelectorAll("[data-journal-field]").forEach((input) => {
+      entry[input.dataset.journalField] = Number(input.value);
+    });
+    document.querySelectorAll("[data-journal-text]").forEach((input) => {
+      entry[input.dataset.journalText] = input.value.trim();
+    });
+    storage.journalEntries = [...storage.journalEntries.filter((item) => item.date !== today), entry];
+    render();
+  });
+
+  document.querySelector("[data-save-machine-setting]")?.addEventListener("click", (event) => {
+    const exerciseId = event.currentTarget.dataset.saveMachineSetting;
+    const current = latestMachineSetting(exerciseId);
+    const setting = {
+      id: current?.id || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+      exerciseId,
+      machineName: "",
+      seatPosition: "",
+      handlePosition: "",
+      backrestPosition: "",
+      note: "",
+      updatedAt: new Date().toISOString()
+    };
+    document.querySelectorAll("[data-machine-exercise]").forEach((input) => {
+      if (input.dataset.machineExercise !== exerciseId) return;
+      setting[input.dataset.machineField] = input.value.trim();
+    });
+    storage.machineSettings = [...storage.machineSettings.filter((item) => item.id !== setting.id), setting];
+    render();
+  });
+
   document.querySelector("[data-export-backup]")?.addEventListener("click", exportBackup);
   document.querySelector("[data-install-pwa]")?.addEventListener("click", installPwa);
 
@@ -1497,6 +1779,8 @@ function bindEvents() {
     if (!confirm("Alle Trainings- und Gewichtsdaten löschen?")) return;
     storage.sessions = [];
     storage.weights = [];
+    storage.journalEntries = [];
+    storage.machineSettings = [];
     clearWorkoutDraft();
     storage.lastBackupAt = null;
     state.activeWorkout = null;

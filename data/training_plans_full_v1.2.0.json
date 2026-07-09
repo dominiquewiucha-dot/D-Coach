@@ -1,0 +1,114 @@
+{
+  "version": "1.2.0",
+  "type": "training_plans_full",
+  "locale": "de-DE",
+  "plans": [
+    {
+      "id": "plan_ppl_lws_reentry_v1",
+      "planName": "3er Split Wiedereinstieg LWS-schonend",
+      "status": "activeCandidate",
+      "maxDurationMinutes": 60,
+      "days": [
+        {
+          "name": "Push",
+          "exercises": [
+            "ex_chest_press_machine",
+            "ex_incline_chest_press_machine",
+            "ex_shoulder_press_machine",
+            "ex_lateral_raise",
+            "ex_triceps_pushdown",
+            "ex_cable_fly"
+          ]
+        },
+        {
+          "name": "Pull",
+          "exercises": [
+            "ex_lat_pulldown",
+            "ex_seated_row",
+            "ex_chest_supported_row",
+            "ex_reverse_pec_deck",
+            "ex_cable_biceps_curl",
+            "ex_face_pull"
+          ]
+        },
+        {
+          "name": "Beine + Core",
+          "exercises": [
+            "ex_leg_press",
+            "ex_bulgarian_split_squat",
+            "ex_seated_leg_curl",
+            "ex_leg_extension",
+            "ex_calf_raise_machine",
+            "ex_pallof_press",
+            "ex_plank"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plan_fullbody_lws_beginner_v1",
+      "planName": "Ganzkörper LWS-schonend",
+      "status": "draft",
+      "maxDurationMinutes": 50,
+      "days": [
+        {
+          "name": "Ganzkörper A",
+          "exercises": [
+            "ex_leg_press",
+            "ex_chest_press_machine",
+            "ex_lat_pulldown",
+            "ex_seated_leg_curl",
+            "ex_lateral_raise",
+            "ex_pallof_press"
+          ]
+        },
+        {
+          "name": "Ganzkörper B",
+          "exercises": [
+            "ex_bulgarian_split_squat",
+            "ex_incline_chest_press_machine",
+            "ex_chest_supported_row",
+            "ex_hip_thrust_machine",
+            "ex_triceps_pushdown",
+            "ex_plank"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plan_upper_lower_lws_v1",
+      "planName": "Upper / Lower LWS-schonend",
+      "status": "draft",
+      "maxDurationMinutes": 60,
+      "days": [
+        {
+          "name": "Upper",
+          "exercises": [
+            "ex_chest_press_machine",
+            "ex_lat_pulldown",
+            "ex_shoulder_press_machine",
+            "ex_chest_supported_row",
+            "ex_lateral_raise",
+            "ex_cable_biceps_curl",
+            "ex_triceps_pushdown"
+          ]
+        },
+        {
+          "name": "Lower",
+          "exercises": [
+            "ex_leg_press",
+            "ex_hip_thrust_machine",
+            "ex_seated_leg_curl",
+            "ex_leg_extension",
+            "ex_calf_raise_machine",
+            "ex_pallof_press"
+          ]
+        }
+      ]
+    }
+  ],
+  "defaults": {
+    "sets": 2,
+    "restSeconds": 90
+  }
+}

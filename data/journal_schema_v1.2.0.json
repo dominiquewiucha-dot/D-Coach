@@ -1,0 +1,61 @@
+{
+  "version": "1.2.0",
+  "type": "journal_schema",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "name": "sleepQuality",
+      "type": "number",
+      "min": 1,
+      "max": 5
+    },
+    {
+      "name": "energy",
+      "type": "number",
+      "min": 1,
+      "max": 5
+    },
+    {
+      "name": "stress",
+      "type": "number",
+      "min": 1,
+      "max": 5
+    },
+    {
+      "name": "soreness",
+      "type": "number",
+      "min": 1,
+      "max": 5
+    },
+    {
+      "name": "mood",
+      "type": "number",
+      "min": 1,
+      "max": 5
+    },
+    {
+      "name": "nutritionNote",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "painNote",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "required": false
+    }
+  ]
+}

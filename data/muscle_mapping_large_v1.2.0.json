@@ -1,0 +1,1540 @@
+{
+  "version": "1.2.0",
+  "type": "exercise_muscle_mapping_large",
+  "locale": "de-DE",
+  "mappings": [
+    {
+      "exerciseId": "ex_chest_press_machine",
+      "exerciseName": "Brustpresse Maschine",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.55
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.45
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Horizontal Push"
+    },
+    {
+      "exerciseId": "ex_incline_chest_press_machine",
+      "exerciseName": "Schrägbank Brustpresse Maschine",
+      "primaryMuscle": "mg_chest_upper",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.55
+        },
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_chest_middle",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Horizontal Push"
+    },
+    {
+      "exerciseId": "ex_cable_fly",
+      "exerciseName": "Kabel-Flys",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_chest_upper",
+          "intensityWeight": 0.25
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_pec_deck",
+      "exerciseName": "Pec Deck",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_dumbbell_bench_press",
+      "exerciseName": "Kurzhantel Bankdrücken",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.45
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_rotator_cuff",
+          "intensityWeight": 0.25
+        }
+      ],
+      "movementPattern": "Horizontal Push"
+    },
+    {
+      "exerciseId": "ex_dumbbell_incline_press",
+      "exerciseName": "Kurzhantel Schrägbankdrücken",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Push"
+    },
+    {
+      "exerciseId": "ex_barbell_bench_press",
+      "exerciseName": "Langhantel Bankdrücken",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Push"
+    },
+    {
+      "exerciseId": "ex_push_up",
+      "exerciseName": "Liegestütze",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Push"
+    },
+    {
+      "exerciseId": "ex_machine_dip",
+      "exerciseName": "Dip Maschine",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Push"
+    },
+    {
+      "exerciseId": "ex_dips",
+      "exerciseName": "Dips",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Push"
+    },
+    {
+      "exerciseId": "ex_shoulder_press_machine",
+      "exerciseName": "Schulterpresse Maschine",
+      "primaryMuscle": "mg_front_delts",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_side_delts",
+          "intensityWeight": 0.55
+        },
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.55
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.2
+        }
+      ],
+      "movementPattern": "Vertical Push"
+    },
+    {
+      "exerciseId": "ex_dumbbell_shoulder_press",
+      "exerciseName": "Kurzhantel Schulterdrücken",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Push"
+    },
+    {
+      "exerciseId": "ex_lateral_raise",
+      "exerciseName": "Seitheben",
+      "primaryMuscle": "mg_side_delts",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_traps",
+          "intensityWeight": 0.25
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_rotator_cuff",
+          "intensityWeight": 0.2
+        }
+      ],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_cable_lateral_raise",
+      "exerciseName": "Seitheben am Kabel",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Push"
+    },
+    {
+      "exerciseId": "ex_front_raise",
+      "exerciseName": "Frontheben",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Push"
+    },
+    {
+      "exerciseId": "ex_upright_row_cable",
+      "exerciseName": "Aufrechtes Rudern Kabel",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Push"
+    },
+    {
+      "exerciseId": "ex_triceps_pushdown",
+      "exerciseName": "Trizepsdrücken Kabel",
+      "primaryMuscle": "mg_triceps",
+      "secondaryMuscles": [],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_rope_pushdown",
+      "exerciseName": "Trizepsdrücken Seil",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_triceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Push"
+    },
+    {
+      "exerciseId": "ex_overhead_triceps_extension",
+      "exerciseName": "Überkopf Trizepsdrücken Kabel",
+      "primaryMuscle": "mg_triceps",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_chest_middle",
+          "intensityWeight": 0.2
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Isolation/Push"
+    },
+    {
+      "exerciseId": "ex_skullcrusher",
+      "exerciseName": "Skullcrusher SZ",
+      "primaryMuscle": "mg_triceps",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_chest_middle",
+          "intensityWeight": 0.2
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Isolation/Push"
+    },
+    {
+      "exerciseId": "ex_close_grip_bench",
+      "exerciseName": "Enges Bankdrücken",
+      "primaryMuscle": "mg_triceps",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_chest_middle",
+          "intensityWeight": 0.2
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Isolation/Push"
+    },
+    {
+      "exerciseId": "ex_lat_pulldown",
+      "exerciseName": "Latziehen",
+      "primaryMuscle": "mg_lats",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_biceps",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_upper_back",
+          "intensityWeight": 0.35
+        },
+        {
+          "muscleId": "mg_rear_delts",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Vertical Pull"
+    },
+    {
+      "exerciseId": "ex_close_grip_pulldown",
+      "exerciseName": "Enger Latzug",
+      "primaryMuscle": "mg_triceps",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_chest_middle",
+          "intensityWeight": 0.2
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Isolation/Push"
+    },
+    {
+      "exerciseId": "ex_straight_arm_pulldown",
+      "exerciseName": "Überzüge Kabel",
+      "primaryMuscle": "mg_upper_back",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_lats",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_biceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_rear_delts",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Pull"
+    },
+    {
+      "exerciseId": "ex_assisted_pullup",
+      "exerciseName": "Unterstützte Klimmzüge",
+      "primaryMuscle": "mg_upper_back",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_lats",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_biceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_rear_delts",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Pull"
+    },
+    {
+      "exerciseId": "ex_pullup",
+      "exerciseName": "Klimmzüge",
+      "primaryMuscle": "mg_upper_back",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_lats",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_biceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_rear_delts",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Pull"
+    },
+    {
+      "exerciseId": "ex_seated_row",
+      "exerciseName": "Rudern sitzend",
+      "primaryMuscle": "mg_upper_back",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_lats",
+          "intensityWeight": 0.55
+        },
+        {
+          "muscleId": "mg_biceps",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_rear_delts",
+          "intensityWeight": 0.35
+        },
+        {
+          "muscleId": "mg_rhomboids",
+          "intensityWeight": 0.6
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.2
+        },
+        {
+          "muscleId": "mg_erectors",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Horizontal Pull"
+    },
+    {
+      "exerciseId": "ex_machine_row",
+      "exerciseName": "Rudermaschine",
+      "primaryMuscle": "mg_upper_back",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_lats",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_biceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_rear_delts",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Pull"
+    },
+    {
+      "exerciseId": "ex_chest_supported_row",
+      "exerciseName": "Brustgestütztes Rudern",
+      "primaryMuscle": "mg_upper_back",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_lats",
+          "intensityWeight": 0.5
+        },
+        {
+          "muscleId": "mg_biceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_rear_delts",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_rhomboids",
+          "intensityWeight": 0.6
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Horizontal Pull"
+    },
+    {
+      "exerciseId": "ex_one_arm_cable_row",
+      "exerciseName": "Einarmiges Kabelrudern",
+      "primaryMuscle": "mg_upper_back",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_lats",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_biceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_rear_delts",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Pull"
+    },
+    {
+      "exerciseId": "ex_one_arm_dumbbell_row",
+      "exerciseName": "Einarmiges Kurzhantelrudern",
+      "primaryMuscle": "mg_upper_back",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_lats",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_biceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_rear_delts",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Pull"
+    },
+    {
+      "exerciseId": "ex_bent_over_row",
+      "exerciseName": "Vorgebeugtes Rudern",
+      "primaryMuscle": "mg_upper_back",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_lats",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_biceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_rear_delts",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Pull"
+    },
+    {
+      "exerciseId": "ex_t_bar_row_supported",
+      "exerciseName": "T-Bar Rudern brustgestützt",
+      "primaryMuscle": "mg_upper_back",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_lats",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_biceps",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_rear_delts",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Pull"
+    },
+    {
+      "exerciseId": "ex_reverse_pec_deck",
+      "exerciseName": "Reverse Butterfly",
+      "primaryMuscle": "mg_rear_delts",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_upper_back",
+          "intensityWeight": 0.3
+        },
+        {
+          "muscleId": "mg_traps",
+          "intensityWeight": 0.25
+        },
+        {
+          "muscleId": "mg_rhomboids",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_rotator_cuff",
+          "intensityWeight": 0.2
+        }
+      ],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_face_pull",
+      "exerciseName": "Face Pulls",
+      "primaryMuscle": "mg_rear_delts",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_rotator_cuff",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_traps",
+          "intensityWeight": 0.3
+        },
+        {
+          "muscleId": "mg_rhomboids",
+          "intensityWeight": 0.3
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Horizontal Pull"
+    },
+    {
+      "exerciseId": "ex_cable_biceps_curl",
+      "exerciseName": "Bizepscurls Kabel",
+      "primaryMuscle": "mg_biceps",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_forearms",
+          "intensityWeight": 0.3
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_dumbbell_biceps_curl",
+      "exerciseName": "Kurzhantel Bizepscurls",
+      "primaryMuscle": "mg_biceps",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_forearms",
+          "intensityWeight": 0.3
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_hammer_curl",
+      "exerciseName": "Hammer Curls",
+      "primaryMuscle": "mg_biceps",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_forearms",
+          "intensityWeight": 0.3
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_preacher_curl_machine",
+      "exerciseName": "Preacher Curl Maschine",
+      "primaryMuscle": "mg_biceps",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_forearms",
+          "intensityWeight": 0.3
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_concentration_curl",
+      "exerciseName": "Konzentrationscurl",
+      "primaryMuscle": "mg_biceps",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_forearms",
+          "intensityWeight": 0.3
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_leg_press",
+      "exerciseName": "Beinpresse",
+      "primaryMuscle": "mg_quads",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_glutes",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.25
+        },
+        {
+          "muscleId": "mg_adductors",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_deep_core",
+          "intensityWeight": 0.1
+        }
+      ],
+      "movementPattern": "Squat Pattern"
+    },
+    {
+      "exerciseId": "ex_hack_squat",
+      "exerciseName": "Hackenschmidt",
+      "primaryMuscle": "mg_quads",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_glutes",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Squat Pattern"
+    },
+    {
+      "exerciseId": "ex_bulgarian_split_squat",
+      "exerciseName": "Bulgarian Split Squat",
+      "primaryMuscle": "mg_quads",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_glutes",
+          "intensityWeight": 0.55
+        },
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.25
+        },
+        {
+          "muscleId": "mg_adductors",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.3
+        },
+        {
+          "muscleId": "mg_abductors",
+          "intensityWeight": 0.35
+        }
+      ],
+      "movementPattern": "Lunge Pattern"
+    },
+    {
+      "exerciseId": "ex_step_up",
+      "exerciseName": "Step Ups",
+      "primaryMuscle": "mg_quads",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_glutes",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Squat Pattern"
+    },
+    {
+      "exerciseId": "ex_goblet_squat",
+      "exerciseName": "Goblet Squat",
+      "primaryMuscle": "mg_quads",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_glutes",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Squat Pattern"
+    },
+    {
+      "exerciseId": "ex_barbell_back_squat",
+      "exerciseName": "Kniebeuge Langhantel",
+      "primaryMuscle": "mg_quads",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_glutes",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Squat Pattern"
+    },
+    {
+      "exerciseId": "ex_front_squat",
+      "exerciseName": "Frontkniebeuge",
+      "primaryMuscle": "mg_quads",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_glutes",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Squat Pattern"
+    },
+    {
+      "exerciseId": "ex_smith_squat",
+      "exerciseName": "Multipresse Kniebeuge",
+      "primaryMuscle": "mg_quads",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_glutes",
+          "intensityWeight": 0.4
+        },
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Squat Pattern"
+    },
+    {
+      "exerciseId": "ex_leg_extension",
+      "exerciseName": "Beinstrecker",
+      "primaryMuscle": "mg_quads",
+      "secondaryMuscles": [],
+      "stabilizers": [],
+      "movementPattern": "Knee Extension"
+    },
+    {
+      "exerciseId": "ex_seated_leg_curl",
+      "exerciseName": "Beinbeuger sitzend",
+      "primaryMuscle": "mg_hamstrings",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_calves",
+          "intensityWeight": 0.15
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Knee Flexion"
+    },
+    {
+      "exerciseId": "ex_lying_leg_curl",
+      "exerciseName": "Beinbeuger liegend",
+      "primaryMuscle": "mg_biceps",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_forearms",
+          "intensityWeight": 0.3
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_standing_leg_curl",
+      "exerciseName": "Beinbeuger stehend",
+      "primaryMuscle": "mg_biceps",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_forearms",
+          "intensityWeight": 0.3
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_hip_thrust_machine",
+      "exerciseName": "Hip Thrust Maschine",
+      "primaryMuscle": "mg_glutes",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.35
+        },
+        {
+          "muscleId": "mg_quads",
+          "intensityWeight": 0.15
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.2
+        },
+        {
+          "muscleId": "mg_erectors",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Hip Thrust"
+    },
+    {
+      "exerciseId": "ex_barbell_hip_thrust",
+      "exerciseName": "Langhantel Hip Thrust",
+      "primaryMuscle": "mg_glutes",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_erectors",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.2
+        }
+      ],
+      "movementPattern": "Hip Hinge"
+    },
+    {
+      "exerciseId": "ex_glute_bridge",
+      "exerciseName": "Glute Bridge",
+      "primaryMuscle": "mg_glutes",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_erectors",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.2
+        }
+      ],
+      "movementPattern": "Hip Hinge"
+    },
+    {
+      "exerciseId": "ex_cable_pull_through",
+      "exerciseName": "Kabel Pull-Through",
+      "primaryMuscle": "mg_glutes",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_erectors",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.2
+        }
+      ],
+      "movementPattern": "Hip Hinge"
+    },
+    {
+      "exerciseId": "ex_back_extension_45",
+      "exerciseName": "45° Hyperextension kontrolliert",
+      "primaryMuscle": "mg_glutes",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_erectors",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.2
+        }
+      ],
+      "movementPattern": "Hip Hinge"
+    },
+    {
+      "exerciseId": "ex_deadlift",
+      "exerciseName": "Kreuzheben klassisch",
+      "primaryMuscle": "mg_glutes",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.65
+        },
+        {
+          "muscleId": "mg_erectors",
+          "intensityWeight": 0.75
+        },
+        {
+          "muscleId": "mg_upper_back",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_forearms",
+          "intensityWeight": 0.4
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_lats",
+          "intensityWeight": 0.35
+        }
+      ],
+      "movementPattern": "Hip Hinge"
+    },
+    {
+      "exerciseId": "ex_sumo_deadlift",
+      "exerciseName": "Sumo Kreuzheben",
+      "primaryMuscle": "mg_glutes",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_erectors",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.2
+        }
+      ],
+      "movementPattern": "Hip Hinge"
+    },
+    {
+      "exerciseId": "ex_romanian_deadlift",
+      "exerciseName": "Rumänisches Kreuzheben",
+      "primaryMuscle": "mg_glutes",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_hamstrings",
+          "intensityWeight": 0.45
+        },
+        {
+          "muscleId": "mg_erectors",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.2
+        }
+      ],
+      "movementPattern": "Hip Hinge"
+    },
+    {
+      "exerciseId": "ex_calf_raise_machine",
+      "exerciseName": "Wadenheben Maschine",
+      "primaryMuscle": "mg_calves",
+      "secondaryMuscles": [],
+      "stabilizers": [],
+      "movementPattern": "Calf Raise"
+    },
+    {
+      "exerciseId": "ex_seated_calf_raise",
+      "exerciseName": "Wadenheben sitzend",
+      "primaryMuscle": "mg_calves",
+      "secondaryMuscles": [],
+      "stabilizers": [],
+      "movementPattern": "Calf Raise"
+    },
+    {
+      "exerciseId": "ex_adductor_machine",
+      "exerciseName": "Adduktoren Maschine",
+      "primaryMuscle": "mg_adductors",
+      "secondaryMuscles": [],
+      "stabilizers": [],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_abductor_machine",
+      "exerciseName": "Abduktoren Maschine",
+      "primaryMuscle": "mg_abductors",
+      "secondaryMuscles": [],
+      "stabilizers": [],
+      "movementPattern": "Isolation"
+    },
+    {
+      "exerciseId": "ex_pallof_press",
+      "exerciseName": "Pallof Press",
+      "primaryMuscle": "mg_deep_core",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_obliques",
+          "intensityWeight": 0.6
+        },
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.4
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_glutes",
+          "intensityWeight": 0.15
+        }
+      ],
+      "movementPattern": "Core Anti-Rotation"
+    },
+    {
+      "exerciseId": "ex_plank",
+      "exerciseName": "Plank",
+      "primaryMuscle": "mg_abs",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_deep_core",
+          "intensityWeight": 0.65
+        },
+        {
+          "muscleId": "mg_obliques",
+          "intensityWeight": 0.35
+        },
+        {
+          "muscleId": "mg_glutes",
+          "intensityWeight": 0.25
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Core Anti-Extension"
+    },
+    {
+      "exerciseId": "ex_side_plank",
+      "exerciseName": "Side Plank",
+      "primaryMuscle": "mg_abs",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_deep_core",
+          "intensityWeight": 0.5
+        },
+        {
+          "muscleId": "mg_obliques",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Core"
+    },
+    {
+      "exerciseId": "ex_dead_bug",
+      "exerciseName": "Dead Bug",
+      "primaryMuscle": "mg_abs",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_deep_core",
+          "intensityWeight": 0.5
+        },
+        {
+          "muscleId": "mg_obliques",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Core"
+    },
+    {
+      "exerciseId": "ex_bird_dog",
+      "exerciseName": "Bird Dog",
+      "primaryMuscle": "mg_abs",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_deep_core",
+          "intensityWeight": 0.5
+        },
+        {
+          "muscleId": "mg_obliques",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Core"
+    },
+    {
+      "exerciseId": "ex_cable_crunch",
+      "exerciseName": "Cable Crunch",
+      "primaryMuscle": "mg_abs",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_deep_core",
+          "intensityWeight": 0.5
+        },
+        {
+          "muscleId": "mg_obliques",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Core"
+    },
+    {
+      "exerciseId": "ex_hanging_knee_raise",
+      "exerciseName": "Hanging Knee Raise",
+      "primaryMuscle": "mg_abs",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_deep_core",
+          "intensityWeight": 0.5
+        },
+        {
+          "muscleId": "mg_obliques",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Core"
+    },
+    {
+      "exerciseId": "ex_reverse_crunch",
+      "exerciseName": "Reverse Crunch",
+      "primaryMuscle": "mg_abs",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_deep_core",
+          "intensityWeight": 0.5
+        },
+        {
+          "muscleId": "mg_obliques",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Core"
+    },
+    {
+      "exerciseId": "ex_farmer_walk",
+      "exerciseName": "Farmer Walk",
+      "primaryMuscle": "mg_abs",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_deep_core",
+          "intensityWeight": 0.5
+        },
+        {
+          "muscleId": "mg_obliques",
+          "intensityWeight": 0.35
+        }
+      ],
+      "stabilizers": [],
+      "movementPattern": "Core"
+    },
+    {
+      "exerciseId": "ex_sled_push",
+      "exerciseName": "Schlitten schieben",
+      "primaryMuscle": "mg_deep_core",
+      "secondaryMuscles": [],
+      "stabilizers": [],
+      "movementPattern": "Conditioning"
+    },
+    {
+      "exerciseId": "ex_bike",
+      "exerciseName": "Fahrradergometer",
+      "primaryMuscle": "mg_deep_core",
+      "secondaryMuscles": [],
+      "stabilizers": [],
+      "movementPattern": "Conditioning"
+    },
+    {
+      "exerciseId": "ex_treadmill_walk",
+      "exerciseName": "Laufband Gehen",
+      "primaryMuscle": "mg_deep_core",
+      "secondaryMuscles": [],
+      "stabilizers": [],
+      "movementPattern": "Conditioning"
+    },
+    {
+      "exerciseId": "ex_rower_machine",
+      "exerciseName": "Ruderergometer",
+      "primaryMuscle": "mg_deep_core",
+      "secondaryMuscles": [],
+      "stabilizers": [],
+      "movementPattern": "Conditioning"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "version": "1.2.0",
+  "type": "recovery_rules",
+  "readiness": {
+    "green": {
+      "minScore": 4.0,
+      "message": "Gute Tagesform."
+    },
+    "yellow": {
+      "minScore": 2.8,
+      "message": "Moderat starten."
+    },
+    "red": {
+      "minScore": 0,
+      "message": "Leichter trainieren oder Volumen reduzieren."
+    }
+  },
+  "inputs": [
+    "sleepQuality",
+    "energy",
+    "stress",
+    "soreness",
+    "mood",
+    "painNote",
+    "nutritionNote"
+  ]
+}

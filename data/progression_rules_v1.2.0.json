@@ -1,0 +1,30 @@
+{
+  "version": "1.2.0",
+  "type": "progression_rules",
+  "rules": [
+    {
+      "id": "increase_if_top_reps_all_sets",
+      "condition": "allSetsAtTopOfRepRange",
+      "action": "suggestWeightIncrease",
+      "message": "Alle Sätze stark. Nächstes Mal leicht erhöhen."
+    },
+    {
+      "id": "hold_if_in_range",
+      "condition": "setsInTargetRangeButNotTop",
+      "action": "holdWeight",
+      "message": "Gewicht halten und Wiederholungen sammeln."
+    },
+    {
+      "id": "reduce_if_drop",
+      "condition": "performanceDropTwoSessions",
+      "action": "suggestDeloadOrReduce",
+      "message": "Leistung fällt. Regeneration prüfen oder Gewicht reduzieren."
+    },
+    {
+      "id": "lws_conservative",
+      "condition": "exerciseLumbarDiscSuitabilityNotSuitable",
+      "action": "conservativeProgression",
+      "message": "LWS-Hinweis: keine aggressive Steigerung."
+    }
+  ]
+}

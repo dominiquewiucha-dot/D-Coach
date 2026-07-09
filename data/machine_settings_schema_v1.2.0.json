@@ -1,0 +1,15 @@
+{
+  "version": "1.2.0",
+  "type": "machine_settings_schema",
+  "fields": [
+    "id",
+    "exerciseId",
+    "machineName",
+    "seatPosition",
+    "handlePosition",
+    "backrestPosition",
+    "weightStackNote",
+    "note",
+    "updatedAt"
+  ]
+}
