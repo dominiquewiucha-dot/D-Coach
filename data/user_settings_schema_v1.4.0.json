@@ -1,0 +1,41 @@
+{
+  "version": "1.4.0",
+  "type": "user_settings_schema",
+  "settings": [
+    {
+      "key": "theme",
+      "type": "string",
+      "default": "dark-blue"
+    },
+    {
+      "key": "accentColor",
+      "type": "string",
+      "default": "#2563EB"
+    },
+    {
+      "key": "weightUnit",
+      "type": "string",
+      "default": "kg"
+    },
+    {
+      "key": "restTimerEnabled",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "key": "debugMode",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "key": "autoBackupReminder",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "key": "activePlanId",
+      "type": "string",
+      "default": null
+    }
+  ]
+}

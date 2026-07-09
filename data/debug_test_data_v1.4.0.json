@@ -1,0 +1,45 @@
+{
+  "version": "1.4.0",
+  "type": "debug_test_data",
+  "sampleWorkouts": [
+    {
+      "id": "test_workout_001",
+      "planNameSnapshot": "Test Push",
+      "dayNameSnapshot": "Push",
+      "completedExercises": [
+        {
+          "exerciseId": "ex_chest_press_machine",
+          "exerciseNameSnapshot": "Brustpresse Maschine",
+          "sets": [
+            {
+              "setNumber": 1,
+              "weightKg": 50,
+              "reps": 10,
+              "completed": true
+            },
+            {
+              "setNumber": 2,
+              "weightKg": 50,
+              "reps": 9,
+              "completed": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sampleBodyweight": [
+    {
+      "date": "2026-07-01",
+      "weightKg": 88.4
+    },
+    {
+      "date": "2026-07-02",
+      "weightKg": 88.2
+    },
+    {
+      "date": "2026-07-03",
+      "weightKg": 88.1
+    }
+  ]
+}

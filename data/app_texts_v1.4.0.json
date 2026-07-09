@@ -1,0 +1,14 @@
+{
+  "version": "1.4.0",
+  "type": "app_texts",
+  "locale": "de-DE",
+  "texts": {
+    "backup.success": "Backup wurde erstellt.",
+    "backup.importPreview": "Import-Vorschau prüfen.",
+    "qr.tooLarge": "Dieser Plan ist zu groß für einen QR-Code. Bitte JSON-Export verwenden.",
+    "debug.enabled": "Debug-Modus aktiviert.",
+    "migration.backupFirst": "Bitte vor der Migration ein Backup erstellen.",
+    "exercise.customArchived": "Diese Übung hat Historie und wurde archiviert statt gelöscht.",
+    "plan.generated": "Planvorschlag erstellt. Bitte prüfen und aktivieren."
+  }
+}

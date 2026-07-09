@@ -1,0 +1,36 @@
+{
+  "version": "1.4.0",
+  "type": "plan_generator_rules",
+  "inputs": [
+    "goal",
+    "daysPerWeek",
+    "availableMinutes",
+    "lumbarDiscProfile",
+    "equipment",
+    "splitPreference",
+    "excludedExerciseIds",
+    "favoriteExerciseIds"
+  ],
+  "rules": [
+    {
+      "id": "lws_exclude_avoidInitially",
+      "if": "lumbarDiscProfile.active == true",
+      "then": "exclude exercises with lumbarDiscSuitability == avoidInitially"
+    },
+    {
+      "id": "prefer_machines_lws",
+      "if": "lumbarDiscProfile.active == true",
+      "then": "prefer machine/cable/chest-supported exercises"
+    },
+    {
+      "id": "max_duration",
+      "if": "availableMinutes <= 60",
+      "then": "limit exercises to 5-7 per session"
+    },
+    {
+      "id": "balanced_volume",
+      "if": "goal == hypertrophy",
+      "then": "balance weekly sets across major muscle groups"
+    }
+  ]
+}

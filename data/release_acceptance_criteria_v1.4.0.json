@@ -1,0 +1,18 @@
+{
+  "version": "1.4.0",
+  "type": "release_acceptance_criteria",
+  "beta": [
+    "Training kann gestartet und gespeichert werden",
+    "Letzte Leistung wird angezeigt",
+    "Backup kann erstellt werden",
+    "PWA läuft offline",
+    "Keine kritischen Console-Fehler"
+  ],
+  "stable": [
+    "Import/Export getestet",
+    "Datenmigration sicher",
+    "Mobile UX gut",
+    "Service Worker aktuell",
+    "Release Checklist erfüllt"
+  ]
+}

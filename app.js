@@ -17,12 +17,19 @@ const state = {
   warmupCooldownRules: null,
   userProfileSchema: null,
   exerciseScoringRules: null,
+  planGeneratorRules: null,
+  qrSchema: null,
+  userSettingsSchema: null,
+  debugTestData: null,
+  appTexts: null,
+  releaseAcceptanceCriteria: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
   exerciseFilter: "all",
   selectedExerciseId: null,
   selectedSessionId: null,
+  planImportText: "",
   showAlternatives: false,
   isOnline: navigator.onLine,
   deferredInstallPrompt: null,
@@ -33,8 +40,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v15";
-const STORAGE_SCHEMA_VERSION = "1.3.0";
+const APP_VERSION = "pwa-v16";
+const STORAGE_SCHEMA_VERSION = "1.4.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -44,6 +51,9 @@ const STORAGE_KEYS = [
   { key: "dcoach.archivedPlanNames", label: "Archivierte Plaene", type: "array" },
   { key: "dcoach.deletedPlanNames", label: "Geloeschte Plaene", type: "array" },
   { key: "dcoach.customPlans", label: "Eigene Plaene", type: "array" },
+  { key: "dcoach.customExercises", label: "Eigene Uebungen", type: "array" },
+  { key: "dcoach.userSettings", label: "Einstellungen", type: "object" },
+  { key: "dcoach.lastErrors", label: "Fehlerlog", type: "array" },
   { key: "dcoach.activeWorkoutDraft", label: "Trainingsentwurf", type: "object" },
   { key: "dcoach.lastBackupAt", label: "Letztes Backup", type: "string" },
   { key: "dcoach.storageVersion", label: "Speicherversion", type: "string" },
@@ -99,6 +109,24 @@ const storage = {
   },
   set customPlans(value) {
     writeJson("dcoach.customPlans", value);
+  },
+  get customExercises() {
+    return readJson("dcoach.customExercises", []);
+  },
+  set customExercises(value) {
+    writeJson("dcoach.customExercises", value);
+  },
+  get userSettings() {
+    return readJson("dcoach.userSettings", {});
+  },
+  set userSettings(value) {
+    writeJson("dcoach.userSettings", value);
+  },
+  get lastErrors() {
+    return readJson("dcoach.lastErrors", []);
+  },
+  set lastErrors(value) {
+    writeJson("dcoach.lastErrors", value.slice(-20));
   },
   get activeWorkoutDraft() {
     return readJson("dcoach.activeWorkoutDraft", null);
@@ -346,6 +374,122 @@ function mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, traini
   }
 }
 
+function appText(key, fallback = "") {
+  return state.appTexts?.texts?.[key] || fallback;
+}
+
+function defaultUserSettings() {
+  const settings = {};
+  (state.userSettingsSchema?.settings || []).forEach((item) => {
+    settings[item.key] = item.default ?? null;
+  });
+  return settings;
+}
+
+function currentUserSettings() {
+  return { ...defaultUserSettings(), ...storage.userSettings };
+}
+
+function updateUserSetting(key, value) {
+  storage.userSettings = { ...currentUserSettings(), [key]: value };
+}
+
+function logAppError(message, source = "app") {
+  storage.lastErrors = [...storage.lastErrors, {
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+    message: String(message || "Unbekannter Fehler"),
+    source,
+    at: new Date().toISOString()
+  }];
+}
+
+function requireBackupBeforeMigration() {
+  if (storage.lastBackupAt) return true;
+  return confirm(appText("migration.backupFirst", "Bitte vor der Migration ein Backup erstellen.") + "\n\nTrotzdem fortfahren?");
+}
+
+function planQrPayload(plan) {
+  if (!plan) return "";
+  return JSON.stringify({
+    type: "dcoach_plan",
+    version: "1.4.0",
+    exportedAt: new Date().toISOString(),
+    plan: {
+      id: plan.id || plan.planName,
+      name: plan.planName,
+      description: plan.description || "",
+      goal: plan.goal || "",
+      days: plan.days || []
+    }
+  });
+}
+
+function parsePlanPayload(text) {
+  const payload = JSON.parse(String(text || "").trim());
+  if (payload?.type !== "dcoach_plan" || !payload.plan?.name || !Array.isArray(payload.plan.days)) {
+    throw new Error("Kein gueltiger D-Coach-Plan.");
+  }
+  return normalizePlanPreset({
+    id: payload.plan.id || `plan_import_${Date.now()}`,
+    name: payload.plan.name,
+    description: payload.plan.description || "Importierter Plan",
+    goal: payload.plan.goal || "",
+    days: payload.plan.days
+  });
+}
+
+function importPlanPayload(text) {
+  const plan = parsePlanPayload(text);
+  const usedNames = new Set(availablePlans().map((item) => item.planName));
+  let nextName = plan.planName;
+  let index = 2;
+  while (usedNames.has(nextName)) {
+    nextName = `${plan.planName} Import ${index}`;
+    index += 1;
+  }
+  plan.id = `${plan.id || "plan_import"}_${Date.now()}`;
+  plan.planName = nextName;
+  storage.customPlans = [...storage.customPlans, plan];
+  storage.activePlanName = plan.planName;
+}
+
+function generatePlanCandidate() {
+  const exercises = allExercises()
+    .filter((exercise) => !exercise.isArchived && exercise.lumbarDiscSuitability !== "avoidInitially")
+    .sort((a, b) => lwsRank(a.lumbarDiscSuitability) - lwsRank(b.lumbarDiscSuitability));
+  const groups = [
+    ["Push", ["push", "brust", "schulter", "trizeps"]],
+    ["Pull", ["pull", "ruecken", "rücken", "bizeps"]],
+    ["Beine + Core", ["bein", "quad", "glute", "hamstring", "core", "bauch"]]
+  ];
+  const days = groups.map(([name, needles]) => {
+    const chosen = exercises.filter((exercise) => {
+      const text = `${exercise.displayName} ${exercise.category} ${exercise.movementPattern} ${exercise.tags.join(" ")} ${exercise.primaryMuscleGroups.join(" ")}`.toLowerCase();
+      return needles.some((needle) => text.includes(needle));
+    }).slice(0, 6);
+    return {
+      name,
+      maxDurationMinutes: 60,
+      exercises: chosen.map((exercise, index) => ({
+        exerciseId: exercise.id,
+        sets: exercise.defaultSets || 2,
+        reps: exercise.defaultRepRange || "8-12",
+        restSeconds: exercise.defaultRestSeconds || 90,
+        priority: index < 4 ? "required" : "important",
+        sortOrder: index + 1
+      }))
+    };
+  }).filter((day) => day.exercises.length);
+  return {
+    id: `plan_generated_${Date.now()}`,
+    planName: `D-Coach Vorschlag ${new Date().toLocaleDateString("de-DE")}`,
+    description: "Regelbasiert aus vorhandenen Uebungen erzeugt. Bitte pruefen.",
+    goal: "Hypertrophie / Wiedereinstieg",
+    maxDurationMinutes: 60,
+    days
+  };
+}
+
 async function fetchOptionalJson(path) {
   try {
     const response = await fetch(path);
@@ -383,7 +527,15 @@ async function boot() {
     coachingTexts,
     warmupCooldownRules,
     userProfileSchema,
-    exerciseScoringRules
+    exerciseScoringRules,
+    exercisesPlus,
+    muscleMappingPlus,
+    planGeneratorRules,
+    qrSchema,
+    userSettingsSchema,
+    debugTestData,
+    appTexts,
+    releaseAcceptanceCriteria
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -408,7 +560,15 @@ async function boot() {
     fetchOptionalJson("./data/coaching_texts_v1.3.0.json"),
     fetchOptionalJson("./data/warmup_cooldown_rules_v1.3.0.json"),
     fetchOptionalJson("./data/user_profile_schema_v1.3.0.json"),
-    fetchOptionalJson("./data/exercise_scoring_rules_v1.3.0.json")
+    fetchOptionalJson("./data/exercise_scoring_rules_v1.3.0.json"),
+    fetchOptionalJson("./data/exercises_plus_v1.4.0.json"),
+    fetchOptionalJson("./data/exercise_muscle_mapping_plus_v1.4.0.json"),
+    fetchOptionalJson("./data/plan_generator_rules_v1.4.0.json"),
+    fetchOptionalJson("./data/qr_schema_v1.4.0.json"),
+    fetchOptionalJson("./data/user_settings_schema_v1.4.0.json"),
+    fetchOptionalJson("./data/debug_test_data_v1.4.0.json"),
+    fetchOptionalJson("./data/app_texts_v1.4.0.json"),
+    fetchOptionalJson("./data/release_acceptance_criteria_v1.4.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -427,7 +587,14 @@ async function boot() {
   state.warmupCooldownRules = warmupCooldownRules;
   state.userProfileSchema = userProfileSchema;
   state.exerciseScoringRules = exerciseScoringRules;
+  state.planGeneratorRules = planGeneratorRules;
+  state.qrSchema = qrSchema;
+  state.userSettingsSchema = userSettingsSchema;
+  state.debugTestData = debugTestData;
+  state.appTexts = appTexts;
+  state.releaseAcceptanceCriteria = releaseAcceptanceCriteria;
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
+  mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   runStorageMigrations();
   const plan = activePlan();
   if (plan && storage.activePlanName !== plan.planName) {
@@ -459,6 +626,12 @@ function bindPwaEvents() {
   window.addEventListener("appinstalled", () => {
     state.deferredInstallPrompt = null;
     render();
+  });
+  window.addEventListener("error", (event) => {
+    logAppError(event.message, "window");
+  });
+  window.addEventListener("unhandledrejection", (event) => {
+    logAppError(event.reason?.message || event.reason || "Unhandled promise rejection", "promise");
   });
 }
 
@@ -518,6 +691,10 @@ function availablePlans() {
   return [...state.seed.trainingPlans, ...storage.customPlans].filter((plan) => !storage.deletedPlanNames.includes(plan.planName));
 }
 
+function allExercises() {
+  return [...state.seed.exercises, ...storage.customExercises];
+}
+
 function isPlanArchived(planName) {
   return storage.archivedPlanNames.includes(planName);
 }
@@ -552,8 +729,116 @@ function duplicatePlan(planName) {
   storage.activePlanName = copy.planName;
 }
 
+function customExerciseFromForm(existing = null) {
+  const name = document.querySelector("[data-custom-exercise-name]")?.value.trim();
+  if (!name) throw new Error("Name fehlt.");
+  const equipment = document.querySelector("[data-custom-exercise-equipment]")?.value.trim() || "Eigen";
+  const primary = document.querySelector("[data-custom-exercise-primary]")?.value.trim() || "Nicht zugeordnet";
+  const reps = document.querySelector("[data-custom-exercise-reps]")?.value.trim() || "8-12";
+  const note = document.querySelector("[data-custom-exercise-note]")?.value.trim() || "";
+  const lws = document.querySelector("[data-custom-exercise-lws]")?.value || "conditionallySuitable";
+  return normalizeExercise({
+    id: existing?.id || `custom_ex_${Date.now()}`,
+    displayName: name,
+    aliases: [],
+    primaryMuscleGroups: [primary],
+    secondaryMuscleGroups: [],
+    movementPattern: "Custom",
+    equipment: [equipment],
+    category: "Eigene Uebung",
+    difficulty: "mittel",
+    spineLoadLevel: lws === "suitable" ? "low" : "medium",
+    lumbarDiscSuitability: lws,
+    defaultSets: existing?.defaultSets || 2,
+    defaultRepRange: reps,
+    defaultRestSeconds: existing?.defaultRestSeconds || 90,
+    techniqueNotes: note,
+    commonMistakes: [],
+    tags: ["custom"],
+    alternatives: [],
+    isCustom: true,
+    isArchived: false,
+    schemaVersion: "1.4.0",
+    createdAt: existing?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }, existing);
+}
+
+function saveCustomExercise(existingId = null) {
+  const existing = existingId ? storage.customExercises.find((item) => item.id === existingId) : null;
+  const exercise = customExerciseFromForm(existing);
+  storage.customExercises = [...storage.customExercises.filter((item) => item.id !== exercise.id), exercise];
+}
+
+function exerciseHasHistory(exerciseId) {
+  return storage.sessions.some((session) => session.completedExercises.some((exercise) => exercise.exerciseId === exerciseId));
+}
+
+function archiveCustomExercise(exerciseId) {
+  storage.customExercises = storage.customExercises.map((exercise) => exercise.id === exerciseId ? { ...exercise, isArchived: true, updatedAt: new Date().toISOString() } : exercise);
+}
+
+function deleteCustomExercise(exerciseId) {
+  if (exerciseHasHistory(exerciseId)) {
+    archiveCustomExercise(exerciseId);
+    alert(appText("exercise.customArchived", "Diese Uebung hat Historie und wurde archiviert statt geloescht."));
+    return;
+  }
+  storage.customExercises = storage.customExercises.filter((exercise) => exercise.id !== exerciseId);
+}
+
+function loadDebugTestData() {
+  if (!state.debugTestData) return;
+  const now = new Date().toISOString();
+  const sessions = (state.debugTestData.sampleWorkouts || []).map((item, index) => ({
+    id: `${item.id}_${Date.now()}_${index}`,
+    planId: "debug",
+    planName: item.planNameSnapshot || "Debug",
+    planNameSnapshot: item.planNameSnapshot || "Debug",
+    dayName: item.dayNameSnapshot || "Debug",
+    dayNameSnapshot: item.dayNameSnapshot || "Debug",
+    startedAt: now,
+    endedAt: now,
+    completedAt: now,
+    readinessSnapshot: null,
+    completedExercises: (item.completedExercises || []).map((exercise, sortIndex) => ({
+      exerciseId: exercise.exerciseId,
+      exerciseNameSnapshot: exercise.exerciseNameSnapshot || exercise.exerciseId,
+      plannedSets: exercise.sets?.length || 0,
+      completedSets: exercise.sets?.filter((set) => set.completed).length || 0,
+      sortOrder: sortIndex + 1,
+      sets: (exercise.sets || []).map((set) => ({
+        setNumber: set.setNumber,
+        actualWeightKg: Number(set.weightKg),
+        plannedReps: "",
+        actualReps: Number(set.reps),
+        rir: null,
+        completed: !!set.completed
+      }))
+    }))
+  }));
+  const weights = (state.debugTestData.sampleBodyweight || []).map((item, index) => ({
+    id: `debug_weight_${Date.now()}_${index}`,
+    date: new Date(item.date).toISOString(),
+    weightKg: Number(item.weightKg)
+  }));
+  storage.sessions = mergeById(storage.sessions, sessions);
+  storage.weights = mergeById(storage.weights, weights);
+}
+
+async function clearPwaCache() {
+  if ("serviceWorker" in navigator) {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map((registration) => registration.update()));
+  }
+  if ("caches" in window) {
+    const keys = await caches.keys();
+    await Promise.all(keys.map((key) => caches.delete(key)));
+  }
+}
+
 function exerciseById(id) {
-  return state.seed.exercises.find((exercise) => exercise.id === id);
+  return allExercises().find((exercise) => exercise.id === id);
 }
 
 function htmlesc(value) {
@@ -1510,9 +1795,28 @@ function renderSessionDetail(id) {
 function renderPlans() {
   const plans = availablePlans();
   const deletedCount = storage.deletedPlanNames.length;
+  const active = activePlan();
+  const payload = planQrPayload(active);
+  const qrLimit = state.qrSchema?.maxRecommendedCharacters || 2500;
   return `
     <section class="screen stack">
       <header><h1 class="title">Pläne</h1><p class="subtitle">Aktiver Plan und Bibliothek.</p></header>
+      <article class="card stack">
+        <h3>Plan teilen / importieren</h3>
+        <p class="muted">${payload.length > qrLimit ? appText("qr.tooLarge", "Dieser Plan ist zu gross fuer QR. Bitte JSON-Export verwenden.") : "Kompakter Plan-Code fuer QR/Text-Import."}</p>
+        <textarea class="input area mono" readonly data-plan-payload>${htmlesc(payload)}</textarea>
+        <div class="button-row">
+          <button class="secondary" data-copy-plan-payload>Code kopieren</button>
+          <button class="secondary" data-download-plan-json>JSON speichern</button>
+        </div>
+        <textarea class="input area mono" placeholder="D-Coach Plan-Code einfuegen" data-plan-import>${htmlesc(state.planImportText)}</textarea>
+        <button class="primary" data-import-plan-code>Plan importieren</button>
+      </article>
+      <article class="card stack">
+        <h3>Plan-Generator</h3>
+        <p class="muted">Erstellt einen Vorschlag aus vorhandenen Uebungen. Bitte danach pruefen.</p>
+        <button class="secondary" data-generate-plan>${htmlesc(appText("plan.generated", "Planvorschlag erstellen"))}</button>
+      </article>
       ${plans.length ? plans.map((plan) => `
         <article class="card stack">
           <h2>${htmlesc(plan.planName)}</h2>
@@ -1552,8 +1856,8 @@ function renderExercises() {
     ["Core", "Core"],
     ["lws", "LWS-freundlich"]
   ];
-  const exercises = state.seed.exercises.filter((exercise) => {
-    const haystack = `${exercise.displayName} ${exercise.aliases.join(" ")} ${exercise.primaryMuscleGroups.join(" ")} ${exercise.secondaryMuscleGroups.join(" ")} ${exerciseMuscleSearchText(exercise)} ${exercise.tags.join(" ")}`.toLowerCase();
+  const exercises = allExercises().filter((exercise) => !exercise.isArchived).filter((exercise) => {
+    const haystack = `${exercise.displayName} ${(exercise.aliases || []).join(" ")} ${exercise.primaryMuscleGroups.join(" ")} ${exercise.secondaryMuscleGroups.join(" ")} ${exerciseMuscleSearchText(exercise)} ${(exercise.tags || []).join(" ")}`.toLowerCase();
     const matchesSearch = !needle || haystack.includes(needle);
     const matchesFilter = state.exerciseFilter === "all"
       || (state.exerciseFilter === "lws" && exercise.lumbarDiscSuitability === "suitable")
@@ -1569,6 +1873,22 @@ function renderExercises() {
           ${filters.map(([id, label]) => `<button class="chip ${state.exerciseFilter === id ? "active" : ""}" data-exercise-filter="${htmlesc(id)}">${htmlesc(label)}</button>`).join("")}
         </div>
       </div>
+      <article class="card stack">
+        <h3>Eigene Uebung</h3>
+        <input class="input" placeholder="Name" data-custom-exercise-name>
+        <div class="mini-grid">
+          <input class="input" placeholder="Equipment" data-custom-exercise-equipment>
+          <input class="input" placeholder="Zielmuskel" data-custom-exercise-primary>
+          <input class="input" placeholder="Wdh. z.B. 8-12" data-custom-exercise-reps>
+        </div>
+        <select class="input" data-custom-exercise-lws>
+          <option value="suitable">LWS geeignet</option>
+          <option value="conditionallySuitable">LWS vorsichtig</option>
+          <option value="avoidInitially">Anfangs vermeiden</option>
+        </select>
+        <textarea class="input area" placeholder="Techniknotiz" data-custom-exercise-note></textarea>
+        <button class="secondary" data-save-custom-exercise>Eigene Uebung speichern</button>
+      </article>
       ${exercises.map((exercise) => `
         <button class="list-button" data-exercise-id="${htmlesc(exercise.id)}">
           <article class="card stack">
@@ -1600,6 +1920,7 @@ function renderExerciseDetail(id) {
         </div>
         ${muscleRoleCards(exercise)}
         <p class="muted">${htmlesc(exerciseKindText(exercise))}</p>
+        ${exercise.isCustom ? `<button class="danger" data-delete-custom-exercise="${htmlesc(exercise.id)}">Eigene Uebung entfernen</button>` : ""}
       </article>
       ${renderMuscleMap(exercise)}
       <article class="card stack">
@@ -1816,7 +2137,42 @@ function renderSettings() {
         <p class="muted">Löscht nur die lokalen Trainings- und Gewichtsdaten auf diesem Gerät.</p>
         <button class="danger" data-reset-app>App-Daten zurücksetzen</button>
       </article>
+      <article class="card stack">
+        <div class="row">
+          <h3 class="grow">Debug</h3>
+          <span class="badge blue">${APP_VERSION}</span>
+        </div>
+        <label class="range-field"><span>Debug-Modus</span><input type="checkbox" ${currentUserSettings().debugMode ? "checked" : ""} data-toggle-debug></label>
+        ${currentUserSettings().debugMode ? renderDebugPanel(manifest) : ""}
+      </article>
     </section>
+  `;
+}
+
+function renderDebugPanel(manifest) {
+  const databases = [
+    state.extendedExercises,
+    state.exerciseMuscleMap,
+    state.muscleAssets,
+    state.planGeneratorRules,
+    state.qrSchema,
+    state.userSettingsSchema,
+    state.debugTestData,
+    state.releaseAcceptanceCriteria
+  ].filter(Boolean);
+  return `
+    <div class="stack">
+      <div class="storage-table">
+        <div><span>Storage</span><strong>${manifest.totalBytes}</strong></div>
+        <div><span>Uebungen</span><strong>${allExercises().length}</strong></div>
+        <div><span>Eigene Uebungen</span><strong>${storage.customExercises.length}</strong></div>
+        <div><span>Datenbanken</span><strong>${databases.length}</strong></div>
+        <div><span>Fehler</span><strong>${storage.lastErrors.length}</strong></div>
+      </div>
+      <button class="secondary" data-load-test-data>Testdaten laden</button>
+      <button class="secondary" data-clear-cache>Cache leeren</button>
+      <ul class="small-list">${storage.lastErrors.slice(-5).map((item) => `<li>${dateTimeText(item.at)}: ${htmlesc(item.message)}</li>`).join("") || "<li>Keine Fehler protokolliert.</li>"}</ul>
+    </div>
   `;
 }
 
@@ -1838,6 +2194,9 @@ function createBackup() {
     journalEntries: storage.journalEntries,
     machineSettings: storage.machineSettings,
     customPlans: storage.customPlans,
+    customExercises: storage.customExercises,
+    userSettings: currentUserSettings(),
+    lastErrors: storage.lastErrors,
     archivedPlanNames: storage.archivedPlanNames,
     deletedPlanNames: storage.deletedPlanNames,
     activeWorkoutDraft: storage.activeWorkoutDraft
@@ -1905,10 +2264,13 @@ function importBackupFile(file) {
       storage.journalEntries = mergeById(storage.journalEntries, Array.isArray(backup.journalEntries) ? backup.journalEntries : []);
       storage.machineSettings = mergeById(storage.machineSettings, Array.isArray(backup.machineSettings) ? backup.machineSettings : []);
       storage.customPlans = mergeById(storage.customPlans, Array.isArray(backup.customPlans) ? backup.customPlans : []);
+      storage.customExercises = mergeById(storage.customExercises, Array.isArray(backup.customExercises) ? backup.customExercises : []);
+      storage.userSettings = { ...currentUserSettings(), ...(backup.userSettings && typeof backup.userSettings === "object" ? backup.userSettings : {}) };
+      storage.lastErrors = mergeById(storage.lastErrors, Array.isArray(backup.lastErrors) ? backup.lastErrors : []);
       storage.migrationLog = mergeById(storage.migrationLog, Array.isArray(backup.migrationLog) ? backup.migrationLog : []);
       if (!storage.storageVersion && backup.storageVersion) storage.storageVersion = backup.storageVersion;
-      storage.archivedPlanNames = Array.isArray(backup.archivedPlanNames) ? backup.archivedPlanNames : [];
-      storage.deletedPlanNames = Array.isArray(backup.deletedPlanNames) ? backup.deletedPlanNames : [];
+      storage.archivedPlanNames = uniqueValues(storage.archivedPlanNames, Array.isArray(backup.archivedPlanNames) ? backup.archivedPlanNames : []);
+      storage.deletedPlanNames = uniqueValues(storage.deletedPlanNames, Array.isArray(backup.deletedPlanNames) ? backup.deletedPlanNames : []);
       storage.activeWorkoutDraft = backup.activeWorkoutDraft || null;
       if (backup.activePlanName) storage.activePlanName = backup.activePlanName;
       restoreWorkoutDraft();
@@ -2013,6 +2375,52 @@ function bindEvents() {
     });
   });
 
+  document.querySelector("[data-plan-import]")?.addEventListener("input", (event) => {
+    state.planImportText = event.target.value;
+  });
+
+  document.querySelector("[data-copy-plan-payload]")?.addEventListener("click", async () => {
+    const payload = document.querySelector("[data-plan-payload]")?.value || "";
+    await navigator.clipboard?.writeText(payload).catch(() => null);
+    alert("Plan-Code kopiert.");
+  });
+
+  document.querySelector("[data-download-plan-json]")?.addEventListener("click", () => {
+    const payload = document.querySelector("[data-plan-payload]")?.value || "";
+    const blob = new Blob([payload], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "d-coach-plan.json";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  document.querySelector("[data-import-plan-code]")?.addEventListener("click", () => {
+    try {
+      importPlanPayload(document.querySelector("[data-plan-import]")?.value || "");
+      state.planImportText = "";
+      alert("Plan importiert und aktiviert.");
+      render();
+    } catch (error) {
+      alert(error.message || "Plan konnte nicht importiert werden.");
+    }
+  });
+
+  document.querySelector("[data-generate-plan]")?.addEventListener("click", () => {
+    const plan = generatePlanCandidate();
+    if (!plan.days.length) {
+      alert("Kein Planvorschlag moeglich. Es fehlen passende Uebungen.");
+      return;
+    }
+    storage.customPlans = [...storage.customPlans, plan];
+    storage.activePlanName = plan.planName;
+    alert(appText("plan.generated", "Planvorschlag erstellt. Bitte pruefen und aktivieren."));
+    render();
+  });
+
   document.querySelectorAll("[data-duplicate-plan]").forEach((button) => {
     button.addEventListener("click", () => {
       duplicatePlan(button.dataset.duplicatePlan);
@@ -2040,6 +2448,25 @@ function bindEvents() {
   document.querySelector("[data-search-exercise]")?.addEventListener("input", (event) => {
     state.exerciseSearch = event.target.value;
     render();
+  });
+
+  document.querySelector("[data-save-custom-exercise]")?.addEventListener("click", () => {
+    try {
+      saveCustomExercise();
+      alert("Eigene Uebung gespeichert.");
+      render();
+    } catch (error) {
+      alert(error.message || "Uebung konnte nicht gespeichert werden.");
+    }
+  });
+
+  document.querySelectorAll("[data-delete-custom-exercise]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (!confirm("Eigene Uebung entfernen? Historie bleibt erhalten.")) return;
+      deleteCustomExercise(button.dataset.deleteCustomExercise);
+      render();
+    });
   });
 
   document.querySelectorAll("[data-exercise-filter]").forEach((button) => {
@@ -2205,10 +2632,29 @@ function bindEvents() {
     storage.journalEntries = [];
     storage.machineSettings = [];
     storage.customPlans = [];
+    storage.customExercises = [];
+    storage.lastErrors = [];
     clearWorkoutDraft();
     storage.lastBackupAt = null;
     state.activeWorkout = null;
     render();
+  });
+
+  document.querySelector("[data-toggle-debug]")?.addEventListener("change", (event) => {
+    updateUserSetting("debugMode", event.target.checked);
+    alert(event.target.checked ? appText("debug.enabled", "Debug-Modus aktiviert.") : "Debug-Modus deaktiviert.");
+    render();
+  });
+
+  document.querySelector("[data-load-test-data]")?.addEventListener("click", () => {
+    if (!confirm("Testdaten hinzufuegen? Bestehende Daten bleiben erhalten.")) return;
+    loadDebugTestData();
+    render();
+  });
+
+  document.querySelector("[data-clear-cache]")?.addEventListener("click", async () => {
+    await clearPwaCache().catch((error) => logAppError(error.message, "cache"));
+    alert("Cache wurde geleert. Lade die App danach neu.");
   });
 }
 

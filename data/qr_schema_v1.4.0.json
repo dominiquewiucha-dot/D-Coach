@@ -1,0 +1,15 @@
+{
+  "version": "1.4.0",
+  "type": "qr_schema",
+  "planQr": {
+    "type": "dcoach_plan",
+    "version": "1.4.0",
+    "plan": {
+      "id": "string",
+      "name": "string",
+      "days": "array"
+    }
+  },
+  "maxRecommendedCharacters": 2500,
+  "fallback": "Use JSON file export if QR payload is too large."
+}
