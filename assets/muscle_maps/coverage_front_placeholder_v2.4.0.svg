@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 640">
+<rect width="360" height="640" fill="#0B1220"/>
+<text x="180" y="32" text-anchor="middle" fill="#9CA3AF" font-size="18">D-Coach Front</text>
+<circle cx="180" cy="78" r="32" fill="#141C2B" stroke="#1B263B"/>
+<path id="body_front" d="M130 130 Q180 105 230 130 L250 300 Q220 390 218 590 L185 590 L180 430 L175 590 L142 590 Q140 390 110 300 Z" fill="#141C2B" stroke="#1B263B" stroke-width="4"/>
+<ellipse id="mg_chest_middle" cx="180" cy="185" rx="62" ry="38" fill="#2563EB" opacity="0.35"/>
+<ellipse id="mg_abs" cx="180" cy="285" rx="38" ry="70" fill="#2563EB" opacity="0.25"/>
+<ellipse id="mg_quads" cx="158" cy="455" rx="28" ry="90" fill="#2563EB" opacity="0.25"/>
+<ellipse id="mg_quads_r" cx="202" cy="455" rx="28" ry="90" fill="#2563EB" opacity="0.25"/>
+</svg>

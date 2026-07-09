@@ -1,0 +1,77 @@
+{
+  "version": "2.4.0",
+  "type": "muscle_coverage_visual_mapping",
+  "locale": "de-DE",
+  "colorScale": [
+    {
+      "min": 0,
+      "max": 0,
+      "color": "#1B263B",
+      "label": "nicht trainiert"
+    },
+    {
+      "min": 1,
+      "max": 39,
+      "color": "#1E3A8A",
+      "label": "niedrig"
+    },
+    {
+      "min": 40,
+      "max": 69,
+      "color": "#2563EB",
+      "label": "moderat"
+    },
+    {
+      "min": 70,
+      "max": 100,
+      "color": "#60A5FA",
+      "label": "Zielbereich"
+    },
+    {
+      "min": 101,
+      "max": 120,
+      "color": "#93C5FD",
+      "label": "über Ziel"
+    },
+    {
+      "min": 121,
+      "max": 999,
+      "color": "#F59E0B",
+      "label": "deutlich über Ziel"
+    }
+  ],
+  "views": {
+    "front": [
+      "mg_chest_upper",
+      "mg_chest_middle",
+      "mg_front_delts",
+      "mg_side_delts",
+      "mg_biceps",
+      "mg_triceps",
+      "mg_abs",
+      "mg_obliques",
+      "mg_quads",
+      "mg_adductors",
+      "mg_calves"
+    ],
+    "back": [
+      "mg_lats",
+      "mg_upper_back",
+      "mg_rhomboids",
+      "mg_traps",
+      "mg_rear_delts",
+      "mg_rotator_cuff",
+      "mg_erectors",
+      "mg_glutes",
+      "mg_hamstrings",
+      "mg_abductors",
+      "mg_calves"
+    ]
+  },
+  "interaction": {
+    "listClickSelectsBody": true,
+    "bodyClickOpensDetail": true,
+    "selectedMuscleDimsOthers": true,
+    "defaultMode": "week"
+  }
+}

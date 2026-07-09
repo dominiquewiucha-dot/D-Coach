@@ -28,6 +28,9 @@ const state = {
   personalizationRules: null,
   personalCoachRules: null,
   studioContext: null,
+  muscleCoverageVisualMapping: null,
+  muscleCoverageDetailSchema: null,
+  muscleCoverageCoachTexts: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -37,6 +40,8 @@ const state = {
   planImportText: "",
   showAlternatives: false,
   coverageMode: "week",
+  coverageView: "front",
+  selectedMuscleId: null,
   isOnline: navigator.onLine,
   deferredInstallPrompt: null,
   restTimer: {
@@ -46,8 +51,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v20";
-const STORAGE_SCHEMA_VERSION = "2.3.0";
+const APP_VERSION = "pwa-v21";
+const STORAGE_SCHEMA_VERSION = "2.4.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -595,7 +600,10 @@ async function boot() {
     personalProfileSeed,
     personalizationRules,
     personalCoachRules,
-    studioContext
+    studioContext,
+    muscleCoverageVisualMapping,
+    muscleCoverageDetailSchema,
+    muscleCoverageCoachTexts
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -636,7 +644,10 @@ async function boot() {
     fetchOptionalJson("./data/personal_profile_dominique_seed_v2.2.0.json"),
     fetchOptionalJson("./data/personalization_rules_v2.2.0.json"),
     fetchOptionalJson("./data/personal_coach_rules_v2.2.0.json"),
-    fetchOptionalJson("./data/studio_context_v2.2.0.json")
+    fetchOptionalJson("./data/studio_context_v2.2.0.json"),
+    fetchOptionalJson("./data/muscle_coverage_visual_mapping_v2.4.0.json"),
+    fetchOptionalJson("./data/muscle_coverage_detail_schema_v2.4.0.json"),
+    fetchOptionalJson("./data/muscle_coverage_coach_texts_v2.4.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -666,6 +677,9 @@ async function boot() {
   state.personalizationRules = personalizationRules;
   state.personalCoachRules = personalCoachRules;
   state.studioContext = studioContext;
+  state.muscleCoverageVisualMapping = muscleCoverageVisualMapping;
+  state.muscleCoverageDetailSchema = muscleCoverageDetailSchema;
+  state.muscleCoverageCoachTexts = muscleCoverageCoachTexts;
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
@@ -1218,6 +1232,87 @@ function coverageCoachHints(items) {
   }).filter(Boolean).slice(0, 3);
 }
 
+function coverageStatus(percent) {
+  if (percent <= 0) return "not_trained";
+  if (percent < 40) return "low";
+  if (percent < 70) return "moderate";
+  if (percent <= 120) return "target";
+  return "over_target";
+}
+
+function coverageCoachTextFor(percent) {
+  const status = coverageStatus(percent);
+  return state.muscleCoverageCoachTexts?.texts?.[status] || {
+    not_trained: "Diese Muskelgruppe wurde diese Woche noch nicht trainiert.",
+    low: "Diese Muskelgruppe ist diese Woche noch deutlich unter dem Ziel.",
+    moderate: "Diese Muskelgruppe wurde bereits teilweise belastet.",
+    target: "Diese Muskelgruppe liegt im Zielbereich.",
+    over_target: "Diese Muskelgruppe wurde diese Woche bereits deutlich ueber dem Ziel belastet."
+  }[status];
+}
+
+function coverageColorFor(percent) {
+  const scale = state.muscleCoverageVisualMapping?.colorScale || [];
+  return scale.find((item) => percent >= item.min && percent <= item.max)?.color || "#2563EB";
+}
+
+function coverageItemByMuscle(items, muscleId) {
+  return items.find((item) => item.muscleId === muscleId) || {
+    muscleId,
+    name: muscleName(muscleId),
+    points: 0,
+    percent: 0,
+    isTarget: activePlanTargetMuscles().has(muscleId)
+  };
+}
+
+function muscleContributionWeight(mapping, muscleId) {
+  if (mapping?.primaryMuscle === muscleId) return 1;
+  const secondary = (mapping?.secondaryMuscles || []).find((item) => item.muscleId === muscleId);
+  if (secondary) return Number(secondary.intensityWeight) || 0;
+  const stabilizer = (mapping?.stabilizers || []).find((item) => item.muscleId === muscleId);
+  if (stabilizer) return (Number(stabilizer.intensityWeight) || 0) * 0.5;
+  return 0;
+}
+
+function coverageContributors(muscleId, sessions) {
+  const contributors = new Map();
+  sessions.forEach((session) => {
+    (session.completedExercises || []).forEach((completedExercise) => {
+      const mapping = muscleMappingForExercise(completedExercise.exerciseId);
+      const weight = muscleContributionWeight(mapping, muscleId);
+      if (!weight) return;
+      const points = (completedExercise.sets || []).reduce((sum, set) => sum + completedSetCoverageFactor(set), 0) * weight;
+      if (points <= 0) return;
+      const existing = contributors.get(completedExercise.exerciseId) || {
+        exerciseId: completedExercise.exerciseId,
+        name: completedExercise.exerciseNameSnapshot || exerciseById(completedExercise.exerciseId)?.displayName || completedExercise.exerciseId,
+        points: 0,
+        role: mapping.primaryMuscle === muscleId ? "Zielmuskel" : "Hilfsmuskel"
+      };
+      existing.points += points;
+      contributors.set(completedExercise.exerciseId, existing);
+    });
+  });
+  return [...contributors.values()].sort((a, b) => b.points - a.points).slice(0, 6);
+}
+
+function coverageDetailForMuscle(muscleId) {
+  const today = coverageItemByMuscle(coverageForSessions(sessionsForToday()), muscleId);
+  const week = coverageItemByMuscle(coverageForSessions(sessionsSince(7)), muscleId);
+  return {
+    muscleId,
+    muscleName: muscleName(muscleId),
+    todayCoveragePercent: today.percent,
+    weekCoveragePercent: week.percent,
+    targetPercent: 100,
+    status: coverageStatus(week.percent),
+    mainExerciseContributors: coverageContributors(muscleId, sessionsSince(7)).filter((item) => item.role === "Zielmuskel"),
+    secondaryExerciseContributors: coverageContributors(muscleId, sessionsSince(7)).filter((item) => item.role !== "Zielmuskel"),
+    coachText: coverageCoachTextFor(week.percent)
+  };
+}
+
 function coverageTrendWeeks() {
   const weeks = [];
   const now = new Date();
@@ -1600,9 +1695,11 @@ function renderCoverageCard() {
         ].map(([id, label]) => `<button class="${mode === id ? "active" : ""}" data-coverage-mode="${id}">${label}</button>`).join("")}
       </div>
       ${mode === "trend" ? renderCoverageTrend() : `
+        ${renderCoverageBodyView(items)}
         <div class="coverage-list">
           ${visibleItems.length ? visibleItems.map(renderCoverageRow).join("") : `<p class="muted">Noch keine Trainingsdaten fuer diese Ansicht.</p>`}
         </div>
+        ${state.selectedMuscleId ? renderCoverageDetail(state.selectedMuscleId) : ""}
         ${hints.length && mode === "week" ? `<ul class="small-list">${hints.map((hint) => `<li>${htmlesc(hint)}</li>`).join("")}</ul>` : ""}
       `}
     </article>
@@ -1613,12 +1710,56 @@ function renderCoverageRow(item) {
   const color = item.percent > 120 ? "over" : item.percent === 0 ? "empty" : item.percent < 70 ? "low" : "ok";
   const width = Math.min(item.percent, 140);
   return `
-    <div class="coverage-row ${color}">
+    <button class="coverage-row ${color} ${state.selectedMuscleId === item.muscleId ? "selected" : ""}" data-select-coverage-muscle="${htmlesc(item.muscleId)}">
       <div class="row">
         <strong class="grow">${htmlesc(item.name)}</strong>
         <span>${item.percent}%</span>
       </div>
       <div class="coverage-bar"><span style="width:${width}%"></span></div>
+    </button>
+  `;
+}
+
+function renderCoverageBodyView(items) {
+  const view = state.coverageView || "front";
+  const mapping = state.muscleCoverageVisualMapping;
+  const muscleIds = mapping?.views?.[view] || items.map((item) => item.muscleId);
+  const image = `./assets/muscle_maps/coverage_${view}_placeholder_v2.4.0.svg`;
+  return `
+    <div class="coverage-body">
+      <div class="coverage-switch compact">
+        ${[["front", "Front"], ["back", "Ruecken"]].map(([id, label]) => `<button class="${view === id ? "active" : ""}" data-coverage-view="${id}">${label}</button>`).join("")}
+      </div>
+      <div class="coverage-body-map">
+        <img src="${image}" alt="${view === "front" ? "Vorderseite" : "Rueckseite"}">
+        <div class="coverage-body-chips">
+          ${muscleIds.map((muscleId) => {
+            const item = coverageItemByMuscle(items, muscleId);
+            const selected = state.selectedMuscleId === muscleId;
+            return `<button class="${selected ? "selected" : ""}" style="--coverage-color:${coverageColorFor(item.percent)}" data-open-coverage-muscle="${htmlesc(muscleId)}">${htmlesc(muscleName(muscleId))}</button>`;
+          }).join("")}
+        </div>
+      </div>
+      <p class="quiet">${htmlesc(state.muscleCoverageCoachTexts?.texts?.detail_hint || "Tippe auf eine Muskelgruppe, um Uebungen und Belastung zu sehen.")}</p>
+    </div>
+  `;
+}
+
+function renderCoverageDetail(muscleId) {
+  const detail = coverageDetailForMuscle(muscleId);
+  const contributors = [...detail.mainExerciseContributors, ...detail.secondaryExerciseContributors];
+  return `
+    <div class="coverage-detail">
+      <div class="row">
+        <h4 class="grow">${htmlesc(detail.muscleName)}</h4>
+        <span class="badge blue">${detail.weekCoveragePercent}% Woche</span>
+      </div>
+      <div class="coverage-detail-metrics">
+        <div><strong>${detail.todayCoveragePercent}%</strong><span>Heute</span></div>
+        <div><strong>${detail.weekCoveragePercent}%</strong><span>Woche</span></div>
+      </div>
+      <p class="muted">${htmlesc(detail.coachText)}</p>
+      ${contributors.length ? `<ul class="small-list">${contributors.map((item) => `<li>${htmlesc(item.name)}: ${Math.round(item.points * 10) / 10} Punkte (${htmlesc(item.role)})</li>`).join("")}</ul>` : `<p class="quiet">Noch keine Uebung fuer diese Muskelgruppe in der aktuellen Woche.</p>`}
     </div>
   `;
 }
@@ -2495,7 +2636,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "2.3.0",
+    backupVersion: "2.4.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),
@@ -2619,6 +2760,27 @@ function bindEvents() {
   document.querySelectorAll("[data-coverage-mode]").forEach((button) => {
     button.addEventListener("click", () => {
       state.coverageMode = button.dataset.coverageMode;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-coverage-view]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.coverageView = button.dataset.coverageView;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-select-coverage-muscle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedMuscleId = button.dataset.selectCoverageMuscle;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-open-coverage-muscle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedMuscleId = button.dataset.openCoverageMuscle;
       render();
     });
   });

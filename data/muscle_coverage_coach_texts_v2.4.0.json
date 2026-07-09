@@ -1,0 +1,13 @@
+{
+  "version": "2.4.0",
+  "type": "muscle_coverage_coach_texts",
+  "locale": "de-DE",
+  "texts": {
+    "not_trained": "Diese Muskelgruppe wurde diese Woche noch nicht trainiert.",
+    "low": "Diese Muskelgruppe ist diese Woche noch deutlich unter dem Ziel.",
+    "moderate": "Diese Muskelgruppe wurde bereits teilweise belastet.",
+    "target": "Diese Muskelgruppe liegt im Zielbereich.",
+    "over_target": "Diese Muskelgruppe wurde diese Woche bereits deutlich über dem Ziel belastet.",
+    "detail_hint": "Tippe auf eine Muskelgruppe, um Übungen und Belastung zu sehen."
+  }
+}

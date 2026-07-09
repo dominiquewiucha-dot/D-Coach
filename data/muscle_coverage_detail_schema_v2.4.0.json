@@ -1,0 +1,50 @@
+{
+  "version": "2.4.0",
+  "type": "muscle_coverage_detail_schema",
+  "fields": [
+    {
+      "key": "muscleId",
+      "type": "string"
+    },
+    {
+      "key": "muscleName",
+      "type": "string"
+    },
+    {
+      "key": "todayCoveragePercent",
+      "type": "number"
+    },
+    {
+      "key": "weekCoveragePercent",
+      "type": "number"
+    },
+    {
+      "key": "targetPercent",
+      "type": "number",
+      "default": 100
+    },
+    {
+      "key": "status",
+      "type": "string",
+      "allowed": [
+        "not_trained",
+        "low",
+        "moderate",
+        "target",
+        "over_target"
+      ]
+    },
+    {
+      "key": "mainExerciseContributors",
+      "type": "array"
+    },
+    {
+      "key": "secondaryExerciseContributors",
+      "type": "array"
+    },
+    {
+      "key": "coachText",
+      "type": "string"
+    }
+  ]
+}
