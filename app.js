@@ -61,7 +61,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v23";
+const APP_VERSION = "pwa-v24";
 const STORAGE_SCHEMA_VERSION = "2.6.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -2361,6 +2361,7 @@ function renderAlternativePicker(alternatives) {
             <div>
               <strong>${htmlesc(item.exercise.displayName)}</strong>
               <p class="muted">${htmlesc(item.note || exerciseListMuscleText(item.exercise))}</p>
+              ${item.explanation ? `<p class="quiet">${htmlesc(item.explanation)}</p>` : ""}
               ${item.reason ? `<p class="quiet">${htmlesc(item.reason)}</p>` : ""}
             </div>
             <div class="badge-stack">
