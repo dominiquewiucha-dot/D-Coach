@@ -7,6 +7,8 @@ const state = {
   selectedExerciseId: null,
   selectedSessionId: null,
   showAlternatives: false,
+  isOnline: navigator.onLine,
+  deferredInstallPrompt: null,
   restTimer: {
     remaining: 0,
     running: false
@@ -51,6 +53,13 @@ const storage = {
   set activeWorkoutDraft(value) {
     if (value) writeJson("dcoach.activeWorkoutDraft", value);
     else localStorage.removeItem("dcoach.activeWorkoutDraft");
+  },
+  get lastBackupAt() {
+    return localStorage.getItem("dcoach.lastBackupAt") || null;
+  },
+  set lastBackupAt(value) {
+    if (value) localStorage.setItem("dcoach.lastBackupAt", value);
+    else localStorage.removeItem("dcoach.lastBackupAt");
   }
 };
 
@@ -75,9 +84,30 @@ async function boot() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
   }
+  bindPwaEvents();
   restoreWorkoutDraft();
   startTimerLoop();
   render();
+}
+
+function bindPwaEvents() {
+  window.addEventListener("online", () => {
+    state.isOnline = true;
+    render();
+  });
+  window.addEventListener("offline", () => {
+    state.isOnline = false;
+    render();
+  });
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    state.deferredInstallPrompt = event;
+    render();
+  });
+  window.addEventListener("appinstalled", () => {
+    state.deferredInstallPrompt = null;
+    render();
+  });
 }
 
 function restoreWorkoutDraft() {
@@ -181,6 +211,22 @@ function parseInteger(value) {
 
 function dateText(value) {
   return new Intl.DateTimeFormat("de-DE", { dateStyle: "short" }).format(new Date(value));
+}
+
+function dateTimeText(value) {
+  if (!value) return "Noch nie";
+  return new Intl.DateTimeFormat("de-DE", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
+}
+
+function daysSince(value) {
+  if (!value) return null;
+  const diff = Date.now() - new Date(value).getTime();
+  if (!Number.isFinite(diff) || diff < 0) return null;
+  return Math.floor(diff / 86400000);
+}
+
+function isStandaloneApp() {
+  return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 }
 
 function averageWeight(days) {
@@ -850,17 +896,33 @@ function renderWeight() {
 }
 
 function renderSettings() {
+  const lastBackupAt = storage.lastBackupAt;
+  const backupAge = daysSince(lastBackupAt);
+  const needsBackup = !lastBackupAt || backupAge >= 7;
+  const standalone = isStandaloneApp();
   return `
     <section class="screen stack">
       <header><h1 class="title">Einstellungen</h1><p class="subtitle">Lokale Offline-Daten.</p></header>
+      <article class="card stack">
+        <div class="row">
+          <h3 class="grow">PWA-Status</h3>
+          <span class="badge ${state.isOnline ? "green" : "amber"}">${state.isOnline ? "Online" : "Offline"}</span>
+        </div>
+        <p class="muted">${standalone ? "Als App gestartet." : "Im Browser geoeffnet. Auf dem iPhone ueber Teilen > Zum Home-Bildschirm hinzufuegen installieren."}</p>
+        ${state.deferredInstallPrompt && !standalone ? `<button class="primary" data-install-pwa>App installieren</button>` : ""}
+      </article>
       <article class="card stack">
         <h3>Aktiver Plan</h3>
         <p class="muted">${htmlesc(activePlan()?.planName || "Kein aktiver Plan")}</p>
         <button class="secondary" data-reset-plan-library>Planbibliothek wiederherstellen</button>
       </article>
       <article class="card stack">
-        <h3>Backup</h3>
+        <div class="row">
+          <h3 class="grow">Backup</h3>
+          <span class="badge ${needsBackup ? "amber" : "green"}">${needsBackup ? "Faellig" : "Ok"}</span>
+        </div>
         <p class="muted">Exportiere regelmäßig deine Trainingsdaten. GitHub speichert deine Fortschritte nicht.</p>
+        <p class="quiet">Letztes Backup: ${dateTimeText(lastBackupAt)}</p>
         <button class="primary" data-export-backup>Backup exportieren</button>
         <label class="secondary file-label">
           Backup importieren
@@ -891,6 +953,7 @@ function createBackup() {
 }
 
 function exportBackup() {
+  storage.lastBackupAt = new Date().toISOString();
   const backup = createBackup();
   const json = JSON.stringify(backup, null, 2);
   const blob = new Blob([json], { type: "application/json" });
@@ -903,6 +966,16 @@ function exportBackup() {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+  render();
+}
+
+async function installPwa() {
+  if (!state.deferredInstallPrompt) return;
+  const promptEvent = state.deferredInstallPrompt;
+  state.deferredInstallPrompt = null;
+  promptEvent.prompt();
+  await promptEvent.userChoice.catch(() => null);
+  render();
 }
 
 function validateBackup(backup) {
@@ -1144,6 +1217,7 @@ function bindEvents() {
   });
 
   document.querySelector("[data-export-backup]")?.addEventListener("click", exportBackup);
+  document.querySelector("[data-install-pwa]")?.addEventListener("click", installPwa);
 
   document.querySelector("[data-import-backup]")?.addEventListener("change", (event) => {
     const file = event.target.files?.[0];
@@ -1163,6 +1237,7 @@ function bindEvents() {
     storage.sessions = [];
     storage.weights = [];
     clearWorkoutDraft();
+    storage.lastBackupAt = null;
     state.activeWorkout = null;
     render();
   });

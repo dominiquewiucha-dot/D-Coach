@@ -1,4 +1,4 @@
-const CACHE_NAME = "dcoach-pwa-v8";
+const CACHE_NAME = "dcoach-pwa-v9";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,7 +6,8 @@ const ASSETS = [
   "./app.js",
   "./manifest.webmanifest",
   "./seed_training_database.json",
-  "./assets/icon.svg"
+  "./assets/icon.svg",
+  "./assets/apple-touch-icon.png"
 ];
 
 self.addEventListener("install", (event) => {
