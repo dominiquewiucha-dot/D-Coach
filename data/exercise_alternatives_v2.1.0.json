@@ -1,0 +1,3993 @@
+{
+  "version": "2.1.0",
+  "type": "exercise_alternative_rules",
+  "locale": "de-DE",
+  "rules": [
+    {
+      "sourceExerciseId": "ex_chest_press_machine",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_chest_press_machine_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_chest_press_machine_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_chest_press_machine_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_incline_chest_press_machine",
+      "alternatives": [
+        {
+          "exerciseId": "ex_incline_chest_press_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_incline_chest_press_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_incline_chest_press_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_incline_chest_press_machine_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_incline_chest_press_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_incline_chest_press_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_incline_chest_press_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_incline_chest_press_machine_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_incline_chest_press_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_incline_chest_press_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_incline_chest_press_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_incline_chest_press_machine_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_incline_chest_press_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_incline_chest_press_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_incline_chest_press_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_pec_deck",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_pec_deck_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_pec_deck_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_pec_deck_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_cable_fly_mid",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_cable_fly_mid_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_cable_fly_mid_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_cable_fly_mid_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_dumbbell_bench_press",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_dumbbell_bench_press_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_dumbbell_bench_press_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_dumbbell_bench_press_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_barbell_bench_press",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_barbell_bench_press_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_barbell_bench_press_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_barbell_bench_press_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_cable_fly_mid",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_shoulder_press_machine",
+      "alternatives": [
+        {
+          "exerciseId": "ex_shoulder_press_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_shoulder_press_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_shoulder_press_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_shoulder_press_machine_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_shoulder_press_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_shoulder_press_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_shoulder_press_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_shoulder_press_machine_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_shoulder_press_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_shoulder_press_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_shoulder_press_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_shoulder_press_machine_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_shoulder_press_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_shoulder_press_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_shoulder_press_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lateral_raise_dumbbell",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lateral_raise_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_dumbbell_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lateral_raise_dumbbell_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lateral_raise_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lateral_raise_dumbbell_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lateral_raise_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lateral_raise_dumbbell_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lateral_raise_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lateral_raise_cable",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lateral_raise_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_dumbbell_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lateral_raise_cable_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lateral_raise_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_dumbbell_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lateral_raise_cable_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lateral_raise_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_dumbbell_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lateral_raise_cable_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lateral_raise_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lateral_raise_dumbbell_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_triceps_pushdown_bar",
+      "alternatives": [
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_overhead_triceps_rope",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_overhead_triceps_rope_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_triceps_pushdown_bar_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_triceps_pushdown_bar",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_overhead_triceps_rope",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_overhead_triceps_rope_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_triceps_pushdown_bar_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_triceps_pushdown_bar",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_overhead_triceps_rope",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_overhead_triceps_rope_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_triceps_pushdown_bar_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_triceps_pushdown_bar",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_overhead_triceps_rope",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_overhead_triceps_rope_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_overhead_triceps_rope",
+      "alternatives": [
+        {
+          "exerciseId": "ex_triceps_pushdown_bar",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_overhead_triceps_rope_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_overhead_triceps_rope_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_triceps_pushdown_bar",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_overhead_triceps_rope",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_overhead_triceps_rope_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_triceps_pushdown_bar",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_overhead_triceps_rope",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_overhead_triceps_rope_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_triceps_pushdown_bar",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_triceps_pushdown_bar_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_overhead_triceps_rope",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lat_pulldown_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lat_pulldown_wide_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lat_pulldown_wide_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lat_pulldown_wide_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lat_pulldown_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lat_pulldown_neutral_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lat_pulldown_neutral_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lat_pulldown_neutral_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_assisted_pullup",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_assisted_pullup_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_assisted_pullup_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_assisted_pullup_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_straight_arm_pulldown",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_straight_arm_pulldown_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_straight_arm_pulldown_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_straight_arm_pulldown_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_straight_arm_pulldown",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_straight_arm_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_lat_pulldown_wide_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_machine_row_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_machine_row_neutral_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_machine_row_neutral_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_machine_row_neutral_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_seated_cable_row",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_seated_cable_row_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_seated_cable_row_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_seated_cable_row_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_chest_supported_row_machine",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_chest_supported_row_machine_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_chest_supported_row_machine_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_chest_supported_row_machine_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_bent_over_row_barbell",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_bent_over_row_barbell_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_bent_over_row_barbell_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_bent_over_row_barbell_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_chest_supported_row_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_machine_row_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_reverse_pec_deck",
+      "alternatives": [
+        {
+          "exerciseId": "ex_reverse_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_face_pull",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_face_pull_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_reverse_pec_deck_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_reverse_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_face_pull",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_face_pull_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_reverse_pec_deck_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_reverse_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_face_pull",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_face_pull_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_reverse_pec_deck_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_reverse_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_face_pull",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_face_pull_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_face_pull",
+      "alternatives": [
+        {
+          "exerciseId": "ex_reverse_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_face_pull_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_face_pull_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_reverse_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_face_pull",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_face_pull_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_reverse_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_face_pull",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_face_pull_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_reverse_pec_deck",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_reverse_pec_deck_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_face_pull",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_biceps_curl_cable",
+      "alternatives": [
+        {
+          "exerciseId": "ex_biceps_curl_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hammer_curl_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hammer_curl_dumbbell_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_biceps_curl_cable_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_biceps_curl_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hammer_curl_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hammer_curl_dumbbell_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_biceps_curl_cable_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_biceps_curl_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hammer_curl_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hammer_curl_dumbbell_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_biceps_curl_cable_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_biceps_curl_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hammer_curl_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hammer_curl_dumbbell_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_hammer_curl_dumbbell",
+      "alternatives": [
+        {
+          "exerciseId": "ex_biceps_curl_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hammer_curl_dumbbell_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_hammer_curl_dumbbell_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_biceps_curl_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hammer_curl_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_hammer_curl_dumbbell_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_biceps_curl_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hammer_curl_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_hammer_curl_dumbbell_close",
+      "alternatives": [
+        {
+          "exerciseId": "ex_biceps_curl_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_close",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_biceps_curl_cable_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hammer_curl_dumbbell",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_leg_press_45",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_leg_press_45_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_leg_press_45_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_leg_press_horizontal",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_leg_press_horizontal_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_leg_press_horizontal_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_hack_squat_machine",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_hack_squat_machine_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_hack_squat_machine_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_bulgarian_split_squat",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_bulgarian_split_squat_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_bulgarian_split_squat_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_leg_extension_machine",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_leg_extension_machine_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_leg_extension_machine_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bike_warmup",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_seated_leg_curl_machine",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lying_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_seated_leg_curl_machine_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lying_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_seated_leg_curl_machine_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lying_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lying_leg_curl_machine",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lying_leg_curl_machine_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lying_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_lying_leg_curl_machine_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lying_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_hip_thrust_machine",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_hip_thrust_machine_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_hip_thrust_machine_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_glute_bridge_bodyweight",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_glute_bridge_bodyweight_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_glute_bridge_bodyweight_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_cable_pull_through",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_cable_pull_through_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_cable_pull_through_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_back_extension_45_glute",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_back_extension_45_glute_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_back_extension_45_glute_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_romanian_deadlift_dumbbell",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lying_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_romanian_deadlift_dumbbell_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lying_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_romanian_deadlift_dumbbell_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_lying_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_lying_leg_curl_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_deadlift_barbell",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_deadlift_barbell_neutral",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_deadlift_barbell_wide",
+      "alternatives": [
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_glute_bridge_bodyweight_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_adductor_machine",
+      "alternatives": []
+    },
+    {
+      "sourceExerciseId": "ex_abductor_machine",
+      "alternatives": []
+    },
+    {
+      "sourceExerciseId": "ex_calf_raise_machine_standing",
+      "alternatives": [
+        {
+          "exerciseId": "ex_treadmill_walk",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_seated_calf_raise",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_seated_calf_raise",
+      "alternatives": [
+        {
+          "exerciseId": "ex_treadmill_walk",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_calf_raise_machine_standing",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_pallof_press_cable",
+      "alternatives": [
+        {
+          "exerciseId": "ex_bird_dog",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_dead_bug",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_plank_forearm",
+      "alternatives": []
+    },
+    {
+      "sourceExerciseId": "ex_side_plank",
+      "alternatives": []
+    },
+    {
+      "sourceExerciseId": "ex_dead_bug",
+      "alternatives": [
+        {
+          "exerciseId": "ex_bird_dog",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pallof_press_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_bird_dog",
+      "alternatives": [
+        {
+          "exerciseId": "ex_dead_bug",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_pallof_press_cable",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_bike_warmup",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_extension_machine",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_leg_extension_machine_wide",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat_neutral",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_treadmill_walk",
+      "alternatives": [
+        {
+          "exerciseId": "ex_seated_calf_raise",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "veryLow"
+        },
+        {
+          "exerciseId": "ex_calf_raise_machine_standing",
+          "reason": "gleicher Zielmuskel, als Ersatz geeignet",
+          "spineLoadLevel": "low"
+        }
+      ]
+    }
+  ]
+}

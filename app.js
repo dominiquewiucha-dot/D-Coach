@@ -40,8 +40,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v17";
-const STORAGE_SCHEMA_VERSION = "2.0.0";
+const APP_VERSION = "pwa-v18";
+const STORAGE_SCHEMA_VERSION = "2.1.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -374,6 +374,15 @@ function mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, traini
   }
 }
 
+function mergeAlternativeRules(incoming) {
+  if (!incoming?.rules?.length) return;
+  state.alternativeRules = {
+    ...(state.alternativeRules || {}),
+    version: incoming.version,
+    rules: mergeByKey(state.alternativeRules?.rules || [], incoming.rules, "sourceExerciseId")
+  };
+}
+
 function appText(key, fallback = "") {
   return state.appTexts?.texts?.[key] || fallback;
 }
@@ -535,7 +544,10 @@ async function boot() {
     userSettingsSchema,
     debugTestData,
     appTexts,
-    releaseAcceptanceCriteria
+    releaseAcceptanceCriteria,
+    exerciseCoreV21,
+    muscleMappingV21,
+    alternativesV21
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -568,7 +580,10 @@ async function boot() {
     fetchOptionalJson("./data/user_settings_schema_v1.4.0.json"),
     fetchOptionalJson("./data/debug_test_data_v1.4.0.json"),
     fetchOptionalJson("./data/app_texts_v1.4.0.json"),
-    fetchOptionalJson("./data/release_acceptance_criteria_v1.4.0.json")
+    fetchOptionalJson("./data/release_acceptance_criteria_v1.4.0.json"),
+    fetchOptionalJson("./data/exercise_core_v2.1.0.json"),
+    fetchOptionalJson("./data/exercise_muscle_mapping_v2.1.0.json"),
+    fetchOptionalJson("./data/exercise_alternatives_v2.1.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -595,6 +610,8 @@ async function boot() {
   state.releaseAcceptanceCriteria = releaseAcceptanceCriteria;
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
+  mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
+  mergeAlternativeRules(alternativesV21);
   runStorageMigrations();
   const plan = activePlan();
   if (plan && storage.activePlanName !== plan.planName) {
@@ -2257,7 +2274,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "2.0.0",
+    backupVersion: "2.1.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

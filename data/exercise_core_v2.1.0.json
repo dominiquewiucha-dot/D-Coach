@@ -1,0 +1,5400 @@
+{
+  "version": "2.1.0",
+  "type": "exercise_core_database",
+  "locale": "de-DE",
+  "principle": "Training First: Datenbasis groß, Trainingsscreen schlank.",
+  "exercises": [
+    {
+      "id": "ex_chest_press_machine",
+      "displayName": "Brustpresse Maschine",
+      "englishName": "Machine Chest Press",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_chest_press_machine_neutral",
+      "displayName": "Brustpresse Maschine neutraler Griff",
+      "englishName": "Machine Chest Press Neutral Grip",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_chest_press_machine_wide",
+      "displayName": "Brustpresse Maschine weiter Griff",
+      "englishName": "Machine Chest Press Wide Grip",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_chest_press_machine_close",
+      "displayName": "Brustpresse Maschine enger Griff",
+      "englishName": "Machine Chest Press Close Grip",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_incline_chest_press_machine",
+      "displayName": "Schrägbank Brustpresse Maschine",
+      "englishName": "Incline Machine Chest Press",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_upper",
+      "movementPattern": "Incline Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_incline_chest_press_machine_neutral",
+      "displayName": "Schrägbank Brustpresse Maschine neutraler Griff",
+      "englishName": "Incline Machine Chest Press Neutral Grip",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_upper",
+      "movementPattern": "Incline Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_incline_chest_press_machine_wide",
+      "displayName": "Schrägbank Brustpresse Maschine weiter Griff",
+      "englishName": "Incline Machine Chest Press Wide Grip",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_upper",
+      "movementPattern": "Incline Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_incline_chest_press_machine_close",
+      "displayName": "Schrägbank Brustpresse Maschine enger Griff",
+      "englishName": "Incline Machine Chest Press Close Grip",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_upper",
+      "movementPattern": "Incline Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_pec_deck",
+      "displayName": "Pec Deck",
+      "englishName": "Pec Deck",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Chest Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_pec_deck_neutral",
+      "displayName": "Pec Deck neutraler Griff",
+      "englishName": "Pec Deck Neutral Grip",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Chest Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_pec_deck_wide",
+      "displayName": "Pec Deck weiter Griff",
+      "englishName": "Pec Deck Wide Grip",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Chest Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_pec_deck_close",
+      "displayName": "Pec Deck enger Griff",
+      "englishName": "Pec Deck Close Grip",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Chest Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_cable_fly_mid",
+      "displayName": "Kabel-Flys mittig",
+      "englishName": "Cable Fly Mid",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Chest Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_cable_fly_mid_neutral",
+      "displayName": "Kabel-Flys mittig neutraler Griff",
+      "englishName": "Cable Fly Mid Neutral Grip",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Chest Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_cable_fly_mid_wide",
+      "displayName": "Kabel-Flys mittig weiter Griff",
+      "englishName": "Cable Fly Mid Wide Grip",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Chest Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_cable_fly_mid_close",
+      "displayName": "Kabel-Flys mittig enger Griff",
+      "englishName": "Cable Fly Mid Close Grip",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Chest Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_dumbbell_bench_press",
+      "displayName": "Kurzhantel Bankdrücken",
+      "englishName": "Dumbbell Bench Press",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_dumbbell_bench_press_neutral",
+      "displayName": "Kurzhantel Bankdrücken neutraler Griff",
+      "englishName": "Dumbbell Bench Press Neutral Grip",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_dumbbell_bench_press_wide",
+      "displayName": "Kurzhantel Bankdrücken weiter Griff",
+      "englishName": "Dumbbell Bench Press Wide Grip",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_dumbbell_bench_press_close",
+      "displayName": "Kurzhantel Bankdrücken enger Griff",
+      "englishName": "Dumbbell Bench Press Close Grip",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_barbell_bench_press",
+      "displayName": "Langhantel Bankdrücken",
+      "englishName": "Barbell Bench Press",
+      "category": "Push",
+      "equipmentId": "eq_barbell",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_barbell_bench_press_neutral",
+      "displayName": "Langhantel Bankdrücken neutraler Griff",
+      "englishName": "Barbell Bench Press Neutral Grip",
+      "category": "Push",
+      "equipmentId": "eq_barbell",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_barbell_bench_press_wide",
+      "displayName": "Langhantel Bankdrücken weiter Griff",
+      "englishName": "Barbell Bench Press Wide Grip",
+      "category": "Push",
+      "equipmentId": "eq_barbell",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_barbell_bench_press_close",
+      "displayName": "Langhantel Bankdrücken enger Griff",
+      "englishName": "Barbell Bench Press Close Grip",
+      "category": "Push",
+      "equipmentId": "eq_barbell",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_shoulder_press_machine",
+      "displayName": "Schulterpresse Maschine",
+      "englishName": "Machine Shoulder Press",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_front_delts",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_shoulder_press_machine_neutral",
+      "displayName": "Schulterpresse Maschine neutraler Griff",
+      "englishName": "Machine Shoulder Press Neutral Grip",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_front_delts",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_shoulder_press_machine_wide",
+      "displayName": "Schulterpresse Maschine weiter Griff",
+      "englishName": "Machine Shoulder Press Wide Grip",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_front_delts",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_shoulder_press_machine_close",
+      "displayName": "Schulterpresse Maschine enger Griff",
+      "englishName": "Machine Shoulder Press Close Grip",
+      "category": "Push",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_front_delts",
+      "movementPattern": "Vertical Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lateral_raise_dumbbell",
+      "displayName": "Seitheben Kurzhantel",
+      "englishName": "Dumbbell Lateral Raise",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_side_delts",
+      "movementPattern": "Shoulder Abduction",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lateral_raise_dumbbell_neutral",
+      "displayName": "Seitheben Kurzhantel neutraler Griff",
+      "englishName": "Dumbbell Lateral Raise Neutral Grip",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_side_delts",
+      "movementPattern": "Shoulder Abduction",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lateral_raise_dumbbell_wide",
+      "displayName": "Seitheben Kurzhantel weiter Griff",
+      "englishName": "Dumbbell Lateral Raise Wide Grip",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_side_delts",
+      "movementPattern": "Shoulder Abduction",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lateral_raise_dumbbell_close",
+      "displayName": "Seitheben Kurzhantel enger Griff",
+      "englishName": "Dumbbell Lateral Raise Close Grip",
+      "category": "Push",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_side_delts",
+      "movementPattern": "Shoulder Abduction",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lateral_raise_cable",
+      "displayName": "Seitheben Kabel",
+      "englishName": "Cable Lateral Raise",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_side_delts",
+      "movementPattern": "Shoulder Abduction",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lateral_raise_cable_neutral",
+      "displayName": "Seitheben Kabel neutraler Griff",
+      "englishName": "Cable Lateral Raise Neutral Grip",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_side_delts",
+      "movementPattern": "Shoulder Abduction",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lateral_raise_cable_wide",
+      "displayName": "Seitheben Kabel weiter Griff",
+      "englishName": "Cable Lateral Raise Wide Grip",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_side_delts",
+      "movementPattern": "Shoulder Abduction",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lateral_raise_cable_close",
+      "displayName": "Seitheben Kabel enger Griff",
+      "englishName": "Cable Lateral Raise Close Grip",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_side_delts",
+      "movementPattern": "Shoulder Abduction",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_triceps_pushdown_bar",
+      "displayName": "Trizepsdrücken Stange",
+      "englishName": "Cable Triceps Pushdown",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_triceps",
+      "movementPattern": "Elbow Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_triceps_pushdown_bar_neutral",
+      "displayName": "Trizepsdrücken Stange neutraler Griff",
+      "englishName": "Cable Triceps Pushdown Neutral Grip",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_triceps",
+      "movementPattern": "Elbow Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_triceps_pushdown_bar_wide",
+      "displayName": "Trizepsdrücken Stange weiter Griff",
+      "englishName": "Cable Triceps Pushdown Wide Grip",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_triceps",
+      "movementPattern": "Elbow Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_triceps_pushdown_bar_close",
+      "displayName": "Trizepsdrücken Stange enger Griff",
+      "englishName": "Cable Triceps Pushdown Close Grip",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_triceps",
+      "movementPattern": "Elbow Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_overhead_triceps_rope",
+      "displayName": "Überkopf Trizepsdrücken Seil",
+      "englishName": "Overhead Rope Triceps Extension",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_triceps",
+      "movementPattern": "Elbow Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_overhead_triceps_rope_neutral",
+      "displayName": "Überkopf Trizepsdrücken Seil neutraler Griff",
+      "englishName": "Overhead Rope Triceps Extension Neutral Grip",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_triceps",
+      "movementPattern": "Elbow Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_overhead_triceps_rope_wide",
+      "displayName": "Überkopf Trizepsdrücken Seil weiter Griff",
+      "englishName": "Overhead Rope Triceps Extension Wide Grip",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_triceps",
+      "movementPattern": "Elbow Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_overhead_triceps_rope_close",
+      "displayName": "Überkopf Trizepsdrücken Seil enger Griff",
+      "englishName": "Overhead Rope Triceps Extension Close Grip",
+      "category": "Push",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_triceps",
+      "movementPattern": "Elbow Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "commonMistakes": [
+        "zu schwer wählen",
+        "Schultern nach vorne fallen lassen",
+        "Schwung nutzen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lat_pulldown_wide",
+      "displayName": "Latziehen breit",
+      "englishName": "Wide Grip Lat Pulldown",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lat_pulldown_wide_neutral",
+      "displayName": "Latziehen breit neutraler Griff",
+      "englishName": "Wide Grip Lat Pulldown Neutral Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lat_pulldown_wide_wide",
+      "displayName": "Latziehen breit weiter Griff",
+      "englishName": "Wide Grip Lat Pulldown Wide Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lat_pulldown_wide_close",
+      "displayName": "Latziehen breit enger Griff",
+      "englishName": "Wide Grip Lat Pulldown Close Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lat_pulldown_neutral",
+      "displayName": "Latziehen neutraler Griff",
+      "englishName": "Neutral Grip Lat Pulldown",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lat_pulldown_neutral_neutral",
+      "displayName": "Latziehen neutraler Griff neutraler Griff",
+      "englishName": "Neutral Grip Lat Pulldown Neutral Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lat_pulldown_neutral_wide",
+      "displayName": "Latziehen neutraler Griff weiter Griff",
+      "englishName": "Neutral Grip Lat Pulldown Wide Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lat_pulldown_neutral_close",
+      "displayName": "Latziehen neutraler Griff enger Griff",
+      "englishName": "Neutral Grip Lat Pulldown Close Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_assisted_pullup",
+      "displayName": "Unterstützte Klimmzüge",
+      "englishName": "Assisted Pull Up",
+      "category": "Pull",
+      "equipmentId": "eq_pullup",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_assisted_pullup_neutral",
+      "displayName": "Unterstützte Klimmzüge neutraler Griff",
+      "englishName": "Assisted Pull Up Neutral Grip",
+      "category": "Pull",
+      "equipmentId": "eq_pullup",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_assisted_pullup_wide",
+      "displayName": "Unterstützte Klimmzüge weiter Griff",
+      "englishName": "Assisted Pull Up Wide Grip",
+      "category": "Pull",
+      "equipmentId": "eq_pullup",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_assisted_pullup_close",
+      "displayName": "Unterstützte Klimmzüge enger Griff",
+      "englishName": "Assisted Pull Up Close Grip",
+      "category": "Pull",
+      "equipmentId": "eq_pullup",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Vertical Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_straight_arm_pulldown",
+      "displayName": "Überzüge am Kabel",
+      "englishName": "Straight Arm Pulldown",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Shoulder Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_straight_arm_pulldown_neutral",
+      "displayName": "Überzüge am Kabel neutraler Griff",
+      "englishName": "Straight Arm Pulldown Neutral Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Shoulder Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_straight_arm_pulldown_wide",
+      "displayName": "Überzüge am Kabel weiter Griff",
+      "englishName": "Straight Arm Pulldown Wide Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Shoulder Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_straight_arm_pulldown_close",
+      "displayName": "Überzüge am Kabel enger Griff",
+      "englishName": "Straight Arm Pulldown Close Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Shoulder Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_machine_row_neutral",
+      "displayName": "Rudermaschine neutral",
+      "englishName": "Machine Row Neutral",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_machine_row_neutral_neutral",
+      "displayName": "Rudermaschine neutral neutraler Griff",
+      "englishName": "Machine Row Neutral Neutral Grip",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_machine_row_neutral_wide",
+      "displayName": "Rudermaschine neutral weiter Griff",
+      "englishName": "Machine Row Neutral Wide Grip",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_machine_row_neutral_close",
+      "displayName": "Rudermaschine neutral enger Griff",
+      "englishName": "Machine Row Neutral Close Grip",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_seated_cable_row",
+      "displayName": "Kabelrudern sitzend",
+      "englishName": "Seated Cable Row",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_seated_cable_row_neutral",
+      "displayName": "Kabelrudern sitzend neutraler Griff",
+      "englishName": "Seated Cable Row Neutral Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_seated_cable_row_wide",
+      "displayName": "Kabelrudern sitzend weiter Griff",
+      "englishName": "Seated Cable Row Wide Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_seated_cable_row_close",
+      "displayName": "Kabelrudern sitzend enger Griff",
+      "englishName": "Seated Cable Row Close Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_chest_supported_row_machine",
+      "displayName": "Brustgestütztes Rudern Maschine",
+      "englishName": "Chest Supported Machine Row",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_chest_supported_row_machine_neutral",
+      "displayName": "Brustgestütztes Rudern Maschine neutraler Griff",
+      "englishName": "Chest Supported Machine Row Neutral Grip",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_chest_supported_row_machine_wide",
+      "displayName": "Brustgestütztes Rudern Maschine weiter Griff",
+      "englishName": "Chest Supported Machine Row Wide Grip",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_chest_supported_row_machine_close",
+      "displayName": "Brustgestütztes Rudern Maschine enger Griff",
+      "englishName": "Chest Supported Machine Row Close Grip",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_bent_over_row_barbell",
+      "displayName": "Vorgebeugtes Rudern Langhantel",
+      "englishName": "Barbell Bent Over Row",
+      "category": "Pull",
+      "equipmentId": "eq_barbell",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "high",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_bent_over_row_barbell_neutral",
+      "displayName": "Vorgebeugtes Rudern Langhantel neutraler Griff",
+      "englishName": "Barbell Bent Over Row Neutral Grip",
+      "category": "Pull",
+      "equipmentId": "eq_barbell",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "high",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_bent_over_row_barbell_wide",
+      "displayName": "Vorgebeugtes Rudern Langhantel weiter Griff",
+      "englishName": "Barbell Bent Over Row Wide Grip",
+      "category": "Pull",
+      "equipmentId": "eq_barbell",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "high",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_bent_over_row_barbell_close",
+      "displayName": "Vorgebeugtes Rudern Langhantel enger Griff",
+      "englishName": "Barbell Bent Over Row Close Grip",
+      "category": "Pull",
+      "equipmentId": "eq_barbell",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "high",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "6-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_reverse_pec_deck",
+      "displayName": "Reverse Butterfly",
+      "englishName": "Reverse Pec Deck",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_rear_delts",
+      "movementPattern": "Rear Delt Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_reverse_pec_deck_neutral",
+      "displayName": "Reverse Butterfly neutraler Griff",
+      "englishName": "Reverse Pec Deck Neutral Grip",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_rear_delts",
+      "movementPattern": "Rear Delt Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_reverse_pec_deck_wide",
+      "displayName": "Reverse Butterfly weiter Griff",
+      "englishName": "Reverse Pec Deck Wide Grip",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_rear_delts",
+      "movementPattern": "Rear Delt Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_reverse_pec_deck_close",
+      "displayName": "Reverse Butterfly enger Griff",
+      "englishName": "Reverse Pec Deck Close Grip",
+      "category": "Pull",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_rear_delts",
+      "movementPattern": "Rear Delt Isolation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_face_pull",
+      "displayName": "Face Pulls",
+      "englishName": "Face Pull",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_rear_delts",
+      "movementPattern": "Rear Delt / Rotator Cuff",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_face_pull_neutral",
+      "displayName": "Face Pulls neutraler Griff",
+      "englishName": "Face Pull Neutral Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_rear_delts",
+      "movementPattern": "Rear Delt / Rotator Cuff",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_face_pull_wide",
+      "displayName": "Face Pulls weiter Griff",
+      "englishName": "Face Pull Wide Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_rear_delts",
+      "movementPattern": "Rear Delt / Rotator Cuff",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_face_pull_close",
+      "displayName": "Face Pulls enger Griff",
+      "englishName": "Face Pull Close Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_rear_delts",
+      "movementPattern": "Rear Delt / Rotator Cuff",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_biceps_curl_cable",
+      "displayName": "Bizepscurls Kabel",
+      "englishName": "Cable Biceps Curl",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_biceps",
+      "movementPattern": "Elbow Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_biceps_curl_cable_neutral",
+      "displayName": "Bizepscurls Kabel neutraler Griff",
+      "englishName": "Cable Biceps Curl Neutral Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_biceps",
+      "movementPattern": "Elbow Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_biceps_curl_cable_wide",
+      "displayName": "Bizepscurls Kabel weiter Griff",
+      "englishName": "Cable Biceps Curl Wide Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_biceps",
+      "movementPattern": "Elbow Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_biceps_curl_cable_close",
+      "displayName": "Bizepscurls Kabel enger Griff",
+      "englishName": "Cable Biceps Curl Close Grip",
+      "category": "Pull",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_biceps",
+      "movementPattern": "Elbow Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_hammer_curl_dumbbell",
+      "displayName": "Hammer Curls",
+      "englishName": "Dumbbell Hammer Curl",
+      "category": "Pull",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_biceps",
+      "movementPattern": "Elbow Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_hammer_curl_dumbbell_neutral",
+      "displayName": "Hammer Curls neutraler Griff",
+      "englishName": "Dumbbell Hammer Curl Neutral Grip",
+      "category": "Pull",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_biceps",
+      "movementPattern": "Elbow Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_hammer_curl_dumbbell_wide",
+      "displayName": "Hammer Curls weiter Griff",
+      "englishName": "Dumbbell Hammer Curl Wide Grip",
+      "category": "Pull",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_biceps",
+      "movementPattern": "Elbow Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_hammer_curl_dumbbell_close",
+      "displayName": "Hammer Curls enger Griff",
+      "englishName": "Dumbbell Hammer Curl Close Grip",
+      "category": "Pull",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_biceps",
+      "movementPattern": "Elbow Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpf stabil halten, kontrolliert ziehen, nicht reißen.",
+      "commonMistakes": [
+        "Gewicht reißen",
+        "Rundrücken",
+        "Schultern hochziehen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_leg_press_45",
+      "displayName": "45° Beinpresse",
+      "englishName": "45 Degree Leg Press",
+      "category": "Legs",
+      "equipmentId": "eq_leg_press",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_leg_press_45_neutral",
+      "displayName": "45° Beinpresse neutraler Griff",
+      "englishName": "45 Degree Leg Press Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_leg_press",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_leg_press_45_wide",
+      "displayName": "45° Beinpresse weiter Griff",
+      "englishName": "45 Degree Leg Press Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_leg_press",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_leg_press_horizontal",
+      "displayName": "Horizontale Beinpresse",
+      "englishName": "Horizontal Leg Press",
+      "category": "Legs",
+      "equipmentId": "eq_leg_press",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_leg_press_horizontal_neutral",
+      "displayName": "Horizontale Beinpresse neutraler Griff",
+      "englishName": "Horizontal Leg Press Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_leg_press",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_leg_press_horizontal_wide",
+      "displayName": "Horizontale Beinpresse weiter Griff",
+      "englishName": "Horizontal Leg Press Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_leg_press",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_hack_squat_machine",
+      "displayName": "Hackenschmidt Maschine",
+      "englishName": "Hack Squat Machine",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_hack_squat_machine_neutral",
+      "displayName": "Hackenschmidt Maschine neutraler Griff",
+      "englishName": "Hack Squat Machine Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_hack_squat_machine_wide",
+      "displayName": "Hackenschmidt Maschine weiter Griff",
+      "englishName": "Hack Squat Machine Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Squat Pattern",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_bulgarian_split_squat",
+      "displayName": "Bulgarian Split Squat",
+      "englishName": "Bulgarian Split Squat",
+      "category": "Legs",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Lunge Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_bulgarian_split_squat_neutral",
+      "displayName": "Bulgarian Split Squat neutraler Griff",
+      "englishName": "Bulgarian Split Squat Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Lunge Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_bulgarian_split_squat_wide",
+      "displayName": "Bulgarian Split Squat weiter Griff",
+      "englishName": "Bulgarian Split Squat Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Lunge Pattern",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_leg_extension_machine",
+      "displayName": "Beinstrecker Maschine",
+      "englishName": "Leg Extension Machine",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Knee Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_leg_extension_machine_neutral",
+      "displayName": "Beinstrecker Maschine neutraler Griff",
+      "englishName": "Leg Extension Machine Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Knee Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_leg_extension_machine_wide",
+      "displayName": "Beinstrecker Maschine weiter Griff",
+      "englishName": "Leg Extension Machine Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Knee Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_seated_leg_curl_machine",
+      "displayName": "Beinbeuger sitzend",
+      "englishName": "Seated Leg Curl",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_hamstrings",
+      "movementPattern": "Knee Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_seated_leg_curl_machine_neutral",
+      "displayName": "Beinbeuger sitzend neutraler Griff",
+      "englishName": "Seated Leg Curl Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_hamstrings",
+      "movementPattern": "Knee Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_seated_leg_curl_machine_wide",
+      "displayName": "Beinbeuger sitzend weiter Griff",
+      "englishName": "Seated Leg Curl Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_hamstrings",
+      "movementPattern": "Knee Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lying_leg_curl_machine",
+      "displayName": "Beinbeuger liegend",
+      "englishName": "Lying Leg Curl",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_hamstrings",
+      "movementPattern": "Knee Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lying_leg_curl_machine_neutral",
+      "displayName": "Beinbeuger liegend neutraler Griff",
+      "englishName": "Lying Leg Curl Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_hamstrings",
+      "movementPattern": "Knee Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_lying_leg_curl_machine_wide",
+      "displayName": "Beinbeuger liegend weiter Griff",
+      "englishName": "Lying Leg Curl Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_hamstrings",
+      "movementPattern": "Knee Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_hip_thrust_machine",
+      "displayName": "Hip Thrust Maschine",
+      "englishName": "Machine Hip Thrust",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_hip_thrust_machine_neutral",
+      "displayName": "Hip Thrust Maschine neutraler Griff",
+      "englishName": "Machine Hip Thrust Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_hip_thrust_machine_wide",
+      "displayName": "Hip Thrust Maschine weiter Griff",
+      "englishName": "Machine Hip Thrust Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_glute_bridge_bodyweight",
+      "displayName": "Glute Bridge",
+      "englishName": "Bodyweight Glute Bridge",
+      "category": "Legs",
+      "equipmentId": "eq_bodyweight",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_glute_bridge_bodyweight_neutral",
+      "displayName": "Glute Bridge neutraler Griff",
+      "englishName": "Bodyweight Glute Bridge Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_bodyweight",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_glute_bridge_bodyweight_wide",
+      "displayName": "Glute Bridge weiter Griff",
+      "englishName": "Bodyweight Glute Bridge Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_bodyweight",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_cable_pull_through",
+      "displayName": "Kabel Pull-Through",
+      "englishName": "Cable Pull Through",
+      "category": "Legs",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_cable_pull_through_neutral",
+      "displayName": "Kabel Pull-Through neutraler Griff",
+      "englishName": "Cable Pull Through Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_cable_pull_through_wide",
+      "displayName": "Kabel Pull-Through weiter Griff",
+      "englishName": "Cable Pull Through Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_back_extension_45_glute",
+      "displayName": "45° Hyperextension Gesäßfokus",
+      "englishName": "45 Degree Back Extension",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_back_extension_45_glute_neutral",
+      "displayName": "45° Hyperextension Gesäßfokus neutraler Griff",
+      "englishName": "45 Degree Back Extension Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_back_extension_45_glute_wide",
+      "displayName": "45° Hyperextension Gesäßfokus weiter Griff",
+      "englishName": "45 Degree Back Extension Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "medium",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_romanian_deadlift_dumbbell",
+      "displayName": "Rumänisches Kreuzheben Kurzhantel",
+      "englishName": "Dumbbell Romanian Deadlift",
+      "category": "Legs",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_hamstrings",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "high",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_romanian_deadlift_dumbbell_neutral",
+      "displayName": "Rumänisches Kreuzheben Kurzhantel neutraler Griff",
+      "englishName": "Dumbbell Romanian Deadlift Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_hamstrings",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "high",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_romanian_deadlift_dumbbell_wide",
+      "displayName": "Rumänisches Kreuzheben Kurzhantel weiter Griff",
+      "englishName": "Dumbbell Romanian Deadlift Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_dumbbell",
+      "primaryMuscleHint": "mg_hamstrings",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "high",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-10",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_deadlift_barbell",
+      "displayName": "Kreuzheben Langhantel",
+      "englishName": "Barbell Deadlift",
+      "category": "Legs",
+      "equipmentId": "eq_barbell",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "veryHigh",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "5-8",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_deadlift_barbell_neutral",
+      "displayName": "Kreuzheben Langhantel neutraler Griff",
+      "englishName": "Barbell Deadlift Neutral Grip",
+      "category": "Legs",
+      "equipmentId": "eq_barbell",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "veryHigh",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "5-8",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_deadlift_barbell_wide",
+      "displayName": "Kreuzheben Langhantel weiter Griff",
+      "englishName": "Barbell Deadlift Wide Grip",
+      "category": "Legs",
+      "equipmentId": "eq_barbell",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hip Hinge",
+      "lumbarDiscSuitability": "avoidInitially",
+      "spineLoadLevel": "veryHigh",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "5-8",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_adductor_machine",
+      "displayName": "Adduktoren Maschine",
+      "englishName": "Adductor Machine",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_adductors",
+      "movementPattern": "Hip Adduction",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_abductor_machine",
+      "displayName": "Abduktoren Maschine",
+      "englishName": "Abductor Machine",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_abductors",
+      "movementPattern": "Hip Abduction",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_calf_raise_machine_standing",
+      "displayName": "Wadenheben stehend Maschine",
+      "englishName": "Standing Machine Calf Raise",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_calves",
+      "movementPattern": "Calf Raise",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_seated_calf_raise",
+      "displayName": "Wadenheben sitzend",
+      "englishName": "Seated Calf Raise",
+      "category": "Legs",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_calves",
+      "movementPattern": "Calf Raise",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-20",
+      "defaultRestSeconds": 90,
+      "difficulty": "einfach",
+      "techniqueNotes": "Bewegung kontrolliert, Knie stabil, LWS neutral und schmerzfrei.",
+      "commonMistakes": [
+        "Bewegung zu schnell",
+        "Knie kippen ein",
+        "LWS verliert Spannung"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_pallof_press_cable",
+      "displayName": "Pallof Press Kabel",
+      "englishName": "Cable Pallof Press",
+      "category": "Core",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_deep_core",
+      "movementPattern": "Core Anti-Rotation",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15 je Seite",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_plank_forearm",
+      "displayName": "Unterarmstütz",
+      "englishName": "Forearm Plank",
+      "category": "Core",
+      "equipmentId": "eq_bodyweight",
+      "primaryMuscleHint": "mg_abs",
+      "movementPattern": "Core Anti-Extension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "30-60 Sekunden",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_side_plank",
+      "displayName": "Side Plank",
+      "englishName": "Side Plank",
+      "category": "Core",
+      "equipmentId": "eq_bodyweight",
+      "primaryMuscleHint": "mg_obliques",
+      "movementPattern": "Core Anti-Lateral-Flexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "20-45 Sekunden je Seite",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_dead_bug",
+      "displayName": "Dead Bug",
+      "englishName": "Dead Bug",
+      "category": "Core",
+      "equipmentId": "eq_bodyweight",
+      "primaryMuscleHint": "mg_deep_core",
+      "movementPattern": "Core Stability",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_bird_dog",
+      "displayName": "Bird Dog",
+      "englishName": "Bird Dog",
+      "category": "Core",
+      "equipmentId": "eq_bodyweight",
+      "primaryMuscleHint": "mg_deep_core",
+      "movementPattern": "Core Stability",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12 je Seite",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Rumpfspannung halten, langsam und sauber ausführen.",
+      "commonMistakes": [
+        "Hohlkreuz",
+        "Atem anhalten",
+        "zu lange halten bei schlechter Technik"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_bike_warmup",
+      "displayName": "Fahrradergometer locker",
+      "englishName": "Stationary Bike Easy",
+      "category": "Cardio",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Warmup",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 1,
+      "defaultRepRange": "5-10 Minuten",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Locker starten, ruhige Atmung halten.",
+      "commonMistakes": [
+        "zu intensiv starten"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_treadmill_walk",
+      "displayName": "Laufband Gehen",
+      "englishName": "Treadmill Walk",
+      "category": "Cardio",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_calves",
+      "movementPattern": "Cardio",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 1,
+      "defaultRepRange": "5-20 Minuten",
+      "defaultRestSeconds": 45,
+      "difficulty": "einfach",
+      "techniqueNotes": "Locker starten, ruhige Atmung halten.",
+      "commonMistakes": [
+        "zu intensiv starten"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "D-Coach Content Release v2.1.0"
+    }
+  ]
+}
