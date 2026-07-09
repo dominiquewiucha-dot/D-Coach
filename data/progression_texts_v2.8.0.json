@@ -1,0 +1,18 @@
+{
+  "version": "2.8.0",
+  "type": "progression_texts",
+  "locale": "de-DE",
+  "texts": {
+    "increase_weight": "Nächstes Mal kleine Gewichtssteigerung testen.",
+    "increase_reps": "Gewicht halten und Wiederholungen sammeln.",
+    "hold_weight": "Gewicht halten und sauber weiterarbeiten.",
+    "reduce_weight": "Gewicht reduzieren und Technik stabilisieren.",
+    "reduce_volume": "Volumen reduzieren und Regeneration priorisieren.",
+    "add_set": "Optionaler Zusatzsatz möglich.",
+    "remove_set": "Heute einen Satz weniger einplanen.",
+    "change_exercise": "Alternative Übung prüfen.",
+    "deload": "Deload oder leichtere Einheit prüfen.",
+    "not_enough_data": "Noch nicht genug Daten für eine sichere Progression.",
+    "why_header": "Warum diese Empfehlung?"
+  }
+}

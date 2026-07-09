@@ -1,0 +1,70 @@
+{
+  "version": "2.8.0",
+  "type": "adaptive_progression_schema",
+  "locale": "de-DE",
+  "decisionTypes": [
+    {
+      "id": "increase_weight",
+      "label": "Gewicht erhöhen"
+    },
+    {
+      "id": "increase_reps",
+      "label": "Wiederholungen erhöhen"
+    },
+    {
+      "id": "hold_weight",
+      "label": "Gewicht halten"
+    },
+    {
+      "id": "reduce_weight",
+      "label": "Gewicht reduzieren"
+    },
+    {
+      "id": "reduce_volume",
+      "label": "Volumen reduzieren"
+    },
+    {
+      "id": "add_set",
+      "label": "Satz ergänzen"
+    },
+    {
+      "id": "remove_set",
+      "label": "Satz entfernen"
+    },
+    {
+      "id": "change_exercise",
+      "label": "Übung wechseln"
+    },
+    {
+      "id": "deload",
+      "label": "Deload prüfen"
+    }
+  ],
+  "inputs": [
+    "lastComparableSessions",
+    "targetRepRange",
+    "completedSets",
+    "weightKg",
+    "reps",
+    "optionalRir",
+    "readiness",
+    "muscleCoverage",
+    "exerciseRating",
+    "personalProfile",
+    "trainingDna"
+  ],
+  "outputSchema": {
+    "exerciseId": "string",
+    "decisionType": "string",
+    "nextWeightKg": "number|null",
+    "nextRepTarget": "string|null",
+    "setChange": "number",
+    "confidencePercent": "number",
+    "why": [
+      "string"
+    ],
+    "quickTrainingText": "string",
+    "coachText": "string"
+  },
+  "displayRule": "Quick Training zeigt maximal einen kurzen Vorschlag. Details nur Coach Mode."
+}

@@ -1,0 +1,39 @@
+{
+  "version": "2.8.0",
+  "type": "progression_prediction_schema",
+  "locale": "de-DE",
+  "description": "Einfache Vorhersage, ob nächstes Gewicht/Wiederholungsziel realistisch ist.",
+  "predictionOutput": {
+    "exerciseId": "string",
+    "candidateWeightKg": "number|null",
+    "candidateRepRange": "string|null",
+    "successProbabilityPercent": "number",
+    "basis": [
+      "string"
+    ],
+    "warning": "string|null"
+  },
+  "rules": [
+    {
+      "id": "small_jump_high_probability",
+      "if": "smallest increment and last top reps reached",
+      "baseProbability": 80
+    },
+    {
+      "id": "poor_readiness_penalty",
+      "if": "readiness red",
+      "penalty": -20
+    },
+    {
+      "id": "lws_high_load_penalty",
+      "if": "lumbar profile and high spineLoad",
+      "penalty": -30
+    },
+    {
+      "id": "history_depth_bonus",
+      "if": "5+ comparable sessions",
+      "bonus": 10
+    }
+  ],
+  "displayRule": "Prediction nur Coach Mode/Details, nicht dauerhaft im Satzscreen."
+}

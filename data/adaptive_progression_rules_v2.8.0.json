@@ -1,0 +1,120 @@
+{
+  "version": "2.8.0",
+  "type": "adaptive_progression_rules",
+  "locale": "de-DE",
+  "rules": [
+    {
+      "id": "double_progression_increase_weight",
+      "priority": 100,
+      "if": [
+        "all completed working sets at upper target reps",
+        "performance stable or improving in last 2 comparable sessions",
+        "readiness not red",
+        "no LWS conflict"
+      ],
+      "then": "increase_weight",
+      "quickText": "Nächstes Mal kleine Steigerung prüfen.",
+      "coachText": "Zielbereich wiederholt erreicht. Eine kleine Gewichtssteigerung ist sinnvoll."
+    },
+    {
+      "id": "increase_reps_before_weight_reentry",
+      "priority": 95,
+      "if": [
+        "trainingGoal == hypertrophy_reentry",
+        "sets in target range but not upper target",
+        "technique caution or unknown RIR"
+      ],
+      "then": "increase_reps",
+      "quickText": "Gewicht halten, Wiederholungen sammeln.",
+      "coachText": "Für den Wiedereinstieg ist eine Wiederholungssteigerung vor einer Gewichtssteigerung sinnvoll."
+    },
+    {
+      "id": "hold_if_drop_off_high",
+      "priority": 90,
+      "if": [
+        "first set reaches target",
+        "last set drops more than 25 percent reps",
+        "same weight"
+      ],
+      "then": "hold_weight",
+      "quickText": "Gewicht halten.",
+      "coachText": "Der Leistungsabfall innerhalb der Sätze ist noch zu hoch für eine Steigerung."
+    },
+    {
+      "id": "hold_if_recovery_poor",
+      "priority": 85,
+      "if": [
+        "readiness red or journal energy low",
+        "otherwise increase_weight would apply"
+      ],
+      "then": "hold_weight",
+      "quickText": "Heute konservativ bleiben.",
+      "coachText": "Trotz guter Leistung spricht die Tagesform gegen aggressive Progression."
+    },
+    {
+      "id": "lws_no_axial_progression",
+      "priority": 100,
+      "if": [
+        "profile.lumbarDiscHistory == true",
+        "exercise.spineLoadLevel high or veryHigh"
+      ],
+      "then": "change_exercise",
+      "quickText": "LWS-Alternative empfohlen.",
+      "coachText": "Bei hoher LWS-Belastung wird im Wiedereinstieg keine Steigerung empfohlen."
+    },
+    {
+      "id": "machine_small_jump",
+      "priority": 70,
+      "if": [
+        "exercise equipment is machine or cable",
+        "increase_weight applies"
+      ],
+      "then": "increase_weight",
+      "modifier": "use smallest available increment",
+      "coachText": "Bei Maschinen/Kabeln kleine, kontrollierte Gewichtssprünge bevorzugen."
+    },
+    {
+      "id": "stagnation_change_variable",
+      "priority": 80,
+      "if": [
+        "stagnation detected 4+ comparable sessions"
+      ],
+      "then": "change_exercise_or_rep_range",
+      "quickText": "Variante prüfen.",
+      "coachText": "Die Übung stagniert. Ein anderer Wiederholungsbereich oder eine Alternative kann sinnvoll sein."
+    },
+    {
+      "id": "coverage_over_target_no_add_set",
+      "priority": 75,
+      "if": [
+        "target muscle weekly coverage > 120 percent"
+      ],
+      "then": "do_not_add_set",
+      "quickText": "Kein Zusatzvolumen nötig.",
+      "coachText": "Die Muskelgruppe liegt diese Woche bereits über dem Zielbereich."
+    },
+    {
+      "id": "coverage_under_target_add_optional_set",
+      "priority": 65,
+      "if": [
+        "target muscle weekly coverage < 70 percent",
+        "session time allows",
+        "readiness green"
+      ],
+      "then": "add_set",
+      "quickText": "Optionaler Zusatzsatz möglich.",
+      "coachText": "Diese Muskelgruppe ist diese Woche noch unter dem Ziel und Zeit/Regeneration erlauben Zusatzvolumen."
+    },
+    {
+      "id": "time_limit_skip_optional_progression",
+      "priority": 90,
+      "if": [
+        "elapsed time close to maxSessionMinutes",
+        "exercise priority optional"
+      ],
+      "then": "remove_set_or_skip_optional",
+      "quickText": "Zeit knapp: optional kürzen.",
+      "coachText": "Damit das 60-Minuten-Zeitfenster eingehalten wird, sollte Optionales gekürzt werden."
+    }
+  ]
+}

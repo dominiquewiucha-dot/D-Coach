@@ -1,0 +1,58 @@
+{
+  "version": "2.8.0",
+  "type": "progression_confidence_rules",
+  "locale": "de-DE",
+  "factors": [
+    {
+      "id": "history_depth",
+      "weight": 25,
+      "description": "mehr vergleichbare Einheiten erhöhen Sicherheit"
+    },
+    {
+      "id": "rule_match_strength",
+      "weight": 25,
+      "description": "je klarer Regeln erfüllt sind, desto höher Sicherheit"
+    },
+    {
+      "id": "data_completeness",
+      "weight": 20,
+      "description": "vollständige Sätze, Gewicht, Reps und optional RIR erhöhen Sicherheit"
+    },
+    {
+      "id": "profile_alignment",
+      "weight": 20,
+      "description": "Empfehlung passt zu persönlichem Profil"
+    },
+    {
+      "id": "conflict_penalty",
+      "weight": -30,
+      "description": "Readiness rot, Schmerznotiz oder LWS-Konflikt senken Sicherheit"
+    }
+  ],
+  "bands": [
+    {
+      "min": 0,
+      "max": 49,
+      "label": "vorsichtig",
+      "display": "nur als vorsichtige Einschätzung anzeigen"
+    },
+    {
+      "min": 50,
+      "max": 74,
+      "label": "mittel",
+      "display": "wahrscheinlich sinnvoll"
+    },
+    {
+      "min": 75,
+      "max": 89,
+      "label": "hoch",
+      "display": "gute Datenbasis"
+    },
+    {
+      "min": 90,
+      "max": 100,
+      "label": "sehr hoch",
+      "display": "sehr klare Empfehlung"
+    }
+  ]
+}

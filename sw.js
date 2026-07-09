@@ -1,4 +1,4 @@
-const CACHE_NAME = "dcoach-pwa-v25";
+const CACHE_NAME = "dcoach-pwa-v26";
 const ASSETS = [
   "./",
   "./index.html",
@@ -64,6 +64,11 @@ const ASSETS = [
   "./data/training_dna_texts_v2.7.0.json",
   "./data/personal_performance_timeline_schema_v2.7.0.json",
   "./data/coach_memory_rules_v2.7.0.json",
+  "./data/adaptive_progression_schema_v2.8.0.json",
+  "./data/adaptive_progression_rules_v2.8.0.json",
+  "./data/progression_confidence_rules_v2.8.0.json",
+  "./data/progression_texts_v2.8.0.json",
+  "./data/progression_prediction_schema_v2.8.0.json",
   "./assets/icon.svg",
   "./assets/apple-touch-icon.png",
   "./assets/muscle_maps/coverage_front_placeholder_v2.4.0.svg",
