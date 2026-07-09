@@ -1,0 +1,41 @@
+{
+  "version": "1.1.0",
+  "type": "training_plans_library",
+  "locale": "de-DE",
+  "plans": [
+    {
+      "id": "plan_ppl_lws_reentry_v1",
+      "planName": "3er Split Wiedereinstieg LWS-schonend",
+      "status": "activeCandidate",
+      "level": "Wiedereinstieg",
+      "maxDurationMinutes": 60,
+      "days": [
+        "Push",
+        "Pull",
+        "Beine + Core"
+      ]
+    },
+    {
+      "id": "plan_fullbody_lws_beginner_v1",
+      "planName": "Ganzkörper LWS-schonend",
+      "status": "draft",
+      "level": "Einsteiger/Wiedereinstieg",
+      "maxDurationMinutes": 50,
+      "days": [
+        "Ganzkörper A",
+        "Ganzkörper B"
+      ]
+    },
+    {
+      "id": "plan_upper_lower_lws_v1",
+      "planName": "Upper / Lower LWS-schonend",
+      "status": "draft",
+      "level": "Fortgeschritten Wiedereinstieg",
+      "maxDurationMinutes": 60,
+      "days": [
+        "Upper",
+        "Lower"
+      ]
+    }
+  ]
+}

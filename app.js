@@ -2,6 +2,11 @@ const state = {
   seed: null,
   muscles: null,
   exerciseMuscleMap: null,
+  equipment: null,
+  extendedExercises: null,
+  alternativeRules: null,
+  statisticsRules: null,
+  planLibrary: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -90,12 +95,22 @@ async function fetchOptionalJson(path) {
 
 async function boot() {
   state.seed = await fetch("./seed_training_database.json").then((response) => response.json());
-  const [muscles, exerciseMuscleMap] = await Promise.all([
+  const [muscles, exerciseMuscleMap, equipment, extendedExercises, alternativeRules, statisticsRules, planLibrary] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
-    fetchOptionalJson("./data/exercise_muscle_mapping.json")
+    fetchOptionalJson("./data/exercise_muscle_mapping.json"),
+    fetchOptionalJson("./data/equipment_v1.1.0.json"),
+    fetchOptionalJson("./data/exercises_extended_v1.1.0.json"),
+    fetchOptionalJson("./data/alternative_rules_v1.1.0.json"),
+    fetchOptionalJson("./data/statistics_rules_v1.1.0.json"),
+    fetchOptionalJson("./data/training_plans_library_v1.1.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = exerciseMuscleMap;
+  state.equipment = equipment;
+  state.extendedExercises = extendedExercises;
+  state.alternativeRules = alternativeRules;
+  state.statisticsRules = statisticsRules;
+  state.planLibrary = planLibrary;
   const plan = activePlan();
   if (plan && storage.activePlanName !== plan.planName) {
     storage.activePlanName = plan.planName;
@@ -407,6 +422,41 @@ function muscleMappingForExercise(exerciseId) {
   return state.exerciseMuscleMap?.mappings?.find((mapping) => mapping.exerciseId === exerciseId) || null;
 }
 
+function extendedExerciseById(id) {
+  return state.extendedExercises?.exercises?.find((exercise) => exercise.id === id) || null;
+}
+
+function equipmentById(id) {
+  return state.equipment?.equipment?.find((item) => item.id === id) || null;
+}
+
+function equipmentNameById(id) {
+  return equipmentById(id)?.name || id || "";
+}
+
+function alternativeRuleForExercise(exerciseId) {
+  return state.alternativeRules?.rules?.find((rule) => rule.sourceExerciseId === exerciseId) || null;
+}
+
+function lwsRank(value) {
+  const ranks = {
+    suitable: 0,
+    conditionallySuitable: 1,
+    avoidInitially: 2,
+    notRecommended: 3
+  };
+  return ranks[value] ?? 1;
+}
+
+function spineLoadText(value) {
+  const map = {
+    low: "gering",
+    medium: "mittel",
+    high: "hoch"
+  };
+  return map[value] || value;
+}
+
 function muscleRoleItem(name, intensityWeight = null) {
   return { name, intensityWeight };
 }
@@ -465,6 +515,42 @@ function renderMuscleItems(items, fallback) {
   `).join("");
 }
 
+function alternativeCandidatesForExercise(exercise) {
+  const rule = alternativeRuleForExercise(exercise.id);
+  const byId = new Map();
+
+  if (rule) {
+    rule.alternatives.forEach((item) => {
+      const candidate = exerciseById(item.exerciseId);
+      if (!candidate) return;
+      byId.set(candidate.id, {
+        exercise: candidate,
+        score: Number(item.matchScore) || 0,
+        note: item.note || "",
+        reason: rule.reason || "",
+        source: "rule"
+      });
+    });
+  }
+
+  exercise.alternatives.map(exerciseById).filter(Boolean).forEach((candidate) => {
+    if (byId.has(candidate.id)) return;
+    byId.set(candidate.id, {
+      exercise: candidate,
+      score: 0,
+      note: "",
+      reason: "",
+      source: "fallback"
+    });
+  });
+
+  return [...byId.values()].sort((a, b) => {
+    const scoreDelta = b.score - a.score;
+    if (scoreDelta) return scoreDelta;
+    return lwsRank(a.exercise.lumbarDiscSuitability) - lwsRank(b.exercise.lumbarDiscSuitability);
+  });
+}
+
 function exerciseKindText(exercise) {
   if (exerciseKind(exercise) === "Isolation") {
     return "Belastet vor allem den Zielmuskel. Hilfsmuskeln spielen nur eine kleine Rolle.";
@@ -497,17 +583,20 @@ function muscleRoleCards(exercise) {
 
 function exerciseKnowledge(exercise) {
   const roles = exerciseMuscleRoles(exercise);
+  const extended = extendedExerciseById(exercise.id);
   const primary = muscleItemsText(roles.primary, "Zielmuskel nicht hinterlegt");
   const secondary = muscleItemsText(roles.secondary, "");
   const stabilizers = muscleItemsText(roles.stabilizers, "");
-  const equipment = exercise.equipment.join(", ") || "Geraet nicht hinterlegt";
-  return [
+  const equipment = extended?.equipmentId ? equipmentNameById(extended.equipmentId) : exercise.equipment.join(", ") || "Geraet nicht hinterlegt";
+  const notes = [
     `${exerciseKind(exercise)}: ${exerciseKindText(exercise)}`,
     `Primaer: ${primary}.`,
     secondary ? `Sekundaer: ${secondary}.` : "Sekundaer: keine wesentlichen Hilfsmuskeln hinterlegt.",
     stabilizers ? `Stabilisatoren: ${stabilizers}.` : "Stabilisatoren: nicht gesondert hinterlegt.",
     `Geraet: ${equipment}.`
   ];
+  if (extended?.spineLoadLevel) notes.push(`LWS-Last: ${spineLoadText(extended.spineLoadLevel)}.`);
+  return notes;
 }
 
 function render() {
@@ -683,7 +772,7 @@ function renderWorkout() {
   const last = lastCompletedExercise(entry.exerciseId);
   const progress = Math.round(((workout.index + 1) / workout.entries.length) * 100);
   const hint = progressionHint(exercise, entry.reps, last?.exercise?.sets || []);
-  const alternatives = exercise.alternatives.map(exerciseById).filter(Boolean);
+  const alternatives = alternativeCandidatesForExercise(exercise);
   return `
     <section class="screen stack">
       <header>
@@ -742,13 +831,17 @@ function renderAlternativePicker(alternatives) {
     <article class="card stack">
       <h3>Alternativen</h3>
       ${alternatives.length ? alternatives.map((item) => `
-        <button class="list-button" data-select-alternative="${htmlesc(item.id)}">
+        <button class="list-button" data-select-alternative="${htmlesc(item.exercise.id)}">
           <div class="history-row">
             <div>
-              <strong>${htmlesc(item.displayName)}</strong>
-              <p class="muted">${htmlesc(item.primaryMuscleGroups.join(", "))} · ${htmlesc(item.equipment.join(", "))}</p>
+              <strong>${htmlesc(item.exercise.displayName)}</strong>
+              <p class="muted">${htmlesc(item.note || exerciseListMuscleText(item.exercise))}</p>
+              ${item.reason ? `<p class="quiet">${htmlesc(item.reason)}</p>` : ""}
             </div>
-            ${lwsBadge(item.lumbarDiscSuitability)}
+            <div class="badge-stack">
+              ${lwsBadge(item.exercise.lumbarDiscSuitability)}
+              ${item.score ? `<span class="badge blue">${Math.round(item.score * 100)}%</span>` : ""}
+            </div>
           </div>
         </button>
       `).join("") : `<p class="muted">Keine Alternative hinterlegt.</p>`}
@@ -972,7 +1065,7 @@ function renderExerciseDetail(id) {
   const exercise = exerciseById(id);
   const last = lastCompletedExercise(id);
   const history = exerciseHistory(id);
-  const alternatives = exercise.alternatives.map(exerciseById).filter(Boolean);
+  const alternatives = alternativeCandidatesForExercise(exercise);
   return `
     <section class="screen stack">
       <button class="secondary" data-back-exercises>Zurück</button>
@@ -1014,7 +1107,22 @@ function renderExerciseDetail(id) {
           </div>
         `).join("") : `<p class="muted">Noch kein Verlauf gespeichert.</p>`}
       </article>
-      <article class="card stack"><h3>Alternativen</h3>${alternatives.length ? alternatives.map((item) => `<p>${htmlesc(item.displayName)}</p>`).join("") : `<p class="muted">Keine Alternativen hinterlegt.</p>`}</article>
+      <article class="card stack">
+        <h3>Alternativen</h3>
+        ${alternatives.length ? alternatives.map((item) => `
+          <div class="history-row">
+            <div>
+              <strong>${htmlesc(item.exercise.displayName)}</strong>
+              <p class="muted">${htmlesc(item.note || exerciseListMuscleText(item.exercise))}</p>
+              ${item.reason ? `<p class="quiet">${htmlesc(item.reason)}</p>` : ""}
+            </div>
+            <div class="badge-stack">
+              ${lwsBadge(item.exercise.lumbarDiscSuitability)}
+              ${item.score ? `<span class="badge blue">${Math.round(item.score * 100)}%</span>` : ""}
+            </div>
+          </div>
+        `).join("") : `<p class="muted">Keine Alternativen hinterlegt.</p>`}
+      </article>
     </section>
   `;
 }

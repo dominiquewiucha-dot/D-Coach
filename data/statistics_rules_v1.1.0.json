@@ -1,0 +1,17 @@
+{
+  "version": "1.1.0",
+  "type": "statistics_rules",
+  "rules": {
+    "exerciseVolume": "sum(weightKg * reps) for completed sets",
+    "musclePrimaryVolume": "completedSetCount * 1.0",
+    "muscleSecondaryVolume": "completedSetCount * intensityWeight",
+    "muscleStabilizerVolume": "completedSetCount * intensityWeight * 0.5",
+    "weeklyWindow": "ISO week, Monday to Sunday",
+    "improvementRules": [
+      "sameWeightMoreReps",
+      "higherWeightSimilarReps",
+      "higherTotalVolume",
+      "newEstimatedBest"
+    ]
+  }
+}

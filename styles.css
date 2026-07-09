@@ -171,6 +171,14 @@ button {
 .badge.amber { color: var(--amber); background: rgba(245,158,11,.13); }
 .badge.red { color: var(--red); background: rgba(239,68,68,.13); }
 
+.badge-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 .warning {
   border: 1px solid var(--amber);
   background: rgba(245,158,11,.12);

@@ -1,0 +1,96 @@
+{
+  "version": "1.1.0",
+  "type": "alternative_rules",
+  "locale": "de-DE",
+  "rules": [
+    {
+      "sourceExerciseId": "ex_deadlift",
+      "reason": "LWS hohe Belastung im Wiedereinstieg",
+      "alternatives": [
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "matchScore": 0.9,
+          "note": "Gesäßfokus, deutlich besser kontrollierbar"
+        },
+        {
+          "exerciseId": "ex_glute_bridge",
+          "matchScore": 0.82,
+          "note": "Sehr LWS-schonend"
+        },
+        {
+          "exerciseId": "ex_seated_leg_curl",
+          "matchScore": 0.75,
+          "note": "Beinbeuger isoliert"
+        },
+        {
+          "exerciseId": "ex_cable_pull_through",
+          "matchScore": 0.7,
+          "note": "Hip-Hinge-Muster, nur kontrolliert"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_bent_over_row",
+      "reason": "Vorgebeugte Haltung belastet LWS",
+      "alternatives": [
+        {
+          "exerciseId": "ex_chest_supported_row",
+          "matchScore": 0.95,
+          "note": "Sehr gute Alternative ohne freie Rumpfbelastung"
+        },
+        {
+          "exerciseId": "ex_machine_row",
+          "matchScore": 0.85,
+          "note": "Stabil und gut kontrollierbar"
+        },
+        {
+          "exerciseId": "ex_seated_row",
+          "matchScore": 0.8,
+          "note": "Sitzend, geringere LWS-Belastung"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_barbell_back_squat",
+      "reason": "Axiale Last und hohe Rumpfanforderung",
+      "alternatives": [
+        {
+          "exerciseId": "ex_leg_press",
+          "matchScore": 0.88,
+          "note": "Beintraining mit besserer Stabilität"
+        },
+        {
+          "exerciseId": "ex_hack_squat",
+          "matchScore": 0.82,
+          "note": "Geführte Bewegung"
+        },
+        {
+          "exerciseId": "ex_bulgarian_split_squat",
+          "matchScore": 0.75,
+          "note": "Einbeinige Alternative mit weniger Last"
+        }
+      ]
+    },
+    {
+      "sourceExerciseId": "ex_romanian_deadlift",
+      "reason": "Hip Hinge mit hoher LWS-Kontrolle nötig",
+      "alternatives": [
+        {
+          "exerciseId": "ex_seated_leg_curl",
+          "matchScore": 0.8,
+          "note": "Beinbeuger isoliert"
+        },
+        {
+          "exerciseId": "ex_hip_thrust_machine",
+          "matchScore": 0.78,
+          "note": "Gesäßfokus"
+        },
+        {
+          "exerciseId": "ex_back_extension_45",
+          "matchScore": 0.65,
+          "note": "Nur kontrolliert und schmerzfrei"
+        }
+      ]
+    }
+  ]
+}
