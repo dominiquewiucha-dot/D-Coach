@@ -51,6 +51,11 @@ const state = {
   progressionConfidenceRules: null,
   progressionTexts: null,
   progressionPredictionSchema: null,
+  smartWorkoutBuilderSchema: null,
+  smartWorkoutBuilderRules: null,
+  smartWorkoutDayTemplates: null,
+  smartSubstitutionRules: null,
+  smartWorkoutBuilderTexts: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -71,8 +76,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v26";
-const STORAGE_SCHEMA_VERSION = "2.8.0";
+const APP_VERSION = "pwa-v27";
+const STORAGE_SCHEMA_VERSION = "2.9.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -643,7 +648,12 @@ async function boot() {
     adaptiveProgressionRules,
     progressionConfidenceRules,
     progressionTexts,
-    progressionPredictionSchema
+    progressionPredictionSchema,
+    smartWorkoutBuilderSchema,
+    smartWorkoutBuilderRules,
+    smartWorkoutDayTemplates,
+    smartSubstitutionRules,
+    smartWorkoutBuilderTexts
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -707,7 +717,12 @@ async function boot() {
     fetchOptionalJson("./data/adaptive_progression_rules_v2.8.0.json"),
     fetchOptionalJson("./data/progression_confidence_rules_v2.8.0.json"),
     fetchOptionalJson("./data/progression_texts_v2.8.0.json"),
-    fetchOptionalJson("./data/progression_prediction_schema_v2.8.0.json")
+    fetchOptionalJson("./data/progression_prediction_schema_v2.8.0.json"),
+    fetchOptionalJson("./data/smart_workout_builder_schema_v2.9.0.json"),
+    fetchOptionalJson("./data/smart_workout_builder_rules_v2.9.0.json"),
+    fetchOptionalJson("./data/smart_workout_day_templates_v2.9.0.json"),
+    fetchOptionalJson("./data/smart_substitution_rules_v2.9.0.json"),
+    fetchOptionalJson("./data/smart_workout_builder_texts_v2.9.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -760,6 +775,11 @@ async function boot() {
   state.progressionConfidenceRules = progressionConfidenceRules;
   state.progressionTexts = progressionTexts;
   state.progressionPredictionSchema = progressionPredictionSchema;
+  state.smartWorkoutBuilderSchema = smartWorkoutBuilderSchema;
+  state.smartWorkoutBuilderRules = smartWorkoutBuilderRules;
+  state.smartWorkoutDayTemplates = smartWorkoutDayTemplates;
+  state.smartSubstitutionRules = smartSubstitutionRules;
+  state.smartWorkoutBuilderTexts = smartWorkoutBuilderTexts;
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
@@ -1651,6 +1671,105 @@ function adaptiveProgressionForExercise(completedExercise, session, baseInsight 
   };
 }
 
+function smartBuilderText(key, fallback) {
+  return state.smartWorkoutBuilderTexts?.texts?.[key] || fallback;
+}
+
+function dayTypeFromName(value) {
+  const text = String(value || "").toLowerCase();
+  if (text.includes("push") || text.includes("brust") || text.includes("schulter") || text.includes("trizeps")) return "Push";
+  if (text.includes("pull") || text.includes("ruecken") || text.includes("rücken") || text.includes("bizeps")) return "Pull";
+  if (text.includes("leg") || text.includes("bein") || text.includes("unter")) return "Legs";
+  return "FullBody";
+}
+
+function exerciseMatchesSlot(exercise, slot) {
+  const mapping = muscleMappingForExercise(exercise.id);
+  const primaryMatch = mapping?.primaryMuscle === slot.primaryMuscle;
+  const muscleText = exerciseListMuscleText(exercise).toLowerCase();
+  const movement = `${exercise.movementPattern} ${exercise.category} ${(exercise.tags || []).join(" ")}`.toLowerCase();
+  const slotPattern = String(slot.movementPattern || "").toLowerCase();
+  return primaryMatch || muscleText.includes(muscleName(slot.primaryMuscle).toLowerCase()) || movement.includes(slotPattern);
+}
+
+function estimateExerciseMinutes(exercise, sets = null) {
+  const setCount = sets || exercise.defaultSets || 3;
+  const rest = Number(exercise.defaultRestSeconds) || 90;
+  return Math.ceil(setCount * (rest + 55) / 60);
+}
+
+function smartWorkoutCandidateForSlot(slot, usedIds, profile) {
+  const avoidIds = new Set(profile.avoidExerciseIds || []);
+  const preferredIds = new Set(profile.preferredExerciseIds || []);
+  return allExercises()
+    .filter((exercise) => !exercise.isArchived && !usedIds.has(exercise.id) && !avoidIds.has(exercise.id))
+    .filter((exercise) => exerciseMatchesSlot(exercise, slot))
+    .filter((exercise) => !(profile.lumbarDiscHistory && exercise.lumbarDiscSuitability === "avoidInitially"))
+    .map((exercise) => {
+      const score = personalExerciseQualityScore(exercise)
+        + (preferredIds.has(exercise.id) ? 2 : 0)
+        + (exerciseHasHistory(exercise.id) ? 0.8 : 0)
+        - lwsRank(exercise.lumbarDiscSuitability) * 0.2;
+      return { exercise, score };
+    })
+    .sort((a, b) => b.score - a.score)[0]?.exercise || null;
+}
+
+function buildSmartWorkout(dayTypeOrName) {
+  const profile = currentPersonalProfile();
+  const dayType = dayTypeFromName(dayTypeOrName);
+  const maxMinutes = Number(profile.maxSessionMinutes) || 60;
+  const template = state.smartWorkoutDayTemplates?.templates?.find((item) => item.dayType === dayType && item.maxMinutes <= maxMinutes)
+    || state.smartWorkoutDayTemplates?.templates?.find((item) => item.dayType === dayType)
+    || null;
+  const reasons = [];
+  const warnings = [];
+  const usedIds = new Set();
+  const skippedOptionalExercises = [];
+  if (!template) {
+    return { dayType, estimatedDurationMinutes: 0, exercises: [], skippedOptionalExercises, builderReasons: [], warnings: ["Keine passende Vorlage gefunden."] };
+  }
+  const exercises = template.exerciseSlots.map((slot, index) => {
+    const exercise = smartWorkoutCandidateForSlot(slot, usedIds, profile);
+    if (!exercise) {
+      warnings.push(`Keine passende Uebung fuer ${slot.slot} gefunden.`);
+      return null;
+    }
+    usedIds.add(exercise.id);
+    return {
+      exerciseId: exercise.id,
+      exercise,
+      slot: slot.slot,
+      priority: slot.priority,
+      sets: slot.priority === "optional" ? 2 : 3,
+      reps: exercise.defaultRepRange || "8-12",
+      restSeconds: exercise.defaultRestSeconds || 90,
+      sortOrder: index + 1,
+      estimatedMinutes: estimateExerciseMinutes(exercise, slot.priority === "optional" ? 2 : 3)
+    };
+  }).filter(Boolean);
+  let estimatedDurationMinutes = exercises.reduce((sum, item) => sum + item.estimatedMinutes, 0);
+  while (estimatedDurationMinutes > maxMinutes && exercises.some((item) => item.priority === "optional")) {
+    const removed = exercises.splice(exercises.findLastIndex((item) => item.priority === "optional"), 1)[0];
+    skippedOptionalExercises.push(removed.exercise.displayName);
+    estimatedDurationMinutes = exercises.reduce((sum, item) => sum + item.estimatedMinutes, 0);
+  }
+  if (profile.lumbarDiscHistory) reasons.push(smartBuilderText("adapted_lws", "LWS-freundliche Varianten wurden bevorzugt."));
+  if (skippedOptionalExercises.length) reasons.push(smartBuilderText("optional_removed", "Optionale Uebungen wurden entfernt, damit die Einheit in der Zeit bleibt."));
+  if (!storage.sessions.length) reasons.push(smartBuilderText("not_enough_data", "Noch nicht genug persoenliche Daten. Standardregeln werden genutzt."));
+  reasons.push(smartBuilderText("generated", "Training wurde aus deinem Plan und deinen Vorgaben erstellt."));
+  return {
+    workoutId: `smart-${dayType}-${Date.now()}`,
+    source: "generated",
+    dayType,
+    estimatedDurationMinutes,
+    exercises,
+    skippedOptionalExercises,
+    builderReasons: reasons,
+    warnings
+  };
+}
+
 function trainingDnaText(key, fallback) {
   return state.trainingDnaTexts?.texts?.[key] || fallback;
 }
@@ -2526,12 +2645,32 @@ function renderTraining() {
             <span class="badge blue">Start</span>
           </article>
         </button>
+        ${renderSmartWorkoutPreview(day.name)}
       `).join("") : `<article class="card stack">
         <h2>Kein Training verfügbar</h2>
         <p class="muted">Aktiviere zuerst einen Plan.</p>
         <button class="secondary" data-tab="plans">Plan auswählen</button>
       </article>`}
     </section>
+  `;
+}
+
+function renderSmartWorkoutPreview(dayName) {
+  const proposal = buildSmartWorkout(dayName);
+  if (!proposal.exercises.length) return "";
+  return `
+    <article class="card stack builder-preview">
+      <div class="row">
+        <h3 class="grow">Smart Builder · ${htmlesc(proposal.dayType)}</h3>
+        <span class="badge blue">ca. ${proposal.estimatedDurationMinutes} min</span>
+      </div>
+      <ol class="builder-list">
+        ${proposal.exercises.map((item) => `<li><strong>${htmlesc(item.exercise.displayName)}</strong><span>${item.sets} Saetze · ${htmlesc(item.reps)}</span></li>`).join("")}
+      </ol>
+      ${proposal.builderReasons.length ? `<ul class="small-list">${proposal.builderReasons.slice(0, 2).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
+      ${proposal.warnings.length ? `<p class="quiet">${htmlesc(proposal.warnings[0])}</p>` : ""}
+      <button class="secondary" data-start-smart-day="${htmlesc(dayName)}">Smart-Training starten</button>
+    </article>
   `;
 }
 
@@ -2580,6 +2719,46 @@ function startDay(dayName) {
     startedAt: new Date().toISOString(),
     index: 0,
     entries: day.exercises.sort((a, b) => a.sortOrder - b.sortOrder).map((planned) => {
+      const last = lastCompletedExercise(planned.exerciseId);
+      return {
+        exerciseId: planned.exerciseId,
+        reps: planned.reps,
+        restSeconds: planned.restSeconds,
+        priority: planned.priority,
+        sortOrder: planned.sortOrder,
+        sets: Array.from({ length: Math.max(planned.sets, 1) }, (_, index) => {
+          const previous = last?.exercise?.sets?.find((set) => set.setNumber === index + 1);
+          return {
+            setNumber: index + 1,
+            weightText: previous?.actualWeightKg ? String(previous.actualWeightKg).replace(".", ",") : "",
+            repsText: "",
+            rirText: "",
+            completed: false
+          };
+        })
+      };
+    })
+  };
+  persistWorkoutDraft();
+  render();
+}
+
+function startSmartDay(dayName) {
+  const proposal = buildSmartWorkout(dayName);
+  if (!proposal.exercises.length) {
+    alert("Keine passende Uebung gefunden. Bitte manuell auswaehlen.");
+    return;
+  }
+  const plan = activePlan();
+  state.showAlternatives = false;
+  state.restTimer.remaining = 0;
+  state.restTimer.running = false;
+  state.activeWorkout = {
+    planName: plan?.planName || "Smart Workout",
+    dayName: `${proposal.dayType} Smart`,
+    startedAt: new Date().toISOString(),
+    index: 0,
+    entries: proposal.exercises.map((planned) => {
       const last = lastCompletedExercise(planned.exerciseId);
       return {
         exerciseId: planned.exerciseId,
@@ -3234,7 +3413,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "2.8.0",
+    backupVersion: "2.9.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),
@@ -3353,6 +3532,10 @@ function bindEvents() {
 
   document.querySelectorAll("[data-start-day]").forEach((button) => {
     button.addEventListener("click", () => startDay(button.dataset.startDay));
+  });
+
+  document.querySelectorAll("[data-start-smart-day]").forEach((button) => {
+    button.addEventListener("click", () => startSmartDay(button.dataset.startSmartDay));
   });
 
   document.querySelectorAll("[data-coverage-mode]").forEach((button) => {

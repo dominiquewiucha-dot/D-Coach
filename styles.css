@@ -688,6 +688,31 @@ select:focus-visible {
   font-size: 20px;
 }
 
+.builder-preview {
+  border-color: rgba(37,99,235,.35);
+}
+
+.builder-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.builder-list li {
+  color: var(--muted);
+}
+
+.builder-list strong {
+  display: block;
+  color: var(--text);
+}
+
+.builder-list span {
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .set-row {
   display: grid;
   grid-template-columns: 30px 1fr 1fr 64px 42px;

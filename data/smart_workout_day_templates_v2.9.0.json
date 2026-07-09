@@ -1,0 +1,130 @@
+{
+  "version": "2.9.0",
+  "type": "smart_workout_day_templates",
+  "locale": "de-DE",
+  "templates": [
+    {
+      "id": "template_push_lws_reentry_60",
+      "dayType": "Push",
+      "maxMinutes": 60,
+      "exerciseSlots": [
+        {
+          "slot": "main_chest",
+          "primaryMuscle": "mg_chest_middle",
+          "movementPattern": "Horizontal Push",
+          "priority": "required"
+        },
+        {
+          "slot": "upper_chest",
+          "primaryMuscle": "mg_chest_upper",
+          "movementPattern": "Incline Push",
+          "priority": "required"
+        },
+        {
+          "slot": "shoulder",
+          "primaryMuscle": "mg_front_delts",
+          "movementPattern": "Vertical Push",
+          "priority": "required"
+        },
+        {
+          "slot": "side_delt",
+          "primaryMuscle": "mg_side_delts",
+          "movementPattern": "Shoulder Abduction",
+          "priority": "recommended"
+        },
+        {
+          "slot": "triceps",
+          "primaryMuscle": "mg_triceps",
+          "movementPattern": "Elbow Extension",
+          "priority": "recommended"
+        },
+        {
+          "slot": "chest_isolation",
+          "primaryMuscle": "mg_chest_middle",
+          "movementPattern": "Chest Isolation",
+          "priority": "optional"
+        }
+      ]
+    },
+    {
+      "id": "template_pull_lws_reentry_60",
+      "dayType": "Pull",
+      "maxMinutes": 60,
+      "exerciseSlots": [
+        {
+          "slot": "vertical_pull",
+          "primaryMuscle": "mg_lats",
+          "movementPattern": "Vertical Pull",
+          "priority": "required"
+        },
+        {
+          "slot": "row_supported",
+          "primaryMuscle": "mg_upper_back",
+          "movementPattern": "Horizontal Pull",
+          "priority": "required"
+        },
+        {
+          "slot": "rear_delt",
+          "primaryMuscle": "mg_rear_delts",
+          "movementPattern": "Rear Delt Isolation",
+          "priority": "recommended"
+        },
+        {
+          "slot": "biceps",
+          "primaryMuscle": "mg_biceps",
+          "movementPattern": "Elbow Flexion",
+          "priority": "recommended"
+        },
+        {
+          "slot": "second_back",
+          "primaryMuscle": "mg_lats",
+          "movementPattern": "Shoulder Extension",
+          "priority": "optional"
+        }
+      ]
+    },
+    {
+      "id": "template_legs_lws_reentry_60",
+      "dayType": "Legs",
+      "maxMinutes": 60,
+      "exerciseSlots": [
+        {
+          "slot": "quad_main",
+          "primaryMuscle": "mg_quads",
+          "movementPattern": "Squat Pattern",
+          "priority": "required"
+        },
+        {
+          "slot": "hamstring",
+          "primaryMuscle": "mg_hamstrings",
+          "movementPattern": "Knee Flexion",
+          "priority": "required"
+        },
+        {
+          "slot": "glute",
+          "primaryMuscle": "mg_glutes",
+          "movementPattern": "Hip Extension",
+          "priority": "required"
+        },
+        {
+          "slot": "quad_isolation",
+          "primaryMuscle": "mg_quads",
+          "movementPattern": "Knee Extension",
+          "priority": "recommended"
+        },
+        {
+          "slot": "calves",
+          "primaryMuscle": "mg_calves",
+          "movementPattern": "Calf Raise",
+          "priority": "recommended"
+        },
+        {
+          "slot": "core",
+          "primaryMuscle": "mg_deep_core",
+          "movementPattern": "Core Anti-Rotation",
+          "priority": "optional"
+        }
+      ]
+    }
+  ]
+}

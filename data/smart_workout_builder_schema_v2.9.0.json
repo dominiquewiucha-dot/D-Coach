@@ -1,0 +1,30 @@
+{
+  "version": "2.9.0",
+  "type": "smart_workout_builder_schema",
+  "locale": "de-DE",
+  "description": "Regeln und Output für automatische Trainingstag-Erstellung oder Anpassung.",
+  "inputs": [
+    "activePlan",
+    "selectedDayType",
+    "maxSessionMinutes",
+    "preferredStudio",
+    "availableEquipment",
+    "personalProfile",
+    "muscleCoverageWeek",
+    "exerciseRatings",
+    "exerciseHistory",
+    "avoidExerciseIds",
+    "preferredExerciseIds"
+  ],
+  "outputSchema": {
+    "workoutId": "string",
+    "source": "planned|generated|adapted",
+    "dayType": "Push|Pull|Legs|FullBody|Custom",
+    "estimatedDurationMinutes": "number",
+    "exercises": "array",
+    "skippedOptionalExercises": "array",
+    "builderReasons": "array",
+    "warnings": "array"
+  },
+  "displayRule": "Builder-Ergebnis vor dem Training oder im Plan/Coach Mode anzeigen. Quick Training bleibt nur Durchführung."
+}

@@ -1,0 +1,25 @@
+{
+  "version": "2.9.0",
+  "type": "smart_substitution_rules",
+  "locale": "de-DE",
+  "rules": [
+    {
+      "id": "device_occupied_same_pattern",
+      "trigger": "user marks exercise as occupied",
+      "logic": "find same primary muscle + same movement pattern + available equipment + lower/equal risk",
+      "quickText": "Alternative mit ähnlichem Trainingseffekt anzeigen."
+    },
+    {
+      "id": "missing_machine_fallback",
+      "trigger": "planned machine not available",
+      "logic": "use cable or bodyweight alternative with same primary muscle",
+      "quickText": "Gerät nicht verfügbar: passende Alternative wählen."
+    },
+    {
+      "id": "lws_substitution",
+      "trigger": "exercise avoidInitially and lumbarDiscHistory true",
+      "logic": "rank alternatives by lumbarFriendliness and same primary muscle",
+      "quickText": "LWS-freundliche Alternative empfohlen."
+    }
+  ]
+}

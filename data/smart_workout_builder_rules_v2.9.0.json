@@ -1,0 +1,77 @@
+{
+  "version": "2.9.0",
+  "type": "smart_workout_builder_rules",
+  "locale": "de-DE",
+  "rules": [
+    {
+      "id": "keep_session_under_60",
+      "priority": 100,
+      "if": "maxSessionMinutes <= 60",
+      "then": "limit workout to 5-7 exercises and mark isolation/accessory work optional",
+      "reason": "Training soll in der Mittagspause realistisch bleiben."
+    },
+    {
+      "id": "respect_lws_profile",
+      "priority": 100,
+      "if": "personalProfile.lumbarDiscHistory == true",
+      "then": "exclude avoidInitially exercises unless user explicitly chooses them",
+      "reason": "LWS-Profil aktiv: risikoärmere Alternativen bevorzugen."
+    },
+    {
+      "id": "prefer_known_successful_exercises",
+      "priority": 85,
+      "if": "exercise has positive history or preferredExerciseIds",
+      "then": "rank higher",
+      "reason": "Übungen mit guter persönlicher Historie bevorzugen."
+    },
+    {
+      "id": "coverage_fill_missing_muscles",
+      "priority": 80,
+      "if": "muscleCoverageWeek target muscle < 70%",
+      "then": "prefer exercises for undertrained muscle if matching day type",
+      "reason": "Unterversorgte Muskelgruppen werden priorisiert."
+    },
+    {
+      "id": "avoid_overcovered_muscles",
+      "priority": 75,
+      "if": "muscleCoverageWeek target muscle > 120%",
+      "then": "avoid adding extra volume for this muscle",
+      "reason": "Muskelgruppe liegt bereits deutlich über Wochenziel."
+    },
+    {
+      "id": "push_template",
+      "priority": 70,
+      "if": "dayType == Push",
+      "then": "include chest press, incline/upper chest, shoulder press or lateral raise, triceps, optional fly",
+      "reason": "Ausgewogener Push-Tag ohne Überladung."
+    },
+    {
+      "id": "pull_template",
+      "priority": 70,
+      "if": "dayType == Pull",
+      "then": "include vertical pull, horizontal row, rear delt, biceps, optional second row/pulldown",
+      "reason": "Rückenbreite, Rückendichte und Arme abdecken."
+    },
+    {
+      "id": "legs_template_lws",
+      "priority": 70,
+      "if": "dayType == Legs AND lumbarDiscHistory == true",
+      "then": "prefer leg press, leg curl, leg extension, hip thrust, calves, core anti-rotation",
+      "reason": "Beine trainieren ohne hohe Hinge-/Axialbelastung."
+    },
+    {
+      "id": "machine_if_studio_unknown",
+      "priority": 65,
+      "if": "preferredStudio exists but exact machine catalog unknown",
+      "then": "use generic machine/cable/bodyweight alternatives",
+      "reason": "Studio-Kontext wird berücksichtigt, ohne Geräte zu erfinden."
+    },
+    {
+      "id": "optional_if_time_low",
+      "priority": 90,
+      "if": "estimatedDurationMinutes > maxSessionMinutes",
+      "then": "remove optional exercises from bottom of priority list",
+      "reason": "Zeitlimit hat Vorrang."
+    }
+  ]
+}

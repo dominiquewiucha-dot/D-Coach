@@ -1,0 +1,15 @@
+{
+  "version": "2.9.0",
+  "type": "smart_workout_builder_texts",
+  "locale": "de-DE",
+  "texts": {
+    "generated": "Training wurde aus deinem Plan und deinen Vorgaben erstellt.",
+    "adapted_time": "Training wurde auf dein 60-Minuten-Zeitfenster angepasst.",
+    "adapted_lws": "LWS-freundliche Varianten wurden bevorzugt.",
+    "adapted_coverage": "Unterversorgte Muskelgruppen wurden priorisiert.",
+    "optional_removed": "Optionale Übungen wurden entfernt, damit die Einheit in der Zeit bleibt.",
+    "not_enough_data": "Noch nicht genug persönliche Daten. Standardregeln werden genutzt.",
+    "device_occupied": "Gerät besetzt? Alternative anzeigen.",
+    "start_workout": "Training starten"
+  }
+}
