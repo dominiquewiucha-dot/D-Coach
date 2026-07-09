@@ -1,0 +1,26 @@
+{
+  "version": "2.6.0",
+  "type": "alternative_explanation_rules",
+  "rules": [
+    {
+      "id": "lws_better_alternative",
+      "trigger": "alternative.lumbarFriendliness > source.lumbarFriendliness + 2",
+      "text": "Diese Alternative ist LWS-freundlicher und trainiert eine ähnliche Muskelgruppe."
+    },
+    {
+      "id": "same_stimulus_less_fatigue",
+      "trigger": "alternative.stimulusScore >= source.stimulusScore - 1 AND alternative.fatigueCost < source.fatigueCost",
+      "text": "Ähnlicher Muskelreiz bei geringerer Ermüdung."
+    },
+    {
+      "id": "better_time_efficiency",
+      "trigger": "alternative.timeEfficiency > source.timeEfficiency + 1",
+      "text": "Diese Alternative ist zeiteffizienter."
+    },
+    {
+      "id": "better_reentry",
+      "trigger": "alternative.reentrySuitability > source.reentrySuitability + 2",
+      "text": "Diese Übung passt besser zum moderaten Wiedereinstieg."
+    }
+  ]
+}

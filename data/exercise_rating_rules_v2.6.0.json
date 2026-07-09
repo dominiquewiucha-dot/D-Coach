@@ -1,0 +1,23 @@
+{
+  "version": "2.6.0",
+  "type": "exercise_rating_rules",
+  "rules": [
+    {
+      "id": "personal_lws_quality_score",
+      "calculation": "stimulusScore*.35 + lumbarFriendliness*.30 + progressionPotential*.15 + timeEfficiency*.10 + reentrySuitability*.10 - fatigueCost*.10",
+      "appliesWhen": "profile.lumbarDiscHistory == true"
+    },
+    {
+      "id": "hypertrophy_quality_score",
+      "calculation": "stimulusScore*.45 + progressionPotential*.20 + timeEfficiency*.15 - fatigueCost*.10 - skillRequirement*.05"
+    },
+    {
+      "id": "time_limited_score",
+      "calculation": "timeEfficiency*.45 + stimulusScore*.30 + progressionPotential*.10"
+    },
+    {
+      "id": "substitution_match_score",
+      "calculation": "samePrimaryMuscle*40 + sameMovementPattern*25 + lowerRisk*20 + availableEquipment*10 + userHistory*5"
+    }
+  ]
+}

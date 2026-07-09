@@ -1,0 +1,20 @@
+{
+  "version": "2.6.0",
+  "type": "exercise_rating_schema",
+  "scale": "0-10",
+  "fields": [
+    "stimulusScore",
+    "fatigueCost",
+    "timeEfficiency",
+    "progressionPotential",
+    "skillRequirement",
+    "stabilityRequirement",
+    "lumbarFriendliness",
+    "shoulderFriendliness",
+    "kneeFriendliness",
+    "reentrySuitability",
+    "hypertrophySuitability",
+    "strengthSuitability"
+  ],
+  "displayRule": "Ratings nicht im Quick Training Mode anzeigen; nur Alternativen, Coach Mode und Übungsdetails."
+}

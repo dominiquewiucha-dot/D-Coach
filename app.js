@@ -37,6 +37,10 @@ const state = {
   smartNotesRules: null,
   confidenceScoreRules: null,
   whyExplanationSchema: null,
+  exerciseRatingSchema: null,
+  exerciseRatingRules: null,
+  exerciseRatingsSeed: null,
+  alternativeExplanationRules: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -57,8 +61,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v22";
-const STORAGE_SCHEMA_VERSION = "2.5.0";
+const APP_VERSION = "pwa-v23";
+const STORAGE_SCHEMA_VERSION = "2.6.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -615,7 +619,11 @@ async function boot() {
     personalRecordRules,
     smartNotesRules,
     confidenceScoreRules,
-    whyExplanationSchema
+    whyExplanationSchema,
+    exerciseRatingSchema,
+    exerciseRatingRules,
+    exerciseRatingsSeed,
+    alternativeExplanationRules
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -665,7 +673,11 @@ async function boot() {
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
     fetchOptionalJson("./data/smart_notes_rules_v2.5.0.json"),
     fetchOptionalJson("./data/confidence_score_rules_v2.5.0.json"),
-    fetchOptionalJson("./data/why_explanation_schema_v2.5.0.json")
+    fetchOptionalJson("./data/why_explanation_schema_v2.5.0.json"),
+    fetchOptionalJson("./data/exercise_rating_schema_v2.6.0.json"),
+    fetchOptionalJson("./data/exercise_rating_rules_v2.6.0.json"),
+    fetchOptionalJson("./data/exercise_ratings_seed_v2.6.0.json"),
+    fetchOptionalJson("./data/alternative_explanation_rules_v2.6.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -704,6 +716,10 @@ async function boot() {
   state.smartNotesRules = smartNotesRules;
   state.confidenceScoreRules = confidenceScoreRules;
   state.whyExplanationSchema = whyExplanationSchema;
+  state.exerciseRatingSchema = exerciseRatingSchema;
+  state.exerciseRatingRules = exerciseRatingRules;
+  state.exerciseRatingsSeed = exerciseRatingsSeed;
+  state.alternativeExplanationRules = alternativeExplanationRules;
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
@@ -1533,6 +1549,74 @@ function coachingTexts() {
   return state.coachingTexts?.texts || {};
 }
 
+function exerciseRatingFor(exerciseId) {
+  return state.exerciseRatingsSeed?.ratings?.find((item) => item.exerciseId === exerciseId) || null;
+}
+
+function fallbackExerciseRating(exercise) {
+  const lwsValue = {
+    suitable: 9,
+    conditionallySuitable: 6,
+    notRecommended: 3,
+    avoidInitially: 2
+  }[exercise?.lumbarDiscSuitability] || 6;
+  return {
+    exerciseId: exercise?.id || "unknown",
+    stimulusScore: 6,
+    fatigueCost: 4,
+    timeEfficiency: 6,
+    progressionPotential: 6,
+    skillRequirement: 4,
+    stabilityRequirement: 4,
+    lumbarFriendliness: lwsValue,
+    shoulderFriendliness: 6,
+    kneeFriendliness: 6,
+    reentrySuitability: lwsValue,
+    hypertrophySuitability: 6,
+    strengthSuitability: 5,
+    isFallback: true
+  };
+}
+
+function ratingForExercise(exercise) {
+  return exerciseRatingFor(exercise?.id) || fallbackExerciseRating(exercise);
+}
+
+function personalExerciseQualityScore(exercise) {
+  const rating = ratingForExercise(exercise);
+  const profile = currentPersonalProfile();
+  const lwsScore = rating.stimulusScore * 0.35
+    + rating.lumbarFriendliness * 0.30
+    + rating.progressionPotential * 0.15
+    + rating.timeEfficiency * 0.10
+    + rating.reentrySuitability * 0.10
+    - rating.fatigueCost * 0.10;
+  const hypertrophyScore = rating.stimulusScore * 0.45
+    + rating.progressionPotential * 0.20
+    + rating.timeEfficiency * 0.15
+    - rating.fatigueCost * 0.10
+    - rating.skillRequirement * 0.05;
+  const value = profile.lumbarDiscHistory ? lwsScore : hypertrophyScore;
+  return Math.max(0, Math.min(10, Math.round(value * 10) / 10));
+}
+
+function alternativeExplanation(sourceExercise, alternativeExercise) {
+  const source = ratingForExercise(sourceExercise);
+  const alternative = ratingForExercise(alternativeExercise);
+  const textFor = (id, fallback) => state.alternativeExplanationRules?.rules?.find((item) => item.id === id)?.text || fallback;
+  if (alternative.lumbarFriendliness > source.lumbarFriendliness + 2) return textFor("lws_better_alternative", "Diese Alternative ist LWS-freundlicher und trainiert eine aehnliche Muskelgruppe.");
+  if (alternative.stimulusScore >= source.stimulusScore - 1 && alternative.fatigueCost < source.fatigueCost) return textFor("same_stimulus_less_fatigue", "Aehnlicher Muskelreiz bei geringerer Ermuedung.");
+  if (alternative.timeEfficiency > source.timeEfficiency + 1) return textFor("better_time_efficiency", "Diese Alternative ist zeiteffizienter.");
+  if (alternative.reentrySuitability > source.reentrySuitability + 2) return textFor("better_reentry", "Diese Uebung passt besser zum moderaten Wiedereinstieg.");
+  return "";
+}
+
+function alternativeCandidateScore(sourceExercise, candidate, baseScore, preferred) {
+  const ratingDelta = (personalExerciseQualityScore(candidate) - personalExerciseQualityScore(sourceExercise)) / 100;
+  const value = (Number(baseScore) || 0) + (preferred ? 0.2 : 0) + ratingDelta;
+  return Math.max(0, Math.min(1, Math.round(value * 100) / 100));
+}
+
 function muscleAssetFor(muscleId) {
   return state.muscleAssets?.muscles?.find((item) => item.muscleId === muscleId) || null;
 }
@@ -1657,8 +1741,9 @@ function alternativeCandidatesForExercise(exercise) {
       if (!candidate || avoidIds.has(candidate.id)) return;
       byId.set(candidate.id, {
         exercise: candidate,
-        score: (Number(item.matchScore) || 0) + (preferredIds.has(candidate.id) ? 0.2 : 0),
+        score: alternativeCandidateScore(exercise, candidate, item.matchScore, preferredIds.has(candidate.id)),
         note: item.note || item.reason || "",
+        explanation: alternativeExplanation(exercise, candidate),
         reason: rule.reason || "",
         source: "rule"
       });
@@ -1670,8 +1755,9 @@ function alternativeCandidatesForExercise(exercise) {
     if (byId.has(candidate.id)) return;
     byId.set(candidate.id, {
       exercise: candidate,
-      score: preferredIds.has(candidate.id) ? 0.2 : 0,
+      score: alternativeCandidateScore(exercise, candidate, 0, preferredIds.has(candidate.id)),
       note: "",
+      explanation: alternativeExplanation(exercise, candidate),
       reason: "",
       source: "fallback"
     });
@@ -1933,6 +2019,36 @@ function renderPerformanceCoachCard(session) {
           </details>
         </div>
       `).join("")}
+    </article>
+  `;
+}
+
+function renderExerciseRatingCard(exercise) {
+  const rating = ratingForExercise(exercise);
+  const quality = personalExerciseQualityScore(exercise);
+  const rows = [
+    ["Muskelreiz", rating.stimulusScore],
+    ["Ermuedungskosten", rating.fatigueCost],
+    ["Zeiteffizienz", rating.timeEfficiency],
+    ["Progression", rating.progressionPotential],
+    ["LWS-Freundlichkeit", rating.lumbarFriendliness],
+    ["Wiedereinstieg", rating.reentrySuitability]
+  ];
+  return `
+    <article class="card stack">
+      <div class="row">
+        <h3 class="grow">Uebungsbewertung</h3>
+        <span class="badge blue">${quality}/10</span>
+      </div>
+      ${rating.isFallback ? `<p class="quiet">Fallback-Bewertung, weil fuer diese Uebung noch kein Seed-Rating hinterlegt ist.</p>` : ""}
+      <div class="rating-grid">
+        ${rows.map(([label, value]) => `
+          <div>
+            <span>${htmlesc(label)}</span>
+            <strong>${Number(value).toFixed(1).replace(".", ",")}</strong>
+          </div>
+        `).join("")}
+      </div>
     </article>
   `;
 }
@@ -2560,6 +2676,7 @@ function renderExerciseDetail(id) {
         <h3>Wissenswertes</h3>
         <ul class="small-list">${exerciseKnowledge(exercise).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
       </article>
+      ${renderExerciseRatingCard(exercise)}
       <article class="card stack"><h3>Ausführung</h3><p class="muted">${htmlesc(exercise.techniqueNotes || "Keine Technikhinweise hinterlegt.")}</p></article>
       <article class="card stack"><h3>Häufige Fehler</h3>${exercise.commonMistakes?.length ? `<ul class="small-list">${exercise.commonMistakes.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : `<p class="muted">Keine Fehlerhinweise hinterlegt.</p>`}</article>
       <article class="card stack"><h3>Letzte Leistung</h3>${last ? `<p class="muted">Letztes Mal am ${dateText(last.session.endedAt || last.session.startedAt)}</p><ul class="small-list">${last.exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}</li>`).join("")}</ul>` : `<p class="muted">Noch keine vorherige Leistung vorhanden.</p>`}</article>
@@ -2582,10 +2699,12 @@ function renderExerciseDetail(id) {
             <div>
               <strong>${htmlesc(item.exercise.displayName)}</strong>
               <p class="muted">${htmlesc(item.note || exerciseListMuscleText(item.exercise))}</p>
+              ${item.explanation ? `<p class="quiet">${htmlesc(item.explanation)}</p>` : ""}
               ${item.reason ? `<p class="quiet">${htmlesc(item.reason)}</p>` : ""}
             </div>
             <div class="badge-stack">
               ${lwsBadge(item.exercise.lumbarDiscSuitability)}
+              <span class="badge blue">${personalExerciseQualityScore(item.exercise)}/10</span>
               ${item.score ? `<span class="badge blue">${Math.round(item.score * 100)}%</span>` : ""}
             </div>
           </div>
@@ -2801,7 +2920,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "2.5.0",
+    backupVersion: "2.6.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),
