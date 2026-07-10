@@ -1,0 +1,19 @@
+{
+  "version": "4.2.0",
+  "type": "plan_optimizer_schema",
+  "inputs": [
+    "activePlan",
+    "muscleCoverage",
+    "muscleBalance",
+    "weakPoints",
+    "recoveryFatigue",
+    "timeAvailable"
+  ],
+  "outputs": [
+    "planChanges",
+    "planPreview",
+    "simulation",
+    "why",
+    "confidence"
+  ]
+}

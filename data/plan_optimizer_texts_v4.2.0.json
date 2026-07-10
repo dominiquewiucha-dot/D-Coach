@@ -1,0 +1,10 @@
+{
+  "version": "4.2.0",
+  "type": "plan_optimizer_texts",
+  "texts": {
+    "preview": "Planvorschau",
+    "simulation": "Auswirkung nach Training",
+    "swap": "Tausch vorschlagen",
+    "weakPoint": "Schwachpunkt erkannt"
+  }
+}

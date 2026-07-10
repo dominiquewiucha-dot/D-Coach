@@ -1,4 +1,4 @@
-const CACHE_NAME = "dcoach-pwa-v36";
+const CACHE_NAME = "dcoach-pwa-v37";
 const ASSETS = [
   "./",
   "./index.html",
@@ -111,6 +111,12 @@ const ASSETS = [
   "./data/joint_stress_rules_v4.1.0.json",
   "./data/deload_detection_rules_v4.1.0.json",
   "./data/recovery_texts_v4.1.0.json",
+  "./data/plan_optimizer_schema_v4.2.0.json",
+  "./data/plan_simulation_schema_v4.2.0.json",
+  "./data/muscle_balance_rules_v4.2.0.json",
+  "./data/weak_point_engine_rules_v4.2.0.json",
+  "./data/adaptive_weekly_planning_rules_v4.2.0.json",
+  "./data/plan_optimizer_texts_v4.2.0.json",
   "./assets/icon.svg",
   "./assets/apple-touch-icon.png",
   "./assets/muscle_maps/muscle_map_front_v3.0.0.svg",

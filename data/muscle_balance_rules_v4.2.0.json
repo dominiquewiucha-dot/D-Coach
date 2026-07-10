@@ -1,0 +1,22 @@
+{
+  "version": "4.2.0",
+  "type": "muscle_balance_rules",
+  "rules": [
+    {
+      "id": "front_delts_over_triceps_under",
+      "then": "reduce shoulder press; add triceps"
+    },
+    {
+      "id": "upper_back_over_lat_under",
+      "then": "replace row with vertical pull"
+    },
+    {
+      "id": "quads_over_hams_under",
+      "then": "add leg curl/hip thrust"
+    },
+    {
+      "id": "front_rear_delt_imbalance",
+      "then": "add rear delt work"
+    }
+  ]
+}

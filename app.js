@@ -68,6 +68,12 @@ const state = {
   jointStressRules: null,
   deloadDetectionRules: null,
   recoveryTexts: null,
+  planOptimizerSchema: null,
+  planSimulationSchema: null,
+  muscleBalanceRules: null,
+  weakPointEngineRules: null,
+  adaptiveWeeklyPlanningRules: null,
+  planOptimizerTexts: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -113,8 +119,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v36";
-const STORAGE_SCHEMA_VERSION = "4.1.0";
+const APP_VERSION = "pwa-v37";
+const STORAGE_SCHEMA_VERSION = "4.2.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -703,6 +709,12 @@ async function boot() {
     jointStressRules,
     deloadDetectionRules,
     recoveryTexts,
+    planOptimizerSchema,
+    planSimulationSchema,
+    muscleBalanceRules,
+    weakPointEngineRules,
+    adaptiveWeeklyPlanningRules,
+    planOptimizerTexts,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -809,6 +821,12 @@ async function boot() {
     fetchOptionalJson("./data/joint_stress_rules_v4.1.0.json"),
     fetchOptionalJson("./data/deload_detection_rules_v4.1.0.json"),
     fetchOptionalJson("./data/recovery_texts_v4.1.0.json"),
+    fetchOptionalJson("./data/plan_optimizer_schema_v4.2.0.json"),
+    fetchOptionalJson("./data/plan_simulation_schema_v4.2.0.json"),
+    fetchOptionalJson("./data/muscle_balance_rules_v4.2.0.json"),
+    fetchOptionalJson("./data/weak_point_engine_rules_v4.2.0.json"),
+    fetchOptionalJson("./data/adaptive_weekly_planning_rules_v4.2.0.json"),
+    fetchOptionalJson("./data/plan_optimizer_texts_v4.2.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -903,6 +921,12 @@ async function boot() {
   state.jointStressRules = jointStressRules;
   state.deloadDetectionRules = deloadDetectionRules;
   state.recoveryTexts = recoveryTexts;
+  state.planOptimizerSchema = planOptimizerSchema;
+  state.planSimulationSchema = planSimulationSchema;
+  state.muscleBalanceRules = muscleBalanceRules;
+  state.weakPointEngineRules = weakPointEngineRules;
+  state.adaptiveWeeklyPlanningRules = adaptiveWeeklyPlanningRules;
+  state.planOptimizerTexts = planOptimizerTexts;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -3284,6 +3308,55 @@ function renderRecoveryFatigueCard(context = "coach") {
   `;
 }
 
+function planOptimizerText(key, fallback) {
+  return state.planOptimizerTexts?.texts?.[key] || fallback;
+}
+
+function planOptimizerSummary() {
+  const plan = activePlan();
+  const weekCoverage = coverageForSessions(sessionsSince(7));
+  const weakPoints = weekCoverage.filter((item) => item.isTarget && item.percent < 70).slice(0, 3);
+  const overTargets = weekCoverage.filter((item) => item.percent > 120).slice(0, 3);
+  const recovery = recoveryFatigueSummary();
+  const action = weakPoints.length
+    ? `${weakPoints[0].name}: +2 bis +4 Saetze diese Woche pruefen.`
+    : overTargets.length
+      ? `${overTargets[0].name}: Zusatzvolumen reduzieren.`
+      : recovery.deloadCandidate
+        ? "Plan konservativ halten, Deload-Option pruefen."
+        : "Plan aktuell ohne harte Korrektur weiterfuehren.";
+  return {
+    planName: plan?.planName || "Kein aktiver Plan",
+    weakPoints,
+    overTargets,
+    action,
+    simulatedSessions: plan?.days?.length || 0,
+    estimatedMinutes: plan?.days?.reduce((sum, day) => sum + (Number(day.maxDurationMinutes) || 0), 0) || 0
+  };
+}
+
+function renderPlanOptimizerCard(context = "plans") {
+  const summary = planOptimizerSummary();
+  return `
+    <article class="card stack plan-optimizer-card">
+      <div class="row">
+        <h3 class="grow">Plan Optimizer</h3>
+        <span class="badge blue">v4.2</span>
+      </div>
+      <p class="muted">${htmlesc(planOptimizerText("preview", "Planvorschau"))}: ${htmlesc(summary.planName)}</p>
+      <div class="mini-grid">
+        <div class="fatigue-metric"><strong>${summary.simulatedSessions}</strong><span>Einheiten</span></div>
+        <div class="fatigue-metric"><strong>${summary.estimatedMinutes}</strong><span>Min/Woche</span></div>
+        <div class="fatigue-metric"><strong>${summary.weakPoints.length}</strong><span>Schwachpunkte</span></div>
+      </div>
+      <p class="muted">${htmlesc(summary.action)}</p>
+      ${summary.weakPoints.length ? `<ul class="small-list">${summary.weakPoints.map((item) => `<li>${htmlesc(planOptimizerText("weakPoint", "Schwachpunkt erkannt"))}: ${htmlesc(item.name)} (${item.percent}%)</li>`).join("")}</ul>` : `<p class="quiet">Keine Zielmuskelgruppe klar unter 70% Wochenabdeckung.</p>`}
+      ${summary.overTargets.length ? `<p class="quiet">Ueber Ziel: ${summary.overTargets.map((item) => `${htmlesc(item.name)} ${item.percent}%`).join(", ")}</p>` : ""}
+      <p class="quiet">${context === "coach" ? "Coachansicht: als Wochensteuerung, nicht als Satzscreen-Hinweis." : "Planung: Simulation nutzt aktive Planstruktur und aktuelle Wochenabdeckung."}</p>
+    </article>
+  `;
+}
+
 function renderDashboard() {
   const plan = activePlan();
   const latestWeight = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
@@ -3372,6 +3445,7 @@ function renderCoach() {
       </div>
       ${renderIntelligenceCoreCard("coach")}
       ${renderRecoveryFatigueCard("coach")}
+      ${renderPlanOptimizerCard("coach")}
       <article class="card stack">
         <div class="row"><h3 class="grow">Recovery</h3><span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span></div>
         <p class="muted">${htmlesc(readiness.hint)}</p>
@@ -3830,6 +3904,7 @@ function renderPlans() {
       <header><h1 class="title">Pläne</h1><p class="subtitle">Aktiver Plan und Bibliothek.</p></header>
       ${renderIntelligenceCoreCard("plans")}
       ${renderRecoveryFatigueCard("plans")}
+      ${renderPlanOptimizerCard("plans")}
       <article class="card stack">
         <h3>Plan teilen / importieren</h3>
         <p class="muted">${payload.length > qrLimit ? appText("qr.tooLarge", "Dieser Plan ist zu gross fuer QR. Bitte JSON-Export verwenden.") : "Kompakter Plan-Code fuer QR/Text-Import."}</p>
@@ -4330,7 +4405,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "4.1.0",
+    backupVersion: "4.2.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

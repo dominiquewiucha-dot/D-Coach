@@ -1,0 +1,18 @@
+{
+  "version": "4.2.0",
+  "type": "adaptive_weekly_planning_rules",
+  "rules": [
+    {
+      "id": "legs_missing",
+      "then": "suggest Legs Lite"
+    },
+    {
+      "id": "pull_skipped",
+      "then": "prioritize Pull"
+    },
+    {
+      "id": "time_short",
+      "then": "remove optional isolation"
+    }
+  ]
+}

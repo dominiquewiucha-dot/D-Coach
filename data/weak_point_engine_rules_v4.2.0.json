@@ -1,0 +1,18 @@
+{
+  "version": "4.2.0",
+  "type": "weak_point_engine_rules",
+  "rules": [
+    {
+      "id": "coverage_weak_point",
+      "if": "muscle below 70 percent for 3+ weeks"
+    },
+    {
+      "id": "progress_weak_point",
+      "if": "stagnates 4+ sessions"
+    },
+    {
+      "id": "recommend_volume_add",
+      "then": "+2 to +4 sets per week for 4 weeks"
+    }
+  ]
+}
