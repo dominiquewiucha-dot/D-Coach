@@ -1,0 +1,17 @@
+{
+  "version": "3.6.0",
+  "type": "exercise_history_chart_config",
+  "modes": [
+    "volume",
+    "bestSet",
+    "estimatedStrength",
+    "repsAtWeight"
+  ],
+  "defaultMode": "bestSet",
+  "colors": {
+    "line": "#2563EB",
+    "area": "#1E3A8A",
+    "highlight": "#60A5FA",
+    "warning": "#F59E0B"
+  }
+}

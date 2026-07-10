@@ -1,0 +1,83 @@
+{
+  "version": "3.6.0",
+  "type": "exercise_detail_layout",
+  "sections": [
+    {
+      "id": "hero",
+      "title": "Übung",
+      "fields": [
+        "displayName",
+        "category",
+        "equipment",
+        "primaryMuscle",
+        "quickRating"
+      ]
+    },
+    {
+      "id": "last_performance",
+      "title": "Letzte Leistung",
+      "fields": [
+        "lastWeight",
+        "lastReps",
+        "lastDate",
+        "trend"
+      ]
+    },
+    {
+      "id": "progression",
+      "title": "Progression",
+      "fields": [
+        "coachDecision",
+        "nextSuggestion",
+        "why",
+        "confidence"
+      ]
+    },
+    {
+      "id": "muscle_impact",
+      "title": "Muskelbeitrag",
+      "fields": [
+        "primaryMuscle",
+        "secondaryMuscles",
+        "coverageContribution"
+      ]
+    },
+    {
+      "id": "ratings",
+      "title": "Bewertung",
+      "fields": [
+        "stimulusScore",
+        "lumbarFriendliness",
+        "timeEfficiency",
+        "progressionPotential"
+      ]
+    },
+    {
+      "id": "records",
+      "title": "Rekorde",
+      "fields": [
+        "maxWeight",
+        "maxRepsAtWeight",
+        "maxVolume"
+      ]
+    },
+    {
+      "id": "alternatives",
+      "title": "Alternativen",
+      "fields": [
+        "reason",
+        "lwsSuitability",
+        "similarityScore"
+      ]
+    },
+    {
+      "id": "notes",
+      "title": "Notizen",
+      "fields": [
+        "userNotes",
+        "smartNotes"
+      ]
+    }
+  ],
+  "displayRule": "Detailseite nur nach Tap. Quick Training zeigt nur Name, letztes Gewicht, heutige Sätze."
+}

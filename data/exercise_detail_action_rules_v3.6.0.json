@@ -1,0 +1,31 @@
+{
+  "version": "3.6.0",
+  "type": "exercise_detail_action_rules",
+  "rules": [
+    {
+      "id": "start_from_detail",
+      "label": "Übung starten",
+      "effect": "open quick training with selected exercise"
+    },
+    {
+      "id": "use_alternative",
+      "label": "Alternative nutzen",
+      "effect": "replace exercise in current workout if active"
+    },
+    {
+      "id": "open_why",
+      "label": "Warum anzeigen",
+      "effect": "open why explanation from v2.5/v2.8"
+    },
+    {
+      "id": "open_muscle",
+      "label": "Muskel öffnen",
+      "effect": "open v3.0/v3.3 muscle detail"
+    },
+    {
+      "id": "show_history",
+      "label": "Historie anzeigen",
+      "effect": "open exercise history chart"
+    }
+  ]
+}

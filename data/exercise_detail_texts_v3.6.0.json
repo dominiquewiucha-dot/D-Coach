@@ -1,0 +1,18 @@
+{
+  "version": "3.6.0",
+  "type": "exercise_detail_texts",
+  "locale": "de-DE",
+  "texts": {
+    "lastPerformance": "Letzte Leistung",
+    "nextSuggestion": "Nächster Vorschlag",
+    "why": "Warum?",
+    "records": "Rekorde",
+    "alternatives": "Alternativen",
+    "muscleImpact": "Muskelbeitrag",
+    "ratings": "Bewertung",
+    "notEnoughData": "Noch nicht genug Daten.",
+    "openHistory": "Historie öffnen",
+    "useAlternative": "Alternative nutzen",
+    "startExercise": "Übung starten"
+  }
+}

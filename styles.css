@@ -876,6 +876,60 @@ select:focus-visible {
   margin-bottom: 5px;
 }
 
+.premium-exercise-card {
+  border-color: rgba(37,99,235,.55);
+}
+
+.exercise-premium-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.exercise-premium-stats div {
+  min-width: 0;
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--input);
+}
+
+.exercise-premium-stats strong,
+.exercise-premium-stats span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.exercise-premium-stats strong {
+  font-size: 17px;
+}
+
+.exercise-premium-stats span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.exercise-history-chart {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  min-height: 126px;
+}
+
+.exercise-history-chart .trend-item span {
+  background: var(--blue);
+}
+
+.compact-button {
+  width: auto;
+  min-width: 96px;
+  min-height: 38px;
+  padding: 0 12px;
+  flex-shrink: 0;
+}
+
 .rating-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

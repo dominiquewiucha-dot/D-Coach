@@ -54,6 +54,10 @@ const state = {
   personalRecordsSchema: null,
   achievementRules: null,
   achievementTexts: null,
+  exerciseDetailLayout: null,
+  exerciseDetailTexts: null,
+  exerciseDetailActionRules: null,
+  exerciseHistoryChartConfig: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -99,8 +103,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v33";
-const STORAGE_SCHEMA_VERSION = "3.5.0";
+const APP_VERSION = "pwa-v34";
+const STORAGE_SCHEMA_VERSION = "3.6.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -675,6 +679,10 @@ async function boot() {
     personalRecordsSchema,
     achievementRules,
     achievementTexts,
+    exerciseDetailLayout,
+    exerciseDetailTexts,
+    exerciseDetailActionRules,
+    exerciseHistoryChartConfig,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -767,6 +775,10 @@ async function boot() {
     fetchOptionalJson("./data/personal_records_schema_v3.5.0.json"),
     fetchOptionalJson("./data/achievement_rules_v3.5.0.json"),
     fetchOptionalJson("./data/achievement_texts_v3.5.0.json"),
+    fetchOptionalJson("./data/exercise_detail_layout_v3.6.0.json"),
+    fetchOptionalJson("./data/exercise_detail_texts_v3.6.0.json"),
+    fetchOptionalJson("./data/exercise_detail_action_rules_v3.6.0.json"),
+    fetchOptionalJson("./data/exercise_history_chart_config_v3.6.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -847,6 +859,10 @@ async function boot() {
   state.personalRecordsSchema = personalRecordsSchema;
   state.achievementRules = achievementRules;
   state.achievementTexts = achievementTexts;
+  state.exerciseDetailLayout = exerciseDetailLayout;
+  state.exerciseDetailTexts = exerciseDetailTexts;
+  state.exerciseDetailActionRules = exerciseDetailActionRules;
+  state.exerciseHistoryChartConfig = exerciseHistoryChartConfig;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -3724,6 +3740,113 @@ function renderExercises() {
   `;
 }
 
+function exerciseDetailText(key, fallback) {
+  return state.exerciseDetailTexts?.texts?.[key] || fallback;
+}
+
+function exerciseRecordFor(exerciseId) {
+  return allExerciseRecords().find((record) => record.exerciseId === exerciseId) || null;
+}
+
+function exerciseProgressionInsight(exerciseId) {
+  const last = lastCompletedExercise(exerciseId);
+  if (!last) return null;
+  return performanceInsightsForSession(last.session).find((item) => item.exercise.exerciseId === exerciseId) || null;
+}
+
+function exerciseHistoryBars(history) {
+  const points = [...history].reverse().slice(-6);
+  if (!points.length) return `<p class="muted">${htmlesc(exerciseDetailText("notEnoughData", "Noch nicht genug Daten."))}</p>`;
+  const values = points.map((item) => totalVolume(item.exercise));
+  const max = Math.max(...values, 1);
+  return `
+    <div class="exercise-history-chart">
+      ${points.map((item) => {
+        const value = totalVolume(item.exercise);
+        const height = 24 + (value / max) * 86;
+        return `<div class="trend-item"><span style="height:${height}px"></span><small>${dateText(item.session.startedAt).slice(0, 5)}</small></div>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderExerciseDetailPremium(exercise, last, history, alternatives) {
+  const insight = exerciseProgressionInsight(exercise.id);
+  const record = exerciseRecordFor(exercise.id);
+  const roles = exerciseMuscleRoles(exercise);
+  const lastBestWeight = last ? Math.max(0, ...last.exercise.sets.map((set) => Number(set.actualWeightKg) || 0)) : 0;
+  return `
+    <section class="exercise-detail-premium stack">
+      <article class="card stack premium-exercise-card">
+        <div class="row">
+          <div class="grow">
+            <p class="muted">${htmlesc(exercise.category || exerciseKind(exercise))}</p>
+            <h2>${htmlesc(exercise.displayName)}</h2>
+          </div>
+          <span class="badge blue">${personalExerciseQualityScore(exercise)}/10</span>
+        </div>
+        <div class="exercise-premium-stats">
+          <div><strong>${last ? kg(lastBestWeight) : "-"}</strong><span>${htmlesc(exerciseDetailText("lastPerformance", "Letzte Leistung"))}</span></div>
+          <div><strong>${record ? kg(record.maxWeight) : "-"}</strong><span>${htmlesc(exerciseDetailText("records", "Rekorde"))}</span></div>
+          <div><strong>${htmlesc(roles.primary.length ? muscleItemsText(roles.primary, "-") : "-")}</strong><span>${htmlesc(exerciseDetailText("muscleImpact", "Muskelbeitrag"))}</span></div>
+        </div>
+      </article>
+
+      <article class="card stack">
+        <div class="row">
+          <h3 class="grow">${htmlesc(exerciseDetailText("nextSuggestion", "Naechster Vorschlag"))}</h3>
+          <span class="badge ${insight?.progression.decisionType === "increase" ? "green" : "blue"}">${htmlesc(insight?.progression.label || "Fallback")}</span>
+        </div>
+        <p class="muted">${htmlesc(insight?.progression.coachText || exerciseDetailText("notEnoughData", "Noch nicht genug Daten."))}</p>
+        ${insight?.progression.nextWeightKg ? `<p class="green">Naechstes Ziel: ${kg(insight.progression.nextWeightKg)}</p>` : ""}
+        <details>
+          <summary>${htmlesc(exerciseDetailText("why", "Warum?"))}</summary>
+          <ul class="small-list">
+            ${(insight ? [...insight.progression.why, ...insight.insight.evidence, ...insight.insight.whyBullets] : ["Es gibt noch keine ausreichende Historie fuer eine belastbare Progression."]).map((item) => `<li>${htmlesc(item)}</li>`).join("")}
+          </ul>
+        </details>
+      </article>
+
+      <div class="grid">
+        <article class="card stack">
+          <h3>${htmlesc(exerciseDetailText("records", "Rekorde"))}</h3>
+          ${record ? `<ul class="small-list">
+            <li>Bestgewicht: ${kg(record.maxWeight)}</li>
+            <li>Wdh. bei Bestgewicht: ${record.maxRepsAtWeight || "-"}</li>
+            <li>Bestes Volumen: ${Math.round(record.maxVolume)} kg</li>
+          </ul>` : `<p class="muted">${htmlesc(exerciseDetailText("notEnoughData", "Noch nicht genug Daten."))}</p>`}
+        </article>
+        <article class="card stack">
+          <h3>${htmlesc(exerciseDetailText("muscleImpact", "Muskelbeitrag"))}</h3>
+          <p class="muted">Primaer: ${htmlesc(muscleItemsText(roles.primary, "nicht hinterlegt"))}</p>
+          <p class="quiet">Hilfsbelastung: ${htmlesc(muscleItemsText([...roles.secondary, ...roles.stabilizers], "nicht hinterlegt"))}</p>
+        </article>
+      </div>
+
+      <article class="card stack">
+        <div class="row">
+          <h3 class="grow">${htmlesc(exerciseDetailText("openHistory", "Historie"))}</h3>
+          <span class="badge blue">${history.length} Einheiten</span>
+        </div>
+        ${exerciseHistoryBars(history)}
+      </article>
+
+      <article class="card stack">
+        <h3>${htmlesc(exerciseDetailText("alternatives", "Alternativen"))}</h3>
+        ${alternatives.length ? alternatives.slice(0, 4).map((item) => `
+          <div class="history-row">
+            <div>
+              <strong>${htmlesc(item.exercise.displayName)}</strong>
+              <p class="muted">${htmlesc(item.explanation || item.reason || exerciseListMuscleText(item.exercise))}</p>
+            </div>
+            ${state.activeWorkout ? `<button class="secondary compact-button" data-select-alternative="${htmlesc(item.exercise.id)}">${htmlesc(exerciseDetailText("useAlternative", "Alternative nutzen"))}</button>` : `<button class="secondary compact-button" data-exercise-id="${htmlesc(item.exercise.id)}">Details</button>`}
+          </div>
+        `).join("") : `<p class="muted">Keine Alternativen hinterlegt.</p>`}
+      </article>
+    </section>
+  `;
+}
+
 function renderExerciseDetail(id) {
   const exercise = exerciseById(id);
   const last = lastCompletedExercise(id);
@@ -3743,6 +3866,7 @@ function renderExerciseDetail(id) {
         <p class="muted">${htmlesc(exerciseKindText(exercise))}</p>
         ${exercise.isCustom ? `<button class="danger" data-delete-custom-exercise="${htmlesc(exercise.id)}">Eigene Uebung entfernen</button>` : ""}
       </article>
+      ${renderExerciseDetailPremium(exercise, last, history, alternatives)}
       ${renderMuscleMap(exercise)}
       <article class="card stack">
         <p>${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].join(" · "))}</p>
@@ -4014,7 +4138,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "3.5.0",
+    backupVersion: "3.6.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),
