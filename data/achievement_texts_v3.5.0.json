@@ -1,0 +1,9 @@
+{
+  "version": "3.5.0",
+  "type": "texts",
+  "texts": {
+    "title": "Rekorde & Meilensteine",
+    "newRecord": "Neue Bestleistung",
+    "notChildish": "Sachliche Meilensteine statt Spiel-Level."
+  }
+}

@@ -51,6 +51,9 @@ const state = {
   workoutTimelineSchema: null,
   workoutTimelineRules: null,
   workoutTimelineTexts: null,
+  personalRecordsSchema: null,
+  achievementRules: null,
+  achievementTexts: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -96,8 +99,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v32";
-const STORAGE_SCHEMA_VERSION = "3.4.0";
+const APP_VERSION = "pwa-v33";
+const STORAGE_SCHEMA_VERSION = "3.5.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -669,6 +672,9 @@ async function boot() {
     workoutTimelineSchema,
     workoutTimelineRules,
     workoutTimelineTexts,
+    personalRecordsSchema,
+    achievementRules,
+    achievementTexts,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -758,6 +764,9 @@ async function boot() {
     fetchOptionalJson("./data/workout_timeline_schema_v3.4.0.json"),
     fetchOptionalJson("./data/workout_timeline_rules_v3.4.0.json"),
     fetchOptionalJson("./data/workout_timeline_texts_v3.4.0.json"),
+    fetchOptionalJson("./data/personal_records_schema_v3.5.0.json"),
+    fetchOptionalJson("./data/achievement_rules_v3.5.0.json"),
+    fetchOptionalJson("./data/achievement_texts_v3.5.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -835,6 +844,9 @@ async function boot() {
   state.workoutTimelineSchema = workoutTimelineSchema;
   state.workoutTimelineRules = workoutTimelineRules;
   state.workoutTimelineTexts = workoutTimelineTexts;
+  state.personalRecordsSchema = personalRecordsSchema;
+  state.achievementRules = achievementRules;
+  state.achievementTexts = achievementTexts;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -2721,6 +2733,14 @@ function workoutTimelineEvents(session) {
       });
     }
   });
+  sessionPersonalRecordEvents(session).forEach((record) => {
+    events.push({
+      type: "pr",
+      title: achievementText("newRecord", timelineText("newPr", "Neue Bestleistung")),
+      text: record,
+      tone: "green"
+    });
+  });
   events.push({
     type: "workout_end",
     title: timelineText("workoutFinished", "Training beendet"),
@@ -2750,6 +2770,122 @@ function renderWorkoutTimelineCard(session) {
           </div>
         `).join("")}
       </div>
+    </article>
+  `;
+}
+
+function achievementText(key, fallback) {
+  return state.achievementTexts?.texts?.[key] || fallback;
+}
+
+function allExerciseRecords(sessions = storage.sessions) {
+  const records = new Map();
+  [...sessions].sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt)).forEach((session) => {
+    (session.completedExercises || []).forEach((exercise) => {
+      const current = records.get(exercise.exerciseId) || {
+        exerciseId: exercise.exerciseId,
+        exerciseName: exercise.exerciseNameSnapshot,
+        maxWeight: 0,
+        maxRepsAtWeight: 0,
+        maxVolume: 0,
+        date: session.startedAt
+      };
+      const bestSet = (exercise.sets || []).reduce((best, set) => {
+        const weight = Number(set.actualWeightKg) || 0;
+        const reps = Number(set.actualReps) || 0;
+        if (weight > (best.weight || 0) || (weight === best.weight && reps > (best.reps || 0))) return { weight, reps };
+        return best;
+      }, { weight: 0, reps: 0 });
+      const volume = totalVolume(exercise);
+      if (bestSet.weight > current.maxWeight || (bestSet.weight === current.maxWeight && bestSet.reps > current.maxRepsAtWeight)) {
+        current.maxWeight = bestSet.weight;
+        current.maxRepsAtWeight = bestSet.reps;
+        current.date = session.startedAt;
+      }
+      if (volume > current.maxVolume) {
+        current.maxVolume = volume;
+        current.volumeDate = session.startedAt;
+      }
+      records.set(exercise.exerciseId, current);
+    });
+  });
+  return [...records.values()].sort((a, b) => b.maxWeight - a.maxWeight || b.maxVolume - a.maxVolume);
+}
+
+function sessionPersonalRecordEvents(session) {
+  if (!session) return [];
+  const previousSessions = storage.sessions.filter((item) => new Date(item.startedAt) < new Date(session.startedAt));
+  const previousRecords = new Map(allExerciseRecords(previousSessions).map((record) => [record.exerciseId, record]));
+  return (session.completedExercises || []).flatMap((exercise) => {
+    const previous = previousRecords.get(exercise.exerciseId);
+    const bestWeight = Math.max(0, ...(exercise.sets || []).map((set) => Number(set.actualWeightKg) || 0));
+    const volume = totalVolume(exercise);
+    const events = [];
+    if (bestWeight > 0 && (!previous || bestWeight > previous.maxWeight)) {
+      events.push(`${exercise.exerciseNameSnapshot}: ${kg(bestWeight)} Bestgewicht`);
+    }
+    if (volume > 0 && (!previous || volume > previous.maxVolume)) {
+      events.push(`${exercise.exerciseNameSnapshot}: ${Math.round(volume)} kg Volumen`);
+    }
+    return events;
+  }).slice(0, 5);
+}
+
+function bestMuscleWeekRecord() {
+  const targetMuscles = activePlanTargetMuscles();
+  let best = null;
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  for (let index = 12; index >= 0; index -= 1) {
+    const start = new Date(now);
+    start.setDate(start.getDate() - (index * 7) - 6);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 7);
+    coverageForSessions(sessionsBetween(start, end))
+      .filter((item) => !targetMuscles.size || item.isTarget)
+      .forEach((item) => {
+        if (!best || item.percent > best.percent) best = { ...item, date: start.toISOString() };
+      });
+  }
+  return best;
+}
+
+function achievementItems() {
+  const count = storage.sessions.length;
+  const records = sessionPersonalRecordEvents(lastSession());
+  const bestWeight = storage.weights.length ? [...storage.weights].sort((a, b) => a.weightKg - b.weightKg)[0] : null;
+  return [
+    { id: "first_workout", title: "Erstes Training", active: count >= 1, text: count >= 1 ? "Erste Einheit gespeichert." : "Noch keine Einheit gespeichert." },
+    { id: "ten_workouts", title: "10 Workouts", active: count >= 10, text: `${count}/10 gespeicherte Einheiten.` },
+    { id: "hundred_workouts", title: "100 Workouts", active: count >= 100, text: `${count}/100 gespeicherte Einheiten.` },
+    { id: "new_pr", title: achievementText("newRecord", "Neue Bestleistung"), active: records.length > 0, text: records[0] || "Noch kein neuer PR in der letzten Einheit." },
+    { id: "bodyweight_milestone", title: "Koerpergewicht", active: Boolean(bestWeight), text: bestWeight ? `Niedrigster gespeicherter Wert: ${kg(bestWeight.weightKg)}.` : "Noch kein Gewicht gespeichert." }
+  ];
+}
+
+function renderRecordsAchievementsCard(session = lastSession()) {
+  const exerciseRecords = allExerciseRecords().slice(0, 5);
+  const sessionRecords = sessionPersonalRecordEvents(session);
+  const bestMuscle = bestMuscleWeekRecord();
+  const achievements = achievementItems();
+  return `
+    <article class="card stack records-achievements-card">
+      <div class="row">
+        <h3 class="grow">${htmlesc(achievementText("title", "Rekorde & Meilensteine"))}</h3>
+        <span class="badge blue">v3.5</span>
+      </div>
+      <p class="muted">${htmlesc(achievementText("notChildish", "Sachliche Meilensteine statt Spiel-Level."))}</p>
+      ${sessionRecords.length ? `<div class="record-highlight"><strong>${htmlesc(achievementText("newRecord", "Neue Bestleistung"))}</strong><p class="muted">${sessionRecords.map(htmlesc).join("<br>")}</p></div>` : ""}
+      <div class="achievement-grid">
+        ${achievements.map((item) => `
+          <div class="achievement-item ${item.active ? "active" : ""}">
+            <strong>${htmlesc(item.title)}</strong>
+            <p class="muted">${htmlesc(item.text)}</p>
+          </div>
+        `).join("")}
+      </div>
+      ${exerciseRecords.length ? `<ul class="small-list">${exerciseRecords.map((record) => `<li>${htmlesc(record.exerciseName)}: ${kg(record.maxWeight)} x ${record.maxRepsAtWeight || "-"} - ${Math.round(record.maxVolume)} kg Volumen</li>`).join("")}</ul>` : `<p class="quiet">Noch keine Rekorde berechenbar.</p>`}
+      ${bestMuscle ? `<p class="quiet">Bester Muskel-Wochenwert: ${htmlesc(bestMuscle.name)} mit ${bestMuscle.percent}%.</p>` : ""}
     </article>
   `;
 }
@@ -3036,6 +3172,7 @@ function renderCoach() {
       </article>
       ${renderPerformanceCoachCard(session)}
       ${renderTrainingDnaCard()}
+      ${renderRecordsAchievementsCard(session)}
       <article class="card stack">
         <h3>Coverage Coach</h3>
         ${coverageHints.length ? `<ul class="small-list">${coverageHints.map((hint) => `<li>${htmlesc(hint)}</li>`).join("")}</ul>` : `<p class="muted">Die Wochenabdeckung wirkt aktuell ausgeglichen.</p>`}
@@ -3447,6 +3584,7 @@ function renderSessionDetail(id) {
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
       ${renderWorkoutTimelineCard(session)}
+      ${renderRecordsAchievementsCard(session)}
       ${renderPerformanceCoachCard(session)}
       <article class="card stack">
         <h3>Verbesserungen</h3>
@@ -3876,7 +4014,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "3.4.0",
+    backupVersion: "3.5.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

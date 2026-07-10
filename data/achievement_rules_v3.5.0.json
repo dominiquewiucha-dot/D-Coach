@@ -1,0 +1,26 @@
+{
+  "version": "3.5.0",
+  "type": "achievement_rules",
+  "rules": [
+    {
+      "id": "first_workout",
+      "trigger": "workout_count >= 1"
+    },
+    {
+      "id": "ten_workouts",
+      "trigger": "workout_count >= 10"
+    },
+    {
+      "id": "hundred_workouts",
+      "trigger": "workout_count >= 100"
+    },
+    {
+      "id": "coverage_8_weeks",
+      "trigger": "muscle coverage target reached 8 weeks"
+    },
+    {
+      "id": "new_pr",
+      "trigger": "personal record"
+    }
+  ]
+}

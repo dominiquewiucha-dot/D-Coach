@@ -1,0 +1,12 @@
+{
+  "version": "3.5.0",
+  "type": "records_schema",
+  "recordTypes": [
+    "max_weight",
+    "max_reps_at_weight",
+    "max_volume_exercise",
+    "best_muscle_week",
+    "training_streak",
+    "bodyweight_milestone"
+  ]
+}
