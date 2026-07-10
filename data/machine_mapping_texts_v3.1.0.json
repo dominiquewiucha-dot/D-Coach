@@ -1,0 +1,15 @@
+{
+  "version": "3.1.0",
+  "type": "machine_mapping_texts",
+  "locale": "de-DE",
+  "texts": {
+    "studioUnknown": "Für dieses Studio liegt noch kein bestätigter Gerätekatalog vor.",
+    "usingGeneric": "Es werden generische Geräte/Alternativen genutzt.",
+    "confirmMachine": "Gerät bestätigen",
+    "markOccupied": "Gerät besetzt",
+    "showAlternative": "Alternative anzeigen",
+    "verifiedByUser": "Vom Nutzer bestätigt",
+    "notVerified": "Noch nicht bestätigt",
+    "noMatch": "Keine passende Maschine gefunden. Bitte manuell auswählen."
+  }
+}

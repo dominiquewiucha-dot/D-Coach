@@ -36,6 +36,12 @@ const state = {
   muscleMapRegions: null,
   muscleDetailCardSchema: null,
   muscleMapTexts: null,
+  machineCatalogSchema: null,
+  studioProfileSchema: null,
+  genericMachineCatalog: null,
+  studioSpeedFitnessSeed: null,
+  machineMatchingRules: null,
+  machineMappingTexts: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -81,8 +87,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v28";
-const STORAGE_SCHEMA_VERSION = "3.0.0";
+const APP_VERSION = "pwa-v29";
+const STORAGE_SCHEMA_VERSION = "3.1.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -639,6 +645,12 @@ async function boot() {
     muscleMapRegions,
     muscleDetailCardSchema,
     muscleMapTexts,
+    machineCatalogSchema,
+    studioProfileSchema,
+    genericMachineCatalog,
+    studioSpeedFitnessSeed,
+    machineMatchingRules,
+    machineMappingTexts,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -713,6 +725,12 @@ async function boot() {
     fetchOptionalJson("./data/muscle_map_regions_v3.0.0.json"),
     fetchOptionalJson("./data/muscle_detail_card_schema_v3.0.0.json"),
     fetchOptionalJson("./data/muscle_map_texts_v3.0.0.json"),
+    fetchOptionalJson("./data/machine_catalog_schema_v3.1.0.json"),
+    fetchOptionalJson("./data/studio_profile_schema_v3.1.0.json"),
+    fetchOptionalJson("./data/generic_machine_catalog_v3.1.0.json"),
+    fetchOptionalJson("./data/studio_speed_fitness_seed_v3.1.0.json"),
+    fetchOptionalJson("./data/machine_matching_rules_v3.1.0.json"),
+    fetchOptionalJson("./data/machine_mapping_texts_v3.1.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -775,6 +793,12 @@ async function boot() {
   state.muscleMapRegions = muscleMapRegions;
   state.muscleDetailCardSchema = muscleDetailCardSchema;
   state.muscleMapTexts = muscleMapTexts;
+  state.machineCatalogSchema = machineCatalogSchema;
+  state.studioProfileSchema = studioProfileSchema;
+  state.genericMachineCatalog = genericMachineCatalog;
+  state.studioSpeedFitnessSeed = studioSpeedFitnessSeed;
+  state.machineMatchingRules = machineMatchingRules;
+  state.machineMappingTexts = machineMappingTexts;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -1703,6 +1727,39 @@ function smartBuilderText(key, fallback) {
   return state.smartWorkoutBuilderTexts?.texts?.[key] || fallback;
 }
 
+function machineText(key, fallback) {
+  return state.machineMappingTexts?.texts?.[key] || fallback;
+}
+
+function machineForExercise(exercise) {
+  const mapping = muscleMappingForExercise(exercise?.id);
+  return (state.genericMachineCatalog?.machines || []).map((machine) => {
+    const exact = (machine.exerciseIds || []).includes(exercise?.id);
+    const muscle = mapping?.primaryMuscle && (machine.primaryMuscles || []).includes(mapping.primaryMuscle);
+    const pattern = (machine.movementPatterns || []).includes(exercise?.movementPattern);
+    const score = (exact ? 100 : 0) + (muscle ? 35 : 0) + (pattern ? 25 : 0) + (exerciseHasHistory(exercise?.id) ? 10 : 0);
+    return { machine, score, exact, muscle, pattern };
+  }).filter((item) => item.score > 0).sort((a, b) => b.score - a.score)[0] || null;
+}
+
+function machineStatusForExercise(exercise) {
+  const match = machineForExercise(exercise);
+  if (!match) return null;
+  return {
+    machineId: match.machine.machineId,
+    displayName: match.machine.displayName,
+    verified: match.machine.verified || "unknown",
+    isGeneric: match.machine.manufacturer === "generic",
+    note: match.machine.verified === "unknown" ? machineText("notVerified", "Noch nicht bestaetigt") : machineText("verifiedByUser", "Vom Nutzer bestaetigt")
+  };
+}
+
+function occupiedAlternativesForExercise(exercise) {
+  return alternativeCandidatesForExercise(exercise)
+    .filter((item) => machineForExercise(item.exercise))
+    .slice(0, 3);
+}
+
 function dayTypeFromName(value) {
   const text = String(value || "").toLowerCase();
   if (text.includes("push") || text.includes("brust") || text.includes("schulter") || text.includes("trizeps")) return "Push";
@@ -2573,6 +2630,34 @@ function renderExerciseRatingCard(exercise) {
   `;
 }
 
+function renderMachineMatchCard(exercise) {
+  const match = machineStatusForExercise(exercise);
+  const alternatives = occupiedAlternativesForExercise(exercise);
+  const studio = state.studioSpeedFitnessSeed?.studios?.[0];
+  return `
+    <article class="card stack">
+      <div class="row">
+        <h3 class="grow">Studio & Maschine</h3>
+        <span class="badge amber">${htmlesc(studio?.name || "Studio")}</span>
+      </div>
+      <p class="muted">${htmlesc(machineText("studioUnknown", "Fuer dieses Studio liegt noch kein bestaetigter Geraetekatalog vor."))}</p>
+      ${match ? `
+        <div class="history-row">
+          <div>
+            <strong>${htmlesc(match.displayName)}</strong>
+            <p class="quiet">${htmlesc(machineText("usingGeneric", "Es werden generische Geraete/Alternativen genutzt."))}</p>
+          </div>
+          <span class="badge blue">${htmlesc(match.note)}</span>
+        </div>
+      ` : `<p class="quiet">${htmlesc(machineText("noMatch", "Keine passende Maschine gefunden. Bitte manuell auswaehlen."))}</p>`}
+      ${alternatives.length ? `
+        <h4>${htmlesc(machineText("markOccupied", "Geraet besetzt"))}</h4>
+        <ul class="small-list">${alternatives.map((item) => `<li>${htmlesc(item.exercise.displayName)} - ${htmlesc(item.explanation || exerciseListMuscleText(item.exercise))}</li>`).join("")}</ul>
+      ` : ""}
+    </article>
+  `;
+}
+
 function renderDashboard() {
   const plan = activePlan();
   const latestWeight = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
@@ -2909,7 +2994,7 @@ function renderWorkout() {
       ${state.restTimer.remaining > 0 || state.restTimer.running ? renderRestTimer() : ""}
       ${state.showAlternatives ? renderAlternativePicker(alternatives) : ""}
       <div class="actions">
-        <button class="secondary" data-toggle-alternatives>${state.showAlternatives ? "Alternativen ausblenden" : "Alternative anzeigen"}</button>
+        <button class="secondary" data-toggle-alternatives>${state.showAlternatives ? "Alternativen ausblenden" : machineText("device_occupied", "Geraet besetzt? Alternative anzeigen.")}</button>
         <button class="primary" data-next-exercise>${workout.index < workout.entries.length - 1 ? "Nächste Übung" : "Training speichern"}</button>
         <button class="secondary" data-cancel-workout>Training abbrechen</button>
       </div>
@@ -3249,6 +3334,7 @@ function renderExerciseDetail(id) {
         <textarea class="input area" placeholder="Notiz" data-machine-field="note" data-machine-exercise="${htmlesc(id)}">${htmlesc(machineSetting.note || "")}</textarea>
         <button class="secondary" data-save-machine-setting="${htmlesc(id)}">Einstellung speichern</button>
       </article>
+      ${renderMachineMatchCard(exercise)}
       ${exerciseIsCritical(exercise) ? `<article class="card warning">${lwsWarning(exercise)}</article>` : ""}
       <div class="grid">
         ${metric(kg(bestWeightForExercise(id)), "Bestgewicht")}
@@ -3502,7 +3588,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "3.0.0",
+    backupVersion: "3.1.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

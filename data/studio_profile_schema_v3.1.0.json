@@ -1,0 +1,15 @@
+{
+  "version": "3.1.0",
+  "type": "studio_profile_schema",
+  "locale": "de-DE",
+  "fields": [
+    "studioId",
+    "name",
+    "location",
+    "verified",
+    "machineCatalogStatus",
+    "preferredFallbackStrategy",
+    "notes"
+  ],
+  "rule": "Keine konkreten Geräte behaupten, wenn sie nicht im Katalog stehen."
+}

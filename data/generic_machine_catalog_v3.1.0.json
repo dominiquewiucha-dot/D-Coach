@@ -1,0 +1,215 @@
+{
+  "version": "3.1.0",
+  "type": "generic_machine_catalog",
+  "locale": "de-DE",
+  "machines": [
+    {
+      "machineId": "generic_chest_press",
+      "displayName": "Brustpresse Maschine",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_chest_press_machine"
+      ],
+      "primaryMuscles": [
+        "mg_chest_middle"
+      ],
+      "movementPatterns": [
+        "Horizontal Push"
+      ]
+    },
+    {
+      "machineId": "generic_incline_chest_press",
+      "displayName": "Schrägbank Brustpresse Maschine",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_incline_chest_press_machine"
+      ],
+      "primaryMuscles": [
+        "mg_chest_upper"
+      ],
+      "movementPatterns": [
+        "Incline Push"
+      ]
+    },
+    {
+      "machineId": "generic_pec_deck",
+      "displayName": "Pec Deck / Butterfly",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_pec_deck"
+      ],
+      "primaryMuscles": [
+        "mg_chest_middle"
+      ],
+      "movementPatterns": [
+        "Chest Isolation"
+      ]
+    },
+    {
+      "machineId": "generic_lat_pulldown",
+      "displayName": "Latzug",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_lat_pulldown_neutral",
+        "ex_lat_pulldown_wide"
+      ],
+      "primaryMuscles": [
+        "mg_lats"
+      ],
+      "movementPatterns": [
+        "Vertical Pull"
+      ]
+    },
+    {
+      "machineId": "generic_seated_row",
+      "displayName": "Rudermaschine / Kabelrudern",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_seated_cable_row",
+        "ex_machine_row_neutral"
+      ],
+      "primaryMuscles": [
+        "mg_upper_back"
+      ],
+      "movementPatterns": [
+        "Horizontal Pull"
+      ]
+    },
+    {
+      "machineId": "generic_chest_supported_row",
+      "displayName": "Brustgestütztes Rudern",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_chest_supported_row_machine"
+      ],
+      "primaryMuscles": [
+        "mg_upper_back"
+      ],
+      "movementPatterns": [
+        "Horizontal Pull"
+      ]
+    },
+    {
+      "machineId": "generic_shoulder_press",
+      "displayName": "Schulterpresse",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_shoulder_press_machine"
+      ],
+      "primaryMuscles": [
+        "mg_front_delts"
+      ],
+      "movementPatterns": [
+        "Vertical Push"
+      ]
+    },
+    {
+      "machineId": "generic_leg_press",
+      "displayName": "Beinpresse",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_leg_press_horizontal",
+        "ex_leg_press_45"
+      ],
+      "primaryMuscles": [
+        "mg_quads"
+      ],
+      "movementPatterns": [
+        "Squat Pattern"
+      ]
+    },
+    {
+      "machineId": "generic_leg_extension",
+      "displayName": "Beinstrecker",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_leg_extension_machine"
+      ],
+      "primaryMuscles": [
+        "mg_quads"
+      ],
+      "movementPatterns": [
+        "Knee Extension"
+      ]
+    },
+    {
+      "machineId": "generic_seated_leg_curl",
+      "displayName": "Beinbeuger sitzend",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_seated_leg_curl_machine"
+      ],
+      "primaryMuscles": [
+        "mg_hamstrings"
+      ],
+      "movementPatterns": [
+        "Knee Flexion"
+      ]
+    },
+    {
+      "machineId": "generic_hip_thrust",
+      "displayName": "Hip Thrust Maschine",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_hip_thrust_machine"
+      ],
+      "primaryMuscles": [
+        "mg_glutes"
+      ],
+      "movementPatterns": [
+        "Hip Extension"
+      ]
+    },
+    {
+      "machineId": "generic_calf_raise",
+      "displayName": "Wadenheben Maschine",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_calf_raise_machine_standing",
+        "ex_seated_calf_raise"
+      ],
+      "primaryMuscles": [
+        "mg_calves"
+      ],
+      "movementPatterns": [
+        "Calf Raise"
+      ]
+    },
+    {
+      "machineId": "generic_cable_station",
+      "displayName": "Kabelzug / Cable Station",
+      "manufacturer": "generic",
+      "verified": "unknown",
+      "exerciseIds": [
+        "ex_triceps_pushdown_bar",
+        "ex_biceps_curl_cable",
+        "ex_pallof_press_cable",
+        "ex_cable_fly_mid"
+      ],
+      "primaryMuscles": [
+        "mg_triceps",
+        "mg_biceps",
+        "mg_deep_core",
+        "mg_chest_middle"
+      ],
+      "movementPatterns": [
+        "Elbow Extension",
+        "Elbow Flexion",
+        "Core Anti-Rotation",
+        "Chest Isolation"
+      ]
+    }
+  ]
+}

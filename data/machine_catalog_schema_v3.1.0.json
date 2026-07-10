@@ -1,0 +1,25 @@
+{
+  "version": "3.1.0",
+  "type": "machine_catalog_schema",
+  "locale": "de-DE",
+  "fields": [
+    "machineId",
+    "displayName",
+    "manufacturer",
+    "model",
+    "studioId",
+    "exerciseIds",
+    "primaryMuscles",
+    "movementPatterns",
+    "equipmentType",
+    "adjustments",
+    "notes",
+    "verified"
+  ],
+  "verifiedValues": [
+    "unknown",
+    "user_confirmed",
+    "official_catalog"
+  ],
+  "displayRule": "Konkrete Geräte nur anzeigen, wenn bestätigt. Sonst generische Maschinen/Alternativen nutzen."
+}

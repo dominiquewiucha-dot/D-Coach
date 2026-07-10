@@ -1,0 +1,16 @@
+{
+  "version": "3.1.0",
+  "type": "studio_profile_seed",
+  "locale": "de-DE",
+  "studios": [
+    {
+      "studioId": "studio_speed_fitness_generic",
+      "name": "Speed Fitness",
+      "location": "generic",
+      "verified": "unknown",
+      "machineCatalogStatus": "not_verified",
+      "preferredFallbackStrategy": "generic_machine_catalog",
+      "notes": "Platzhalter bis echter Gerätekatalog vom Nutzer bestätigt wird."
+    }
+  ]
+}

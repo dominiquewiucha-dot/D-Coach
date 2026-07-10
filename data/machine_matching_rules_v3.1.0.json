@@ -1,0 +1,42 @@
+{
+  "version": "3.1.0",
+  "type": "machine_matching_rules",
+  "locale": "de-DE",
+  "rules": [
+    {
+      "id": "match_exact_exercise",
+      "priority": 100,
+      "logic": "if machine.exerciseIds contains planned exerciseId, rank highest"
+    },
+    {
+      "id": "match_primary_muscle",
+      "priority": 80,
+      "logic": "same primary muscle"
+    },
+    {
+      "id": "match_movement_pattern",
+      "priority": 75,
+      "logic": "same movement pattern"
+    },
+    {
+      "id": "prefer_verified",
+      "priority": 70,
+      "logic": "user_confirmed or official_catalog above unknown"
+    },
+    {
+      "id": "prefer_user_history",
+      "priority": 65,
+      "logic": "exercise has previous performance history"
+    },
+    {
+      "id": "prefer_lws_safe",
+      "priority": 90,
+      "logic": "if lumbarDiscHistory true, prefer lower spineLoad and higher lumbarFriendliness"
+    },
+    {
+      "id": "do_not_invent_machine",
+      "priority": 100,
+      "logic": "do not show manufacturer/model unless verified in catalog"
+    }
+  ]
+}
