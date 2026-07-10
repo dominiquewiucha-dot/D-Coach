@@ -737,6 +737,39 @@ select:focus-visible {
   font-weight: 800;
 }
 
+.muscle-detail-system {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.coverage-target-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.coverage-target-row strong {
+  color: var(--text);
+}
+
+.muscle-detail-columns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.muscle-detail-columns h4,
+.muscle-detail-system h4 {
+  margin: 0 0 8px;
+}
+
+.muscle-detail-trend {
+  min-height: 110px;
+}
+
 .coach-insight {
   display: grid;
   gap: 8px;

@@ -1,0 +1,26 @@
+{
+  "version": "3.3.0",
+  "type": "status_rules",
+  "rules": [
+    {
+      "id": "not_trained",
+      "range": "0%"
+    },
+    {
+      "id": "low",
+      "range": "1-49%"
+    },
+    {
+      "id": "medium",
+      "range": "50-79%"
+    },
+    {
+      "id": "target",
+      "range": "80-120%"
+    },
+    {
+      "id": "over",
+      "range": ">120%"
+    }
+  ]
+}

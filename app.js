@@ -45,6 +45,9 @@ const state = {
   coachDashboardLayout: null,
   coachDashboardCards: null,
   coachDashboardVisualRules: null,
+  muscleDetailSections: null,
+  muscleDetailStatusRules: null,
+  muscleDetailTexts: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -90,8 +93,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v30";
-const STORAGE_SCHEMA_VERSION = "3.2.0";
+const APP_VERSION = "pwa-v31";
+const STORAGE_SCHEMA_VERSION = "3.3.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -657,6 +660,9 @@ async function boot() {
     coachDashboardLayout,
     coachDashboardCards,
     coachDashboardVisualRules,
+    muscleDetailSections,
+    muscleDetailStatusRules,
+    muscleDetailTexts,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -740,6 +746,9 @@ async function boot() {
     fetchOptionalJson("./data/coach_dashboard_layout_v3.2.0.json"),
     fetchOptionalJson("./data/coach_dashboard_cards_v3.2.0.json"),
     fetchOptionalJson("./data/coach_dashboard_visual_rules_v3.2.0.json"),
+    fetchOptionalJson("./data/muscle_detail_sections_v3.3.0.json"),
+    fetchOptionalJson("./data/muscle_detail_status_rules_v3.3.0.json"),
+    fetchOptionalJson("./data/muscle_detail_texts_v3.3.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -811,6 +820,9 @@ async function boot() {
   state.coachDashboardLayout = coachDashboardLayout;
   state.coachDashboardCards = coachDashboardCards;
   state.coachDashboardVisualRules = coachDashboardVisualRules;
+  state.muscleDetailSections = muscleDetailSections;
+  state.muscleDetailStatusRules = muscleDetailStatusRules;
+  state.muscleDetailTexts = muscleDetailTexts;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -1463,6 +1475,7 @@ function coverageDetailForMuscle(muscleId) {
   const today = coverageItemByMuscle(coverageForSessions(sessionsForToday()), muscleId);
   const week = coverageItemByMuscle(coverageForSessions(sessionsSince(7)), muscleId);
   const month = coverageItemByMuscle(coverageForSessions(sessionsSince(30)), muscleId);
+  const contributors = coverageContributors(muscleId, sessionsSince(7));
   return {
     muscleId,
     muscleName: muscleName(muscleId),
@@ -1471,10 +1484,62 @@ function coverageDetailForMuscle(muscleId) {
     monthCoveragePercent: month.percent,
     targetPercent: 100,
     status: coverageStatus(week.percent),
-    mainExerciseContributors: coverageContributors(muscleId, sessionsSince(7)).filter((item) => item.role === "Zielmuskel"),
-    secondaryExerciseContributors: coverageContributors(muscleId, sessionsSince(7)).filter((item) => item.role !== "Zielmuskel"),
+    mainExerciseContributors: contributors.filter((item) => item.role === "Zielmuskel"),
+    secondaryExerciseContributors: contributors.filter((item) => item.role !== "Zielmuskel"),
+    history: coverageHistoryForMuscle(muscleId),
+    subregions: muscleSubregions(muscleId),
     coachText: coverageCoachTextFor(week.percent)
   };
+}
+
+function coverageHistoryForMuscle(muscleId) {
+  const weeks = [];
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  for (let index = 5; index >= 0; index -= 1) {
+    const start = new Date(now);
+    start.setDate(start.getDate() - (index * 7) - 6);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 7);
+    const item = coverageItemByMuscle(coverageForSessions(sessionsBetween(start, end)), muscleId);
+    weeks.push({ label: `${start.getDate()}.${start.getMonth() + 1}.`, percent: item.percent });
+  }
+  return weeks;
+}
+
+function muscleSubregions(muscleId) {
+  return (state.muscleMapRegions?.regions || [])
+    .filter((region) => region.muscleId === muscleId)
+    .map((region) => region.label)
+    .filter((label, index, list) => list.indexOf(label) === index);
+}
+
+function muscleDetailText(key, fallback) {
+  return state.muscleDetailTexts?.texts?.[key] || fallback;
+}
+
+function muscleDetailStatusClass(status) {
+  return {
+    not_trained: "red",
+    low: "red",
+    moderate: "amber",
+    medium: "amber",
+    target: "green",
+    over: "amber",
+    over_target: "amber"
+  }[status] || "blue";
+}
+
+function muscleDetailStatusLabel(status) {
+  return {
+    not_trained: "Nicht trainiert",
+    low: "Niedrig",
+    moderate: "Mittel",
+    medium: "Mittel",
+    target: "Zielbereich",
+    over: "Hoch",
+    over_target: "Hoch"
+  }[status] || "Status";
 }
 
 function coverageTrendWeeks() {
@@ -2521,21 +2586,48 @@ function backRegionShape(regionId, index) {
 function renderCoverageDetail(muscleId) {
   const detail = coverageDetailForMuscle(muscleId);
   const contributors = [...detail.mainExerciseContributors, ...detail.secondaryExerciseContributors];
+  const statusClass = muscleDetailStatusClass(detail.status);
   return `
-    <div class="coverage-detail">
+    <div class="coverage-detail muscle-detail-system">
       <div class="row">
         <h4 class="grow">${htmlesc(detail.muscleName)}</h4>
-        <span class="badge blue">${detail.weekCoveragePercent}% Woche</span>
+        <span class="badge ${statusClass}">${htmlesc(muscleDetailStatusLabel(detail.status))}</span>
       </div>
       <div class="coverage-detail-metrics">
         <div><strong>${detail.todayCoveragePercent}%</strong><span>Heute</span></div>
         <div><strong>${detail.weekCoveragePercent}%</strong><span>Woche</span></div>
         <div><strong>${detail.monthCoveragePercent}%</strong><span>Monat</span></div>
       </div>
+      <div class="coverage-target-row">
+        <span>Zielwert</span>
+        <div class="coverage-bar"><span style="width:${Math.min(detail.weekCoveragePercent, 140)}%; background:${coverageColorFor(detail.weekCoveragePercent)}"></span></div>
+        <strong>${detail.targetPercent}%</strong>
+      </div>
+      ${detail.subregions.length ? `<div class="chip-row">${detail.subregions.map((name) => `<span class="muscle-chip">${htmlesc(name)}</span>`).join("")}</div>` : ""}
       <p class="muted">${htmlesc(detail.coachText)}</p>
-      ${contributors.length ? `<ul class="small-list">${contributors.map((item) => `<li>${htmlesc(item.name)}: ${Math.round(item.points * 10) / 10} Punkte (${htmlesc(item.role)})</li>`).join("")}</ul>` : `<p class="quiet">Noch keine Uebung fuer diese Muskelgruppe in der aktuellen Woche.</p>`}
+      <div class="muscle-detail-columns">
+        <div>
+          <h4>${htmlesc(muscleDetailText("mainLoad", "Hauptbelastung"))}</h4>
+          ${detail.mainExerciseContributors.length ? `<ul class="small-list">${detail.mainExerciseContributors.map(renderMuscleContributor).join("")}</ul>` : `<p class="quiet">Keine direkte Hauptbelastung in dieser Woche.</p>`}
+        </div>
+        <div>
+          <h4>${htmlesc(muscleDetailText("secondaryLoad", "Hilfsbelastung"))}</h4>
+          ${detail.secondaryExerciseContributors.length ? `<ul class="small-list">${detail.secondaryExerciseContributors.map(renderMuscleContributor).join("")}</ul>` : `<p class="quiet">Keine Hilfsbelastung in dieser Woche.</p>`}
+        </div>
+      </div>
+      <div>
+        <h4>Verlauf</h4>
+        <div class="trend-bars muscle-detail-trend">
+          ${detail.history.map((week) => `<div class="trend-item"><span style="height:${Math.max(14, Math.min(120, week.percent))}px; background:${coverageColorFor(week.percent)}"></span><small>${htmlesc(week.label)}</small></div>`).join("")}
+        </div>
+      </div>
+      ${contributors.length ? `<p class="quiet">${htmlesc(muscleDetailText("contributors", "Beteiligte Uebungen"))}: ${contributors.length}</p>` : `<p class="quiet">Noch keine Uebung fuer diese Muskelgruppe in der aktuellen Woche.</p>`}
     </div>
   `;
+}
+
+function renderMuscleContributor(item) {
+  return `<li>${htmlesc(item.name)}: ${Math.round(item.points * 10) / 10} Punkte (${htmlesc(item.role)})</li>`;
 }
 
 function renderCoverageTrend() {
@@ -3698,7 +3790,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "3.2.0",
+    backupVersion: "3.3.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

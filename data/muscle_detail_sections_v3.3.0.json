@@ -1,0 +1,11 @@
+{
+  "version": "3.3.0",
+  "type": "muscle_detail_sections",
+  "sections": [
+    "overview",
+    "subregions",
+    "contributors",
+    "history",
+    "coach"
+  ]
+}

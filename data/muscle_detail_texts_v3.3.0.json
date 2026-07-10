@@ -1,0 +1,9 @@
+{
+  "version": "3.3.0",
+  "type": "texts",
+  "texts": {
+    "contributors": "Beteiligte Übungen",
+    "mainLoad": "Hauptbelastung",
+    "secondaryLoad": "Hilfsbelastung"
+  }
+}
