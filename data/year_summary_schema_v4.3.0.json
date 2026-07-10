@@ -1,0 +1,14 @@
+{
+  "version": "4.3.0",
+  "type": "year_summary_schema",
+  "fields": [
+    "trainingDays",
+    "trainingHours",
+    "bestMuscleCoverage",
+    "topExercises",
+    "bodyweightChange",
+    "records",
+    "consistencyPercent",
+    "coachSummary"
+  ]
+}

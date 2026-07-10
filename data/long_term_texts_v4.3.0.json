@@ -1,0 +1,11 @@
+{
+  "version": "4.3.0",
+  "type": "long_term_texts",
+  "texts": {
+    "title": "Langzeitfortschritt",
+    "plateau": "Plateau erkannt",
+    "improving": "Verbessert sich",
+    "declining": "Rückläufig",
+    "notEnoughData": "Noch nicht genug Langzeitdaten"
+  }
+}

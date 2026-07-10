@@ -74,6 +74,11 @@ const state = {
   weakPointEngineRules: null,
   adaptiveWeeklyPlanningRules: null,
   planOptimizerTexts: null,
+  longTermProgressSchema: null,
+  yearSummarySchema: null,
+  trendAnalysisRules: null,
+  progressForecastRules: null,
+  longTermTexts: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -119,8 +124,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v37";
-const STORAGE_SCHEMA_VERSION = "4.2.0";
+const APP_VERSION = "pwa-v38";
+const STORAGE_SCHEMA_VERSION = "4.3.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -715,6 +720,11 @@ async function boot() {
     weakPointEngineRules,
     adaptiveWeeklyPlanningRules,
     planOptimizerTexts,
+    longTermProgressSchema,
+    yearSummarySchema,
+    trendAnalysisRules,
+    progressForecastRules,
+    longTermTexts,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -827,6 +837,11 @@ async function boot() {
     fetchOptionalJson("./data/weak_point_engine_rules_v4.2.0.json"),
     fetchOptionalJson("./data/adaptive_weekly_planning_rules_v4.2.0.json"),
     fetchOptionalJson("./data/plan_optimizer_texts_v4.2.0.json"),
+    fetchOptionalJson("./data/long_term_progress_schema_v4.3.0.json"),
+    fetchOptionalJson("./data/year_summary_schema_v4.3.0.json"),
+    fetchOptionalJson("./data/trend_analysis_rules_v4.3.0.json"),
+    fetchOptionalJson("./data/progress_forecast_rules_v4.3.0.json"),
+    fetchOptionalJson("./data/long_term_texts_v4.3.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -927,6 +942,11 @@ async function boot() {
   state.weakPointEngineRules = weakPointEngineRules;
   state.adaptiveWeeklyPlanningRules = adaptiveWeeklyPlanningRules;
   state.planOptimizerTexts = planOptimizerTexts;
+  state.longTermProgressSchema = longTermProgressSchema;
+  state.yearSummarySchema = yearSummarySchema;
+  state.trendAnalysisRules = trendAnalysisRules;
+  state.progressForecastRules = progressForecastRules;
+  state.longTermTexts = longTermTexts;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -3357,6 +3377,50 @@ function renderPlanOptimizerCard(context = "plans") {
   `;
 }
 
+function longTermText(key, fallback) {
+  return state.longTermTexts?.texts?.[key] || fallback;
+}
+
+function longTermProgressSummary() {
+  const sessions = [...storage.sessions].sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt));
+  const totalVolumeValue = sessions.reduce((sum, session) => sum + sessionVolume(session), 0);
+  const firstHalf = sessions.slice(0, Math.floor(sessions.length / 2));
+  const secondHalf = sessions.slice(Math.floor(sessions.length / 2));
+  const avg = (items) => items.length ? items.reduce((sum, session) => sum + sessionVolume(session), 0) / items.length : 0;
+  const firstAvg = avg(firstHalf);
+  const secondAvg = avg(secondHalf);
+  const delta = firstAvg ? Math.round(((secondAvg - firstAvg) / firstAvg) * 100) : 0;
+  const status = sessions.length < 6 ? "notEnoughData" : delta > 8 ? "improving" : delta < -8 ? "declining" : "plateau";
+  return {
+    sessions: sessions.length,
+    totalVolumeValue,
+    delta,
+    status,
+    statusText: longTermText(status, status),
+    forecast: sessions.length >= 6 ? Math.round(secondAvg * 4) : 0
+  };
+}
+
+function renderLongTermProgressCard(context = "coach") {
+  const summary = longTermProgressSummary();
+  const tone = summary.status === "improving" ? "green" : summary.status === "declining" ? "amber" : "blue";
+  return `
+    <article class="card stack long-term-progress-card">
+      <div class="row">
+        <h3 class="grow">${htmlesc(longTermText("title", "Langzeitfortschritt"))}</h3>
+        <span class="badge ${tone}">${htmlesc(summary.statusText)}</span>
+      </div>
+      <div class="mini-grid">
+        <div class="fatigue-metric"><strong>${summary.sessions}</strong><span>Einheiten</span></div>
+        <div class="fatigue-metric"><strong>${Math.round(summary.totalVolumeValue)}</strong><span>kg Gesamt</span></div>
+        <div class="fatigue-metric"><strong>${summary.sessions >= 6 ? `${summary.delta}%` : "-"}</strong><span>Trend</span></div>
+      </div>
+      ${summary.sessions >= 6 ? `<p class="muted">Prognose bei aktuellem Schnitt: ca. ${summary.forecast} kg Monatsvolumen.</p>` : `<p class="muted">${htmlesc(longTermText("notEnoughData", "Noch nicht genug Langzeitdaten"))}.</p>`}
+      <p class="quiet">${context === "plans" ? "Planung: Trend als Hintergrund fuer Wochenanpassungen." : "Coach: Plateau/Trend aus gespeicherten Einheiten berechnet."}</p>
+    </article>
+  `;
+}
+
 function renderDashboard() {
   const plan = activePlan();
   const latestWeight = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
@@ -3446,6 +3510,7 @@ function renderCoach() {
       ${renderIntelligenceCoreCard("coach")}
       ${renderRecoveryFatigueCard("coach")}
       ${renderPlanOptimizerCard("coach")}
+      ${renderLongTermProgressCard("coach")}
       <article class="card stack">
         <div class="row"><h3 class="grow">Recovery</h3><span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span></div>
         <p class="muted">${htmlesc(readiness.hint)}</p>
@@ -3905,6 +3970,7 @@ function renderPlans() {
       ${renderIntelligenceCoreCard("plans")}
       ${renderRecoveryFatigueCard("plans")}
       ${renderPlanOptimizerCard("plans")}
+      ${renderLongTermProgressCard("plans")}
       <article class="card stack">
         <h3>Plan teilen / importieren</h3>
         <p class="muted">${payload.length > qrLimit ? appText("qr.tooLarge", "Dieser Plan ist zu gross fuer QR. Bitte JSON-Export verwenden.") : "Kompakter Plan-Code fuer QR/Text-Import."}</p>
@@ -4405,7 +4471,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "4.2.0",
+    backupVersion: "4.3.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

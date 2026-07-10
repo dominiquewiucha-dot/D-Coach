@@ -1,0 +1,14 @@
+{
+  "version": "4.3.0",
+  "type": "progress_forecast_rules",
+  "rules": [
+    {
+      "id": "forecast_conservative",
+      "logic": "use only if 8+ weeks data"
+    },
+    {
+      "id": "forecast_low_confidence",
+      "logic": "if insufficient data show no prediction"
+    }
+  ]
+}

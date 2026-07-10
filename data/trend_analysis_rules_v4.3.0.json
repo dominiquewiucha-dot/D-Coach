@@ -1,0 +1,21 @@
+{
+  "version": "4.3.0",
+  "type": "trend_analysis_rules",
+  "rules": [
+    {
+      "id": "muscle_improving"
+    },
+    {
+      "id": "muscle_declining"
+    },
+    {
+      "id": "exercise_plateau"
+    },
+    {
+      "id": "volume_creep"
+    },
+    {
+      "id": "consistency_drop"
+    }
+  ]
+}
