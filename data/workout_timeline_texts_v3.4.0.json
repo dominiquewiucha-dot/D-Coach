@@ -1,0 +1,9 @@
+{
+  "version": "3.4.0",
+  "type": "texts",
+  "texts": {
+    "title": "Workout Timeline",
+    "newPr": "Neue Bestleistung",
+    "workoutFinished": "Training beendet"
+  }
+}

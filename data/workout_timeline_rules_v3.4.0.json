@@ -1,0 +1,18 @@
+{
+  "version": "3.4.0",
+  "type": "timeline_rules",
+  "rules": [
+    {
+      "id": "create_exercise_event"
+    },
+    {
+      "id": "create_pr_event"
+    },
+    {
+      "id": "create_coach_note"
+    },
+    {
+      "id": "create_summary"
+    }
+  ]
+}

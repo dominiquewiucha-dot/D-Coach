@@ -48,6 +48,9 @@ const state = {
   muscleDetailSections: null,
   muscleDetailStatusRules: null,
   muscleDetailTexts: null,
+  workoutTimelineSchema: null,
+  workoutTimelineRules: null,
+  workoutTimelineTexts: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -93,8 +96,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v31";
-const STORAGE_SCHEMA_VERSION = "3.3.0";
+const APP_VERSION = "pwa-v32";
+const STORAGE_SCHEMA_VERSION = "3.4.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -663,6 +666,9 @@ async function boot() {
     muscleDetailSections,
     muscleDetailStatusRules,
     muscleDetailTexts,
+    workoutTimelineSchema,
+    workoutTimelineRules,
+    workoutTimelineTexts,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -749,6 +755,9 @@ async function boot() {
     fetchOptionalJson("./data/muscle_detail_sections_v3.3.0.json"),
     fetchOptionalJson("./data/muscle_detail_status_rules_v3.3.0.json"),
     fetchOptionalJson("./data/muscle_detail_texts_v3.3.0.json"),
+    fetchOptionalJson("./data/workout_timeline_schema_v3.4.0.json"),
+    fetchOptionalJson("./data/workout_timeline_rules_v3.4.0.json"),
+    fetchOptionalJson("./data/workout_timeline_texts_v3.4.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -823,6 +832,9 @@ async function boot() {
   state.muscleDetailSections = muscleDetailSections;
   state.muscleDetailStatusRules = muscleDetailStatusRules;
   state.muscleDetailTexts = muscleDetailTexts;
+  state.workoutTimelineSchema = workoutTimelineSchema;
+  state.workoutTimelineRules = workoutTimelineRules;
+  state.workoutTimelineTexts = workoutTimelineTexts;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -2669,6 +2681,79 @@ function renderPerformanceCoachCard(session) {
   `;
 }
 
+function timelineText(key, fallback) {
+  return state.workoutTimelineTexts?.texts?.[key] || fallback;
+}
+
+function workoutTimelineEvents(session) {
+  if (!session) return [];
+  const insights = performanceInsightsForSession(session);
+  const insightByExercise = new Map(insights.map((item) => [item.exercise.exerciseId, item]));
+  const events = [{
+    type: "workout_start",
+    title: "Training gestartet",
+    text: dateTimeText(session.startedAt),
+    tone: "blue"
+  }];
+  [...session.completedExercises].sort((a, b) => a.sortOrder - b.sortOrder).forEach((exercise) => {
+    const completedSets = (exercise.sets || []).filter((set) => set.completed).length;
+    const insight = insightByExercise.get(exercise.exerciseId);
+    events.push({
+      type: "exercise_start",
+      title: exercise.exerciseNameSnapshot,
+      text: `${completedSets}/${exercise.plannedSets || exercise.sets?.length || 0} Saetze abgeschlossen - ${Math.round(totalVolume(exercise))} kg`,
+      tone: "blue"
+    });
+    (insight?.insight.records || []).forEach((record) => {
+      events.push({
+        type: "pr",
+        title: timelineText("newPr", "Neue Bestleistung"),
+        text: `${exercise.exerciseNameSnapshot}: ${record}`,
+        tone: "green"
+      });
+    });
+    if (insight?.smartNote) {
+      events.push({
+        type: "coach_note",
+        title: "Smart Note",
+        text: insight.smartNote,
+        tone: insight.progression.decisionType === "change_exercise" ? "amber" : "blue"
+      });
+    }
+  });
+  events.push({
+    type: "workout_end",
+    title: timelineText("workoutFinished", "Training beendet"),
+    text: `${sessionDurationMinutes(session)} Minuten - ${sessionSetCount(session)} Saetze - ${Math.round(sessionVolume(session))} kg Volumen`,
+    tone: "green"
+  });
+  return events;
+}
+
+function renderWorkoutTimelineCard(session) {
+  const events = workoutTimelineEvents(session);
+  return `
+    <article class="card stack workout-timeline-card">
+      <div class="row">
+        <h3 class="grow">${htmlesc(timelineText("title", "Workout Timeline"))}</h3>
+        <span class="badge blue">${events.length} Events</span>
+      </div>
+      <p class="muted">${sessionSetCount(session)} Saetze, ${session.completedExercises.length} Uebungen, ${Math.round(sessionVolume(session))} kg Gesamtvolumen.</p>
+      <div class="workout-timeline-list">
+        ${events.map((event) => `
+          <div class="timeline-event ${htmlesc(event.tone)}">
+            <span></span>
+            <div>
+              <strong>${htmlesc(event.title)}</strong>
+              <p class="muted">${htmlesc(event.text)}</p>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </article>
+  `;
+}
+
 function renderCoachDashboardPremium() {
   const plan = activePlan();
   const session = lastSession();
@@ -3332,7 +3417,7 @@ function finishOrNext() {
   state.showAlternatives = false;
   state.restTimer.remaining = 0;
   state.restTimer.running = false;
-  state.selectedSessionId = null;
+  state.selectedSessionId = session.id;
   state.tab = "coach";
   render();
 }
@@ -3361,6 +3446,7 @@ function renderSessionDetail(id) {
         ${metric(String(sessionSetCount(session)), "Sätze")}
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
+      ${renderWorkoutTimelineCard(session)}
       ${renderPerformanceCoachCard(session)}
       <article class="card stack">
         <h3>Verbesserungen</h3>
@@ -3790,7 +3876,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "3.3.0",
+    backupVersion: "3.4.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

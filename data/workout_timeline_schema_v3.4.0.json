@@ -1,0 +1,12 @@
+{
+  "version": "3.4.0",
+  "type": "timeline_schema",
+  "eventTypes": [
+    "workout_start",
+    "exercise_start",
+    "set_completed",
+    "pr",
+    "coach_note",
+    "workout_end"
+  ]
+}
