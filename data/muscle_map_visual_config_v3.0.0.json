@@ -1,0 +1,60 @@
+{
+  "version": "3.0.0",
+  "type": "muscle_map_visual_config",
+  "locale": "de-DE",
+  "brandColors": {
+    "background": "#0B1220",
+    "card": "#141C2B",
+    "primary": "#2563EB",
+    "primaryLight": "#60A5FA",
+    "text": "#FFFFFF",
+    "muted": "#9CA3AF",
+    "warning": "#F59E0B"
+  },
+  "coverageColorScale": [
+    {
+      "min": 0,
+      "max": 0,
+      "color": "#1B263B",
+      "label": "nicht trainiert"
+    },
+    {
+      "min": 1,
+      "max": 39,
+      "color": "#1E3A8A",
+      "label": "niedrig"
+    },
+    {
+      "min": 40,
+      "max": 69,
+      "color": "#2563EB",
+      "label": "moderat"
+    },
+    {
+      "min": 70,
+      "max": 100,
+      "color": "#60A5FA",
+      "label": "Zielbereich"
+    },
+    {
+      "min": 101,
+      "max": 120,
+      "color": "#93C5FD",
+      "label": "über Ziel"
+    },
+    {
+      "min": 121,
+      "max": 999,
+      "color": "#F59E0B",
+      "label": "deutlich über Ziel"
+    }
+  ],
+  "selectedMuscle": {
+    "stroke": "#FFFFFF",
+    "strokeWidth": 2,
+    "opacity": 1
+  },
+  "unselectedMuscle": {
+    "opacityWhenSelected": 0.25
+  }
+}

@@ -31,6 +31,11 @@ const state = {
   muscleCoverageVisualMapping: null,
   muscleCoverageDetailSchema: null,
   muscleCoverageCoachTexts: null,
+  interactiveMuscleMapSchema: null,
+  muscleMapVisualConfig: null,
+  muscleMapRegions: null,
+  muscleDetailCardSchema: null,
+  muscleMapTexts: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -76,8 +81,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v27";
-const STORAGE_SCHEMA_VERSION = "2.9.0";
+const APP_VERSION = "pwa-v28";
+const STORAGE_SCHEMA_VERSION = "3.0.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -629,6 +634,11 @@ async function boot() {
     muscleCoverageVisualMapping,
     muscleCoverageDetailSchema,
     muscleCoverageCoachTexts,
+    interactiveMuscleMapSchema,
+    muscleMapVisualConfig,
+    muscleMapRegions,
+    muscleDetailCardSchema,
+    muscleMapTexts,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -698,6 +708,11 @@ async function boot() {
     fetchOptionalJson("./data/muscle_coverage_visual_mapping_v2.4.0.json"),
     fetchOptionalJson("./data/muscle_coverage_detail_schema_v2.4.0.json"),
     fetchOptionalJson("./data/muscle_coverage_coach_texts_v2.4.0.json"),
+    fetchOptionalJson("./data/interactive_muscle_map_schema_v3.0.0.json"),
+    fetchOptionalJson("./data/muscle_map_visual_config_v3.0.0.json"),
+    fetchOptionalJson("./data/muscle_map_regions_v3.0.0.json"),
+    fetchOptionalJson("./data/muscle_detail_card_schema_v3.0.0.json"),
+    fetchOptionalJson("./data/muscle_map_texts_v3.0.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -755,6 +770,11 @@ async function boot() {
   state.muscleCoverageVisualMapping = muscleCoverageVisualMapping;
   state.muscleCoverageDetailSchema = muscleCoverageDetailSchema;
   state.muscleCoverageCoachTexts = muscleCoverageCoachTexts;
+  state.interactiveMuscleMapSchema = interactiveMuscleMapSchema;
+  state.muscleMapVisualConfig = muscleMapVisualConfig;
+  state.muscleMapRegions = muscleMapRegions;
+  state.muscleDetailCardSchema = muscleDetailCardSchema;
+  state.muscleMapTexts = muscleMapTexts;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -1261,6 +1281,12 @@ function sessionsForToday() {
   return storage.sessions.filter((session) => String(session.startedAt || "").slice(0, 10) === today);
 }
 
+function sessionsForCoverageMode(mode) {
+  if (mode === "today") return sessionsForToday();
+  if (mode === "month") return sessionsSince(30);
+  return sessionsSince(7);
+}
+
 function sessionsBetween(start, end) {
   return storage.sessions.filter((session) => {
     const date = new Date(session.startedAt);
@@ -1352,7 +1378,7 @@ function coverageCoachTextFor(percent) {
 }
 
 function coverageColorFor(percent) {
-  const scale = state.muscleCoverageVisualMapping?.colorScale || [];
+  const scale = state.muscleMapVisualConfig?.coverageColorScale || state.muscleCoverageVisualMapping?.colorScale || [];
   return scale.find((item) => percent >= item.min && percent <= item.max)?.color || "#2563EB";
 }
 
@@ -1400,11 +1426,13 @@ function coverageContributors(muscleId, sessions) {
 function coverageDetailForMuscle(muscleId) {
   const today = coverageItemByMuscle(coverageForSessions(sessionsForToday()), muscleId);
   const week = coverageItemByMuscle(coverageForSessions(sessionsSince(7)), muscleId);
+  const month = coverageItemByMuscle(coverageForSessions(sessionsSince(30)), muscleId);
   return {
     muscleId,
     muscleName: muscleName(muscleId),
     todayCoveragePercent: today.percent,
     weekCoveragePercent: week.percent,
+    monthCoveragePercent: month.percent,
     targetPercent: 100,
     status: coverageStatus(week.percent),
     mainExerciseContributors: coverageContributors(muscleId, sessionsSince(7)).filter((item) => item.role === "Zielmuskel"),
@@ -2294,19 +2322,22 @@ function renderTabs() {
 
 function renderCoverageCard() {
   const mode = state.coverageMode || "week";
-  const items = mode === "today" ? coverageForSessions(sessionsForToday()) : coverageForSessions(sessionsSince(7));
+  const items = mode === "trend" ? [] : coverageForSessions(sessionsForCoverageMode(mode));
   const visibleItems = items.slice(0, 8);
   const hints = coverageCoachHints(coverageForSessions(sessionsSince(7)));
+  const texts = state.muscleMapTexts?.texts || {};
   return `
     <article class="card stack">
       <div class="row">
-        <h3 class="grow">Muscle Coverage</h3>
-        <span class="badge blue">${mode === "today" ? "Heute" : mode === "trend" ? "Trend" : "Woche"}</span>
+        <h3 class="grow">${htmlesc(texts.title || "Muscle Map")}</h3>
+        <span class="badge blue">${mode === "today" ? (texts.today || "Heute") : mode === "month" ? (texts.month || "Monat") : mode === "trend" ? (texts.trend || "Trend") : (texts.week || "Woche")}</span>
       </div>
+      <p class="muted">${htmlesc(texts.subtitle || "Sieh, welche Muskelgruppen belastet wurden.")}</p>
       <div class="coverage-switch">
         ${[
           ["today", "Heute"],
           ["week", "Woche"],
+          ["month", "Monat"],
           ["trend", "Trend"]
         ].map(([id, label]) => `<button class="${mode === id ? "active" : ""}" data-coverage-mode="${id}">${label}</button>`).join("")}
       </div>
@@ -2338,16 +2369,16 @@ function renderCoverageRow(item) {
 
 function renderCoverageBodyView(items) {
   const view = state.coverageView || "front";
-  const mapping = state.muscleCoverageVisualMapping;
-  const muscleIds = mapping?.views?.[view] || items.map((item) => item.muscleId);
-  const image = `./assets/muscle_maps/coverage_${view}_placeholder_v2.4.0.svg`;
+  const texts = state.muscleMapTexts?.texts || {};
+  const regions = state.muscleMapRegions?.regions?.filter((item) => item.view === view) || [];
+  const muscleIds = [...new Set(regions.map((item) => item.muscleId))];
   return `
     <div class="coverage-body">
       <div class="coverage-switch compact">
-        ${[["front", "Front"], ["back", "Ruecken"]].map(([id, label]) => `<button class="${view === id ? "active" : ""}" data-coverage-view="${id}">${label}</button>`).join("")}
+        ${[["front", texts.front || "Vorne"], ["back", texts.back || "Hinten"]].map(([id, label]) => `<button class="${view === id ? "active" : ""}" data-coverage-view="${id}">${label}</button>`).join("")}
       </div>
       <div class="coverage-body-map">
-        <img src="${image}" alt="${view === "front" ? "Vorderseite" : "Rueckseite"}">
+        ${renderInteractiveMuscleSvg(view, items)}
         <div class="coverage-body-chips">
           ${muscleIds.map((muscleId) => {
             const item = coverageItemByMuscle(items, muscleId);
@@ -2356,9 +2387,66 @@ function renderCoverageBodyView(items) {
           }).join("")}
         </div>
       </div>
-      <p class="quiet">${htmlesc(state.muscleCoverageCoachTexts?.texts?.detail_hint || "Tippe auf eine Muskelgruppe, um Uebungen und Belastung zu sehen.")}</p>
+      <p class="quiet">${htmlesc(texts.tapHint || "Tippe auf einen Muskel fuer Details.")}</p>
     </div>
   `;
+}
+
+function renderInteractiveMuscleSvg(view, items) {
+  const regions = state.muscleMapRegions?.regions?.filter((item) => item.view === view) || [];
+  if (!regions.length) {
+    return `<img src="./assets/muscle_maps/muscle_map_${view}_v3.0.0.svg" alt="${view === "front" ? "Vorderseite" : "Rueckseite"}">`;
+  }
+  const selected = state.selectedMuscleId;
+  const regionMarkup = regions.map((region, index) => {
+    const item = coverageItemByMuscle(items, region.muscleId);
+    const isSelected = selected === region.muscleId;
+    const opacity = selected && !isSelected ? 0.25 : 1;
+    const color = coverageColorFor(item.percent);
+    const shape = view === "front" ? frontRegionShape(region.svgRegionId, index) : backRegionShape(region.svgRegionId, index);
+    return `<button class="svg-muscle ${isSelected ? "selected" : ""}" style="--coverage-color:${color}; --coverage-opacity:${opacity}; ${shape.style}" data-open-coverage-muscle="${htmlesc(region.muscleId)}" title="${htmlesc(region.label)}"><span>${htmlesc(region.label)}</span></button>`;
+  }).join("");
+  return `
+    <div class="interactive-muscle-map ${view}">
+      <img src="./assets/muscle_maps/muscle_map_${view}_v3.0.0.svg" alt="${view === "front" ? "Vorderseite" : "Rueckseite"}">
+      ${regionMarkup}
+    </div>
+  `;
+}
+
+function frontRegionShape(regionId, index) {
+  const map = {
+    region_chest_upper: [50, 21, 30, 7],
+    region_chest_middle: [50, 30, 36, 10],
+    region_front_delts: [34, 25, 13, 10],
+    region_side_delts: [66, 25, 13, 10],
+    region_biceps: [26, 38, 10, 16],
+    region_triceps: [74, 38, 10, 16],
+    region_abs: [50, 45, 20, 22],
+    region_obliques: [37, 46, 12, 19],
+    region_quads: [44, 71, 17, 28],
+    region_adductors: [50, 71, 11, 24],
+    region_calves_front: [50, 87, 28, 14]
+  };
+  const [left, top, width, height] = map[regionId] || [20 + (index % 4) * 16, 18 + Math.floor(index / 4) * 12, 12, 10];
+  return { style: `left:${left}%; top:${top}%; width:${width}%; height:${height}%;` };
+}
+
+function backRegionShape(regionId, index) {
+  const map = {
+    region_traps: [50, 20, 32, 9],
+    region_upper_back: [50, 27, 40, 13],
+    region_rhomboids: [50, 29, 22, 11],
+    region_lats: [50, 38, 48, 25],
+    region_rear_delts: [33, 25, 13, 10],
+    region_erectors: [50, 47, 14, 30],
+    region_glutes: [50, 61, 36, 15],
+    region_abductors: [36, 66, 11, 19],
+    region_hamstrings: [50, 77, 35, 27],
+    region_calves_back: [50, 88, 28, 15]
+  };
+  const [left, top, width, height] = map[regionId] || [20 + (index % 4) * 16, 18 + Math.floor(index / 4) * 12, 12, 10];
+  return { style: `left:${left}%; top:${top}%; width:${width}%; height:${height}%;` };
 }
 
 function renderCoverageDetail(muscleId) {
@@ -2373,6 +2461,7 @@ function renderCoverageDetail(muscleId) {
       <div class="coverage-detail-metrics">
         <div><strong>${detail.todayCoveragePercent}%</strong><span>Heute</span></div>
         <div><strong>${detail.weekCoveragePercent}%</strong><span>Woche</span></div>
+        <div><strong>${detail.monthCoveragePercent}%</strong><span>Monat</span></div>
       </div>
       <p class="muted">${htmlesc(detail.coachText)}</p>
       ${contributors.length ? `<ul class="small-list">${contributors.map((item) => `<li>${htmlesc(item.name)}: ${Math.round(item.points * 10) / 10} Punkte (${htmlesc(item.role)})</li>`).join("")}</ul>` : `<p class="quiet">Noch keine Uebung fuer diese Muskelgruppe in der aktuellen Woche.</p>`}
@@ -3413,7 +3502,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "2.9.0",
+    backupVersion: "3.0.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

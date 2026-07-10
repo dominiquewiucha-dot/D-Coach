@@ -565,6 +565,44 @@ select:focus-visible {
   background: var(--input);
 }
 
+.interactive-muscle-map {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto;
+}
+
+.interactive-muscle-map img {
+  display: block;
+  width: 100%;
+  max-height: none;
+}
+
+.svg-muscle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  min-height: 0;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--coverage-color, var(--blue)) 70%, white);
+  border-radius: 999px;
+  opacity: var(--coverage-opacity, 1);
+  background: color-mix(in srgb, var(--coverage-color, var(--blue)) 55%, transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--coverage-color, var(--blue)) 45%, transparent);
+}
+
+.svg-muscle.selected {
+  border-color: white;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.65), 0 0 22px var(--blue-light);
+}
+
+.svg-muscle span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
 .coverage-body-chips {
   display: flex;
   flex-wrap: wrap;
@@ -598,7 +636,7 @@ select:focus-visible {
 
 .coverage-detail-metrics {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 

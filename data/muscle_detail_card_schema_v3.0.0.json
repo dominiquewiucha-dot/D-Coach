@@ -1,0 +1,18 @@
+{
+  "version": "3.0.0",
+  "type": "muscle_detail_card_schema",
+  "locale": "de-DE",
+  "fields": [
+    "muscleId",
+    "muscleName",
+    "todayPercent",
+    "weekPercent",
+    "monthPercent",
+    "targetPercent",
+    "status",
+    "mainExerciseContributors",
+    "secondaryExerciseContributors",
+    "trend",
+    "coachText"
+  ]
+}

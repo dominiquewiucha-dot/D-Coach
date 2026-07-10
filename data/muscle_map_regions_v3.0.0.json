@@ -1,0 +1,154 @@
+{
+  "version": "3.0.0",
+  "type": "muscle_map_regions",
+  "locale": "de-DE",
+  "regions": [
+    {
+      "muscleId": "mg_chest_upper",
+      "label": "Obere Brust",
+      "view": "front",
+      "svgRegionId": "region_chest_upper",
+      "group": "chest"
+    },
+    {
+      "muscleId": "mg_chest_middle",
+      "label": "Brust",
+      "view": "front",
+      "svgRegionId": "region_chest_middle",
+      "group": "chest"
+    },
+    {
+      "muscleId": "mg_front_delts",
+      "label": "Vordere Schulter",
+      "view": "front",
+      "svgRegionId": "region_front_delts",
+      "group": "shoulders"
+    },
+    {
+      "muscleId": "mg_side_delts",
+      "label": "Seitliche Schulter",
+      "view": "front",
+      "svgRegionId": "region_side_delts",
+      "group": "shoulders"
+    },
+    {
+      "muscleId": "mg_biceps",
+      "label": "Bizeps",
+      "view": "front",
+      "svgRegionId": "region_biceps",
+      "group": "arms"
+    },
+    {
+      "muscleId": "mg_triceps",
+      "label": "Trizeps",
+      "view": "front",
+      "svgRegionId": "region_triceps",
+      "group": "arms"
+    },
+    {
+      "muscleId": "mg_abs",
+      "label": "Bauch",
+      "view": "front",
+      "svgRegionId": "region_abs",
+      "group": "core"
+    },
+    {
+      "muscleId": "mg_obliques",
+      "label": "Seitliche Bauchmuskeln",
+      "view": "front",
+      "svgRegionId": "region_obliques",
+      "group": "core"
+    },
+    {
+      "muscleId": "mg_quads",
+      "label": "Quadrizeps",
+      "view": "front",
+      "svgRegionId": "region_quads",
+      "group": "legs"
+    },
+    {
+      "muscleId": "mg_adductors",
+      "label": "Adduktoren",
+      "view": "front",
+      "svgRegionId": "region_adductors",
+      "group": "legs"
+    },
+    {
+      "muscleId": "mg_calves",
+      "label": "Waden",
+      "view": "front",
+      "svgRegionId": "region_calves_front",
+      "group": "legs"
+    },
+    {
+      "muscleId": "mg_lats",
+      "label": "Lat",
+      "view": "back",
+      "svgRegionId": "region_lats",
+      "group": "back"
+    },
+    {
+      "muscleId": "mg_upper_back",
+      "label": "Oberer Rücken",
+      "view": "back",
+      "svgRegionId": "region_upper_back",
+      "group": "back"
+    },
+    {
+      "muscleId": "mg_rhomboids",
+      "label": "Rhomboiden",
+      "view": "back",
+      "svgRegionId": "region_rhomboids",
+      "group": "back"
+    },
+    {
+      "muscleId": "mg_traps",
+      "label": "Trapez",
+      "view": "back",
+      "svgRegionId": "region_traps",
+      "group": "back"
+    },
+    {
+      "muscleId": "mg_rear_delts",
+      "label": "Hintere Schulter",
+      "view": "back",
+      "svgRegionId": "region_rear_delts",
+      "group": "shoulders"
+    },
+    {
+      "muscleId": "mg_erectors",
+      "label": "Rückenstrecker",
+      "view": "back",
+      "svgRegionId": "region_erectors",
+      "group": "back"
+    },
+    {
+      "muscleId": "mg_glutes",
+      "label": "Gluteus",
+      "view": "back",
+      "svgRegionId": "region_glutes",
+      "group": "legs"
+    },
+    {
+      "muscleId": "mg_hamstrings",
+      "label": "Beinbeuger",
+      "view": "back",
+      "svgRegionId": "region_hamstrings",
+      "group": "legs"
+    },
+    {
+      "muscleId": "mg_abductors",
+      "label": "Abduktoren",
+      "view": "back",
+      "svgRegionId": "region_abductors",
+      "group": "legs"
+    },
+    {
+      "muscleId": "mg_calves",
+      "label": "Waden",
+      "view": "back",
+      "svgRegionId": "region_calves_back",
+      "group": "legs"
+    }
+  ]
+}

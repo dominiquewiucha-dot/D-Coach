@@ -1,0 +1,41 @@
+{
+  "version": "3.0.0",
+  "type": "interactive_muscle_map_schema",
+  "locale": "de-DE",
+  "views": [
+    "front",
+    "back"
+  ],
+  "modes": [
+    "today",
+    "week",
+    "month",
+    "trend"
+  ],
+  "defaultMode": "week",
+  "defaultView": "front",
+  "state": {
+    "selectedMuscleId": "string|null",
+    "coverageMode": "today|week|month|trend",
+    "bodyView": "front|back"
+  },
+  "interactions": [
+    {
+      "event": "muscleListClick",
+      "effect": "selectedMuscleId setzen, Körperhighlight, Detailkarte öffnen"
+    },
+    {
+      "event": "bodyMuscleClick",
+      "effect": "selectedMuscleId setzen, Liste scrollen, Detailkarte öffnen"
+    },
+    {
+      "event": "modeChange",
+      "effect": "Coverage-Daten neu berechnen"
+    },
+    {
+      "event": "viewToggle",
+      "effect": "Front/Rücken wechseln"
+    }
+  ],
+  "displayRule": "Nicht im Quick Training Satzscreen anzeigen."
+}

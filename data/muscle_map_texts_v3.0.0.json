@@ -1,0 +1,23 @@
+{
+  "version": "3.0.0",
+  "type": "muscle_map_texts",
+  "locale": "de-DE",
+  "texts": {
+    "title": "Muscle Map",
+    "subtitle": "Sieh, welche Muskelgruppen belastet wurden.",
+    "today": "Heute",
+    "week": "Woche",
+    "month": "Monat",
+    "trend": "Trend",
+    "front": "Vorne",
+    "back": "Hinten",
+    "tapHint": "Tippe auf einen Muskel für Details.",
+    "notTrained": "Noch nicht trainiert.",
+    "underTarget": "Noch unter dem Zielbereich.",
+    "target": "Im Zielbereich.",
+    "overTarget": "Über dem Zielbereich.",
+    "contributors": "Beteiligte Übungen",
+    "mainLoad": "Hauptbelastung",
+    "secondaryLoad": "Hilfsbelastung"
+  }
+}
