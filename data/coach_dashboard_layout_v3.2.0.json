@@ -1,0 +1,12 @@
+{
+  "version": "3.2.0",
+  "type": "coach_dashboard_layout",
+  "sections": [
+    "today_focus",
+    "muscle_coverage",
+    "coach_recommendations",
+    "progress_highlights",
+    "next_actions"
+  ],
+  "displayRule": "Dashboard ist Übersicht, nicht Satz-Eingabe."
+}

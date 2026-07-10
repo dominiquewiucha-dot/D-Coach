@@ -42,6 +42,9 @@ const state = {
   studioSpeedFitnessSeed: null,
   machineMatchingRules: null,
   machineMappingTexts: null,
+  coachDashboardLayout: null,
+  coachDashboardCards: null,
+  coachDashboardVisualRules: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -87,8 +90,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v29";
-const STORAGE_SCHEMA_VERSION = "3.1.0";
+const APP_VERSION = "pwa-v30";
+const STORAGE_SCHEMA_VERSION = "3.2.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -651,6 +654,9 @@ async function boot() {
     studioSpeedFitnessSeed,
     machineMatchingRules,
     machineMappingTexts,
+    coachDashboardLayout,
+    coachDashboardCards,
+    coachDashboardVisualRules,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -731,6 +737,9 @@ async function boot() {
     fetchOptionalJson("./data/studio_speed_fitness_seed_v3.1.0.json"),
     fetchOptionalJson("./data/machine_matching_rules_v3.1.0.json"),
     fetchOptionalJson("./data/machine_mapping_texts_v3.1.0.json"),
+    fetchOptionalJson("./data/coach_dashboard_layout_v3.2.0.json"),
+    fetchOptionalJson("./data/coach_dashboard_cards_v3.2.0.json"),
+    fetchOptionalJson("./data/coach_dashboard_visual_rules_v3.2.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -799,6 +808,9 @@ async function boot() {
   state.studioSpeedFitnessSeed = studioSpeedFitnessSeed;
   state.machineMatchingRules = machineMatchingRules;
   state.machineMappingTexts = machineMappingTexts;
+  state.coachDashboardLayout = coachDashboardLayout;
+  state.coachDashboardCards = coachDashboardCards;
+  state.coachDashboardVisualRules = coachDashboardVisualRules;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -2565,6 +2577,103 @@ function renderPerformanceCoachCard(session) {
   `;
 }
 
+function renderCoachDashboardPremium() {
+  const plan = activePlan();
+  const session = lastSession();
+  const nextDay = plan?.days?.[0]?.name || "-";
+  const weekSessions = sessionsSince(7);
+  const coverageItems = coverageForSessions(weekSessions);
+  const undertrained = coverageItems.filter((item) => item.percent < 70).slice(0, 3);
+  const strong = coverageItems.filter((item) => item.percent >= 70 && item.percent <= 120).slice(0, 3);
+  const insights = session ? performanceInsightsForSession(session) : [];
+  const mainInsight = insights[0];
+  const records = insights.flatMap((item) => item.insight.records.map((record) => ({
+    exercise: item.exercise.exerciseNameSnapshot,
+    record
+  }))).slice(0, 3);
+  const recommendationTitle = mainInsight ? mainInsight.progression.label : "Erstes Training sauber erfassen";
+  const recommendationText = mainInsight ? mainInsight.smartNote : "Starte die naechste Einheit und speichere alle Arbeitssaetze. Danach kann D-Coach belastbare Empfehlungen geben.";
+  const whyItems = mainInsight ? [...mainInsight.progression.why, ...mainInsight.insight.evidence].slice(0, 5) : [
+    "Ohne gespeicherte Trainings gibt es noch keine persoenliche Leistungsbasis.",
+    "Sobald Saetze vorhanden sind, werden Muskelabdeckung, Progression und PRs ausgewertet."
+  ];
+  return `
+    <section class="coach-dashboard-premium stack" aria-label="Coach Dashboard">
+      <article class="card stack premium-today-card">
+        <div class="row">
+          <div class="grow">
+            <p class="muted">Heute</p>
+            <h2>${plan ? htmlesc(nextDay) : "Plan auswaehlen"}</h2>
+          </div>
+          <span class="badge blue">v3.2</span>
+        </div>
+        <p class="muted">${plan ? `Aktiver Plan: ${htmlesc(plan.planName)}` : "Ohne aktiven Plan bleibt die Empfehlung allgemein."}</p>
+        <button class="primary" data-tab="${plan ? "training" : "plans"}">${plan ? "Training starten" : "Zu den Plaenen"}</button>
+      </article>
+
+      <div class="premium-card-grid">
+        <article class="card stack">
+          <div class="row">
+            <h3 class="grow">Muscle Coverage</h3>
+            <button class="chip-button" data-coverage-mode="week">Map</button>
+          </div>
+          <div class="premium-mini-map">
+            ${renderDashboardMiniMuscleMap(coverageItems)}
+          </div>
+          <div class="coverage-list compact-list">
+            ${(undertrained.length ? undertrained : coverageItems.slice(0, 3)).map(renderCoverageRow).join("") || `<p class="muted">Noch keine Wochenbelastung gespeichert.</p>`}
+          </div>
+        </article>
+
+        <article class="card stack">
+          <div class="row">
+            <h3 class="grow">Coach Empfehlung</h3>
+            <span class="badge ${mainInsight?.progression.decisionType === "increase" ? "green" : "blue"}">${htmlesc(recommendationTitle)}</span>
+          </div>
+          <p class="muted">${htmlesc(recommendationText)}</p>
+          <details>
+            <summary>Warum?</summary>
+            <ul class="small-list">${whyItems.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
+          </details>
+        </article>
+
+        <article class="card stack">
+          <div class="row">
+            <h3 class="grow">Fortschritt</h3>
+            <span class="badge blue">${weekSessions.length} Einheiten</span>
+          </div>
+          ${records.length ? `<ul class="small-list">${records.map((item) => `<li>${htmlesc(item.exercise)}: ${htmlesc(item.record)}</li>`).join("")}</ul>` : `<p class="muted">Noch keine neuen PRs in der letzten Auswertung.</p>`}
+          ${strong.length ? `<p class="quiet">Stabil abgedeckt: ${strong.map((item) => htmlesc(item.name)).join(", ")}</p>` : ""}
+        </article>
+
+        <article class="card stack">
+          <h3>Naechste Aktionen</h3>
+          <div class="next-action-list">
+            <button class="secondary" data-tab="training">Training starten</button>
+            <button class="secondary" data-tab="journal">Readiness eintragen</button>
+            <button class="secondary" data-tab="coach">Coach ansehen</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  `;
+}
+
+function renderDashboardMiniMuscleMap(items) {
+  const visible = items.slice(0, 6);
+  if (!visible.length) return `<p class="muted">Die Mini-Map fuellt sich nach deinem ersten gespeicherten Training.</p>`;
+  return `
+    <div class="mini-muscle-map">
+      ${visible.map((item) => `
+        <button class="mini-muscle-pill" style="--coverage-color:${coverageColorFor(item.percent)}" data-open-coverage-muscle="${htmlesc(item.muscleId)}">
+          <span>${htmlesc(item.name)}</span>
+          <strong>${item.percent}%</strong>
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
 function renderTrainingDnaCard() {
   const dna = trainingDnaSummary();
   const memory = coachMemoryItems();
@@ -2668,6 +2777,7 @@ function renderDashboard() {
   return `
     <section class="screen stack">
       <header><h1 class="title">D-Coach</h1><p class="subtitle">Heute sauber trainieren.</p></header>
+      ${renderCoachDashboardPremium()}
       ${plan ? `<article class="card stack">
         <p class="muted">Aktiver Plan</p>
         <h2>${htmlesc(plan.planName)}</h2>
@@ -3588,7 +3698,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "3.1.0",
+    backupVersion: "3.2.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

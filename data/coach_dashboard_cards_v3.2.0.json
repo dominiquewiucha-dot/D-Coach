@@ -1,0 +1,24 @@
+{
+  "version": "3.2.0",
+  "type": "coach_dashboard_cards",
+  "cards": [
+    {
+      "id": "miniMuscleMap",
+      "tapAction": "openMuscleMap"
+    },
+    {
+      "id": "coverageSummary"
+    },
+    {
+      "id": "mainRecommendation",
+      "tapAction": "openWhy"
+    },
+    {
+      "id": "newPRs"
+    },
+    {
+      "id": "nextWorkout",
+      "tapAction": "startOrBuildWorkout"
+    }
+  ]
+}

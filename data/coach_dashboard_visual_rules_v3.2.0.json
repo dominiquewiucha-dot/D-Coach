@@ -1,0 +1,5 @@
+{
+  "version": "3.2.0",
+  "type": "visual_rules",
+  "rule": "App bleibt blau. Gelb/Orange/Rot nur Muscle-Coverage/Körperkarte."
+}

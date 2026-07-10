@@ -184,6 +184,17 @@ select:focus-visible {
 .badge.amber { color: var(--amber); background: rgba(245,158,11,.13); }
 .badge.red { color: var(--red); background: rgba(239,68,68,.13); }
 
+.chip-button {
+  min-height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 11px;
+  color: var(--text);
+  background: var(--input);
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .badge-stack {
   display: flex;
   flex-direction: column;
@@ -246,6 +257,74 @@ select:focus-visible {
 .muscle-chip small {
   color: var(--muted);
   font-size: 10px;
+}
+
+.coach-dashboard-premium {
+  gap: 12px;
+}
+
+.premium-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.premium-today-card {
+  border-color: rgba(37,99,235,.55);
+  background: linear-gradient(180deg, rgba(37,99,235,.18), rgba(18,24,33,.95));
+}
+
+.premium-mini-map {
+  display: grid;
+  gap: 10px;
+}
+
+.mini-muscle-map {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mini-muscle-pill {
+  min-width: 0;
+  min-height: 48px;
+  border: 1px solid color-mix(in srgb, var(--coverage-color, var(--blue)) 58%, var(--border));
+  border-radius: 12px;
+  padding: 8px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--coverage-color, var(--blue)) 18%, var(--input));
+  text-align: left;
+}
+
+.mini-muscle-pill span,
+.mini-muscle-pill strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mini-muscle-pill span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.mini-muscle-pill strong {
+  margin-top: 3px;
+  font-size: 16px;
+}
+
+.compact-list {
+  gap: 8px;
+}
+
+.compact-list .coverage-row {
+  padding: 0;
+}
+
+.next-action-list {
+  display: grid;
+  gap: 8px;
 }
 
 .body-map-grid {
