@@ -63,6 +63,11 @@ const state = {
   conflictResolverRules: null,
   explainabilityEngineSchema: null,
   goalStrategyRules: null,
+  recoveryFatigueSchema: null,
+  muscleFatigueRules: null,
+  jointStressRules: null,
+  deloadDetectionRules: null,
+  recoveryTexts: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -108,8 +113,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v35";
-const STORAGE_SCHEMA_VERSION = "4.0.0";
+const APP_VERSION = "pwa-v36";
+const STORAGE_SCHEMA_VERSION = "4.1.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -693,6 +698,11 @@ async function boot() {
     conflictResolverRules,
     explainabilityEngineSchema,
     goalStrategyRules,
+    recoveryFatigueSchema,
+    muscleFatigueRules,
+    jointStressRules,
+    deloadDetectionRules,
+    recoveryTexts,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -794,6 +804,11 @@ async function boot() {
     fetchOptionalJson("./data/conflict_resolver_rules_v4.0.0.json"),
     fetchOptionalJson("./data/explainability_engine_schema_v4.0.0.json"),
     fetchOptionalJson("./data/goal_strategy_rules_v4.0.0.json"),
+    fetchOptionalJson("./data/recovery_fatigue_schema_v4.1.0.json"),
+    fetchOptionalJson("./data/muscle_fatigue_rules_v4.1.0.json"),
+    fetchOptionalJson("./data/joint_stress_rules_v4.1.0.json"),
+    fetchOptionalJson("./data/deload_detection_rules_v4.1.0.json"),
+    fetchOptionalJson("./data/recovery_texts_v4.1.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -883,6 +898,11 @@ async function boot() {
   state.conflictResolverRules = conflictResolverRules;
   state.explainabilityEngineSchema = explainabilityEngineSchema;
   state.goalStrategyRules = goalStrategyRules;
+  state.recoveryFatigueSchema = recoveryFatigueSchema;
+  state.muscleFatigueRules = muscleFatigueRules;
+  state.jointStressRules = jointStressRules;
+  state.deloadDetectionRules = deloadDetectionRules;
+  state.recoveryTexts = recoveryTexts;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -3199,6 +3219,71 @@ function renderIntelligenceCoreCard(context = "coach") {
   `;
 }
 
+function recoveryText(key, fallback) {
+  return state.recoveryTexts?.texts?.[key] || fallback;
+}
+
+function recoveryFatigueSummary() {
+  const weekSessions = sessionsSince(7);
+  const readiness = readinessForJournal(journalEntryForDate(todayIsoDate()) || latestJournalEntry());
+  const coverage = coverageForSessions(weekSessions);
+  const maxMuscle = coverage[0] || null;
+  const rirZeroSets = weekSessions.flatMap((session) => session.completedExercises || [])
+    .flatMap((exercise) => exercise.sets || [])
+    .filter((set) => Number(set.rir) === 0).length;
+  const systemicFatiguePercent = Math.min(100, Math.round((weekSessions.length * 16) + (weeklyVolume() / 900) + (readiness.color === "red" ? 25 : readiness.color === "amber" ? 12 : 0) + (rirZeroSets * 3)));
+  const muscleFatiguePercent = Math.min(100, Math.round(((maxMuscle?.percent || 0) / 140) * 100));
+  const recentExercises = weekSessions.flatMap((session) => session.completedExercises || []);
+  const jointFlags = [];
+  if (recentExercises.some((item) => {
+    const exercise = exerciseById(item.exerciseId);
+    return exercise?.spineLoadLevel === "high" || /hinge|deadlift|kreuzheben/i.test(`${exercise?.movementPattern || ""} ${exercise?.displayName || ""}`);
+  })) jointFlags.push("LWS");
+  if (recentExercises.filter((item) => /push|druecken|press/i.test(exerciseById(item.exerciseId)?.movementPattern || exerciseById(item.exerciseId)?.displayName || "")).length >= 2) jointFlags.push("Schulter");
+  if (coverage.some((item) => /quad|beine|knee|knie/i.test(`${item.muscleId} ${item.name}`) && item.percent > 120)) jointFlags.push("Knie");
+  const deloadCandidate = systemicFatiguePercent >= 75 || muscleFatiguePercent >= 85 || (readiness.color === "red" && weekSessions.length >= 2);
+  const status = deloadCandidate ? "deload" : systemicFatiguePercent >= 65 || muscleFatiguePercent >= 75 ? "high" : systemicFatiguePercent >= 45 ? "caution" : "good";
+  return {
+    status,
+    statusText: recoveryText(status, status === "good" ? "Erholung wirkt ausreichend." : status === "caution" ? "Heute konservativ planen." : status === "high" ? "Belastung hoch." : "Deload pruefen."),
+    systemicFatiguePercent,
+    muscleFatiguePercent,
+    topMuscle: maxMuscle,
+    jointFlags: [...new Set(jointFlags)],
+    deloadCandidate,
+    evidence: [
+      `${weekSessions.length} Trainings in 7 Tagen`,
+      `${Math.round(weeklyVolume())} kg Wochenvolumen`,
+      `${rirZeroSets} Saetze mit RIR 0`
+    ]
+  };
+}
+
+function renderRecoveryFatigueCard(context = "coach") {
+  const summary = recoveryFatigueSummary();
+  const tone = summary.status === "good" ? "green" : summary.status === "caution" ? "blue" : "amber";
+  return `
+    <article class="card stack recovery-fatigue-card">
+      <div class="row">
+        <h3 class="grow">Recovery & Fatigue</h3>
+        <span class="badge ${tone}">${htmlesc(summary.statusText)}</span>
+      </div>
+      <div class="mini-grid">
+        <div class="fatigue-metric"><strong>${summary.systemicFatiguePercent}%</strong><span>Systemisch</span></div>
+        <div class="fatigue-metric"><strong>${summary.muscleFatiguePercent}%</strong><span>Lokal</span></div>
+        <div class="fatigue-metric"><strong>${summary.jointFlags.length}</strong><span>Gelenkflags</span></div>
+      </div>
+      ${summary.topMuscle ? `<p class="muted">Höchste lokale Belastung: ${htmlesc(summary.topMuscle.name)} mit ${summary.topMuscle.percent}% Wochenabdeckung.</p>` : `<p class="muted">Noch nicht genug Muskeldaten fuer lokale Ermuedung.</p>`}
+      ${summary.jointFlags.length ? `<p class="quiet">Gelenkstress: ${summary.jointFlags.map(htmlesc).join(", ")}</p>` : `<p class="quiet">Keine harte Gelenkstress-Regel aktiv.</p>`}
+      <details>
+        <summary>Warum?</summary>
+        <ul class="small-list">${summary.evidence.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
+      </details>
+      <p class="quiet">${context === "plans" ? "Planung: vor Zusatzvolumen pruefen." : "Coach: aus Historie, Readiness, RIR und Wochenlast berechnet."}</p>
+    </article>
+  `;
+}
+
 function renderDashboard() {
   const plan = activePlan();
   const latestWeight = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
@@ -3286,6 +3371,7 @@ function renderCoach() {
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
       ${renderIntelligenceCoreCard("coach")}
+      ${renderRecoveryFatigueCard("coach")}
       <article class="card stack">
         <div class="row"><h3 class="grow">Recovery</h3><span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span></div>
         <p class="muted">${htmlesc(readiness.hint)}</p>
@@ -3743,6 +3829,7 @@ function renderPlans() {
     <section class="screen stack">
       <header><h1 class="title">Pläne</h1><p class="subtitle">Aktiver Plan und Bibliothek.</p></header>
       ${renderIntelligenceCoreCard("plans")}
+      ${renderRecoveryFatigueCard("plans")}
       <article class="card stack">
         <h3>Plan teilen / importieren</h3>
         <p class="muted">${payload.length > qrLimit ? appText("qr.tooLarge", "Dieser Plan ist zu gross fuer QR. Bitte JSON-Export verwenden.") : "Kompakter Plan-Code fuer QR/Text-Import."}</p>
@@ -4243,7 +4330,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "4.0.0",
+    backupVersion: "4.1.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

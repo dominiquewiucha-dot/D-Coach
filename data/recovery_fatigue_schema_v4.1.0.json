@@ -1,0 +1,19 @@
+{
+  "version": "4.1.0",
+  "type": "recovery_fatigue_schema",
+  "signals": [
+    "localMuscleLoad",
+    "systemicLoad",
+    "jointStress",
+    "rirRpe",
+    "sessionDuration",
+    "trainingFrequency",
+    "readiness"
+  ],
+  "outputs": [
+    "muscleFatiguePercent",
+    "systemicFatiguePercent",
+    "jointStressFlags",
+    "deloadCandidate"
+  ]
+}

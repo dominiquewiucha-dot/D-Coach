@@ -1,0 +1,18 @@
+{
+  "version": "4.1.0",
+  "type": "muscle_fatigue_rules",
+  "rules": [
+    {
+      "id": "high_coverage_high_fatigue",
+      "if": "muscleCoverageWeek > 120"
+    },
+    {
+      "id": "recent_same_muscle",
+      "if": "same muscle trained within 48h"
+    },
+    {
+      "id": "rir_zero_repeated",
+      "if": "RIR 0 repeated"
+    }
+  ]
+}

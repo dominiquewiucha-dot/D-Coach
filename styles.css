@@ -946,6 +946,24 @@ select:focus-visible {
   background: var(--blue);
 }
 
+.fatigue-metric {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--input);
+}
+
+.fatigue-metric strong {
+  font-size: 20px;
+}
+
+.fatigue-metric span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .rating-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

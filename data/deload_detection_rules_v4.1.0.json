@@ -1,0 +1,15 @@
+{
+  "version": "4.1.0",
+  "type": "deload_detection_rules",
+  "rules": [
+    {
+      "id": "performance_drop_plus_fatigue"
+    },
+    {
+      "id": "systemic_high"
+    },
+    {
+      "id": "pain_note"
+    }
+  ]
+}

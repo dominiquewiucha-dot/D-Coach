@@ -1,0 +1,10 @@
+{
+  "version": "4.1.0",
+  "type": "recovery_texts",
+  "texts": {
+    "good": "Erholung wirkt ausreichend.",
+    "caution": "Heute konservativ planen.",
+    "high": "Belastung hoch.",
+    "deload": "Deload prüfen."
+  }
+}
