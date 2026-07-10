@@ -1,0 +1,19 @@
+{
+  "version": "4.0.0",
+  "type": "goal_strategy_rules",
+  "strategies": [
+    {
+      "goal": "hypertrophy_reentry",
+      "priorityOrder": [
+        "technique",
+        "coverage",
+        "reps",
+        "small_load_progression"
+      ],
+      "avoid": [
+        "max_attempts",
+        "large_load_jumps"
+      ]
+    }
+  ]
+}

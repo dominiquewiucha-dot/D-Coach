@@ -1,0 +1,48 @@
+{
+  "version": "4.0.0",
+  "type": "confidence_engine_rules",
+  "factors": [
+    {
+      "id": "data_depth",
+      "weight": 25
+    },
+    {
+      "id": "rule_match",
+      "weight": 25
+    },
+    {
+      "id": "profile_alignment",
+      "weight": 20
+    },
+    {
+      "id": "recent_consistency",
+      "weight": 15
+    },
+    {
+      "id": "conflict_penalty",
+      "weight": -35
+    }
+  ],
+  "bands": [
+    {
+      "min": 0,
+      "max": 49,
+      "label": "niedrig"
+    },
+    {
+      "min": 50,
+      "max": 74,
+      "label": "mittel"
+    },
+    {
+      "min": 75,
+      "max": 89,
+      "label": "hoch"
+    },
+    {
+      "min": 90,
+      "max": 100,
+      "label": "sehr hoch"
+    }
+  ]
+}

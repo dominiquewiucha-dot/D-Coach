@@ -58,6 +58,11 @@ const state = {
   exerciseDetailTexts: null,
   exerciseDetailActionRules: null,
   exerciseHistoryChartConfig: null,
+  intelligenceCoreSchema: null,
+  confidenceEngineRules: null,
+  conflictResolverRules: null,
+  explainabilityEngineSchema: null,
+  goalStrategyRules: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -103,8 +108,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v34";
-const STORAGE_SCHEMA_VERSION = "3.6.0";
+const APP_VERSION = "pwa-v35";
+const STORAGE_SCHEMA_VERSION = "4.0.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -683,6 +688,11 @@ async function boot() {
     exerciseDetailTexts,
     exerciseDetailActionRules,
     exerciseHistoryChartConfig,
+    intelligenceCoreSchema,
+    confidenceEngineRules,
+    conflictResolverRules,
+    explainabilityEngineSchema,
+    goalStrategyRules,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -779,6 +789,11 @@ async function boot() {
     fetchOptionalJson("./data/exercise_detail_texts_v3.6.0.json"),
     fetchOptionalJson("./data/exercise_detail_action_rules_v3.6.0.json"),
     fetchOptionalJson("./data/exercise_history_chart_config_v3.6.0.json"),
+    fetchOptionalJson("./data/intelligence_core_schema_v4.0.0.json"),
+    fetchOptionalJson("./data/confidence_engine_rules_v4.0.0.json"),
+    fetchOptionalJson("./data/conflict_resolver_rules_v4.0.0.json"),
+    fetchOptionalJson("./data/explainability_engine_schema_v4.0.0.json"),
+    fetchOptionalJson("./data/goal_strategy_rules_v4.0.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -863,6 +878,11 @@ async function boot() {
   state.exerciseDetailTexts = exerciseDetailTexts;
   state.exerciseDetailActionRules = exerciseDetailActionRules;
   state.exerciseHistoryChartConfig = exerciseHistoryChartConfig;
+  state.intelligenceCoreSchema = intelligenceCoreSchema;
+  state.confidenceEngineRules = confidenceEngineRules;
+  state.conflictResolverRules = conflictResolverRules;
+  state.explainabilityEngineSchema = explainabilityEngineSchema;
+  state.goalStrategyRules = goalStrategyRules;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -3096,6 +3116,89 @@ function renderMachineMatchCard(exercise) {
   `;
 }
 
+function confidenceBand(percent) {
+  const bands = state.confidenceEngineRules?.bands || [];
+  return bands.find((band) => percent >= band.min && percent <= band.max)?.label || (percent >= 75 ? "hoch" : percent >= 50 ? "mittel" : "niedrig");
+}
+
+function intelligenceDecision() {
+  const session = lastSession();
+  const sessionCount = storage.sessions.length;
+  const weekSessions = sessionsSince(7);
+  const readiness = readinessForJournal(journalEntryForDate(todayIsoDate()) || latestJournalEntry());
+  const coverageHints = coverageCoachHints(coverageForSessions(weekSessions));
+  const conflicts = [];
+  if (readiness.color === "red") conflicts.push("Recovery vor Last");
+  if (coverageHints.some((hint) => hint.includes("ueberdurchschnittlich"))) conflicts.push("Ueberlastung vor Zusatzvolumen");
+  if (weekSessions.length >= 4) conflicts.push("Zeit/Erholung vor optionalem Volumen");
+  const factors = {
+    data_depth: Math.min(25, sessionCount * 5),
+    rule_match: session ? 22 : 8,
+    profile_alignment: currentPersonalProfile() ? 18 : 8,
+    recent_consistency: weekSessions.length >= 2 ? 15 : weekSessions.length ? 8 : 0,
+    conflict_penalty: conflicts.length ? -Math.min(35, conflicts.length * 12) : 0
+  };
+  const confidencePercent = Math.max(0, Math.min(100, Object.values(factors).reduce((sum, value) => sum + value, 0)));
+  let recommendation = "Trainingsdaten sammeln";
+  let action = "Naechste Einheit sauber speichern.";
+  const why = [];
+  const evidence = [
+    `${sessionCount} gespeicherte Trainings`,
+    `${weekSessions.length} Trainings in den letzten 7 Tagen`,
+    `Readiness: ${readiness.label}`
+  ];
+  if (!session) {
+    why.push("Ohne gespeicherte Einheiten kann der Coach noch keine belastbare Entscheidung treffen.");
+  } else if (readiness.color === "red") {
+    recommendation = "Recovery priorisieren";
+    action = "Belastung reduzieren oder Technik/leichte Saetze waehlen.";
+    why.push("Die aktuelle Readiness spricht gegen aggressive Progression.");
+  } else if (coverageHints.length) {
+    recommendation = "Muskelabdeckung ausgleichen";
+    action = coverageHints[0];
+    why.push("Die Wochenabdeckung zeigt eine klare Prioritaet.");
+  } else {
+    recommendation = "Kleine Progression pruefen";
+    action = "Bei stabiler Technik vorsichtig steigern.";
+    why.push("Leistung, Abdeckung und Readiness liefern keinen harten Konflikt.");
+  }
+  return {
+    recommendationId: "intelligence_core_v4",
+    recommendation,
+    action,
+    confidencePercent,
+    confidenceLabel: confidenceBand(confidencePercent),
+    why,
+    evidence,
+    conflicts,
+    factors
+  };
+}
+
+function renderIntelligenceCoreCard(context = "coach") {
+  const decision = intelligenceDecision();
+  const tone = decision.confidencePercent >= 75 ? "green" : decision.confidencePercent >= 50 ? "blue" : "amber";
+  return `
+    <article class="card stack intelligence-core-card">
+      <div class="row">
+        <h3 class="grow">Intelligence Core</h3>
+        <span class="badge ${tone}">${decision.confidencePercent}% ${htmlesc(decision.confidenceLabel)}</span>
+      </div>
+      <p class="muted">${htmlesc(decision.recommendation)}: ${htmlesc(decision.action)}</p>
+      <div class="confidence-bar"><span style="width:${decision.confidencePercent}%"></span></div>
+      <details>
+        <summary>Warum?</summary>
+        <ul class="small-list">
+          ${decision.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}
+          ${decision.evidence.map((item) => `<li>${htmlesc(item)}</li>`).join("")}
+          ${decision.conflicts.length ? decision.conflicts.map((item) => `<li>Konflikt: ${htmlesc(item)}</li>`).join("") : `<li>Keine harte Konfliktregel aktiv.</li>`}
+        </ul>
+      </details>
+      <p class="quiet">${context === "plans" ? "Planungsansicht: Empfehlung dient als Pruefung vor Anpassungen." : "Coachansicht: aus Historie, Readiness und Wochenabdeckung berechnet."}</p>
+    </article>
+  `;
+}
+
 function renderDashboard() {
   const plan = activePlan();
   const latestWeight = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
@@ -3182,6 +3285,7 @@ function renderCoach() {
         ${metric(String(sessionSetCount(session)), "Saetze")}
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
+      ${renderIntelligenceCoreCard("coach")}
       <article class="card stack">
         <div class="row"><h3 class="grow">Recovery</h3><span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span></div>
         <p class="muted">${htmlesc(readiness.hint)}</p>
@@ -3638,6 +3742,7 @@ function renderPlans() {
   return `
     <section class="screen stack">
       <header><h1 class="title">Pläne</h1><p class="subtitle">Aktiver Plan und Bibliothek.</p></header>
+      ${renderIntelligenceCoreCard("plans")}
       <article class="card stack">
         <h3>Plan teilen / importieren</h3>
         <p class="muted">${payload.length > qrLimit ? appText("qr.tooLarge", "Dieser Plan ist zu gross fuer QR. Bitte JSON-Export verwenden.") : "Kompakter Plan-Code fuer QR/Text-Import."}</p>
@@ -4138,7 +4243,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "3.6.0",
+    backupVersion: "4.0.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

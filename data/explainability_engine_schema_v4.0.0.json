@@ -1,0 +1,13 @@
+{
+  "version": "4.0.0",
+  "type": "explainability_engine_schema",
+  "fields": [
+    "recommendation",
+    "confidencePercent",
+    "primaryReason",
+    "supportingEvidence",
+    "usedData",
+    "alternativeOptions",
+    "riskNotes"
+  ]
+}

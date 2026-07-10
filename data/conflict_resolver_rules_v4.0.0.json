@@ -1,0 +1,18 @@
+{
+  "version": "4.0.0",
+  "type": "conflict_resolver_rules",
+  "rules": [
+    {
+      "id": "safety_over_progression",
+      "priority": 100
+    },
+    {
+      "id": "time_over_optional_volume",
+      "priority": 90
+    },
+    {
+      "id": "recovery_over_load",
+      "priority": 85
+    }
+  ]
+}
