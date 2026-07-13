@@ -178,7 +178,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v54";
+const APP_VERSION = "pwa-v55";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -1203,6 +1203,7 @@ async function boot() {
   }
   registerServiceWorker();
   bindPwaEvents();
+  bindWorkoutIntegrityEvents();
   restoreWorkoutDraft();
   startTimerLoop();
   state.tab = tabFromHash() || state.tab;
@@ -1290,6 +1291,13 @@ function resumeWorkoutDraft() {
   if (state.activeWorkout) render();
 }
 
+function bindWorkoutIntegrityEvents() {
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") persistWorkoutDraft();
+  });
+  window.addEventListener("pagehide", persistWorkoutDraft);
+}
+
 function startTimerLoop() {
   if (window.dcoachTimerLoop) return;
   window.dcoachTimerLoop = window.setInterval(() => {
@@ -1299,7 +1307,7 @@ function startTimerLoop() {
       state.restTimer.remaining = 0;
       state.restTimer.running = false;
     }
-    if (state.activeWorkout) render();
+    updateRestTimerDisplay();
   }, 1000);
 }
 
@@ -1315,9 +1323,25 @@ function restTimeText(seconds) {
   return `${minutes}:${rest}`;
 }
 
+function updateRestTimerDisplay() {
+  const value = document.querySelector("[data-rest-timer-value]");
+  if (value) value.textContent = restTimeText(state.restTimer.remaining);
+  const button = document.querySelector("[data-pause-timer]");
+  if (button) button.textContent = state.restTimer.running ? "Stop" : "Start";
+}
+
 function activePlan() {
   const plans = availablePlans().filter((plan) => !isPlanArchived(plan.planName));
   return plans.find((plan) => plan.planName === storage.activePlanName) || plans[0] || null;
+}
+
+function nextPlanDayAfterLastSession(plan = activePlan()) {
+  if (!plan?.days?.length) return null;
+  const latest = lastSession();
+  if (!latest) return plan.days[0];
+  const index = plan.days.findIndex((day) => day.name === latest.dayName || day.name === latest.dayNameSnapshot);
+  if (index < 0) return plan.days[0];
+  return plan.days[(index + 1) % plan.days.length];
 }
 
 function availablePlans() {
@@ -1668,7 +1692,10 @@ function bestVolumeForExercise(exerciseId) {
 }
 
 function totalVolume(completedExercise) {
-  return completedExercise.sets.reduce((sum, set) => sum + (Number(set.actualWeightKg) || 0) * (Number(set.actualReps) || 0), 0);
+  return completedExercise.sets.reduce((sum, set) => {
+    if (set.completed !== true) return sum;
+    return sum + (Number(set.actualWeightKg) || 0) * (Number(set.actualReps) || 0);
+  }, 0);
 }
 
 function sessionById(id) {
@@ -1680,7 +1707,7 @@ function sessionVolume(session) {
 }
 
 function sessionSetCount(session) {
-  return session.completedExercises.reduce((sum, exercise) => sum + exercise.sets.length, 0);
+  return session.completedExercises.reduce((sum, exercise) => sum + exercise.sets.filter((set) => set.completed === true).length, 0);
 }
 
 function sessionDurationMinutes(session) {
@@ -1725,15 +1752,15 @@ function activePlanTargetMuscles() {
     day.exercises.forEach((planned) => {
       const mapping = muscleMappingForExercise(planned.exerciseId);
       if (!mapping) return;
-      if (mapping.primaryMuscle) ids.add(mapping.primaryMuscle);
-      (mapping.secondaryMuscles || []).forEach((item) => ids.add(item.muscleId));
+      if (mapping.primaryMuscle) ids.add(canonicalizeMuscleId(mapping.primaryMuscle));
+      (mapping.secondaryMuscles || []).forEach((item) => ids.add(canonicalizeMuscleId(item.muscleId)));
     });
   });
   return ids;
 }
 
 function completedSetCoverageFactor(set) {
-  if (set.completed === false) return 0;
+  if (set.completed !== true) return 0;
   const reps = Number(set.actualReps) || 10;
   const weight = Number(set.actualWeightKg) || 0;
   const repsFactor = Math.min(1.4, Math.max(0.6, reps / 10));
@@ -1794,6 +1821,7 @@ function premiumSubregionsForExercise(exercise, mapping) {
 function premiumCoverageForSessions(sessions) {
   const points = new Map();
   const add = (muscleId, value) => {
+    muscleId = canonicalizeMuscleId(muscleId);
     if (!muscleId || !Number.isFinite(value) || value <= 0) return;
     points.set(muscleId, (points.get(muscleId) || 0) + value);
   };
@@ -2654,6 +2682,17 @@ function muscleById(id) {
 
 function muscleName(id) {
   return muscleById(id)?.name || id;
+}
+
+function canonicalizeMuscleId(id) {
+  const aliases = {
+    chest: "mg_chest",
+    mg_chest_sternal: "mg_chest",
+    mg_chest_clavicular: "mg_chest",
+    mg_chest_lower: "mg_chest",
+    mg_chest_upper: "mg_chest"
+  };
+  return aliases[id] || id;
 }
 
 function muscleMappingForExercise(exerciseId) {
@@ -3806,7 +3845,7 @@ function renderRecordsAchievementsCard(session = lastSession()) {
 function renderCoachDashboardPremium() {
   const plan = activePlan();
   const session = lastSession();
-  const nextDay = plan?.days?.[0]?.name || "-";
+  const nextDay = nextPlanDayAfterLastSession(plan)?.name || "-";
   const weekSessions = sessionsSince(7);
   const coverageItems = coverageForSessions(weekSessions);
   const undertrained = coverageItems.filter((item) => item.percent < 70).slice(0, 3);
@@ -3959,7 +3998,7 @@ function smartCoachRecommendation() {
   const insights = latestSession ? performanceInsightsForSession(latestSession) : [];
   const weak = input.muscleCoverage.filter((item) => item.percent > 0 && item.percent < 70).slice(0, 3);
   const over = input.muscleCoverage.filter((item) => item.percent > 120).slice(0, 3);
-  const nextDay = plan?.days?.[0] || null;
+  const nextDay = nextPlanDayAfterLastSession(plan);
   const criticalPlanned = (nextDay?.exercises || [])
     .map((planned) => exerciseById(planned.exerciseId))
     .filter(Boolean)
@@ -4142,7 +4181,7 @@ function aiReadinessSummary() {
 
 function coachRecommendationSummaryV54() {
   const smart = smartCoachRecommendationSafe();
-  const coverage = premiumCoverageForSessions(sessionsSince(7));
+  const coverage = coverageForSessions(sessionsSince(7));
   const coverageByName = new Map(coverage.map((item) => [item.name, item]));
   const weak = coverage.filter((item) => item.percent > 0 && item.percent < 70).slice(0, 3);
   const over = coverage.filter((item) => item.percent > 120).slice(0, 3);
@@ -4150,8 +4189,7 @@ function coachRecommendationSummaryV54() {
   const affected = [...weak, ...over].slice(0, 4);
   const why = [
     ...smart.why,
-    ...smart.evidence,
-    `Prioritaetsregel: ${smart.ruleId}.`
+    ...smart.evidence
   ].filter(Boolean).slice(0, 7);
   return {
     recommendation: smart.title,
@@ -4187,7 +4225,8 @@ function renderCoachDashboardV54() {
   const summary = coachRecommendationSummaryV54();
   const readiness = aiReadinessSummary();
   const coverage = premiumCoverageForSessions(sessionsSince(7));
-  const weak = coverage.filter((item) => item.percent < 70).slice(0, 3);
+  const chest = coverage.find((item) => item.muscleId === "mg_chest");
+  const weak = coverage.filter((item) => item.percent < 70 && item.muscleId !== "mg_chest").slice(0, 3);
   const over = coverage.filter((item) => item.percent > 120).slice(0, 2);
   return `
     <section class="coach-dashboard-premium coach-dashboard-v54 stack" aria-label="Coach Dashboard">
@@ -4209,16 +4248,17 @@ function renderCoachDashboardV54() {
           <ul class="small-list">${summary.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
         </details>
         <p class="quiet">${htmlesc(coachDashboardText("notAutomatic", "Aenderungen werden erst nach deiner Bestaetigung uebernommen."))}</p>
-        <p class="quiet">Regel: ${htmlesc(summary.smart.ruleId)} · ${summary.smart.requiresConfirmation ? "bestaetigungspflichtig" : "Hinweis ohne Planaenderung"}</p>
+        ${currentUserSettings().debugMode ? `<p class="quiet">Regel: ${htmlesc(summary.smart.ruleId)}</p>` : ""}
         ${renderCoachFeedbackControls(summary.smart.id, summary.smart.ruleId)}
       </article>
       <div class="premium-card-grid">
         <article class="card stack">
           <div class="row">
-            <h3 class="grow">Muskelstatus</h3>
+            <h3 class="grow">Prioritaeten dieser Woche</h3>
             <button class="chip-button" data-tab="musclemap">Map</button>
           </div>
-          ${renderDashboardMiniMuscleMap((weak.length ? weak : coverage).slice(0, 6))}
+          ${renderDashboardMiniMuscleMap(([...(chest ? [chest] : []), ...(weak.length ? weak : coverage)]).slice(0, 6))}
+          ${chest && chest.percent > 0 ? `<p class="quiet">Brust wurde heute bereits belastet: ${chest.percent}% Wochenabdeckung.</p>` : ""}
           ${over.length ? `<p class="quiet">Ueber Ziel: ${over.map((item) => `${htmlesc(item.name)} ${item.percent}%`).join(", ")}</p>` : ""}
         </article>
         <article class="card stack">
@@ -4593,7 +4633,7 @@ function weeklyCoachSummary() {
 
   const recommendedNextDay = activeRules[0]?.id === "legs_missing"
     ? plan?.days?.find((day) => plannedDayHitsMuscleGroup(day, groups.legs))?.name || "Legs Lite"
-    : plan?.days?.find((day) => !lastDayDate(day.name))?.name || plan?.days?.[0]?.name || "Naechste Einheit";
+    : nextPlanDayAfterLastSession(plan)?.name || "Naechste Einheit";
   const fallbackAction = missingMuscles.length
     ? `${missingMuscles[0].name}: diese Woche noch gezielt abdecken.`
     : overloadedMuscles.length
@@ -4641,7 +4681,7 @@ function renderWeeklyCoachCard() {
         <summary>Warum?</summary>
         <ul class="small-list">
           <li>${htmlesc(summary.why)}</li>
-          <li>Regel: ${htmlesc(summary.ruleId)}</li>
+          ${currentUserSettings().debugMode ? `<li>Regel: ${htmlesc(summary.ruleId)}</li>` : ""}
           <li>${summary.rulesLoaded ? "v6.1 Regeln geladen." : "v6.1 Regeln nicht geladen."}</li>
         </ul>
       </details>
@@ -5093,7 +5133,7 @@ function renderDashboard() {
   const plan = activePlan();
   const latestWeight = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
   const session = lastSession();
-  const nextDay = plan?.days?.[0]?.name || "-";
+  const nextDay = nextPlanDayAfterLastSession(plan)?.name || "-";
   const latestSessions = [...storage.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).slice(0, 3);
   const readiness = readinessForJournal(journalEntryForDate(todayIsoDate()) || latestJournalEntry());
   return `
@@ -5415,6 +5455,61 @@ function renderWarmupCard(day) {
   `;
 }
 
+function lastWarmupDefaults() {
+  const warmups = storage.sessions.flatMap((session) => Array.isArray(session.warmups) ? session.warmups : []).filter((item) => item && item.equipment);
+  return warmups[warmups.length - 1] || null;
+}
+
+function askWarmupBeforeWorkout() {
+  if (!confirm("Moechtest du dich vorher aufwaermen?")) return null;
+  const last = lastWarmupDefaults();
+  const equipment = prompt("Warm-up Geraet: Laufband / Fahrrad / Crosstrainer / Rudergeraet / Stepper / Sonstiges", last?.equipment || "Fahrrad");
+  if (equipment === null) return null;
+  const minutesText = prompt("Warm-up Dauer in Minuten", last?.durationMinutes ? String(last.durationMinutes) : "8");
+  if (minutesText === null) return null;
+  const durationMinutes = Math.max(0, parseInteger(minutesText) || 0);
+  if (!durationMinutes) return null;
+  const intensity = prompt("Intensitaet optional: leicht / mittel / hoch", last?.intensity || "leicht") || "";
+  const note = prompt("Warm-up Notiz optional", "") || "";
+  return {
+    id: crypto.randomUUID ? crypto.randomUUID() : `warmup_${Date.now()}`,
+    equipment: equipment.trim() || "Warm-up",
+    durationMinutes,
+    intensity: ["leicht", "mittel", "hoch"].includes(intensity.trim()) ? intensity.trim() : "",
+    note: note.trim(),
+    startedAt: new Date().toISOString(),
+    completedAt: new Date().toISOString(),
+    completed: true
+  };
+}
+
+function workoutEntryFromPlanned(planned) {
+  const last = lastCompletedExercise(planned.exerciseId);
+  const setting = latestMachineSetting(planned.exerciseId);
+  return {
+    exerciseId: planned.exerciseId,
+    reps: planned.reps,
+    restSeconds: planned.restSeconds,
+    priority: planned.priority,
+    sortOrder: planned.sortOrder,
+    seatPosition: setting?.seatPosition || "",
+    gripPosition: setting?.gripPosition || setting?.handlePosition || "",
+    gripWidth: setting?.gripWidth || "",
+    attachment: setting?.attachment || "",
+    exerciseNote: "",
+    sets: Array.from({ length: Math.max(planned.sets, 1) }, (_, index) => {
+      const previous = last?.exercise?.sets?.find((set) => set.setNumber === index + 1);
+      return {
+        setNumber: index + 1,
+        weightText: previous?.actualWeightKg ? String(previous.actualWeightKg).replace(".", ",") : "",
+        repsText: "",
+        rirText: "",
+        completed: false
+      };
+    })
+  };
+}
+
 function renderCooldownCard() {
   const rules = cooldownRules();
   if (!rules.length) return "";
@@ -5429,6 +5524,7 @@ function renderCooldownCard() {
 function startDay(dayName) {
   const plan = activePlan();
   const day = plan.days.find((item) => item.name === dayName);
+  const warmup = askWarmupBeforeWorkout();
   state.showAlternatives = false;
   state.restTimer.remaining = 0;
   state.restTimer.running = false;
@@ -5436,27 +5532,10 @@ function startDay(dayName) {
     planName: plan.planName,
     dayName: day.name,
     startedAt: new Date().toISOString(),
+    warmups: warmup ? [warmup] : [],
+    sessionNote: "",
     index: 0,
-    entries: day.exercises.sort((a, b) => a.sortOrder - b.sortOrder).map((planned) => {
-      const last = lastCompletedExercise(planned.exerciseId);
-      return {
-        exerciseId: planned.exerciseId,
-        reps: planned.reps,
-        restSeconds: planned.restSeconds,
-        priority: planned.priority,
-        sortOrder: planned.sortOrder,
-        sets: Array.from({ length: Math.max(planned.sets, 1) }, (_, index) => {
-          const previous = last?.exercise?.sets?.find((set) => set.setNumber === index + 1);
-          return {
-            setNumber: index + 1,
-            weightText: previous?.actualWeightKg ? String(previous.actualWeightKg).replace(".", ",") : "",
-            repsText: "",
-            rirText: "",
-            completed: false
-          };
-        })
-      };
-    })
+    entries: day.exercises.sort((a, b) => a.sortOrder - b.sortOrder).map(workoutEntryFromPlanned)
   };
   persistWorkoutDraft();
   render();
@@ -5469,6 +5548,7 @@ function startSmartDay(dayName) {
     return;
   }
   const plan = activePlan();
+  const warmup = askWarmupBeforeWorkout();
   state.showAlternatives = false;
   state.restTimer.remaining = 0;
   state.restTimer.running = false;
@@ -5476,27 +5556,10 @@ function startSmartDay(dayName) {
     planName: plan?.planName || "Smart Workout",
     dayName: `${proposal.dayType} Smart`,
     startedAt: new Date().toISOString(),
+    warmups: warmup ? [warmup] : [],
+    sessionNote: "",
     index: 0,
-    entries: proposal.exercises.map((planned) => {
-      const last = lastCompletedExercise(planned.exerciseId);
-      return {
-        exerciseId: planned.exerciseId,
-        reps: planned.reps,
-        restSeconds: planned.restSeconds,
-        priority: planned.priority,
-        sortOrder: planned.sortOrder,
-        sets: Array.from({ length: Math.max(planned.sets, 1) }, (_, index) => {
-          const previous = last?.exercise?.sets?.find((set) => set.setNumber === index + 1);
-          return {
-            setNumber: index + 1,
-            weightText: previous?.actualWeightKg ? String(previous.actualWeightKg).replace(".", ",") : "",
-            repsText: "",
-            rirText: "",
-            completed: false
-          };
-        })
-      };
-    })
+    entries: proposal.exercises.map(workoutEntryFromPlanned)
   };
   persistWorkoutDraft();
   render();
@@ -5517,6 +5580,7 @@ function renderWorkout() {
         <p class="subtitle">Übung ${workout.index + 1} von ${workout.entries.length}</p>
       </header>
       <div class="progress"><span style="width:${progress}%"></span></div>
+      ${renderWorkoutWarmupSummary(workout)}
       ${renderSessionCoachDuringCard(workout, entry, exercise)}
       <article class="card stack">
         <h2>${htmlesc(exercise.displayName)}</h2>
@@ -5536,15 +5600,44 @@ function renderWorkout() {
         <div class="row"><h3 class="grow">Sätze</h3><span class="quiet">kg · Wdh. · RIR</span></div>
         ${entry.sets.map((set, index) => renderSetRow(set, index)).join("")}
       </article>
+      ${renderExerciseSetupFields(entry)}
       <p class="quiet">Dieses Training wird automatisch auf diesem Gerät gesichert.</p>
       ${state.restTimer.remaining > 0 || state.restTimer.running ? renderRestTimer() : ""}
       ${state.showAlternatives ? renderAlternativePicker(alternatives) : ""}
       <div class="actions">
         <button class="secondary" data-toggle-alternatives>${state.showAlternatives ? "Alternativen ausblenden" : machineText("device_occupied", "Geraet besetzt? Alternative anzeigen.")}</button>
+        ${workout.index > 0 ? `<button class="secondary" data-prev-exercise>Vorherige Uebung</button>` : ""}
         <button class="primary" data-next-exercise>${workout.index < workout.entries.length - 1 ? "Nächste Übung" : "Training speichern"}</button>
         <button class="secondary" data-cancel-workout>Training abbrechen</button>
       </div>
     </section>
+  `;
+}
+
+function renderWorkoutWarmupSummary(workout) {
+  const warmups = Array.isArray(workout.warmups) ? workout.warmups : [];
+  if (!warmups.length) return "";
+  return `
+    <article class="card stack compact-card">
+      <h3>0. Aufwaermen</h3>
+      ${warmups.map((item) => `<p class="muted">${htmlesc(item.equipment)} - ${Number(item.durationMinutes) || 0} Minuten${item.intensity ? ` - ${htmlesc(item.intensity)}` : ""}</p>`).join("")}
+    </article>
+  `;
+}
+
+function renderExerciseSetupFields(entry) {
+  return `
+    <article class="card stack">
+      <h3>Sitz, Griff und Notizen</h3>
+      <div class="form-grid">
+        <label>Sitzposition<input class="input" value="${htmlesc(entry.seatPosition || "")}" placeholder="z.B. Stufe 4" data-entry-field="seatPosition"></label>
+        <label>Griff<input class="input" value="${htmlesc(entry.gripPosition || "")}" placeholder="neutral, proniert, oberer Griff" data-entry-field="gripPosition"></label>
+        <label>Griffbreite<input class="input" value="${htmlesc(entry.gripWidth || "")}" placeholder="eng, mittel, breit" data-entry-field="gripWidth"></label>
+        <label>Aufsatz<input class="input" value="${htmlesc(entry.attachment || "")}" placeholder="Seil, V-Griff, Stange" data-entry-field="attachment"></label>
+      </div>
+      <textarea class="input area" placeholder="Notiz zu Uebung oder Training ..." data-entry-field="exerciseNote">${htmlesc(entry.exerciseNote || "")}</textarea>
+      <textarea class="input area" placeholder="Notiz zum Training ..." data-workout-field="sessionNote">${htmlesc(state.activeWorkout?.sessionNote || "")}</textarea>
+    </article>
   `;
 }
 
@@ -5553,7 +5646,7 @@ function renderRestTimer() {
     <article class="card timer-card">
       <div>
         <p class="muted">Pause</p>
-        <strong>${restTimeText(state.restTimer.remaining)}</strong>
+        <strong data-rest-timer-value>${restTimeText(state.restTimer.remaining)}</strong>
       </div>
       <div class="timer-actions">
         <button class="secondary" data-pause-timer>${state.restTimer.running ? "Stop" : "Start"}</button>
@@ -5628,8 +5721,94 @@ function selectAlternative(exerciseId) {
   render();
 }
 
+function setHasAnyInput(set) {
+  return Boolean(String(set.weightText || "").trim() || String(set.repsText || "").trim() || String(set.rirText || "").trim());
+}
+
+function setIsIncomplete(set) {
+  return set.completed !== true && setHasAnyInput(set);
+}
+
+function incompleteSetsForEntry(entry) {
+  return (entry?.sets || []).filter(setIsIncomplete);
+}
+
+function handleIncompleteSetsBeforeLeaving(entry) {
+  const incomplete = incompleteSetsForEntry(entry);
+  if (!incomplete.length) return true;
+  const first = incomplete[0];
+  const filled = [
+    first.weightText ? `${first.weightText} kg` : "",
+    first.repsText ? `${first.repsText} Wdh.` : "",
+    first.rirText ? `RIR ${first.rirText}` : ""
+  ].filter(Boolean).join(", ");
+  const choice = window.prompt(
+    `Satz noch nicht abgeschlossen\n\n${filled || "Es wurden bereits Werte eingetragen."}\n\n1 = Satz fertig eintragen\n2 = Als unvollstaendig speichern\n3 = Eingaben verwerfen\n4 = Abbrechen`,
+    "4"
+  );
+  if (choice === "1") {
+    incomplete.forEach((set) => { set.completed = true; });
+    persistWorkoutDraft();
+    return true;
+  }
+  if (choice === "2") {
+    persistWorkoutDraft();
+    return true;
+  }
+  if (choice === "3") {
+    incomplete.forEach((set) => {
+      set.weightText = "";
+      set.repsText = "";
+      set.rirText = "";
+      set.completed = false;
+    });
+    persistWorkoutDraft();
+    return true;
+  }
+  return false;
+}
+
+function allIncompleteWorkoutSets(workout) {
+  return (workout?.entries || []).flatMap((entry, entryIndex) => incompleteSetsForEntry(entry).map((set) => ({ entry, entryIndex, set })));
+}
+
+function goToPreviousExercise() {
+  const workout = state.activeWorkout;
+  if (!workout || workout.index <= 0) return;
+  persistWorkoutDraft();
+  workout.index -= 1;
+  state.showAlternatives = false;
+  state.restTimer.remaining = 0;
+  state.restTimer.running = false;
+  persistWorkoutDraft();
+  render();
+}
+
+function rememberExerciseSetup(entry) {
+  if (!entry) return;
+  if (!entry.seatPosition && !entry.gripPosition && !entry.gripWidth && !entry.attachment) return;
+  const current = latestMachineSetting(entry.exerciseId);
+  const setting = {
+    id: current?.id || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+    exerciseId: entry.exerciseId,
+    machineName: current?.machineName || "",
+    seatPosition: entry.seatPosition || "",
+    handlePosition: entry.gripPosition || "",
+    gripPosition: entry.gripPosition || "",
+    gripWidth: entry.gripWidth || "",
+    attachment: entry.attachment || "",
+    backrestPosition: current?.backrestPosition || "",
+    note: current?.note || "",
+    updatedAt: new Date().toISOString()
+  };
+  storage.machineSettings = [...storage.machineSettings.filter((item) => item.id !== setting.id), setting];
+}
+
 function finishOrNext() {
   const workout = state.activeWorkout;
+  const entry = workout.entries[workout.index];
+  if (!handleIncompleteSetsBeforeLeaving(entry)) return;
+  rememberExerciseSetup(entry);
   if (workout.index < workout.entries.length - 1) {
     workout.index += 1;
     state.showAlternatives = false;
@@ -5638,6 +5817,18 @@ function finishOrNext() {
     persistWorkoutDraft();
     render();
     return;
+  }
+  const incomplete = allIncompleteWorkoutSets(workout);
+  if (incomplete.length) {
+    const first = incomplete[0];
+    const exercise = exerciseById(first.entry.exerciseId);
+    const proceed = confirm(`Training abschliessen?\n\n${incomplete.length} Satz ist noch unvollstaendig:\n${exercise?.displayName || first.entry.exerciseId} - Satz ${first.set.setNumber}\n\nOK = unvollstaendig abschliessen\nAbbrechen = Satz bearbeiten`);
+    if (!proceed) {
+      workout.index = first.entryIndex;
+      persistWorkoutDraft();
+      render();
+      return;
+    }
   }
   const session = {
     id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
@@ -5650,15 +5841,23 @@ function finishOrNext() {
     endedAt: new Date().toISOString(),
     completedAt: new Date().toISOString(),
     readinessSnapshot: journalEntryForDate(todayIsoDate()) || null,
+    warmups: Array.isArray(workout.warmups) ? workout.warmups : [],
+    sessionNote: workout.sessionNote || "",
     completedExercises: workout.entries.map((entry) => {
       const exercise = exerciseById(entry.exerciseId);
       const completedSets = entry.sets.filter((set) => set.completed).length;
+      rememberExerciseSetup(entry);
       return {
         exerciseId: entry.exerciseId,
         exerciseNameSnapshot: exercise?.displayName || entry.exerciseId,
         plannedSets: entry.sets.length,
         completedSets,
         sortOrder: entry.sortOrder,
+        seatPosition: entry.seatPosition || "",
+        gripPosition: entry.gripPosition || "",
+        gripWidth: entry.gripWidth || "",
+        attachment: entry.attachment || "",
+        exerciseNote: entry.exerciseNote || "",
         sets: entry.sets.map((set) => ({
           setNumber: set.setNumber,
           actualWeightKg: parseNumber(set.weightText),
@@ -6466,6 +6665,19 @@ function bindEvents() {
     });
   });
 
+  document.querySelectorAll("[data-entry-field]").forEach((input) => {
+    input.addEventListener("input", () => {
+      const entry = state.activeWorkout.entries[state.activeWorkout.index];
+      entry[input.dataset.entryField] = input.value;
+      persistWorkoutDraft();
+    });
+  });
+
+  document.querySelector("[data-workout-field]")?.addEventListener("input", (event) => {
+    state.activeWorkout[event.target.dataset.workoutField] = event.target.value;
+    persistWorkoutDraft();
+  });
+
   document.querySelectorAll("[data-check-set]").forEach((button) => {
     button.addEventListener("click", () => {
       const entry = state.activeWorkout.entries[state.activeWorkout.index];
@@ -6477,7 +6689,11 @@ function bindEvents() {
     });
   });
 
-  document.querySelector("[data-next-exercise]")?.addEventListener("click", finishOrNext);
+  document.querySelector("[data-prev-exercise]")?.addEventListener("click", goToPreviousExercise);
+  document.querySelector("[data-next-exercise]")?.addEventListener("click", (event) => {
+    event.currentTarget.disabled = true;
+    finishOrNext();
+  });
   document.querySelector("[data-workout-exercise-detail]")?.addEventListener("click", (event) => {
     persistWorkoutDraft();
     state.selectedExerciseId = event.currentTarget.dataset.workoutExerciseDetail;
