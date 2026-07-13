@@ -178,7 +178,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v56";
+const APP_VERSION = "pwa-v57";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -1328,6 +1328,27 @@ function updateRestTimerDisplay() {
   if (value) value.textContent = restTimeText(state.restTimer.remaining);
   const button = document.querySelector("[data-pause-timer]");
   if (button) button.textContent = state.restTimer.running ? "Stop" : "Start";
+}
+
+function resetPageScroll() {
+  requestAnimationFrame(() => {
+    document.activeElement?.blur?.();
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  });
+}
+
+function navigateToTab(tab) {
+  persistWorkoutDraft();
+  state.tab = tab;
+  state.activeWorkout = null;
+  state.selectedExerciseId = null;
+  state.selectedSessionId = null;
+  state.moreMenuOpen = false;
+  if (window.location.hash !== `#${state.tab}`) window.history.replaceState(null, "", `#${state.tab}`);
+  render();
+  resetPageScroll();
 }
 
 function activePlan() {
@@ -6666,14 +6687,7 @@ function bindEvents() {
 
   document.querySelectorAll("[data-tab]").forEach((button) => {
     button.addEventListener("click", () => {
-      persistWorkoutDraft();
-      state.tab = button.dataset.tab;
-      state.activeWorkout = null;
-      state.selectedExerciseId = null;
-      state.selectedSessionId = null;
-      state.moreMenuOpen = false;
-      if (window.location.hash !== `#${state.tab}`) window.history.replaceState(null, "", `#${state.tab}`);
-      render();
+      navigateToTab(button.dataset.tab);
     });
   });
 

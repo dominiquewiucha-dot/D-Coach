@@ -38,6 +38,7 @@ html, body {
   max-width: 100%;
   overflow-x: hidden;
   overscroll-behavior-x: none;
+  -webkit-overflow-scrolling: touch;
   background: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
@@ -80,6 +81,7 @@ select:focus-visible {
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
+  touch-action: pan-y;
   padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 18px);
 }
 
@@ -831,6 +833,7 @@ select:focus-visible {
 
 .muscle-map-screen {
   padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 24px);
+  touch-action: pan-y;
 }
 
 .prototype-screen {
@@ -933,6 +936,7 @@ select:focus-visible {
   overflow: hidden;
   display: grid;
   place-items: center;
+  touch-action: pan-y;
 }
 
 .production-muscle-map-shell {
@@ -941,6 +945,7 @@ select:focus-visible {
   display: grid;
   grid-template-rows: minmax(400px, 1fr) auto auto;
   gap: 10px;
+  touch-action: pan-y;
 }
 
 .production-muscle-map {
@@ -948,10 +953,12 @@ select:focus-visible {
   height: min(62vh, 560px);
   min-height: 400px;
   overflow: hidden;
+  touch-action: pan-y;
 }
 
 .production-muscle-map canvas {
   border-radius: 12px;
+  touch-action: pan-y;
 }
 
 .production-muscle-map-status {
@@ -995,6 +1002,7 @@ select:focus-visible {
   width: 100%;
   max-width: 300px;
   margin: 0 auto;
+  touch-action: pan-y;
 }
 
 .interactive-muscle-map img {
