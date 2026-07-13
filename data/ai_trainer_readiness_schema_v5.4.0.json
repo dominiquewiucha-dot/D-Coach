@@ -1,0 +1,21 @@
+{
+  "version": "5.4.0",
+  "type": "ai_trainer_readiness_schema",
+  "requiredData": [
+    "workoutHistory",
+    "exerciseHistory",
+    "muscleCoverage",
+    "personalProfile",
+    "planHistory",
+    "recoverySignals",
+    "coachDecisions"
+  ],
+  "minimumSuggestedHistory": {
+    "workouts": 12,
+    "weeks": 4
+  },
+  "modes": [
+    "localSmartCoach",
+    "futureConversationalAI"
+  ]
+}

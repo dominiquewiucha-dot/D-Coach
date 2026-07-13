@@ -1,0 +1,12 @@
+{
+  "version": "5.4.0",
+  "type": "coach_dashboard_texts",
+  "texts": {
+    "learning": "D-Coach lernt dein Training kennen.",
+    "ready": "Deine Datenbasis reicht für persönliche Empfehlungen.",
+    "why": "Warum?",
+    "apply": "Planänderung übernehmen",
+    "review": "Vorschlag prüfen",
+    "notAutomatic": "Änderungen werden erst nach deiner Bestätigung übernommen."
+  }
+}

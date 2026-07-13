@@ -97,6 +97,10 @@ const state = {
   exerciseCardCompact: null,
   smartBuilderCompactRules: null,
   trainingFeedbackMicrocopy: null,
+  coachDashboard2Layout: null,
+  coachRecommendationCard: null,
+  aiTrainerReadinessSchema: null,
+  coachDashboardTexts: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -143,7 +147,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v42";
+const APP_VERSION = "pwa-v43";
 const STORAGE_SCHEMA_VERSION = "5.0.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -762,6 +766,10 @@ async function boot() {
     exerciseCardCompact,
     smartBuilderCompactRules,
     trainingFeedbackMicrocopy,
+    coachDashboard2Layout,
+    coachRecommendationCard,
+    aiTrainerReadinessSchema,
+    coachDashboardTexts,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -897,6 +905,10 @@ async function boot() {
     fetchOptionalJson("./data/exercise_card_compact_v5.3.0.json"),
     fetchOptionalJson("./data/smart_builder_compact_rules_v5.3.0.json"),
     fetchOptionalJson("./data/training_feedback_microcopy_v5.3.0.json"),
+    fetchOptionalJson("./data/coach_dashboard_2_layout_v5.4.0.json"),
+    fetchOptionalJson("./data/coach_recommendation_card_v5.4.0.json"),
+    fetchOptionalJson("./data/ai_trainer_readiness_schema_v5.4.0.json"),
+    fetchOptionalJson("./data/coach_dashboard_texts_v5.4.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -1020,6 +1032,10 @@ async function boot() {
   state.exerciseCardCompact = exerciseCardCompact;
   state.smartBuilderCompactRules = smartBuilderCompactRules;
   state.trainingFeedbackMicrocopy = trainingFeedbackMicrocopy;
+  state.coachDashboard2Layout = coachDashboard2Layout;
+  state.coachRecommendationCard = coachRecommendationCard;
+  state.aiTrainerReadinessSchema = aiTrainerReadinessSchema;
+  state.coachDashboardTexts = coachDashboardTexts;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -3570,6 +3586,120 @@ function renderDashboardMiniMuscleMap(items) {
   `;
 }
 
+function coachDashboardText(key, fallback) {
+  return state.coachDashboardTexts?.texts?.[key] || fallback;
+}
+
+function aiReadinessSummary() {
+  const required = state.aiTrainerReadinessSchema?.minimumSuggestedHistory || { workouts: 12, weeks: 4 };
+  const sessions = storage.sessions.length;
+  const weeks = new Set(storage.sessions.map((session) => String(session.startedAt || "").slice(0, 10,))).size
+    ? Math.max(1, Math.ceil(sessions / 3))
+    : 0;
+  const ready = sessions >= required.workouts && weeks >= required.weeks;
+  return {
+    ready,
+    sessions,
+    weeks,
+    requiredWorkouts: required.workouts,
+    requiredWeeks: required.weeks,
+    percent: Math.min(100, Math.round(((sessions / Math.max(1, required.workouts)) * 0.7 + (weeks / Math.max(1, required.weeks)) * 0.3) * 100))
+  };
+}
+
+function coachRecommendationSummaryV54() {
+  const plan = activePlan();
+  const session = lastSession();
+  const coverage = premiumCoverageForSessions(sessionsSince(7));
+  const weak = coverage.filter((item) => item.percent > 0 && item.percent < 70).slice(0, 3);
+  const over = coverage.filter((item) => item.percent > 120).slice(0, 3);
+  const optimizer = planOptimizerSummary();
+  const insight = session ? performanceInsightsForSession(session)[0] : null;
+  const affected = [...weak, ...over].slice(0, 4);
+  const recommendation = affected.length
+    ? `Naechste Einheit: ${weak[0] ? `${weak[0].name} staerken` : `${over[0].name} entlasten`}`
+    : insight?.progression.label || (plan ? `${plan.days?.[0]?.name || "Training"} sauber starten` : "Plan auswaehlen");
+  const mainReason = affected.length
+    ? `${affected[0].name} liegt aktuell bei ${affected[0].percent}%.`
+    : insight?.smartNote || coachDashboardText("learning", "D-Coach lernt dein Training kennen.");
+  const confidence = insight?.progression.confidencePercent || Math.min(91, 48 + storage.sessions.length * 4);
+  const proposedPlanChange = weak[0]
+    ? `${weak[0].name} in der naechsten Woche priorisieren.`
+    : over[0]
+      ? `${over[0].name} voruebergehend reduzieren.`
+      : optimizer.action;
+  const why = [
+    mainReason,
+    ...affected.map((item) => `${item.name}: ${item.percent}% Wochenabdeckung.`),
+    ...(insight ? [...insight.progression.why, ...insight.insight.evidence] : []),
+    `Plan-Simulation: ${optimizer.simulatedSessions} Einheiten, ${optimizer.estimatedMinutes} Minuten.`
+  ].filter(Boolean).slice(0, 6);
+  return { recommendation, mainReason, confidence, affected, proposedPlanChange, why, optimizer };
+}
+
+function renderCoachDashboardV54() {
+  const plan = activePlan();
+  const summary = coachRecommendationSummaryV54();
+  const readiness = aiReadinessSummary();
+  const coverage = premiumCoverageForSessions(sessionsSince(7));
+  const weak = coverage.filter((item) => item.percent < 70).slice(0, 3);
+  const over = coverage.filter((item) => item.percent > 120).slice(0, 2);
+  return `
+    <section class="coach-dashboard-premium coach-dashboard-v54 stack" aria-label="Coach Dashboard">
+      <article class="card stack coach-hero-v54">
+        <div class="row">
+          <div class="grow">
+            <p class="muted">Coach Empfehlung</p>
+            <h2>${htmlesc(summary.recommendation)}</h2>
+          </div>
+          <span class="badge ${summary.confidence >= 75 ? "green" : "amber"}">${summary.confidence}%</span>
+        </div>
+        <p class="muted">${htmlesc(summary.mainReason)}</p>
+        <div class="coach-action-row">
+          <button class="primary" data-tab="${plan ? "training" : "plans"}">${plan ? "Training starten" : "Plan auswaehlen"}</button>
+          <button class="secondary" data-confirm-plan-adjust>${htmlesc(coachDashboardText("review", "Vorschlag pruefen"))}</button>
+        </div>
+        <details>
+          <summary>${htmlesc(coachDashboardText("why", "Warum?"))}</summary>
+          <ul class="small-list">${summary.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
+        </details>
+        <p class="quiet">${htmlesc(coachDashboardText("notAutomatic", "Aenderungen werden erst nach deiner Bestaetigung uebernommen."))}</p>
+      </article>
+      <div class="premium-card-grid">
+        <article class="card stack">
+          <div class="row">
+            <h3 class="grow">Muskelstatus</h3>
+            <button class="chip-button" data-tab="musclemap">Map</button>
+          </div>
+          ${renderDashboardMiniMuscleMap((weak.length ? weak : coverage).slice(0, 6))}
+          ${over.length ? `<p class="quiet">Ueber Ziel: ${over.map((item) => `${htmlesc(item.name)} ${item.percent}%`).join(", ")}</p>` : ""}
+        </article>
+        <article class="card stack">
+          <div class="row">
+            <h3 class="grow">Plan-Simulation</h3>
+            <span class="badge blue">${summary.optimizer.simulatedSessions} Einheiten</span>
+          </div>
+          <p class="muted">${htmlesc(summary.proposedPlanChange)}</p>
+          <div class="mini-grid">
+            <div class="fatigue-metric"><strong>${summary.optimizer.estimatedMinutes}</strong><span>Min/Woche</span></div>
+            <div class="fatigue-metric"><strong>${summary.optimizer.weakPoints.length}</strong><span>Schwach</span></div>
+            <div class="fatigue-metric"><strong>${summary.optimizer.overTargets.length}</strong><span>Hoch</span></div>
+          </div>
+        </article>
+        <article class="card stack">
+          <div class="row">
+            <h3 class="grow">AI Readiness</h3>
+            <span class="badge ${readiness.ready ? "green" : "amber"}">${readiness.ready ? "bereit" : "lernt"}</span>
+          </div>
+          <div class="confidence-bar"><span style="width:${readiness.percent}%"></span></div>
+          <p class="muted">${readiness.sessions}/${readiness.requiredWorkouts} Trainings · ${readiness.weeks}/${readiness.requiredWeeks} Wochen.</p>
+          <p class="quiet">v6 Smart Coach bleibt offline und regelbasiert. v7 AI Trainer erst nach stabiler Datenbasis.</p>
+        </article>
+      </div>
+    </section>
+  `;
+}
+
 function renderTrainingDnaCard() {
   const dna = trainingDnaSummary();
   const memory = coachMemoryItems();
@@ -3914,7 +4044,7 @@ function renderDashboard() {
   return `
     <section class="screen stack">
       <header><h1 class="title">D-Coach</h1><p class="subtitle">Heute sauber trainieren.</p></header>
-      ${renderCoachDashboardPremium()}
+      ${renderCoachDashboardV54()}
       ${plan ? `<article class="card stack">
         <p class="muted">Aktiver Plan</p>
         <h2>${htmlesc(plan.planName)}</h2>
@@ -5152,6 +5282,16 @@ function importBackupFile(file) {
 function bindEvents() {
   document.querySelector("[data-toggle-more-menu]")?.addEventListener("click", () => {
     state.moreMenuOpen = !state.moreMenuOpen;
+    render();
+  });
+
+  document.querySelector("[data-confirm-plan-adjust]")?.addEventListener("click", () => {
+    const summary = coachRecommendationSummaryV54();
+    const message = `${summary.proposedPlanChange}\n\nNoch wird kein Plan automatisch geaendert. Moechtest du den Vorschlag im Planbereich pruefen?`;
+    if (!confirm(message)) return;
+    state.tab = "plans";
+    state.moreMenuOpen = false;
+    window.history.replaceState(null, "", "#plans");
     render();
   });
 

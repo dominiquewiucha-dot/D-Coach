@@ -1,0 +1,14 @@
+{
+  "version": "5.4.0",
+  "type": "coach_recommendation_card",
+  "fields": [
+    "recommendation",
+    "mainReason",
+    "confidencePercent",
+    "affectedMuscles",
+    "proposedPlanChange",
+    "whyAction",
+    "applyAction"
+  ],
+  "applyRule": "Never change a plan automatically without confirmation."
+}

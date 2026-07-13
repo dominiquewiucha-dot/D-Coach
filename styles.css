@@ -299,6 +299,25 @@ select:focus-visible {
   background: linear-gradient(180deg, rgba(37,99,235,.18), rgba(18,24,33,.95));
 }
 
+.coach-dashboard-v54 {
+  gap: 14px;
+}
+
+.coach-hero-v54 {
+  border-color: rgba(37,99,235,.68);
+  background: linear-gradient(180deg, rgba(37,99,235,.24), rgba(18,24,33,.97));
+}
+
+.coach-hero-v54 h2 {
+  line-height: 1.14;
+}
+
+.coach-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
 .premium-mini-map {
   display: grid;
   gap: 10px;
@@ -1417,5 +1436,14 @@ select:focus-visible {
   .muscle-map-list { grid-template-columns: 1fr; }
   .body-map-grid { grid-template-columns: 1fr; }
   .mini-grid { grid-template-columns: 1fr; }
+  .coach-action-row { grid-template-columns: 1fr; }
   .set-row { grid-template-columns: 24px 1fr 1fr 54px 38px; gap: 6px; }
+}
+
+@media (max-width: 430px) {
+  .coach-action-row { grid-template-columns: 1fr; }
+  .coach-hero-v54 .secondary,
+  .coach-hero-v54 .primary {
+    min-height: 48px;
+  }
 }
