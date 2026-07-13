@@ -1,4 +1,4 @@
-const CACHE_NAME = "dcoach-pwa-v45";
+const CACHE_NAME = "dcoach-pwa-v46";
 const ASSETS = [
   "./",
   "./index.html",
@@ -148,6 +148,9 @@ const ASSETS = [
   "./data/smart_coach_priority_rules_v6.0.0.json",
   "./data/smart_coach_recommendation_schema_v6.0.0.json",
   "./data/smart_coach_texts_v6.0.0.json",
+  "./data/weekly_coach_schema_v6.1.0.json",
+  "./data/weekly_coach_rules_v6.1.0.json",
+  "./data/weekly_coach_texts_v6.1.0.json",
   "./assets/icon.svg",
   "./assets/apple-touch-icon.png",
   "./assets/muscle_maps/premium_muscle_map_front_v5.0.0.svg",

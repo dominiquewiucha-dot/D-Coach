@@ -105,6 +105,9 @@ const state = {
   smartCoachPriorityRules: null,
   smartCoachRecommendationSchema: null,
   smartCoachTexts: null,
+  weeklyCoachSchema: null,
+  weeklyCoachRules: null,
+  weeklyCoachTexts: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -778,6 +781,9 @@ async function boot() {
     smartCoachPriorityRules,
     smartCoachRecommendationSchema,
     smartCoachTexts,
+    weeklyCoachSchema,
+    weeklyCoachRules,
+    weeklyCoachTexts,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -921,6 +927,9 @@ async function boot() {
     fetchOptionalJson("./data/smart_coach_priority_rules_v6.0.0.json"),
     fetchOptionalJson("./data/smart_coach_recommendation_schema_v6.0.0.json"),
     fetchOptionalJson("./data/smart_coach_texts_v6.0.0.json"),
+    fetchOptionalJson("./data/weekly_coach_schema_v6.1.0.json"),
+    fetchOptionalJson("./data/weekly_coach_rules_v6.1.0.json"),
+    fetchOptionalJson("./data/weekly_coach_texts_v6.1.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -1052,6 +1061,9 @@ async function boot() {
   state.smartCoachPriorityRules = smartCoachPriorityRules;
   state.smartCoachRecommendationSchema = smartCoachRecommendationSchema;
   state.smartCoachTexts = smartCoachTexts;
+  state.weeklyCoachSchema = weeklyCoachSchema;
+  state.weeklyCoachRules = weeklyCoachRules;
+  state.weeklyCoachTexts = weeklyCoachTexts;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -4212,6 +4224,141 @@ function planOptimizerSummary() {
   };
 }
 
+function weeklyCoachText(key, fallback) {
+  return state.weeklyCoachTexts?.texts?.[key] || fallback;
+}
+
+function coveragePercentForGroups(coverageById, ids) {
+  const values = ids.map((id) => coverageById.get(id)?.percent).filter((value) => Number.isFinite(value));
+  if (!values.length) return 0;
+  return Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+}
+
+function plannedDayHitsMuscleGroup(day, ids) {
+  return (day?.exercises || []).some((planned) => {
+    const mapping = muscleMappingForExercise(planned.exerciseId);
+    if (!mapping) return false;
+    const mappedIds = [
+      mapping.primaryMuscle,
+      ...(mapping.secondaryMuscles || []).map((item) => item.muscleId),
+      ...(mapping.stabilizers || []).map((item) => item.muscleId)
+    ];
+    return mappedIds.some((id) => ids.includes(id));
+  });
+}
+
+function weeklyCoachSummary() {
+  const plan = activePlan();
+  const weekSessions = sessionsSince(7);
+  const coverage = coverageForSessions(weekSessions);
+  const byId = new Map(coverage.map((item) => [item.muscleId, item]));
+  const groups = {
+    legs: ["mg_quads", "mg_hamstrings", "mg_glutes", "mg_calves", "mg_adductors"],
+    lats: ["mg_lats"],
+    upperBack: ["mg_upper_back", "mg_traps", "mg_rhomboids"],
+    triceps: ["mg_triceps"],
+    frontDelts: ["mg_front_delts"],
+    hamstrings: ["mg_hamstrings"],
+    quads: ["mg_quads"]
+  };
+  const scores = Object.fromEntries(Object.entries(groups).map(([key, ids]) => [key, coveragePercentForGroups(byId, ids)]));
+  const missingMuscles = coverage.filter((item) => item.isTarget && item.percent < 70).slice(0, 5);
+  const overloadedMuscles = coverage.filter((item) => item.percent > 120).slice(0, 5);
+  const weekNearEnd = new Date().getDay() >= 4 || weekSessions.length >= 3;
+  const activeRules = [];
+
+  if (scores.legs === 0 && weekNearEnd) {
+    activeRules.push({
+      id: "legs_missing",
+      title: "Legs Lite einplanen",
+      action: "Naechster sinnvoller Trainingstag: Legs Lite oder ein kurzer Bein-Fokus.",
+      why: "Diese Woche sind noch keine Beinmuskeln abgedeckt."
+    });
+  }
+  if (scores.lats < 70 && scores.upperBack > 120) {
+    activeRules.push({
+      id: "lat_under_upper_back_over",
+      title: "Mehr Vertikalzug",
+      action: "Ruecken-Tag pruefen: mehr Lat-Zug/Klimmzug, weniger rudern.",
+      why: "Lat ist unter Ziel, oberer Ruecken ist bereits hoch belastet."
+    });
+  }
+  if (scores.triceps < 70 && scores.frontDelts > 120) {
+    activeRules.push({
+      id: "triceps_under_front_delt_over",
+      title: "Trizeps statt Schulterdruck",
+      action: "Push-Tag pruefen: mehr Trizeps-Isolation, weniger Schulterdruecken.",
+      why: "Trizeps ist unter Ziel, vordere Schulter ist bereits hoch belastet."
+    });
+  }
+  if (scores.hamstrings < 70 && scores.quads > 120) {
+    activeRules.push({
+      id: "hamstrings_under_quads_over",
+      title: "Mehr Beinbeuger/Hip Hinge",
+      action: "Bein-Tag pruefen: Beinbeuger oder Hueftstreckung ergaenzen.",
+      why: "Hamstrings sind unter Ziel, Quads sind bereits hoch belastet."
+    });
+  }
+
+  const recommendedNextDay = activeRules[0]?.id === "legs_missing"
+    ? plan?.days?.find((day) => plannedDayHitsMuscleGroup(day, groups.legs))?.name || "Legs Lite"
+    : plan?.days?.find((day) => !lastDayDate(day.name))?.name || plan?.days?.[0]?.name || "Naechste Einheit";
+  const fallbackAction = missingMuscles.length
+    ? `${missingMuscles[0].name}: diese Woche noch gezielt abdecken.`
+    : overloadedMuscles.length
+      ? `${overloadedMuscles[0].name}: Zusatzvolumen vermeiden.`
+      : weeklyCoachText("balanced", "Die Woche ist gut ausbalanciert.");
+  const primary = activeRules[0] || {
+    id: "weekly_balance",
+    title: missingMuscles.length ? weeklyCoachText("missing", "Diese Muskelgruppen fehlen noch.") : weeklyCoachText("balanced", "Die Woche ist gut ausbalanciert."),
+    action: fallbackAction,
+    why: `${weekSessions.length} Trainings in den letzten 7 Tagen.`
+  };
+
+  return {
+    title: primary.title,
+    action: primary.action,
+    why: primary.why,
+    ruleId: primary.id,
+    rulesLoaded: Array.isArray(state.weeklyCoachRules?.rules),
+    weeklyCoverageSummary: coverage.slice(0, 6),
+    missingMuscles,
+    overloadedMuscles,
+    recommendedNextDay,
+    recommendedPlanAdjustment: primary.action,
+    requiresConfirmation: activeRules.length > 0
+  };
+}
+
+function renderWeeklyCoachCard() {
+  const summary = weeklyCoachSummary();
+  return `
+    <article class="card stack weekly-coach-card">
+      <div class="row">
+        <h3 class="grow">${htmlesc(weeklyCoachText("title", "Wochen-Coach"))}</h3>
+        <span class="badge ${summary.requiresConfirmation ? "amber" : "green"}">v6.1</span>
+      </div>
+      <p class="muted">${htmlesc(summary.title)}: ${htmlesc(summary.action)}</p>
+      <div class="mini-grid">
+        <div class="fatigue-metric"><strong>${summary.missingMuscles.length}</strong><span>Fehlt</span></div>
+        <div class="fatigue-metric"><strong>${summary.overloadedMuscles.length}</strong><span>Hoch</span></div>
+        <div class="fatigue-metric"><strong>${htmlesc(summary.recommendedNextDay)}</strong><span>Naechster Tag</span></div>
+      </div>
+      ${summary.missingMuscles.length ? `<p class="quiet">Unter Ziel: ${summary.missingMuscles.map((item) => `${htmlesc(item.name)} ${item.percent}%`).join(", ")}</p>` : ""}
+      ${summary.overloadedMuscles.length ? `<p class="quiet">Ueber Ziel: ${summary.overloadedMuscles.map((item) => `${htmlesc(item.name)} ${item.percent}%`).join(", ")}</p>` : ""}
+      <details>
+        <summary>Warum?</summary>
+        <ul class="small-list">
+          <li>${htmlesc(summary.why)}</li>
+          <li>Regel: ${htmlesc(summary.ruleId)}</li>
+          <li>${summary.rulesLoaded ? "v6.1 Regeln geladen." : "v6.1 Regeln nicht geladen."}</li>
+        </ul>
+      </details>
+      <button class="secondary" data-confirm-plan-adjust>${htmlesc(weeklyCoachText("confirm", "Aenderung pruefen"))}</button>
+    </article>
+  `;
+}
+
 function renderPlanOptimizerCard(context = "plans") {
   const summary = planOptimizerSummary();
   return `
@@ -4289,6 +4436,7 @@ function renderDashboard() {
     <section class="screen stack">
       <header><h1 class="title">D-Coach</h1><p class="subtitle">Heute sauber trainieren.</p></header>
       ${renderCoachDashboardV54()}
+      ${renderWeeklyCoachCard()}
       ${plan ? `<article class="card stack">
         <p class="muted">Aktiver Plan</p>
         <h2>${htmlesc(plan.planName)}</h2>
@@ -4352,6 +4500,7 @@ function renderCoach() {
       <section class="screen stack">
         <header><h1 class="title">Coach</h1><p class="subtitle">Auswertung nach dem Training.</p></header>
         ${renderCoachDashboardV54()}
+        ${renderWeeklyCoachCard()}
         <article class="card stack">
           <h2>Training starten</h2>
           <p class="muted">Speichere dein erstes Training, damit der Smart Coach deine Datenbasis aufbauen kann.</p>
@@ -4371,6 +4520,7 @@ function renderCoach() {
         ${metric(String(sessionSetCount(session)), "Saetze")}
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
+      ${renderWeeklyCoachCard()}
       ${renderIntelligenceCoreCard("coach")}
       ${renderRecoveryFatigueCard("coach")}
       ${renderPlanOptimizerCard("coach")}
@@ -5530,15 +5680,17 @@ function bindEvents() {
     render();
   });
 
-  document.querySelector("[data-confirm-plan-adjust]")?.addEventListener("click", () => {
+  document.querySelectorAll("[data-confirm-plan-adjust]").forEach((button) => button.addEventListener("click", () => {
+    const weekly = weeklyCoachSummary();
     const summary = coachRecommendationSummaryV54();
-    const message = `${summary.proposedPlanChange}\n\nNoch wird kein Plan automatisch geaendert. Moechtest du den Vorschlag im Planbereich pruefen?`;
+    const action = weekly.requiresConfirmation ? weekly.recommendedPlanAdjustment : summary.proposedPlanChange;
+    const message = `${action}\n\nNoch wird kein Plan automatisch geaendert. Moechtest du den Vorschlag im Planbereich pruefen?`;
     if (!confirm(message)) return;
     state.tab = "plans";
     state.moreMenuOpen = false;
     window.history.replaceState(null, "", "#plans");
     render();
-  });
+  }));
 
   document.querySelectorAll("[data-tab]").forEach((button) => {
     button.addEventListener("click", () => {

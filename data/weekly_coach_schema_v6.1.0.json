@@ -1,0 +1,11 @@
+{
+  "version": "6.1.0",
+  "type": "weekly_coach_schema",
+  "outputs": [
+    "weeklyCoverageSummary",
+    "missingMuscles",
+    "overloadedMuscles",
+    "recommendedNextDay",
+    "recommendedPlanAdjustment"
+  ]
+}

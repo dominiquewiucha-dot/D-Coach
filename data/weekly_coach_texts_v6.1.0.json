@@ -1,0 +1,11 @@
+{
+  "version": "6.1.0",
+  "type": "weekly_coach_texts",
+  "texts": {
+    "title": "Wochen-Coach",
+    "missing": "Diese Muskelgruppen fehlen noch.",
+    "balanced": "Die Woche ist gut ausbalanciert.",
+    "reviewPlan": "Nächsten Plan anpassen",
+    "confirm": "Änderung prüfen"
+  }
+}

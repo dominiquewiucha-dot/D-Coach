@@ -1,0 +1,26 @@
+{
+  "version": "6.1.0",
+  "type": "weekly_coach_rules",
+  "rules": [
+    {
+      "id": "legs_missing",
+      "if": "legs coverage == 0 and week near end",
+      "then": "suggest Legs Lite"
+    },
+    {
+      "id": "lat_under_upper_back_over",
+      "if": "lats < 70 and upperBack > 120",
+      "then": "more vertical pull, less row"
+    },
+    {
+      "id": "triceps_under_front_delt_over",
+      "if": "triceps < 70 and frontDelts > 120",
+      "then": "more triceps, less shoulder press"
+    },
+    {
+      "id": "hamstrings_under_quads_over",
+      "if": "hamstrings < 70 and quads > 120",
+      "then": "more leg curl/hip extension"
+    }
+  ]
+}
