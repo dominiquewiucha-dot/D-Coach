@@ -108,6 +108,9 @@ const state = {
   weeklyCoachSchema: null,
   weeklyCoachRules: null,
   weeklyCoachTexts: null,
+  sessionCoachSchema: null,
+  sessionCoachRules: null,
+  sessionCoachTexts: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -784,6 +787,9 @@ async function boot() {
     weeklyCoachSchema,
     weeklyCoachRules,
     weeklyCoachTexts,
+    sessionCoachSchema,
+    sessionCoachRules,
+    sessionCoachTexts,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -930,6 +936,9 @@ async function boot() {
     fetchOptionalJson("./data/weekly_coach_schema_v6.1.0.json"),
     fetchOptionalJson("./data/weekly_coach_rules_v6.1.0.json"),
     fetchOptionalJson("./data/weekly_coach_texts_v6.1.0.json"),
+    fetchOptionalJson("./data/session_coach_schema_v6.2.0.json"),
+    fetchOptionalJson("./data/session_coach_rules_v6.2.0.json"),
+    fetchOptionalJson("./data/session_coach_texts_v6.2.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -1064,6 +1073,9 @@ async function boot() {
   state.weeklyCoachSchema = weeklyCoachSchema;
   state.weeklyCoachRules = weeklyCoachRules;
   state.weeklyCoachTexts = weeklyCoachTexts;
+  state.sessionCoachSchema = sessionCoachSchema;
+  state.sessionCoachRules = sessionCoachRules;
+  state.sessionCoachTexts = sessionCoachTexts;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -4359,6 +4371,122 @@ function renderWeeklyCoachCard() {
   `;
 }
 
+function sessionCoachText(key, fallback) {
+  return state.sessionCoachTexts?.texts?.[key] || fallback;
+}
+
+function coverageForPlannedEntries(entries = []) {
+  const points = new Map();
+  const targetMuscles = activePlanTargetMuscles();
+  const add = (muscleId, value) => {
+    if (!muscleId || !Number.isFinite(value) || value <= 0) return;
+    points.set(muscleId, (points.get(muscleId) || 0) + value);
+  };
+  entries.forEach((entry) => {
+    const mapping = muscleMappingForExercise(entry.exerciseId);
+    if (!mapping) return;
+    const setPoints = Number(entry.plannedSets || entry.sets?.length || entry.sets || 0);
+    add(mapping.primaryMuscle, setPoints);
+    (mapping.secondaryMuscles || []).forEach((item) => add(item.muscleId, setPoints * (Number(item.intensityWeight) || 0)));
+    (mapping.stabilizers || []).forEach((item) => add(item.muscleId, setPoints * (Number(item.intensityWeight) || 0) * 0.5));
+  });
+  targetMuscles.forEach((muscleId) => {
+    if (!points.has(muscleId)) points.set(muscleId, 0);
+  });
+  return [...points.entries()].map(([muscleId, value]) => ({
+    muscleId,
+    name: muscleName(muscleId),
+    points: value,
+    percent: Math.round((value / 8) * 100),
+    isTarget: targetMuscles.has(muscleId)
+  })).sort((a, b) => Number(b.isTarget) - Number(a.isTarget) || b.percent - a.percent || a.name.localeCompare(b.name));
+}
+
+function renderSessionCoverageList(items, emptyText = "Noch keine Coverage berechnet.") {
+  const visible = items.filter((item) => item.percent > 0 || item.isTarget).slice(0, 4);
+  if (!visible.length) return `<p class="quiet">${htmlesc(emptyText)}</p>`;
+  return `<ul class="small-list">${visible.map((item) => `<li>${htmlesc(item.name)}: ${item.percent}%</li>`).join("")}</ul>`;
+}
+
+function renderSessionCoachPreWorkoutCard(day) {
+  const plannedCoverage = coverageForPlannedEntries(day?.exercises || []);
+  const optimizer = planOptimizerSummary();
+  const warnings = [
+    ...optimizer.overTargets.slice(0, 1).map((item) => `${item.name}: heute nicht weiter ueberladen.`),
+    ...(day?.exercises || []).filter((planned) => {
+      const exercise = exerciseById(planned.exerciseId);
+      return exercise && exerciseIsCritical(exercise);
+    }).slice(0, 1).map((planned) => `${exerciseById(planned.exerciseId)?.displayName || "Uebung"}: LWS sauber vorbereiten.`)
+  ];
+  return `
+    <article class="card stack session-coach-card" data-session-coach-stage="beforeWorkout">
+      <div class="row">
+        <h3 class="grow">Session Coach</h3>
+        <span class="badge blue">v6.2</span>
+      </div>
+      <p class="muted">${htmlesc(sessionCoachText("before", "So wirkt sich das Training voraussichtlich aus."))}</p>
+      ${renderSessionCoverageList(plannedCoverage, "Keine Planvorschau verfuegbar.")}
+      ${warnings.length ? `<p class="warning compact-warning">${htmlesc(warnings[0])}</p>` : `<p class="quiet">Plan-Simulation: ${htmlesc(optimizer.action)}</p>`}
+    </article>
+  `;
+}
+
+function sessionCoachDuringSummary(workout, entry, exercise) {
+  const planDay = activePlan()?.days?.find((day) => day.name === workout.dayName);
+  const maxMinutes = Number(planDay?.maxDurationMinutes) || Number(currentPersonalProfile().maxSessionMinutes) || 60;
+  const elapsedMinutes = Math.max(0, Math.round((Date.now() - new Date(workout.startedAt).getTime()) / 60000));
+  const remainingEntries = workout.entries.slice(workout.index + 1);
+  const optionalRemaining = remainingEntries.filter((item) => item.priority === "optional");
+  const projectedRemaining = remainingEntries.reduce((sum, item) => sum + estimateExerciseMinutes(exerciseById(item.exerciseId) || { defaultSets: 2, defaultRestSeconds: 90 }, item.sets?.length || 2), 0);
+  const timeLow = elapsedMinutes + projectedRemaining > maxMinutes && optionalRemaining.length > 0;
+  const prompts = [];
+  if (timeLow) prompts.push(sessionCoachText("timeLow", "Zeit knapp: optionale Uebung ueberspringen?"));
+  if (exerciseIsCritical(exercise)) prompts.push("LWS-Hinweis: Technik vor Last.");
+  prompts.push(sessionCoachText("occupied", "Geraet besetzt? Alternative anzeigen."));
+  return { elapsedMinutes, maxMinutes, timeLow, prompts: prompts.slice(0, 3) };
+}
+
+function renderSessionCoachDuringCard(workout, entry, exercise) {
+  const summary = sessionCoachDuringSummary(workout, entry, exercise);
+  return `
+    <article class="card stack session-coach-card compact-session-coach" data-session-coach-stage="duringWorkout">
+      <div class="row">
+        <h3 class="grow">Session Coach</h3>
+        <span class="badge ${summary.timeLow ? "amber" : "blue"}">${summary.elapsedMinutes}/${summary.maxMinutes} min</span>
+      </div>
+      <ul class="small-list">${summary.prompts.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
+    </article>
+  `;
+}
+
+function renderSessionCoachAfterCard(session) {
+  const predicted = coverageForPlannedEntries(session.completedExercises || []);
+  const actual = coverageForSessions([session]);
+  const actualById = new Map(actual.map((item) => [item.muscleId, item]));
+  const rows = predicted.filter((item) => item.percent > 0 || actualById.has(item.muscleId)).slice(0, 4).map((item) => {
+    const actualItem = actualById.get(item.muscleId);
+    return {
+      name: item.name,
+      predicted: item.percent,
+      actual: actualItem?.percent || 0
+    };
+  });
+  const improvements = sessionImprovements(session);
+  const nextSuggestion = weeklyCoachSummary().recommendedNextDay;
+  return `
+    <article class="card stack session-coach-card" data-session-coach-stage="afterWorkout">
+      <div class="row">
+        <h3 class="grow">Session Coach</h3>
+        <span class="badge green">fertig</span>
+      </div>
+      <p class="muted">${htmlesc(sessionCoachText("after", "Training ausgewertet."))}</p>
+      <h4>${htmlesc(sessionCoachText("predictionCompare", "Prognose und tatsaechliche Belastung"))}</h4>
+      ${rows.length ? `<ul class="small-list">${rows.map((item) => `<li>${htmlesc(item.name)}: ${item.predicted}% geplant / ${item.actual}% erreicht</li>`).join("")}</ul>` : `<p class="quiet">Noch keine Coverage fuer diese Einheit.</p>`}
+      <p class="quiet">Fortschritt: ${improvements.length ? `${improvements.length} Verbesserung(en)` : "keine klare Verbesserung erkannt"}. Naechster Vorschlag: ${htmlesc(nextSuggestion)}.</p>
+    </article>
+  `;
+}
+
 function renderPlanOptimizerCard(context = "plans") {
   const summary = planOptimizerSummary();
   return `
@@ -4520,6 +4648,7 @@ function renderCoach() {
         ${metric(String(sessionSetCount(session)), "Saetze")}
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
+      ${renderSessionCoachAfterCard(session)}
       ${renderWeeklyCoachCard()}
       ${renderIntelligenceCoreCard("coach")}
       ${renderRecoveryFatigueCard("coach")}
@@ -4659,6 +4788,7 @@ function renderTrainingV53() {
           ${renderWarmupHint(primaryDay)}
           <button class="primary" data-start-day="${htmlesc(primaryDay.name)}">Training starten</button>
         </article>
+        ${renderSessionCoachPreWorkoutCard(primaryDay)}
         ${renderSmartWorkoutPreviewV53(primaryDay.name)}
         ${otherDays.length ? `
           <details class="disclosure-card stack">
@@ -4839,6 +4969,7 @@ function renderWorkout() {
         <p class="subtitle">Übung ${workout.index + 1} von ${workout.entries.length}</p>
       </header>
       <div class="progress"><span style="width:${progress}%"></span></div>
+      ${renderSessionCoachDuringCard(workout, entry, exercise)}
       <article class="card stack">
         <h2>${htmlesc(exercise.displayName)}</h2>
         <p class="muted">${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].slice(0, 3).join(" · "))}</p>
@@ -5027,6 +5158,7 @@ function renderSessionDetail(id) {
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
       ${renderWorkoutTimelineCard(session)}
+      ${renderSessionCoachAfterCard(session)}
       ${renderRecordsAchievementsCard(session)}
       ${renderPerformanceCoachCard(session)}
       <article class="card stack">

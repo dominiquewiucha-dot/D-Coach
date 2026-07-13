@@ -1,0 +1,22 @@
+---
+project: D-Coach
+document: CODEX_START
+version: 6.2.0
+status: Stable
+replaces: 6.1.0
+date: 2026-07-13
+owner: ChatGPT
+core_principle: Training First - Smart Coach works locally and explainably.
+codex_rule: Integrate only. Do not restructure the app.
+resource_rule: Use the lowest sufficient mode and stop after the defined checkpoint.
+---
+
+# CODEX START – v6.2 Session Coach
+
+## Aufgabe
+
+- Vor dem Training Plan-Simulation zeigen.
+- Während des Trainings nur kompakte Hinweise.
+- Nach dem Training Prognose mit tatsächlicher Belastung vergleichen.
+- Quick Training nicht überladen.
+- STOP nach Tests und Push.

@@ -1,0 +1,31 @@
+{
+  "version": "6.2.0",
+  "type": "session_coach_rules",
+  "rules": [
+    {
+      "id": "before_plan_preview",
+      "stage": "beforeWorkout",
+      "action": "show predicted muscle coverage"
+    },
+    {
+      "id": "during_time_guard",
+      "stage": "duringWorkout",
+      "action": "suggest skipping optional exercise"
+    },
+    {
+      "id": "during_device_occupied",
+      "stage": "duringWorkout",
+      "action": "show substitution"
+    },
+    {
+      "id": "after_progress_note",
+      "stage": "afterWorkout",
+      "action": "show smart note and progression"
+    },
+    {
+      "id": "after_plan_effect",
+      "stage": "afterWorkout",
+      "action": "show actual vs predicted coverage"
+    }
+  ]
+}

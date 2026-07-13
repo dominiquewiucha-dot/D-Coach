@@ -1,0 +1,10 @@
+{
+  "version": "6.2.0",
+  "type": "session_coach_schema",
+  "stages": [
+    "beforeWorkout",
+    "duringWorkout",
+    "afterWorkout"
+  ],
+  "displayRule": "During workout only compact prompts."
+}

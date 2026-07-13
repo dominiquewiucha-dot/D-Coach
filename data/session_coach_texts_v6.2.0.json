@@ -1,0 +1,11 @@
+{
+  "version": "6.2.0",
+  "type": "session_coach_texts",
+  "texts": {
+    "before": "So wirkt sich das Training voraussichtlich aus.",
+    "timeLow": "Zeit knapp: optionale Übung überspringen?",
+    "occupied": "Gerät besetzt? Alternative anzeigen.",
+    "after": "Training ausgewertet.",
+    "predictionCompare": "Prognose und tatsächliche Belastung"
+  }
+}
