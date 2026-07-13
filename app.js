@@ -101,6 +101,10 @@ const state = {
   coachRecommendationCard: null,
   aiTrainerReadinessSchema: null,
   coachDashboardTexts: null,
+  smartCoachSchema: null,
+  smartCoachPriorityRules: null,
+  smartCoachRecommendationSchema: null,
+  smartCoachTexts: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -147,7 +151,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v43";
+const APP_VERSION = "pwa-v44";
 const STORAGE_SCHEMA_VERSION = "5.0.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -770,6 +774,10 @@ async function boot() {
     coachRecommendationCard,
     aiTrainerReadinessSchema,
     coachDashboardTexts,
+    smartCoachSchema,
+    smartCoachPriorityRules,
+    smartCoachRecommendationSchema,
+    smartCoachTexts,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -909,6 +917,10 @@ async function boot() {
     fetchOptionalJson("./data/coach_recommendation_card_v5.4.0.json"),
     fetchOptionalJson("./data/ai_trainer_readiness_schema_v5.4.0.json"),
     fetchOptionalJson("./data/coach_dashboard_texts_v5.4.0.json"),
+    fetchOptionalJson("./data/smart_coach_schema_v6.0.0.json"),
+    fetchOptionalJson("./data/smart_coach_priority_rules_v6.0.0.json"),
+    fetchOptionalJson("./data/smart_coach_recommendation_schema_v6.0.0.json"),
+    fetchOptionalJson("./data/smart_coach_texts_v6.0.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -1036,6 +1048,10 @@ async function boot() {
   state.coachRecommendationCard = coachRecommendationCard;
   state.aiTrainerReadinessSchema = aiTrainerReadinessSchema;
   state.coachDashboardTexts = coachDashboardTexts;
+  state.smartCoachSchema = smartCoachSchema;
+  state.smartCoachPriorityRules = smartCoachPriorityRules;
+  state.smartCoachRecommendationSchema = smartCoachRecommendationSchema;
+  state.smartCoachTexts = smartCoachTexts;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -3590,6 +3606,176 @@ function coachDashboardText(key, fallback) {
   return state.coachDashboardTexts?.texts?.[key] || fallback;
 }
 
+function smartCoachText(key, fallback) {
+  return state.smartCoachTexts?.texts?.[key] || fallback;
+}
+
+function smartCoachPriority(ruleId) {
+  return state.smartCoachPriorityRules?.rules?.find((rule) => rule.id === ruleId)?.priority || 0;
+}
+
+function smartCoachInputData() {
+  const weekSessions = sessionsSince(7);
+  const latestSession = lastSession();
+  const coverage = premiumCoverageForSessions(weekSessions);
+  const recovery = recoveryFatigueSummary();
+  const planSimulation = planOptimizerSummary();
+  const dna = trainingDnaSummary();
+  return {
+    personalProfile: storage.personalProfile,
+    workoutHistory: storage.sessions,
+    exerciseHistory: latestSession?.completedExercises || [],
+    muscleCoverage: coverage,
+    recoveryFatigue: recovery,
+    activePlan: activePlan(),
+    planSimulation,
+    trainingDna: dna
+  };
+}
+
+function smartCoachRecommendation() {
+  const input = smartCoachInputData();
+  const plan = input.activePlan;
+  const sessions = input.workoutHistory || [];
+  const latestSession = lastSession();
+  const insights = latestSession ? performanceInsightsForSession(latestSession) : [];
+  const weak = input.muscleCoverage.filter((item) => item.percent > 0 && item.percent < 70).slice(0, 3);
+  const over = input.muscleCoverage.filter((item) => item.percent > 120).slice(0, 3);
+  const nextDay = plan?.days?.[0] || null;
+  const criticalPlanned = (nextDay?.exercises || [])
+    .map((planned) => exerciseById(planned.exerciseId))
+    .filter(Boolean)
+    .filter(exerciseIsCritical)
+    .slice(0, 2);
+  if (!sessions.length) {
+    return {
+      id: "smart-coach-learning",
+      scope: "daily",
+      title: smartCoachText("learning", "D-Coach lernt dein Training kennen."),
+      summary: smartCoachText("notEnoughData", "Noch nicht genug Daten fuer eine belastbare Empfehlung."),
+      action: nextDay ? `${nextDay.name} starten und sauber speichern.` : "Erstes Training speichern.",
+      affectedMuscles: [],
+      confidencePercent: 35,
+      why: ["Noch keine gespeicherte Trainingshistorie vorhanden."],
+      evidence: [`Operation: ${state.smartCoachSchema?.operation || "offline_rule_based"}.`],
+      alternatives: ["Training starten", "Plan auswaehlen"],
+      requiresConfirmation: false,
+      ruleId: "preference_fifth",
+      priority: smartCoachPriority("preference_fifth")
+    };
+  }
+  const candidates = [];
+  const add = (ruleId, recommendation) => {
+    candidates.push({
+      ...recommendation,
+      ruleId,
+      priority: smartCoachPriority(ruleId)
+    });
+  };
+
+  if (input.recoveryFatigue.deloadCandidate || criticalPlanned.length) {
+    add("safety_first", {
+      scope: "daily",
+      title: input.recoveryFatigue.deloadCandidate ? "Heute konservativ trainieren" : "LWS-sichere Variante pruefen",
+      summary: input.recoveryFatigue.deloadCandidate
+        ? "Mehrere Ermuedungssignale sprechen fuer reduzierte Belastung."
+        : `${criticalPlanned[0]?.displayName || "Eine geplante Uebung"} kann die LWS staerker belasten.`,
+      action: input.recoveryFatigue.deloadCandidate ? "Volumen oder Intensitaet reduzieren." : "Alternative mit niedrigerem LWS-Risiko waehlen.",
+      affectedMuscles: weak.map((item) => item.name),
+      confidencePercent: Math.max(72, input.recoveryFatigue.deloadCandidate ? 84 : 76),
+      why: [
+        input.recoveryFatigue.statusText,
+        ...criticalPlanned.map((exercise) => `${exercise.displayName}: ${exercise.lumbarDiscSuitability}`)
+      ],
+      evidence: [`Systemische Ermuedung ${input.recoveryFatigue.systemicFatiguePercent}%.`, `Gelenkflags: ${input.recoveryFatigue.jointFlags.length}.`],
+      alternatives: ["Maschinengefuehrte Variante", "Weniger Volumen", "Saubere Technik priorisieren"],
+      requiresConfirmation: true
+    });
+  }
+
+  if (!plan) {
+    add("plan_adherence_second", {
+      scope: "daily",
+      title: "Plan auswaehlen",
+      summary: "Ohne aktiven Plan bleibt der Coach allgemein.",
+      action: "Aktiven Plan setzen.",
+      affectedMuscles: [],
+      confidencePercent: 70,
+      why: ["Kein aktiver Trainingsplan gefunden."],
+      evidence: [`Gespeicherte Trainings: ${sessions.length}.`],
+      alternatives: ["Planbibliothek nutzen"],
+      requiresConfirmation: true
+    });
+  }
+
+  if (weak.length || over.length) {
+    const main = weak[0] || over[0];
+    add("muscle_balance_third", {
+      scope: "weekly",
+      title: weak[0] ? `${weak[0].name} priorisieren` : `${over[0].name} entlasten`,
+      summary: `${main.name} liegt aktuell bei ${main.percent}% Wochenabdeckung.`,
+      action: weak[0] ? `${weak[0].name} in der naechsten Einheit gezielt einplanen.` : `${over[0].name} diese Woche nicht weiter erhoehen.`,
+      affectedMuscles: [...weak, ...over].slice(0, 4).map((item) => item.name),
+      confidencePercent: Math.min(91, 65 + sessions.length * 2),
+      why: [...weak.map((item) => `${item.name}: nur ${item.percent}%.`), ...over.map((item) => `${item.name}: ${item.percent}%.`)],
+      evidence: [`Wochentrainings: ${sessionsSince(7).length}.`, `Plan-Simulation: ${input.planSimulation.simulatedSessions} Einheiten.`],
+      alternatives: ["Naechsten Trainingstag anpassen", "Uebungsalternative waehlen"],
+      requiresConfirmation: true
+    });
+  }
+
+  if (insights[0]) {
+    const insight = insights[0];
+    add("progression_fourth", {
+      scope: "exercise",
+      title: insight.progression.label,
+      summary: insight.smartNote,
+      action: insight.progression.coachText,
+      affectedMuscles: [],
+      confidencePercent: insight.progression.confidencePercent,
+      why: insight.progression.why,
+      evidence: [...insight.insight.evidence, ...insight.insight.whyBullets].slice(0, 5),
+      alternatives: ["Gewicht halten", "Wiederholungen steigern"],
+      requiresConfirmation: false
+    });
+  }
+
+  if (!candidates.length || sessions.length < 12) {
+    add("preference_fifth", {
+      scope: "daily",
+      title: sessions.length < 12 ? smartCoachText("learning", "D-Coach lernt dein Training kennen.") : "Training sauber fortsetzen",
+      summary: sessions.length < 12 ? smartCoachText("notEnoughData", "Noch nicht genug Daten fuer eine belastbare Empfehlung.") : "Die aktuelle Datenlage zeigt keinen dringenden Eingriff.",
+      action: nextDay ? `${nextDay.name} wie geplant starten.` : "Naechste Einheit speichern.",
+      affectedMuscles: [],
+      confidencePercent: sessions.length < 12 ? Math.min(68, 35 + sessions.length * 3) : 74,
+      why: [
+        `${sessions.length}/12 Trainings fuer stabile Smart-Coach-Empfehlungen.`,
+        "Keine Regel mit hoeherer Prioritaet verlangt aktuell eine Aenderung."
+      ],
+      evidence: [`Operation: ${state.smartCoachSchema?.operation || "offline_rule_based"}.`],
+      alternatives: ["Weiter Daten sammeln", "Training manuell starten"],
+      requiresConfirmation: false
+    });
+  }
+
+  const winner = candidates.sort((a, b) => b.priority - a.priority || b.confidencePercent - a.confidencePercent)[0];
+  return {
+    id: `smart-coach-${winner.ruleId}`,
+    scope: winner.scope,
+    title: winner.title,
+    summary: winner.summary,
+    action: winner.action,
+    affectedMuscles: winner.affectedMuscles || [],
+    confidencePercent: Math.max(0, Math.min(95, Math.round(winner.confidencePercent || 0))),
+    why: winner.why || [],
+    evidence: winner.evidence || [],
+    alternatives: winner.alternatives || [],
+    requiresConfirmation: Boolean(winner.requiresConfirmation),
+    ruleId: winner.ruleId,
+    priority: winner.priority
+  };
+}
+
 function aiReadinessSummary() {
   const required = state.aiTrainerReadinessSchema?.minimumSuggestedHistory || { workouts: 12, weeks: 4 };
   const sessions = storage.sessions.length;
@@ -3608,33 +3794,27 @@ function aiReadinessSummary() {
 }
 
 function coachRecommendationSummaryV54() {
-  const plan = activePlan();
-  const session = lastSession();
+  const smart = smartCoachRecommendation();
   const coverage = premiumCoverageForSessions(sessionsSince(7));
   const weak = coverage.filter((item) => item.percent > 0 && item.percent < 70).slice(0, 3);
   const over = coverage.filter((item) => item.percent > 120).slice(0, 3);
   const optimizer = planOptimizerSummary();
-  const insight = session ? performanceInsightsForSession(session)[0] : null;
   const affected = [...weak, ...over].slice(0, 4);
-  const recommendation = affected.length
-    ? `Naechste Einheit: ${weak[0] ? `${weak[0].name} staerken` : `${over[0].name} entlasten`}`
-    : insight?.progression.label || (plan ? `${plan.days?.[0]?.name || "Training"} sauber starten` : "Plan auswaehlen");
-  const mainReason = affected.length
-    ? `${affected[0].name} liegt aktuell bei ${affected[0].percent}%.`
-    : insight?.smartNote || coachDashboardText("learning", "D-Coach lernt dein Training kennen.");
-  const confidence = insight?.progression.confidencePercent || Math.min(91, 48 + storage.sessions.length * 4);
-  const proposedPlanChange = weak[0]
-    ? `${weak[0].name} in der naechsten Woche priorisieren.`
-    : over[0]
-      ? `${over[0].name} voruebergehend reduzieren.`
-      : optimizer.action;
   const why = [
-    mainReason,
-    ...affected.map((item) => `${item.name}: ${item.percent}% Wochenabdeckung.`),
-    ...(insight ? [...insight.progression.why, ...insight.insight.evidence] : []),
-    `Plan-Simulation: ${optimizer.simulatedSessions} Einheiten, ${optimizer.estimatedMinutes} Minuten.`
-  ].filter(Boolean).slice(0, 6);
-  return { recommendation, mainReason, confidence, affected, proposedPlanChange, why, optimizer };
+    ...smart.why,
+    ...smart.evidence,
+    `Prioritaetsregel: ${smart.ruleId}.`
+  ].filter(Boolean).slice(0, 7);
+  return {
+    recommendation: smart.title,
+    mainReason: smart.summary,
+    confidence: smart.confidencePercent,
+    affected: smart.affectedMuscles.length ? smart.affectedMuscles.map((name) => ({ name, percent: 0 })) : affected,
+    proposedPlanChange: smart.action || optimizer.action,
+    why,
+    optimizer,
+    smart
+  };
 }
 
 function renderCoachDashboardV54() {
@@ -3649,7 +3829,7 @@ function renderCoachDashboardV54() {
       <article class="card stack coach-hero-v54">
         <div class="row">
           <div class="grow">
-            <p class="muted">Coach Empfehlung</p>
+            <p class="muted">Smart Coach · offline</p>
             <h2>${htmlesc(summary.recommendation)}</h2>
           </div>
           <span class="badge ${summary.confidence >= 75 ? "green" : "amber"}">${summary.confidence}%</span>
@@ -3664,6 +3844,7 @@ function renderCoachDashboardV54() {
           <ul class="small-list">${summary.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
         </details>
         <p class="quiet">${htmlesc(coachDashboardText("notAutomatic", "Aenderungen werden erst nach deiner Bestaetigung uebernommen."))}</p>
+        <p class="quiet">Regel: ${htmlesc(summary.smart.ruleId)} · ${summary.smart.requiresConfirmation ? "bestaetigungspflichtig" : "Hinweis ohne Planaenderung"}</p>
       </article>
       <div class="premium-card-grid">
         <article class="card stack">

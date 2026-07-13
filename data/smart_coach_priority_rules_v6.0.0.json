@@ -1,0 +1,26 @@
+{
+  "version": "6.0.0",
+  "type": "smart_coach_priority_rules",
+  "rules": [
+    {
+      "id": "safety_first",
+      "priority": 100
+    },
+    {
+      "id": "plan_adherence_second",
+      "priority": 90
+    },
+    {
+      "id": "muscle_balance_third",
+      "priority": 80
+    },
+    {
+      "id": "progression_fourth",
+      "priority": 70
+    },
+    {
+      "id": "preference_fifth",
+      "priority": 60
+    }
+  ]
+}

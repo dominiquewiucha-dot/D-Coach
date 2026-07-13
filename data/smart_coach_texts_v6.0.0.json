@@ -1,0 +1,12 @@
+{
+  "version": "6.0.0",
+  "type": "smart_coach_texts",
+  "texts": {
+    "learning": "D-Coach lernt dein Training kennen.",
+    "ready": "Persönliche Empfehlungen sind verfügbar.",
+    "why": "Warum?",
+    "apply": "Vorschlag übernehmen",
+    "review": "Vorschlag prüfen",
+    "notEnoughData": "Noch nicht genug Daten für eine belastbare Empfehlung."
+  }
+}

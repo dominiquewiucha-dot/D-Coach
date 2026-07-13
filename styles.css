@@ -80,6 +80,11 @@ select:focus-visible {
   padding: 18px var(--space-4) 28px;
 }
 
+.screen > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .title {
   margin: 0;
   font-size: 34px;
@@ -126,8 +131,8 @@ select:focus-visible {
   font-size: 17px;
 }
 
-.muted { color: var(--muted); }
-.quiet { color: var(--quiet); }
+.muted { color: var(--muted); overflow-wrap: anywhere; }
+.quiet { color: var(--quiet); overflow-wrap: anywhere; }
 .green { color: var(--green); }
 .amber { color: var(--amber); }
 .red { color: var(--red); }
@@ -306,6 +311,7 @@ select:focus-visible {
 .coach-hero-v54 {
   border-color: rgba(37,99,235,.68);
   background: linear-gradient(180deg, rgba(37,99,235,.24), rgba(18,24,33,.97));
+  overflow: hidden;
 }
 
 .coach-hero-v54 h2 {
@@ -314,7 +320,7 @@ select:focus-visible {
 
 .coach-action-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 

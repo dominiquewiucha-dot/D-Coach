@@ -1,0 +1,17 @@
+{
+  "version": "6.0.0",
+  "type": "smart_coach_recommendation_schema",
+  "fields": [
+    "id",
+    "scope",
+    "title",
+    "summary",
+    "action",
+    "affectedMuscles",
+    "confidencePercent",
+    "why",
+    "evidence",
+    "alternatives",
+    "requiresConfirmation"
+  ]
+}
