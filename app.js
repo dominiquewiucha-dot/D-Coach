@@ -85,6 +85,10 @@ const state = {
   premiumMuscleDetailSchema: null,
   muscleHeatmapColorSystem: null,
   exerciseToSubregionMappingRules: null,
+  designTokens: null,
+  layoutRules: null,
+  bottomNavigationSpec: null,
+  cardHierarchy: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -121,6 +125,7 @@ const state = {
   coverageMode: "week",
   coverageView: "front",
   selectedMuscleId: null,
+  moreMenuOpen: false,
   isOnline: navigator.onLine,
   deferredInstallPrompt: null,
   restTimer: {
@@ -130,7 +135,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v39";
+const APP_VERSION = "pwa-v40";
 const STORAGE_SCHEMA_VERSION = "5.0.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -737,6 +742,10 @@ async function boot() {
     premiumMuscleDetailSchema,
     muscleHeatmapColorSystem,
     exerciseToSubregionMappingRules,
+    designTokens,
+    layoutRules,
+    bottomNavigationSpec,
+    cardHierarchy,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -860,6 +869,10 @@ async function boot() {
     fetchOptionalJson("./data/premium_muscle_detail_schema_v5.0.0.json"),
     fetchOptionalJson("./data/muscle_heatmap_color_system_v5.0.0.json"),
     fetchOptionalJson("./data/exercise_to_subregion_mapping_rules_v5.0.0.json"),
+    fetchOptionalJson("./data/design_tokens_v5.1.0.json"),
+    fetchOptionalJson("./data/layout_rules_v5.1.0.json"),
+    fetchOptionalJson("./data/bottom_navigation_spec_v5.1.0.json"),
+    fetchOptionalJson("./data/card_hierarchy_v5.1.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -971,6 +984,10 @@ async function boot() {
   state.premiumMuscleDetailSchema = premiumMuscleDetailSchema;
   state.muscleHeatmapColorSystem = muscleHeatmapColorSystem;
   state.exerciseToSubregionMappingRules = exerciseToSubregionMappingRules;
+  state.designTokens = designTokens;
+  state.layoutRules = layoutRules;
+  state.bottomNavigationSpec = bottomNavigationSpec;
+  state.cardHierarchy = cardHierarchy;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -2714,7 +2731,7 @@ function render() {
   document.getElementById("app").innerHTML = `
     <main class="app">
       ${renderRoute()}
-      ${renderTabs()}
+      ${renderPremiumTabs()}
     </main>
   `;
   bindEvents();
@@ -2746,6 +2763,47 @@ function renderTabs() {
     ["settings", "Profil", "♙"]
   ];
   return `<nav class="tabs">${tabs.map(([id, label, icon]) => `<button class="tab ${state.tab === id && !state.activeWorkout && !state.selectedExerciseId && !state.selectedSessionId ? "active" : ""}" data-tab="${id}"><span class="tab-icon">${icon}</span><span>${label}</span></button>`).join("")}</nav>`;
+}
+
+function renderPremiumTabs() {
+  const primaryTabs = [
+    ["dashboard", "Start", "D"],
+    ["training", "Train", "T"],
+    ["coach", "Coach", "C"],
+    ["plans", "Plan", "P"]
+  ];
+  const moreTabs = [
+    ["exercises", "Uebungen", "U"],
+    ["weight", "Gewicht", "G"],
+    ["journal", "Journal", "J"],
+    ["settings", "Profil", "S"]
+  ];
+  const tabIsActive = (id) => state.tab === id && !state.activeWorkout && !state.selectedExerciseId && !state.selectedSessionId;
+  const moreActive = moreTabs.some(([id]) => state.tab === id);
+  return `
+    ${state.moreMenuOpen ? `
+      <div class="more-menu" role="menu" aria-label="Weitere Bereiche">
+        ${moreTabs.map(([id, label, icon]) => `
+          <button class="more-menu-item ${tabIsActive(id) ? "active" : ""}" data-tab="${id}" role="menuitem">
+            <span class="tab-icon">${icon}</span>
+            <span>${label}</span>
+          </button>
+        `).join("")}
+      </div>
+    ` : ""}
+    <nav class="tabs" aria-label="Hauptnavigation">
+      ${primaryTabs.map(([id, label, icon]) => `
+        <button class="tab ${tabIsActive(id) ? "active" : ""}" data-tab="${id}">
+          <span class="tab-icon">${icon}</span>
+          <span>${label}</span>
+        </button>
+      `).join("")}
+      <button class="tab ${state.moreMenuOpen || moreActive ? "active" : ""}" data-toggle-more-menu aria-expanded="${state.moreMenuOpen ? "true" : "false"}">
+        <span class="tab-icon">M</span>
+        <span>Mehr</span>
+      </button>
+    </nav>
+  `;
 }
 
 function renderCoverageCard() {
@@ -3683,7 +3741,13 @@ function renderDashboard() {
         ${metric(String(sessionsSince(7).length), "Trainings diese Woche")}
         ${metric(String(storage.sessions.length), "Gespeicherte Einheiten")}
       </div>
-      ${renderCoverageCard()}
+      <details class="disclosure-card stack">
+        <summary>
+          <span>Muscle Map</span>
+          <span class="badge blue">Woche</span>
+        </summary>
+        ${renderCoverageCard()}
+      </details>
       <article class="card">
         <h3>Hinweis</h3>
         <p class="muted">Bewerte nicht einzelne Tageswerte. Gewicht und Training zählen als Trend.</p>
@@ -4808,6 +4872,11 @@ function importBackupFile(file) {
 }
 
 function bindEvents() {
+  document.querySelector("[data-toggle-more-menu]")?.addEventListener("click", () => {
+    state.moreMenuOpen = !state.moreMenuOpen;
+    render();
+  });
+
   document.querySelectorAll("[data-tab]").forEach((button) => {
     button.addEventListener("click", () => {
       persistWorkoutDraft();
@@ -4815,6 +4884,7 @@ function bindEvents() {
       state.activeWorkout = null;
       state.selectedExerciseId = null;
       state.selectedSessionId = null;
+      state.moreMenuOpen = false;
       render();
     });
   });

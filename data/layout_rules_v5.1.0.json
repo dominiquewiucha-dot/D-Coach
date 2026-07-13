@@ -1,0 +1,14 @@
+{
+  "version": "5.1.0",
+  "type": "layout_rules",
+  "rules": [
+    "Use one visual hero per page.",
+    "Do not stack unlimited equal-height cards.",
+    "Collapse secondary content behind disclosure controls.",
+    "Prefer section summaries over full raw data lists.",
+    "Use 16px minimum horizontal page padding.",
+    "Respect env(safe-area-inset-bottom) and env(safe-area-inset-top).",
+    "Bottom navigation labels must never be clipped or horizontally scrollable.",
+    "Large screens use max content width; phones remain single-column."
+  ]
+}

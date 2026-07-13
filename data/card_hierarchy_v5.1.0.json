@@ -1,0 +1,28 @@
+{
+  "version": "5.1.0",
+  "type": "card_hierarchy",
+  "cardTypes": [
+    {
+      "id": "hero",
+      "purpose": "primary page action/status",
+      "maxPerPage": 1
+    },
+    {
+      "id": "metric",
+      "purpose": "single metric or short pair",
+      "compact": true
+    },
+    {
+      "id": "summary",
+      "purpose": "short overview with drill-down"
+    },
+    {
+      "id": "detail",
+      "purpose": "expanded information only after user action"
+    },
+    {
+      "id": "warning",
+      "purpose": "only meaningful warnings; no permanent clutter"
+    }
+  ]
+}

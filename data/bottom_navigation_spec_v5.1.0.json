@@ -1,0 +1,39 @@
+{
+  "version": "5.1.0",
+  "type": "bottom_navigation_spec",
+  "requiredTabs": [
+    "Dashboard",
+    "Training",
+    "Coach",
+    "Pläne",
+    "Übungen",
+    "Gewicht",
+    "Journal"
+  ],
+  "rules": {
+    "position": "fixed",
+    "safeArea": "padding-bottom: max(10px, env(safe-area-inset-bottom))",
+    "overflow": "never horizontal scroll",
+    "labelBehavior": "full label or approved short label; never clip",
+    "layout": "CSS grid with equal-width cells",
+    "fontScaling": "clamp(10px, 2.6vw, 12px)",
+    "activeState": "blue filled pill/background with white text",
+    "inactiveState": "muted text, no oversized padding"
+  },
+  "mobileFallback": {
+    "maxVisiblePrimaryTabs": 5,
+    "primaryTabs": [
+      "Dashboard",
+      "Training",
+      "Coach",
+      "Pläne",
+      "Mehr"
+    ],
+    "moreMenuContains": [
+      "Übungen",
+      "Gewicht",
+      "Journal",
+      "Einstellungen"
+    ]
+  }
+}
