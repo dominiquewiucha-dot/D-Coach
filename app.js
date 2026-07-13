@@ -178,7 +178,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v57";
+const APP_VERSION = "pwa-v59";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -1356,11 +1356,45 @@ function activePlan() {
   return plans.find((plan) => plan.planName === storage.activePlanName) || plans[0] || null;
 }
 
+function explicitDayTypeFromName(value) {
+  const text = String(value || "").toLowerCase();
+  if (text.includes("push") || text.includes("brust") || text.includes("schulter") || text.includes("trizeps")) return "Push";
+  if (text.includes("pull") || text.includes("ruecken") || text.includes("r\u00fccken") || text.includes("bizeps")) return "Pull";
+  if (text.includes("leg") || text.includes("bein") || text.includes("unter")) return "Legs";
+  return null;
+}
+
+function planDayMatchScore(day, session) {
+  const completedIds = new Set((session?.completedExercises || []).map((exercise) => exercise.exerciseId).filter(Boolean));
+  if (!completedIds.size) return 0;
+  return (day?.exercises || []).reduce((score, planned) => score + (completedIds.has(planned.exerciseId) ? 1 : 0), 0);
+}
+
+function planDayIndexFromSession(plan, session) {
+  if (!plan?.days?.length || !session) return -1;
+  const exactIndex = plan.days.findIndex((day) => day.name === session.dayName || day.name === session.dayNameSnapshot);
+  if (exactIndex >= 0) return exactIndex;
+
+  const sessionType = explicitDayTypeFromName(`${session.dayName || ""} ${session.dayNameSnapshot || ""}`);
+  if (sessionType) {
+    const typedIndexes = plan.days
+      .map((day, index) => ({ index, type: explicitDayTypeFromName(day.name) }))
+      .filter((item) => item.type === sessionType);
+    if (typedIndexes.length === 1) return typedIndexes[0].index;
+  }
+
+  const scored = plan.days
+    .map((day, index) => ({ index, score: planDayMatchScore(day, session) }))
+    .sort((a, b) => b.score - a.score);
+  if (!scored[0]?.score || scored[0].score === scored[1]?.score) return -1;
+  return scored[0].index;
+}
+
 function nextPlanDayAfterLastSession(plan = activePlan()) {
   if (!plan?.days?.length) return null;
   const latest = lastSession();
   if (!latest) return plan.days[0];
-  const index = plan.days.findIndex((day) => day.name === latest.dayName || day.name === latest.dayNameSnapshot);
+  const index = planDayIndexFromSession(plan, latest);
   if (index < 0) return plan.days[0];
   return plan.days[(index + 1) % plan.days.length];
 }
@@ -3128,7 +3162,7 @@ function renderPremiumTabs() {
     ["dashboard", "Dashboard", "D"],
     ["training", "Training", "T"],
     ["coach", "Coach", "C"],
-    ["plans", "Plaene", "P"],
+    ["plans", "Pl\u00e4ne", "P"],
     ["settings", "Profil", "S"]
   ];
   const tabIsActive = (id) => state.tab === id && !state.activeWorkout && !state.selectedExerciseId && !state.selectedSessionId;
@@ -3194,7 +3228,7 @@ function renderMuscleMapScreen() {
       <header class="screen-header-row">
         <div class="grow">
           <h1 class="title">Muskelkarte</h1>
-          <p class="subtitle">Belastung, Subregionen und Uebungsbeitraege.</p>
+          <p class="subtitle">Belastung, Subregionen und \u00dcbungsbeitr\u00e4ge.</p>
         </div>
         <span class="badge blue">${average}%</span>
       </header>
@@ -6365,13 +6399,13 @@ function renderProfileShortcuts() {
   const shortcuts = [
     { tab: "weight", icon: "G", title: "Gewicht", text: "Gewichtstracking und Verlauf" },
     { tab: "journal", icon: "J", title: "Journal", text: "Schlaf, Energie, Stress und Notizen" },
-    { tab: "machines", icon: "M", title: "Geraete", text: "Sitz, Griff und Maschinen-Setup" },
+    { tab: "machines", icon: "M", title: "Ger\u00e4te", text: "Sitz, Griff und Maschinen-Setup" },
     { tab: "musclemap", icon: "K", title: "Muskelmapping", text: "Muskelkarte und Wochenabdeckung" },
-    { tab: "exercises", icon: "U", title: "Uebungen", text: "Uebungsdatenbank und Details" }
+    { tab: "exercises", icon: "\u00dc", title: "\u00dcbungen", text: "\u00dcbungsdatenbank und Details" }
   ];
   return `
     <article class="card stack">
-      <h3>Profil-Menue</h3>
+      <h3>Profil-Men\u00fc</h3>
       <div class="profile-shortcut-grid">
         ${shortcuts.map((item) => `
           <button class="profile-shortcut" data-tab="${item.tab}">
@@ -6391,12 +6425,12 @@ function renderMachines() {
   const settings = [...storage.machineSettings].sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
   return `
     <section class="screen stack">
-      <button class="secondary" data-tab="settings">Zurueck zum Profil</button>
-      <header><h1 class="title">Geraete</h1><p class="subtitle">Sitz, Griff und Setup pro Uebung.</p></header>
+      <button class="secondary" data-tab="settings">Zur\u00fcck zum Profil</button>
+      <header><h1 class="title">Ger\u00e4te</h1><p class="subtitle">Sitz, Griff und Setup pro \u00dcbung.</p></header>
       <article class="card stack">
-        <h3>Geraeteeinstellungen</h3>
-        <p class="muted">Neue Werte speicherst du im Detail einer Uebung oder direkt im Training.</p>
-        <button class="primary" data-tab="exercises">Uebung suchen</button>
+        <h3>Ger\u00e4teeinstellungen</h3>
+        <p class="muted">Neue Werte speicherst du im Detail einer \u00dcbung oder direkt im Training.</p>
+        <button class="primary" data-tab="exercises">\u00dcbung suchen</button>
       </article>
       ${settings.length ? settings.map((setting) => {
         const exercise = exerciseById(setting.exerciseId);
@@ -6413,7 +6447,7 @@ function renderMachines() {
                 <div><span>Griff</span><strong>${htmlesc(setting.gripPosition || setting.handlePosition || "-")}</strong></div>
                 <div><span>Breite</span><strong>${htmlesc(setting.gripWidth || "-")}</strong></div>
                 <div><span>Aufsatz</span><strong>${htmlesc(setting.attachment || "-")}</strong></div>
-                <div><span>Ruecken</span><strong>${htmlesc(setting.backrestPosition || "-")}</strong></div>
+                <div><span>R\u00fccken</span><strong>${htmlesc(setting.backrestPosition || "-")}</strong></div>
               </div>
               ${setting.note ? `<p class="muted">${htmlesc(setting.note)}</p>` : ""}
             </article>
@@ -6421,8 +6455,8 @@ function renderMachines() {
         `;
       }).join("") : `
         <article class="card stack">
-          <h3>Noch keine Geraete gespeichert</h3>
-          <p class="muted">Oeffne eine Uebung, trage Sitz/Griff ein und speichere die Einstellung.</p>
+          <h3>Noch keine Ger\u00e4te gespeichert</h3>
+          <p class="muted">\u00d6ffne eine \u00dcbung, trage Sitz/Griff ein und speichere die Einstellung.</p>
         </article>
       `}
     </section>
@@ -6446,7 +6480,7 @@ function renderSettings() {
           <h3 class="grow">PWA-Status</h3>
           <span class="badge ${state.isOnline ? "green" : "amber"}">${state.isOnline ? "Online" : "Offline"}</span>
         </div>
-        <p class="muted">${standalone ? "Als App gestartet." : "Im Browser geoeffnet. Auf dem iPhone ueber Teilen > Zum Home-Bildschirm hinzufuegen installieren."}</p>
+        <p class="muted">${standalone ? "Als App gestartet." : "Im Browser ge\u00f6ffnet. Auf dem iPhone \u00fcber Teilen > Zum Home-Bildschirm hinzuf\u00fcgen installieren."}</p>
         ${state.deferredInstallPrompt && !standalone ? `<button class="primary" data-install-pwa>App installieren</button>` : ""}
       </article>
       <article class="card stack">

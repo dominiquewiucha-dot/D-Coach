@@ -15,6 +15,8 @@ assert(app.includes("function renderMachines()"), "machines screen missing");
 assert(app.includes("${renderProfileShortcuts()}"), "profile shortcuts must render in settings/profile");
 assert(css.includes(".profile-shortcut-grid"), "profile shortcut grid styles missing");
 assert(css.includes(".profile-shortcut-icon"), "profile shortcut icon styles missing");
+assert(css.includes(".profile-shortcut > span:last-child"), "profile shortcut text column must be shrinkable");
+assert(css.includes("overflow-wrap: anywhere"), "long profile shortcut labels must wrap on iPhone");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

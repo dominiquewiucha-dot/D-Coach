@@ -80,7 +80,6 @@ select:focus-visible {
 .app-content {
   min-height: 100vh;
   min-height: 100dvh;
-  overflow-x: hidden;
   touch-action: pan-y;
   padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 18px);
 }
@@ -666,6 +665,16 @@ select:focus-visible {
 .profile-shortcut strong,
 .profile-shortcut small {
   display: block;
+}
+
+.profile-shortcut > span:last-child {
+  min-width: 0;
+}
+
+.profile-shortcut strong,
+.profile-shortcut small {
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .profile-shortcut small {

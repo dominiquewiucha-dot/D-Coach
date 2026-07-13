@@ -7,6 +7,9 @@ assert(app.includes('mg_chest_clavicular: "mg_chest"'), "clavicular chest must a
 assert(app.includes("canonicalizeMuscleId(mapping.primaryMuscle)"), "primary muscle target canonicalization missing");
 assert(app.includes("muscleId = canonicalizeMuscleId(muscleId);"), "coverage aggregation canonicalization missing");
 assert(app.includes("function nextPlanDayAfterLastSession"), "next split day helper missing");
+assert(app.includes("function planDayIndexFromSession"), "next day must resolve latest session against active plan");
+assert(app.includes("function planDayMatchScore"), "next day must fall back to exercise overlap instead of first day");
+assert(app.includes("explicitDayTypeFromName"), "smart day names must resolve to plan day type");
 assert(app.includes("plan.days[(index + 1) % plan.days.length]"), "next day must follow last completed day");
 assert(!app.includes("const nextDay = plan?.days?.[0]?.name || \"-\";"), "dashboard must not hard-code first plan day");
 assert(app.includes("Prioritaeten dieser Woche"), "dashboard status label must clarify priority meaning");

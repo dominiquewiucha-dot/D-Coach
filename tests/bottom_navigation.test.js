@@ -6,7 +6,7 @@ const sw = fs.readFileSync("sw.js", "utf8");
 assert(app.includes('<div class="app-shell">'), "app shell missing");
 assert(app.includes('<main class="app-content">'), "app content main missing");
 assert(app.includes('<nav class="bottom-nav tabs"'), "bottom navigation class missing");
-["Dashboard", "Training", "Coach", "Plaene", "Profil"].forEach((label) => {
+["Dashboard", "Training", "Coach", "Pläne", "Profil"].forEach((label) => {
   assert(app.includes(`"${label}"`), `${label} tab missing`);
 });
 assert(!app.includes("<span>Mehr</span>"), "Mehr tab must not be in primary bottom navigation");
