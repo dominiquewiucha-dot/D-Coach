@@ -2836,10 +2836,12 @@ function exerciseKnowledge(exercise) {
 
 function render() {
   document.getElementById("app").innerHTML = `
-    <main class="app">
-      ${renderRoute()}
+    <div class="app-shell">
+      <main class="app-content">
+        ${renderRoute()}
+      </main>
       ${renderPremiumTabs()}
-    </main>
+    </div>
   `;
   bindEvents();
 }
@@ -2906,7 +2908,7 @@ function renderPremiumTabs() {
         `).join("")}
       </div>
     ` : ""}
-    <nav class="tabs" aria-label="Hauptnavigation">
+    <nav class="bottom-nav tabs" aria-label="Hauptnavigation">
       ${primaryTabs.map(([id, label, icon]) => `
         <button class="tab ${tabIsActive(id) ? "active" : ""}" data-tab="${id}">
           <span class="tab-icon">${icon}</span>

@@ -37,13 +37,14 @@ html, body {
   min-height: 100%;
   max-width: 100%;
   overflow-x: hidden;
+  overscroll-behavior-x: none;
   background: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
 }
 
 body {
-  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  padding-top: env(safe-area-inset-top);
 }
 
 button, input, textarea, select {
@@ -67,12 +68,18 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
-.app {
+.app-shell {
   width: 100%;
   max-width: 720px;
-  overflow-x: hidden;
   margin: 0 auto;
   min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.app-content {
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
   padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 18px);
 }
 
@@ -479,6 +486,7 @@ select:focus-visible {
   padding: 0 10px;
 }
 
+.bottom-nav,
 .tabs {
   position: fixed;
   left: 0;
@@ -486,6 +494,8 @@ select:focus-visible {
   width: 100vw;
   max-width: 100vw;
   bottom: 0;
+  inset-inline: 0;
+  inset-block-end: 0;
   z-index: 10;
   display: flex;
   gap: 4px;
