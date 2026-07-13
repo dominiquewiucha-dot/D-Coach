@@ -891,6 +891,48 @@ select:focus-visible {
   place-items: center;
 }
 
+.production-muscle-map-shell {
+  width: 100%;
+  min-height: 460px;
+  display: grid;
+  grid-template-rows: minmax(400px, 1fr) auto auto;
+  gap: 10px;
+}
+
+.production-muscle-map {
+  width: 100%;
+  height: min(62vh, 560px);
+  min-height: 400px;
+  overflow: hidden;
+}
+
+.production-muscle-map canvas {
+  border-radius: 12px;
+}
+
+.production-muscle-map-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.production-muscle-map-status strong {
+  color: var(--text);
+}
+
+.production-coach-link {
+  color: var(--blue-light);
+}
+
+.production-muscle-map-fallback {
+  text-align: center;
+}
+
 .muscle-map-list {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }

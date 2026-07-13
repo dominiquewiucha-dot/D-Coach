@@ -1,4 +1,4 @@
-const CACHE_NAME = "dcoach-pwa-v50";
+const CACHE_NAME = "dcoach-pwa-v52";
 const ASSETS = [
   "./",
   "./index.html",
@@ -172,6 +172,11 @@ const ASSETS = [
   "./data/musclemapjs_dcoach_adapter_seed_v6.8.0.json",
   "./data/musclemapjs_heatmap_v6.8.0.json",
   "./data/musclemapjs_test_coverage_v6.8.0.json",
+  "./data/production_muscle_map_config_v6.9.0.json",
+  "./data/production_muscle_map_adapter_rules_v6.9.0.json",
+  "./data/production_muscle_detail_schema_v6.9.0.json",
+  "./production/production_muscle_map_release_gate_v6.9.0.json",
+  "./production/production-muscle-map.js",
   "./prototype/musclemapjs_prototype_config_v6.8.0.json",
   "./prototype/musclemapjs-prototype.js",
   "./vendor/MuscleMapJS/browser/index.js",

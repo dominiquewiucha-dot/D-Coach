@@ -151,6 +151,12 @@ const state = {
   smartWorkoutDayTemplates: null,
   smartSubstitutionRules: null,
   smartWorkoutBuilderTexts: null,
+  muscleMapJsAdapterSeed: null,
+  muscleMapJsHeatmap: null,
+  productionMuscleMapConfig: null,
+  productionMuscleMapAdapterRules: null,
+  productionMuscleDetailSchema: null,
+  productionMuscleMapReleaseGate: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -172,7 +178,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v50";
+const APP_VERSION = "pwa-v52";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -851,7 +857,13 @@ async function boot() {
     smartWorkoutBuilderRules,
     smartWorkoutDayTemplates,
     smartSubstitutionRules,
-    smartWorkoutBuilderTexts
+    smartWorkoutBuilderTexts,
+    muscleMapJsAdapterSeed,
+    muscleMapJsHeatmap,
+    productionMuscleMapConfig,
+    productionMuscleMapAdapterRules,
+    productionMuscleDetailSchema,
+    productionMuscleMapReleaseGate
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -1015,7 +1027,13 @@ async function boot() {
     fetchOptionalJson("./data/smart_workout_builder_rules_v2.9.0.json"),
     fetchOptionalJson("./data/smart_workout_day_templates_v2.9.0.json"),
     fetchOptionalJson("./data/smart_substitution_rules_v2.9.0.json"),
-    fetchOptionalJson("./data/smart_workout_builder_texts_v2.9.0.json")
+    fetchOptionalJson("./data/smart_workout_builder_texts_v2.9.0.json"),
+    fetchOptionalJson("./data/musclemapjs_dcoach_adapter_seed_v6.8.0.json"),
+    fetchOptionalJson("./data/musclemapjs_heatmap_v6.8.0.json"),
+    fetchOptionalJson("./data/production_muscle_map_config_v6.9.0.json"),
+    fetchOptionalJson("./data/production_muscle_map_adapter_rules_v6.9.0.json"),
+    fetchOptionalJson("./data/production_muscle_detail_schema_v6.9.0.json"),
+    fetchOptionalJson("./production/production_muscle_map_release_gate_v6.9.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -1168,6 +1186,12 @@ async function boot() {
   state.smartWorkoutDayTemplates = smartWorkoutDayTemplates;
   state.smartSubstitutionRules = smartSubstitutionRules;
   state.smartWorkoutBuilderTexts = smartWorkoutBuilderTexts;
+  state.muscleMapJsAdapterSeed = muscleMapJsAdapterSeed;
+  state.muscleMapJsHeatmap = muscleMapJsHeatmap;
+  state.productionMuscleMapConfig = productionMuscleMapConfig;
+  state.productionMuscleMapAdapterRules = productionMuscleMapAdapterRules;
+  state.productionMuscleDetailSchema = productionMuscleDetailSchema;
+  state.productionMuscleMapReleaseGate = productionMuscleMapReleaseGate;
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
@@ -3097,7 +3121,7 @@ function renderCoverageCard() {
 function renderMuscleMapScreen() {
   const mode = state.coverageMode || "week";
   const view = state.coverageView || "front";
-  const items = mode === "trend" ? premiumCoverageForSessions(sessionsSince(7)) : premiumCoverageForSessions(sessionsForCoverageMode(mode));
+  const items = productionCoverageItemsForMode(mode);
   const regions = premiumRegionsForView(view);
   const visibleItems = regions.map((region) => coverageItemByPremiumMuscle(items, region.muscleId));
   const selected = state.selectedMuscleId && visibleItems.some((item) => item.muscleId === state.selectedMuscleId)
@@ -3117,20 +3141,98 @@ function renderMuscleMapScreen() {
         ${[
           ["today", "Heute"],
           ["week", "Woche"],
-          ["month", "Monat"]
+          ["month", "Monat"],
+          ["trend", "Trend"]
         ].map(([id, label]) => `<button class="${mode === id ? "active" : ""}" data-coverage-mode="${id}">${label}</button>`).join("")}
       </div>
       <div class="coverage-switch compact">
         ${[["front", "Vorne"], ["back", "Hinten"]].map(([id, label]) => `<button class="${view === id ? "active" : ""}" data-coverage-view="${id}">${label}</button>`).join("")}
       </div>
       <article class="muscle-map-stage">
-        ${regions.length ? renderPremiumMuscleSvg(view, items, regions) : `<p class="muted">Muskelkarte konnte nicht geladen werden.</p>`}
+        ${productionMuscleMapEnabled() ? renderProductionMuscleMap(view, mode, items, visibleItems) : regions.length ? renderPremiumMuscleSvg(view, items, regions) : `<p class="muted">Muskelkarte konnte nicht geladen werden.</p>`}
       </article>
+      ${mode === "trend" ? renderCoverageTrend() : ""}
       <div class="coverage-list muscle-map-list" aria-label="Muskelgruppen">
         ${visibleItems.length ? visibleItems.map(renderCoverageRow).join("") : `<p class="muted">Keine Muskelregionen fuer diese Ansicht.</p>`}
       </div>
       ${selected ? renderCoverageDetail(selected) : `<article class="card"><p class="muted">Waehle einen Muskel fuer Details.</p></article>`}
     </section>
+  `;
+}
+
+function productionMuscleMapEnabled() {
+  const config = state.productionMuscleMapConfig;
+  if (!config?.enabledByDefault) return false;
+  if (new URLSearchParams(window.location.search).get("forceLegacyMuscleMap") === "1") return false;
+  const flag = config.featureFlag || "useProductionMuscleMap";
+  return currentUserSettings()[flag] !== false && Boolean(state.muscleMapJsAdapterSeed?.mappings?.length);
+}
+
+function productionCoverageItemsForMode(mode) {
+  if (mode === "today") return premiumCoverageForSessions(sessionsForToday());
+  if (mode === "month") return premiumCoverageForSessions(sessionsSince(30));
+  if (mode === "trend") return premiumTrendCoverageItems();
+  return premiumCoverageForSessions(sessionsSince(7));
+}
+
+function premiumTrendCoverageItems() {
+  const regions = state.premiumMuscleRegions?.regions || [];
+  return regions.map((region) => {
+    const history = premiumCoverageHistoryForMuscle(region.muscleId);
+    const activeWeeks = history.filter((week) => week.percent > 0);
+    const average = history.length ? Math.round(history.reduce((sum, week) => sum + Math.min(week.percent, 160), 0) / history.length) : 0;
+    const last = history[history.length - 1]?.percent || 0;
+    const previous = history[history.length - 2]?.percent || 0;
+    return {
+      muscleId: region.muscleId,
+      name: region.label,
+      points: average / 100,
+      percent: average,
+      isTarget: activeWeeks.length > 0,
+      group: region.group,
+      view: region.view,
+      trendDelta: last - previous
+    };
+  }).sort((a, b) => b.percent - a.percent || a.name.localeCompare(b.name));
+}
+
+function productionMuscleMapPayload(view, mode, items, visibleItems) {
+  const smart = smartCoachRecommendationSafe();
+  return {
+    version: "6.9.0",
+    view,
+    mode,
+    selectedMuscleId: state.selectedMuscleId || visibleItems[0]?.muscleId || null,
+    coverage: items.map((item) => ({
+      muscleId: item.muscleId,
+      name: item.name,
+      percent: item.percent,
+      trendDelta: item.trendDelta || 0
+    })),
+    adapter: state.muscleMapJsAdapterSeed,
+    heatmap: state.muscleMapJsHeatmap,
+    config: state.productionMuscleMapConfig,
+    coach: {
+      title: smart.title,
+      summary: smart.summary,
+      confidencePercent: smart.confidencePercent,
+      why: smart.why || [],
+      affectedMuscles: smart.affectedMuscles || []
+    }
+  };
+}
+
+function renderProductionMuscleMap(view, mode, items, visibleItems) {
+  window.dcoachProductionMuscleMapPayload = productionMuscleMapPayload(view, mode, items, visibleItems);
+  return `
+    <div class="production-muscle-map-shell" data-production-muscle-map>
+      <div class="production-muscle-map" data-production-muscle-map-canvas></div>
+      <div class="production-muscle-map-status" data-production-muscle-map-status>
+        <span class="badge blue">MuscleMapJS</span>
+        <span>${htmlesc(mode === "trend" ? "Trend" : mode === "today" ? "Heute" : mode === "month" ? "Monat" : "Woche")}</span>
+      </div>
+      <p class="quiet production-muscle-map-fallback" data-production-muscle-map-fallback hidden>Fallback: bisherige D-Coach-Muskelkarte wird verwendet.</p>
+    </div>
   `;
 }
 
@@ -6258,6 +6360,7 @@ function bindEvents() {
   if (isMuscleMapPrototypeRoute()) {
     mountMuscleMapJsPrototype();
   }
+  mountProductionMuscleMap();
 
   document.querySelector("[data-toggle-more-menu]")?.addEventListener("click", () => {
     state.moreMenuOpen = !state.moreMenuOpen;
@@ -6345,6 +6448,12 @@ function bindEvents() {
       state.selectedMuscleId = button.dataset.openCoverageMuscle;
       render();
     });
+  });
+
+  document.querySelector("[data-production-muscle-map]")?.addEventListener("dcoach-production-muscle-select", (event) => {
+    if (!event.detail?.dcoachMuscleId) return;
+    state.selectedMuscleId = event.detail.dcoachMuscleId;
+    render();
   });
 
   document.querySelector("[data-resume-workout]")?.addEventListener("click", resumeWorkoutDraft);
@@ -6730,6 +6839,25 @@ function mountMuscleMapJsPrototype() {
       const detail = document.querySelector("[data-prototype-detail]");
       if (detail) {
         detail.innerHTML = `<h3>Prototyp konnte nicht geladen werden</h3><p class="muted">${htmlesc(error?.message || String(error))}</p>`;
+      }
+    });
+}
+
+function mountProductionMuscleMap() {
+  const container = document.querySelector("[data-production-muscle-map]");
+  if (!container || !window.dcoachProductionMuscleMapPayload) return;
+  import("./production/production-muscle-map.js?v=6.9.0")
+    .then((module) => module.mountProductionMuscleMap(container, window.dcoachProductionMuscleMapPayload))
+    .catch((error) => {
+      logAppError(error?.message || error, "production-muscle-map");
+      const fallback = container.querySelector("[data-production-muscle-map-fallback]");
+      if (fallback) fallback.hidden = false;
+      const canvas = container.querySelector("[data-production-muscle-map-canvas]");
+      if (canvas) {
+        const view = state.coverageView || "front";
+        const items = productionCoverageItemsForMode(state.coverageMode || "week");
+        const regions = premiumRegionsForView(view);
+        canvas.innerHTML = regions.length ? renderPremiumMuscleSvg(view, items, regions) : `<p class="muted">Muskelkarte konnte nicht geladen werden.</p>`;
       }
     });
 }

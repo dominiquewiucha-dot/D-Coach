@@ -1,0 +1,11 @@
+{
+  "version": "6.9.0",
+  "type": "production_muscle_map_adapter_rules",
+  "rules": [
+    "verify source IDs",
+    "never persist external IDs",
+    "map unsupported subregions to group",
+    "keep bilateral paths separate visually but shared logically",
+    "log unmapped regions"
+  ]
+}

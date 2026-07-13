@@ -1,0 +1,19 @@
+{
+  "version": "6.9.0",
+  "type": "production_muscle_detail_schema",
+  "fields": [
+    "dcoachMuscleId",
+    "label",
+    "todayPercent",
+    "weekPercent",
+    "monthPercent",
+    "trend",
+    "targetPercent",
+    "primaryExerciseContributors",
+    "secondaryExerciseContributors",
+    "coachRecommendation",
+    "why",
+    "confidencePercent",
+    "riskNotes"
+  ]
+}

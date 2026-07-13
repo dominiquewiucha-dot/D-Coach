@@ -1,0 +1,16 @@
+{
+  "version": "6.9.0",
+  "type": "production_muscle_map_release_gate",
+  "required": [
+    "v6.8 visual approval",
+    "license documented",
+    "source IDs verified",
+    "adapter complete",
+    "fallback works",
+    "offline works",
+    "navigation stable",
+    "responsive screenshots approved",
+    "smart coach regression passed",
+    "training regression passed"
+  ]
+}
