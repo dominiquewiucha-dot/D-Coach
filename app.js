@@ -157,6 +157,7 @@ const state = {
   productionMuscleMapAdapterRules: null,
   productionMuscleDetailSchema: null,
   productionMuscleMapReleaseGate: null,
+  lifeFitnessScannerConfig: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -169,6 +170,16 @@ const state = {
   coverageView: "front",
   selectedMuscleId: null,
   moreMenuOpen: false,
+  equipmentScanner: {
+    active: false,
+    rawCode: "",
+    normalizedCode: "",
+    status: "idle",
+    error: "",
+    search: "",
+    selectedExerciseId: "",
+    mappingId: ""
+  },
   isOnline: navigator.onLine,
   deferredInstallPrompt: null,
   restTimer: {
@@ -178,13 +189,14 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v59";
+const APP_VERSION = "pwa-v62";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
   { key: "dcoach.journalEntries", label: "Journal", type: "array" },
   { key: "dcoach.machineSettings", label: "Geraete", type: "array" },
+  { key: "dcoach.scannedEquipmentMappings", label: "Geraetezuordnungen", type: "array" },
   { key: "dcoach.activePlanName", label: "Aktiver Plan", type: "string" },
   { key: "dcoach.archivedPlanNames", label: "Archivierte Plaene", type: "array" },
   { key: "dcoach.deletedPlanNames", label: "Geloeschte Plaene", type: "array" },
@@ -225,6 +237,12 @@ const storage = {
   },
   set machineSettings(value) {
     writeJson("dcoach.machineSettings", value);
+  },
+  get scannedEquipmentMappings() {
+    return readJson("dcoach.scannedEquipmentMappings", []);
+  },
+  set scannedEquipmentMappings(value) {
+    writeJson("dcoach.scannedEquipmentMappings", Array.isArray(value) ? value : []);
   },
   get activePlanName() {
     return localStorage.getItem("dcoach.activePlanName") || null;
@@ -396,7 +414,7 @@ function openDCoachIndexedDb() {
     const request = indexedDB.open("DCoachLocal", 1);
     request.onupgradeneeded = () => {
       const db = request.result;
-      ["sessions", "weights", "journalEntries", "machineSettings", "meta"].forEach((name) => {
+      ["sessions", "weights", "journalEntries", "machineSettings", "scannedEquipmentMappings", "meta"].forEach((name) => {
         if (!db.objectStoreNames.contains(name)) {
           db.createObjectStore(name, { keyPath: "id" });
         }
@@ -432,6 +450,19 @@ function mergeByKey(existing = [], incoming = [], key) {
   const map = new Map();
   existing.forEach((item) => map.set(item[key], item));
   incoming.forEach((item) => map.set(item[key], { ...(map.get(item[key]) || {}), ...item }));
+  return [...map.values()];
+}
+
+function mergeScannedEquipmentMappings(existing = [], incoming = []) {
+  const map = new Map();
+  existing.forEach((item) => {
+    const key = item.normalizedCode || normalizeScannedEquipmentCode(item.rawCode) || item.id || JSON.stringify(item);
+    map.set(key, item);
+  });
+  incoming.forEach((item) => {
+    const key = item.normalizedCode || normalizeScannedEquipmentCode(item.rawCode) || item.id || JSON.stringify(item);
+    map.set(key, { ...(map.get(key) || {}), ...item, normalizedCode: item.normalizedCode || normalizeScannedEquipmentCode(item.rawCode) });
+  });
   return [...map.values()];
 }
 
@@ -863,7 +894,8 @@ async function boot() {
     productionMuscleMapConfig,
     productionMuscleMapAdapterRules,
     productionMuscleDetailSchema,
-    productionMuscleMapReleaseGate
+    productionMuscleMapReleaseGate,
+    lifeFitnessScannerConfig
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -1033,7 +1065,8 @@ async function boot() {
     fetchOptionalJson("./data/production_muscle_map_config_v6.9.0.json"),
     fetchOptionalJson("./data/production_muscle_map_adapter_rules_v6.9.0.json"),
     fetchOptionalJson("./data/production_muscle_detail_schema_v6.9.0.json"),
-    fetchOptionalJson("./production/production_muscle_map_release_gate_v6.9.0.json")
+    fetchOptionalJson("./production/production_muscle_map_release_gate_v6.9.0.json"),
+    fetchOptionalJson("./data/life_fitness_scanner_config_v6.11.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -1192,6 +1225,7 @@ async function boot() {
   state.productionMuscleMapAdapterRules = productionMuscleMapAdapterRules;
   state.productionMuscleDetailSchema = productionMuscleDetailSchema;
   state.productionMuscleMapReleaseGate = productionMuscleMapReleaseGate;
+  state.lifeFitnessScannerConfig = lifeFitnessScannerConfig;
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
@@ -1206,6 +1240,9 @@ async function boot() {
   bindWorkoutIntegrityEvents();
   restoreWorkoutDraft();
   startTimerLoop();
+  if ("scrollRestoration" in window.history) {
+    window.history.scrollRestoration = "manual";
+  }
   state.tab = tabFromHash() || state.tab;
   render();
 }
@@ -1222,12 +1259,7 @@ function bindPwaEvents() {
   window.addEventListener("hashchange", () => {
     const tab = tabFromHash();
     if (!tab || tab === state.tab) return;
-    state.tab = tab;
-    state.activeWorkout = null;
-    state.selectedExerciseId = null;
-    state.selectedSessionId = null;
-    state.moreMenuOpen = false;
-    render();
+    navigateTo(tab, { updateHash: false });
   });
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
@@ -1331,24 +1363,44 @@ function updateRestTimerDisplay() {
 }
 
 function resetPageScroll() {
-  requestAnimationFrame(() => {
+  const reset = () => {
     document.activeElement?.blur?.();
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-  });
+    const appContent = document.getElementById("app-content");
+    if (appContent && appContent !== document.scrollingElement) {
+      appContent.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
+  };
+  requestAnimationFrame(() => requestAnimationFrame(reset));
 }
 
-function navigateToTab(tab) {
+function navigateTo(tab, options = {}) {
+  const {
+    scroll = "top",
+    updateHash = true,
+    resetSelection = true
+  } = options;
   persistWorkoutDraft();
+  if (state.tab === "machines" && tab !== "machines") {
+    stopEquipmentScannerCamera();
+    state.equipmentScanner = { ...state.equipmentScanner, active: false, status: "idle", error: "" };
+  }
   state.tab = tab;
-  state.activeWorkout = null;
-  state.selectedExerciseId = null;
-  state.selectedSessionId = null;
+  if (resetSelection) {
+    state.activeWorkout = null;
+    state.selectedExerciseId = null;
+    state.selectedSessionId = null;
+  }
   state.moreMenuOpen = false;
-  if (window.location.hash !== `#${state.tab}`) window.history.replaceState(null, "", `#${state.tab}`);
+  if (updateHash && window.location.hash !== `#${state.tab}`) window.history.replaceState(null, "", `#${state.tab}`);
   render();
-  resetPageScroll();
+  if (scroll === "top") resetPageScroll();
+}
+
+function navigateToTab(tab, options = {}) {
+  navigateTo(tab, options);
 }
 
 function activePlan() {
@@ -1691,6 +1743,187 @@ function machineSettingsForExercise(exerciseId) {
 
 function latestMachineSetting(exerciseId) {
   return machineSettingsForExercise(exerciseId)[0] || null;
+}
+
+function latestScannedEquipmentMappingForExercise(exerciseId) {
+  return storage.scannedEquipmentMappings
+    .filter((item) => item.exerciseId === exerciseId)
+    .sort((a, b) => new Date(b.lastUsedAt || b.updatedAt || 0) - new Date(a.lastUsedAt || a.updatedAt || 0))[0] || null;
+}
+
+function normalizeScannedEquipmentCode(rawCode) {
+  const original = String(rawCode || "").trim();
+  if (!original) return "";
+  try {
+    const url = new URL(original);
+    url.hash = "";
+    url.protocol = url.protocol.toLowerCase();
+    url.hostname = url.hostname.toLowerCase();
+    ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "fbclid", "gclid"].forEach((key) => {
+      url.searchParams.delete(key);
+    });
+    const params = [...url.searchParams.entries()].sort(([a], [b]) => a.localeCompare(b));
+    url.search = "";
+    params.forEach(([key, value]) => url.searchParams.append(key, value));
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return original.replace(/\s+/g, " ").toUpperCase();
+  }
+}
+
+function scannedEquipmentMappingForCode(rawCode) {
+  const normalizedCode = normalizeScannedEquipmentCode(rawCode);
+  if (!normalizedCode) return null;
+  return storage.scannedEquipmentMappings.find((item) => item.normalizedCode === normalizedCode) || null;
+}
+
+function scannerCandidateExercises() {
+  const search = state.equipmentScanner.search.trim().toLowerCase();
+  return allExercises()
+    .filter((exercise) => !exercise.isArchived)
+    .filter((exercise) => {
+      if (!search) return true;
+      return `${exercise.displayName} ${exercise.category} ${(exercise.equipment || []).join(" ")}`.toLowerCase().includes(search);
+    })
+    .sort((a, b) => {
+      const aMachine = String(a.category || "").toLowerCase().includes("maschine") || (a.equipment || []).some((item) => String(item).toLowerCase().includes("maschine"));
+      const bMachine = String(b.category || "").toLowerCase().includes("maschine") || (b.equipment || []).some((item) => String(item).toLowerCase().includes("maschine"));
+      return Number(bMachine) - Number(aMachine) || a.displayName.localeCompare(b.displayName, "de");
+    })
+    .slice(0, 20);
+}
+
+function applyScannedEquipmentCode(rawCode) {
+  const normalizedCode = normalizeScannedEquipmentCode(rawCode);
+  if (!normalizedCode) {
+    state.equipmentScanner = { ...state.equipmentScanner, rawCode: rawCode || "", normalizedCode: "", status: "invalid", error: "Kein gueltiger Code erkannt." };
+    return;
+  }
+  const known = scannedEquipmentMappingForCode(rawCode);
+  state.equipmentScanner = {
+    ...state.equipmentScanner,
+    rawCode: String(rawCode || "").trim(),
+    normalizedCode,
+    status: known ? "known" : "unknown",
+    error: "",
+    selectedExerciseId: known?.exerciseId || state.equipmentScanner.selectedExerciseId || "",
+    mappingId: known?.id || ""
+  };
+  if (known) {
+    known.lastUsedAt = new Date().toISOString();
+    storage.scannedEquipmentMappings = [...storage.scannedEquipmentMappings.filter((item) => item.id !== known.id), known];
+    applyScannedEquipmentMappingToActiveWorkout(known);
+  }
+}
+
+function applyScannedEquipmentMappingToEntry(entry, mapping) {
+  if (!entry || !mapping) return;
+  entry.seatPosition = mapping.seatPosition || entry.seatPosition || "";
+  entry.gripPosition = mapping.gripPosition || entry.gripPosition || "";
+  entry.gripWidth = mapping.gripWidth || entry.gripWidth || "";
+  entry.attachment = mapping.attachment || entry.attachment || "";
+  entry.machineLabel = mapping.machineLabel || entry.machineLabel || "";
+  entry.machineSerial = mapping.machineSerial || entry.machineSerial || "";
+}
+
+function applyScannedEquipmentMappingToActiveWorkout(mapping) {
+  const workout = state.activeWorkout;
+  if (!workout || !mapping?.exerciseId) return false;
+  const targetIndex = workout.entries.findIndex((entry) => entry.exerciseId === mapping.exerciseId);
+  if (targetIndex < 0) return false;
+  const currentEntry = workout.entries[workout.index];
+  if (targetIndex !== workout.index && !handleIncompleteSetsBeforeLeaving(currentEntry)) return false;
+  workout.index = targetIndex;
+  applyScannedEquipmentMappingToEntry(workout.entries[targetIndex], mapping);
+  persistWorkoutDraft();
+  return true;
+}
+
+function saveScannedEquipmentMapping() {
+  const scanner = state.equipmentScanner;
+  const exercise = exerciseById(scanner.selectedExerciseId);
+  if (!scanner.normalizedCode) throw new Error("Bitte zuerst einen Code scannen oder eingeben.");
+  if (!exercise) throw new Error("Bitte eine Uebung auswaehlen.");
+  const existing = scannedEquipmentMappingForCode(scanner.rawCode);
+  const now = new Date().toISOString();
+  const equipmentText = `${exercise.displayName} ${exercise.category} ${(exercise.equipment || []).join(" ")}`.toLowerCase();
+  const equipmentType = equipmentText.includes("laufband") || equipmentText.includes("fahrrad") || equipmentText.includes("bike") || equipmentText.includes("cardio") || equipmentText.includes("crosstrainer") || equipmentText.includes("ruderg") || equipmentText.includes("stepper") ? "warmup" : "strength";
+  const mapping = {
+    id: existing?.id || scanner.mappingId || (crypto.randomUUID ? crypto.randomUUID() : `life-fitness-${Date.now()}`),
+    normalizedCode: scanner.normalizedCode,
+    rawCode: scanner.rawCode,
+    brand: "Life Fitness",
+    exerciseId: exercise.id,
+    exerciseNameSnapshot: exercise.displayName,
+    studioName: document.querySelector("[data-scanner-field='studioName']")?.value.trim() || existing?.studioName || "",
+    machineLabel: document.querySelector("[data-scanner-field='machineLabel']")?.value.trim() || existing?.machineLabel || "",
+    machineSerial: document.querySelector("[data-scanner-field='machineSerial']")?.value.trim() || existing?.machineSerial || "",
+    equipmentType,
+    seatPosition: document.querySelector("[data-scanner-field='seatPosition']")?.value.trim() || existing?.seatPosition || "",
+    gripPosition: document.querySelector("[data-scanner-field='gripPosition']")?.value.trim() || existing?.gripPosition || "",
+    gripWidth: document.querySelector("[data-scanner-field='gripWidth']")?.value.trim() || existing?.gripWidth || "",
+    attachment: document.querySelector("[data-scanner-field='attachment']")?.value.trim() || existing?.attachment || "",
+    note: document.querySelector("[data-scanner-field='note']")?.value.trim() || existing?.note || "",
+    createdAt: existing?.createdAt || now,
+    updatedAt: now,
+    lastUsedAt: now
+  };
+  storage.scannedEquipmentMappings = [...storage.scannedEquipmentMappings.filter((item) => item.normalizedCode !== mapping.normalizedCode), mapping];
+  if (state.activeWorkout) applyScannedEquipmentMappingToActiveWorkout(mapping);
+  state.equipmentScanner = { ...state.equipmentScanner, status: "known", mappingId: mapping.id };
+  return mapping;
+}
+
+async function stopEquipmentScannerCamera() {
+  const stream = window.dcoachEquipmentScannerStream;
+  if (stream) stream.getTracks().forEach((track) => track.stop());
+  window.dcoachEquipmentScannerStream = null;
+  window.dcoachEquipmentScannerLoop = null;
+}
+
+async function startEquipmentScannerCamera() {
+  state.equipmentScanner = { ...state.equipmentScanner, active: true, status: "camera", error: "" };
+  render();
+  if (!("mediaDevices" in navigator) || !navigator.mediaDevices.getUserMedia) {
+    state.equipmentScanner = { ...state.equipmentScanner, status: "manual", error: "Kamera ist nicht verfuegbar. Bitte Code manuell eingeben." };
+    render();
+    return;
+  }
+  if (!("BarcodeDetector" in window)) {
+    state.equipmentScanner = { ...state.equipmentScanner, status: "manual", error: "BarcodeDetector ist hier nicht verfuegbar. Bitte Code manuell eingeben." };
+    render();
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+    window.dcoachEquipmentScannerStream = stream;
+    const video = document.querySelector("[data-equipment-scanner-video]");
+    if (!video) return;
+    video.srcObject = stream;
+    await video.play();
+    const detector = new window.BarcodeDetector({ formats: ["qr_code", "code_128", "code_39", "ean_13", "ean_8"] });
+    const scan = async () => {
+      if (!window.dcoachEquipmentScannerStream || state.equipmentScanner.status !== "camera") return;
+      try {
+        const codes = await detector.detect(video);
+        const rawValue = codes[0]?.rawValue || "";
+        if (rawValue) {
+          await stopEquipmentScannerCamera();
+          applyScannedEquipmentCode(rawValue);
+          render();
+          return;
+        }
+      } catch (error) {
+        logAppError(error.message || "Scanner-Komponente nicht initialisiert", "equipment-scanner");
+      }
+      window.dcoachEquipmentScannerLoop = window.requestAnimationFrame(scan);
+    };
+    window.dcoachEquipmentScannerLoop = window.requestAnimationFrame(scan);
+  } catch (error) {
+    state.equipmentScanner = { ...state.equipmentScanner, status: "manual", error: "Kamerazugriff nicht moeglich. Bitte Code manuell eingeben." };
+    logAppError(error.message || "Kamera verweigert", "equipment-scanner");
+    render();
+  }
 }
 
 function lastSession() {
@@ -3066,8 +3299,8 @@ function exerciseKnowledge(exercise) {
 
 function render() {
   document.getElementById("app").innerHTML = `
-    <div class="app-shell">
-      <main class="app-content">
+    <div id="app-shell" class="app-shell">
+      <main id="app-content" class="app-content">
         ${renderRoute()}
       </main>
       ${renderPremiumTabs()}
@@ -3167,7 +3400,7 @@ function renderPremiumTabs() {
   ];
   const tabIsActive = (id) => state.tab === id && !state.activeWorkout && !state.selectedExerciseId && !state.selectedSessionId;
   return `
-    <nav class="bottom-nav tabs" aria-label="Hauptnavigation">
+    <nav id="bottom-nav" class="bottom-nav tabs" aria-label="Hauptnavigation">
       ${primaryTabs.map(([id, label, icon]) => `
         <button class="tab ${tabIsActive(id) ? "active" : ""}" data-tab="${id}">
           <span class="tab-icon">${icon}</span>
@@ -5516,10 +5749,17 @@ function lastWarmupDefaults() {
   return warmups[warmups.length - 1] || null;
 }
 
+function latestWarmupEquipmentMapping() {
+  return storage.scannedEquipmentMappings
+    .filter((item) => String(item.equipmentType || "").toLowerCase() === "warmup" || String(item.equipmentType || "").toLowerCase() === "cardio")
+    .sort((a, b) => new Date(b.lastUsedAt || b.updatedAt || 0) - new Date(a.lastUsedAt || a.updatedAt || 0))[0] || null;
+}
+
 function askWarmupBeforeWorkout() {
   if (!confirm("Moechtest du dich vorher aufwaermen?")) return null;
   const last = lastWarmupDefaults();
-  const equipment = prompt("Warm-up Geraet: Laufband / Fahrrad / Crosstrainer / Rudergeraet / Stepper / Sonstiges", last?.equipment || "Fahrrad");
+  const scanned = latestWarmupEquipmentMapping();
+  const equipment = prompt("Warm-up Geraet: Laufband / Fahrrad / Crosstrainer / Rudergeraet / Stepper / Sonstiges", scanned?.machineLabel || last?.equipment || "Fahrrad");
   if (equipment === null) return null;
   const minutesText = prompt("Warm-up Dauer in Minuten", last?.durationMinutes ? String(last.durationMinutes) : "8");
   if (minutesText === null) return null;
@@ -5533,6 +5773,8 @@ function askWarmupBeforeWorkout() {
     durationMinutes,
     intensity: ["leicht", "mittel", "hoch"].includes(intensity.trim()) ? intensity.trim() : "",
     note: note.trim(),
+    equipmentMappingId: scanned?.id || "",
+    equipmentType: scanned ? (scanned.equipmentType || "warmup") : "warmup",
     startedAt: new Date().toISOString(),
     completedAt: new Date().toISOString(),
     completed: true
@@ -5542,16 +5784,19 @@ function askWarmupBeforeWorkout() {
 function workoutEntryFromPlanned(planned) {
   const last = lastCompletedExercise(planned.exerciseId);
   const setting = latestMachineSetting(planned.exerciseId);
+  const scannedMapping = latestScannedEquipmentMappingForExercise(planned.exerciseId);
   return {
     exerciseId: planned.exerciseId,
     reps: planned.reps,
     restSeconds: planned.restSeconds,
     priority: planned.priority,
     sortOrder: planned.sortOrder,
-    seatPosition: setting?.seatPosition || "",
-    gripPosition: setting?.gripPosition || setting?.handlePosition || "",
-    gripWidth: setting?.gripWidth || "",
-    attachment: setting?.attachment || "",
+    seatPosition: scannedMapping?.seatPosition || setting?.seatPosition || "",
+    gripPosition: scannedMapping?.gripPosition || setting?.gripPosition || setting?.handlePosition || "",
+    gripWidth: scannedMapping?.gripWidth || setting?.gripWidth || "",
+    attachment: scannedMapping?.attachment || setting?.attachment || "",
+    machineLabel: scannedMapping?.machineLabel || "",
+    machineSerial: scannedMapping?.machineSerial || "",
     exerciseNote: "",
     sets: Array.from({ length: Math.max(planned.sets, 1) }, (_, index) => {
       const previous = last?.exercise?.sets?.find((set) => set.setNumber === index + 1);
@@ -5629,6 +5874,7 @@ function renderWorkout() {
   const progress = Math.round(((workout.index + 1) / workout.entries.length) * 100);
   const alternatives = alternativeCandidatesForExercise(exercise);
   const machineSetting = latestMachineSetting(exercise.id);
+  const scannedMapping = latestScannedEquipmentMappingForExercise(exercise.id);
   return `
     <section class="screen stack">
       <header>
@@ -5643,9 +5889,14 @@ function renderWorkout() {
         <p class="muted">${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].slice(0, 3).join(" · "))}</p>
         <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} <span class="badge blue">${htmlesc(entry.reps)} Wdh.</span> <span class="badge">${entry.restSeconds} s Pause</span></div>
         ${machineSetting ? `<p class="quiet">Setup: Sitz ${htmlesc(machineSetting.seatPosition || "-")} · Griff ${htmlesc(machineSetting.handlePosition || "-")} · Ruecken ${htmlesc(machineSetting.backrestPosition || "-")}</p>` : ""}
+        ${scannedMapping ? `<p class="quiet">Life Fitness: ${htmlesc(scannedMapping.machineLabel || scannedMapping.machineSerial || "Zuordnung gespeichert")} - Sitz ${htmlesc(entry.seatPosition || "-")} - Griff ${htmlesc(entry.gripPosition || "-")}</p>` : ""}
         ${exerciseIsCritical(exercise) ? `<p class="warning compact-warning">${lwsWarning(exercise)}</p>` : ""}
-        <button class="secondary" data-workout-exercise-detail="${htmlesc(exercise.id)}">Details ansehen</button>
+        <div class="button-grid">
+          <button class="secondary" data-workout-exercise-detail="${htmlesc(exercise.id)}">Details ansehen</button>
+          <button class="secondary" data-workout-equipment-scan>Geraet scannen</button>
+        </div>
       </article>
+      ${state.equipmentScanner.active ? renderWorkoutScannerPanel() : ""}
       <article class="card stack">
         <h3>Letzte Leistung</h3>
         ${last ? `
@@ -5681,6 +5932,33 @@ function renderWorkoutWarmupSummary(workout) {
   `;
 }
 
+function renderWorkoutScannerPanel() {
+  return `
+    <article class="card stack equipment-scanner-card">
+      <div class="row">
+        <h3 class="grow">Geraet scannen</h3>
+        <span class="badge blue">Training</span>
+      </div>
+      <p class="muted">Der aktuelle Satz wird nicht automatisch abgeschlossen.</p>
+      ${state.equipmentScanner.status === "camera" ? `
+        <div class="scanner-video-wrap">
+          <video playsinline muted data-equipment-scanner-video></video>
+        </div>
+      ` : ""}
+      ${state.equipmentScanner.error ? `<p class="quiet">${htmlesc(state.equipmentScanner.error)}</p>` : ""}
+      <div class="button-grid">
+        <button class="primary" data-start-equipment-scan>Kamera oeffnen</button>
+        <button class="secondary" data-stop-equipment-scan>Scanner schliessen</button>
+      </div>
+      <div class="row">
+        <input class="input grow" placeholder="Code oder URL manuell eingeben" value="${htmlesc(state.equipmentScanner.rawCode)}" data-manual-equipment-code>
+        <button class="secondary compact-button" data-apply-manual-equipment-code>Pruefen</button>
+      </div>
+      ${renderEquipmentScannerResult()}
+    </article>
+  `;
+}
+
 function renderExerciseSetupFields(entry) {
   return `
     <article class="card stack">
@@ -5690,6 +5968,8 @@ function renderExerciseSetupFields(entry) {
         <label>Griff<input class="input" value="${htmlesc(entry.gripPosition || "")}" placeholder="neutral, proniert, oberer Griff" data-entry-field="gripPosition"></label>
         <label>Griffbreite<input class="input" value="${htmlesc(entry.gripWidth || "")}" placeholder="eng, mittel, breit" data-entry-field="gripWidth"></label>
         <label>Aufsatz<input class="input" value="${htmlesc(entry.attachment || "")}" placeholder="Seil, V-Griff, Stange" data-entry-field="attachment"></label>
+        <label>Geraet<input class="input" value="${htmlesc(entry.machineLabel || "")}" placeholder="z.B. Brustpresse Fenster" data-entry-field="machineLabel"></label>
+        <label>Geraetenummer<input class="input" value="${htmlesc(entry.machineSerial || "")}" placeholder="z.B. 12" data-entry-field="machineSerial"></label>
       </div>
       <textarea class="input area" placeholder="Notiz zu Uebung oder Training ..." data-entry-field="exerciseNote">${htmlesc(entry.exerciseNote || "")}</textarea>
       <textarea class="input area" placeholder="Notiz zum Training ..." data-workout-field="sessionNote">${htmlesc(state.activeWorkout?.sessionNote || "")}</textarea>
@@ -5853,6 +6133,8 @@ function rememberExerciseSetup(entry) {
     gripPosition: entry.gripPosition || "",
     gripWidth: entry.gripWidth || "",
     attachment: entry.attachment || "",
+    machineLabel: entry.machineLabel || "",
+    machineSerial: entry.machineSerial || "",
     backrestPosition: current?.backrestPosition || "",
     note: current?.note || "",
     updatedAt: new Date().toISOString()
@@ -5932,8 +6214,7 @@ function finishOrNext() {
   state.restTimer.remaining = 0;
   state.restTimer.running = false;
   state.selectedSessionId = session.id;
-  state.tab = "coach";
-  render();
+  navigateTo("coach", { resetSelection: false });
 }
 
 function renderSessionDetail(id) {
@@ -6421,12 +6702,144 @@ function renderProfileShortcuts() {
   `;
 }
 
+function renderScannerExercisePicker() {
+  const candidates = scannerCandidateExercises();
+  return `
+    <div class="stack">
+      <input class="input" placeholder="Uebung suchen" value="${htmlesc(state.equipmentScanner.search)}" data-scanner-search>
+      <div class="scanner-exercise-list">
+        ${candidates.map((exercise) => `
+          <button class="scanner-exercise-option ${state.equipmentScanner.selectedExerciseId === exercise.id ? "active" : ""}" data-scanner-exercise="${htmlesc(exercise.id)}">
+            <strong>${htmlesc(exercise.displayName)}</strong>
+            <span>${htmlesc(exerciseListMuscleText(exercise))}</span>
+          </button>
+        `).join("") || `<p class="muted">Keine passende Uebung gefunden.</p>`}
+      </div>
+    </div>
+  `;
+}
+
+function renderEquipmentScannerResult() {
+  const scanner = state.equipmentScanner;
+  const mapping = scanner.mappingId ? storage.scannedEquipmentMappings.find((item) => item.id === scanner.mappingId) : null;
+  if (scanner.status === "known" && mapping) {
+    const exercise = exerciseById(mapping.exerciseId);
+    return `
+      <article class="scanner-result known stack">
+        <div class="row">
+          <h3 class="grow">Life Fitness erkannt</h3>
+          <span class="badge green">bekannt</span>
+        </div>
+        <p class="muted">${htmlesc(mapping.machineLabel || "Gespeichertes Geraet")}</p>
+        <div class="storage-table">
+          <div><span>Uebung</span><strong>${htmlesc(exercise?.displayName || mapping.exerciseNameSnapshot || mapping.exerciseId)}</strong></div>
+          <div><span>Sitz</span><strong>${htmlesc(mapping.seatPosition || "-")}</strong></div>
+          <div><span>Griff</span><strong>${htmlesc(mapping.gripPosition || "-")}</strong></div>
+          <div><span>Code</span><strong>${htmlesc(mapping.normalizedCode)}</strong></div>
+        </div>
+        <button class="primary" data-open-scanned-exercise="${htmlesc(mapping.exerciseId)}">Uebung oeffnen</button>
+        <button class="secondary" data-edit-scanned-mapping>Zuordnung bearbeiten</button>
+      </article>
+    `;
+  }
+  if (scanner.status === "unknown") {
+    const existing = scanner.mappingId ? storage.scannedEquipmentMappings.find((item) => item.id === scanner.mappingId) : null;
+    return `
+      <article class="scanner-result stack">
+        <div class="row">
+          <h3 class="grow">${existing ? "Life-Fitness-Zuordnung bearbeiten" : "Unbekanntes Life-Fitness-Geraet"}</h3>
+          <span class="badge amber">${existing ? "edit" : "neu"}</span>
+        </div>
+        <p class="quiet">Gescannt: ${htmlesc(scanner.rawCode)}</p>
+        <p class="quiet">Normalisiert: ${htmlesc(scanner.normalizedCode)}</p>
+        ${renderScannerExercisePicker()}
+        <div class="scanner-field-grid">
+          <input class="input" placeholder="Studio" value="${htmlesc(existing?.studioName || "")}" data-scanner-field="studioName">
+          <input class="input" placeholder="Geraetename" value="${htmlesc(existing?.machineLabel || "")}" data-scanner-field="machineLabel">
+          <input class="input" placeholder="Geraetenummer" value="${htmlesc(existing?.machineSerial || "")}" data-scanner-field="machineSerial">
+          <input class="input" placeholder="Sitzposition" value="${htmlesc(existing?.seatPosition || "")}" data-scanner-field="seatPosition">
+          <input class="input" placeholder="Griffposition" value="${htmlesc(existing?.gripPosition || "")}" data-scanner-field="gripPosition">
+          <input class="input" placeholder="Griffbreite" value="${htmlesc(existing?.gripWidth || "")}" data-scanner-field="gripWidth">
+          <input class="input" placeholder="Aufsatz" value="${htmlesc(existing?.attachment || "")}" data-scanner-field="attachment">
+          <input class="input" placeholder="Notiz" value="${htmlesc(existing?.note || "")}" data-scanner-field="note">
+        </div>
+        <button class="primary" data-save-scanned-mapping>Zuordnung speichern</button>
+      </article>
+    `;
+  }
+  if (scanner.status === "invalid") {
+    return `<p class="muted">${htmlesc(scanner.error)}</p>`;
+  }
+  return "";
+}
+
+function renderEquipmentScannerCard() {
+  const scanner = state.equipmentScanner;
+  const supportsCamera = "mediaDevices" in navigator && "BarcodeDetector" in window;
+  return `
+    <article class="card stack equipment-scanner-card">
+      <div class="row">
+        <h3 class="grow">Life-Fitness-Scanner</h3>
+        <span class="badge ${supportsCamera ? "green" : "amber"}">${supportsCamera ? "Kamera bereit" : "Manuell"}</span>
+      </div>
+      <p class="muted">Scan lokal. Keine Cloud, keine Bildspeicherung.</p>
+      ${scanner.status === "camera" ? `
+        <div class="scanner-video-wrap">
+          <video playsinline muted data-equipment-scanner-video></video>
+        </div>
+      ` : ""}
+      ${scanner.error ? `<p class="quiet">${htmlesc(scanner.error)}</p>` : ""}
+      <div class="button-grid">
+        <button class="primary" data-start-equipment-scan>Kamera oeffnen</button>
+        <button class="secondary" data-stop-equipment-scan>Scanner stoppen</button>
+      </div>
+      <div class="row">
+        <input class="input grow" placeholder="Code oder URL manuell eingeben" value="${htmlesc(scanner.rawCode)}" data-manual-equipment-code>
+        <button class="secondary compact-button" data-apply-manual-equipment-code>Pruefen</button>
+      </div>
+      ${renderEquipmentScannerResult()}
+    </article>
+  `;
+}
+
+function renderScannedEquipmentMappingsCard() {
+  const mappings = [...storage.scannedEquipmentMappings].sort((a, b) => new Date(b.lastUsedAt || b.updatedAt || 0) - new Date(a.lastUsedAt || a.updatedAt || 0));
+  return `
+    <article class="card stack">
+      <div class="row">
+        <h3 class="grow">Geraetezuordnungen</h3>
+        <span class="badge blue">${mappings.length}</span>
+      </div>
+      ${mappings.length ? mappings.map((mapping) => {
+        const exercise = exerciseById(mapping.exerciseId);
+        return `
+          <div class="scanner-mapping-row">
+            <button class="list-button grow" data-open-scanned-exercise="${htmlesc(mapping.exerciseId)}">
+              <div>
+                <strong>${htmlesc(mapping.machineLabel || mapping.exerciseNameSnapshot || exercise?.displayName || "Life Fitness")}</strong>
+                <p class="muted">${htmlesc(exercise?.displayName || mapping.exerciseId)} - ${htmlesc(mapping.normalizedCode)}</p>
+                <p class="quiet">Zuletzt genutzt: ${dateTimeText(mapping.lastUsedAt || mapping.updatedAt)}</p>
+              </div>
+            </button>
+            <div class="compact-actions">
+              <button class="secondary" data-load-scanned-mapping="${htmlesc(mapping.id)}">Bearbeiten</button>
+              <button class="danger" data-delete-scanned-mapping="${htmlesc(mapping.id)}">Loeschen</button>
+            </div>
+          </div>
+        `;
+      }).join("") : `<p class="muted">Noch keine gescannten Geraete gespeichert.</p>`}
+    </article>
+  `;
+}
+
 function renderMachines() {
   const settings = [...storage.machineSettings].sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
   return `
     <section class="screen stack">
       <button class="secondary" data-tab="settings">Zur\u00fcck zum Profil</button>
       <header><h1 class="title">Ger\u00e4te</h1><p class="subtitle">Sitz, Griff und Setup pro \u00dcbung.</p></header>
+      ${renderEquipmentScannerCard()}
+      ${renderScannedEquipmentMappingsCard()}
       <article class="card stack">
         <h3>Ger\u00e4teeinstellungen</h3>
         <p class="muted">Neue Werte speicherst du im Detail einer \u00dcbung oder direkt im Training.</p>
@@ -6573,7 +6986,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "6.7.0",
+    backupVersion: "6.11.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),
@@ -6585,6 +6998,7 @@ function createBackup() {
     weights: storage.weights,
     journalEntries: storage.journalEntries,
     machineSettings: storage.machineSettings,
+    scannedEquipmentMappings: storage.scannedEquipmentMappings,
     customPlans: storage.customPlans,
     customExercises: storage.customExercises,
     personalProfile: storage.personalProfile,
@@ -6649,6 +7063,7 @@ function importBackupFile(file) {
         `Gewichtseinträge: ${backup.weights.length}`,
         `Journal: ${Array.isArray(backup.journalEntries) ? backup.journalEntries.length : 0}`,
         `Geraeteeinstellungen: ${Array.isArray(backup.machineSettings) ? backup.machineSettings.length : 0}`,
+        `Geraetezuordnungen: ${Array.isArray(backup.scannedEquipmentMappings) ? backup.scannedEquipmentMappings.length : 0}`,
         "",
         "Die lokalen Daten werden zusammengefuehrt. Duplikate werden vermieden."
       ].join("\n");
@@ -6657,6 +7072,7 @@ function importBackupFile(file) {
       storage.weights = mergeById(storage.weights, backup.weights);
       storage.journalEntries = mergeById(storage.journalEntries, Array.isArray(backup.journalEntries) ? backup.journalEntries : []);
       storage.machineSettings = mergeById(storage.machineSettings, Array.isArray(backup.machineSettings) ? backup.machineSettings : []);
+      storage.scannedEquipmentMappings = mergeScannedEquipmentMappings(storage.scannedEquipmentMappings, Array.isArray(backup.scannedEquipmentMappings) ? backup.scannedEquipmentMappings : []);
       storage.customPlans = mergeById(storage.customPlans, Array.isArray(backup.customPlans) ? backup.customPlans : []);
       storage.customExercises = mergeById(storage.customExercises, Array.isArray(backup.customExercises) ? backup.customExercises : []);
       storage.coachFeedback = mergeById(storage.coachFeedback, Array.isArray(backup.coachFeedback) ? backup.coachFeedback : []);
@@ -6713,10 +7129,7 @@ function bindEvents() {
     const action = weekly.requiresConfirmation ? weekly.recommendedPlanAdjustment : summary.proposedPlanChange;
     const message = `${action}\n\nNoch wird kein Plan automatisch geaendert. Moechtest du den Vorschlag im Planbereich pruefen?`;
     if (!confirm(message)) return;
-    state.tab = "plans";
-    state.moreMenuOpen = false;
-    window.history.replaceState(null, "", "#plans");
-    render();
+    navigateTo("plans");
   }));
 
   document.querySelectorAll("[data-tab]").forEach((button) => {
@@ -6815,6 +7228,11 @@ function bindEvents() {
   document.querySelector("[data-workout-exercise-detail]")?.addEventListener("click", (event) => {
     persistWorkoutDraft();
     state.selectedExerciseId = event.currentTarget.dataset.workoutExerciseDetail;
+    render();
+  });
+  document.querySelector("[data-workout-equipment-scan]")?.addEventListener("click", () => {
+    persistWorkoutDraft();
+    state.equipmentScanner = { ...state.equipmentScanner, active: true, status: "manual", error: "", rawCode: "", normalizedCode: "", mappingId: "" };
     render();
   });
   document.querySelector("[data-toggle-alternatives]")?.addEventListener("click", () => {
@@ -6980,8 +7398,7 @@ function bindEvents() {
 
   document.querySelector("[data-back-exercises]")?.addEventListener("click", () => {
     state.selectedExerciseId = null;
-    state.tab = "exercises";
-    render();
+    navigateTo("exercises", { resetSelection: false });
   });
 
   document.querySelectorAll("[data-session-id]").forEach((button) => {
@@ -6994,16 +7411,14 @@ function bindEvents() {
 
   document.querySelector("[data-back-dashboard]")?.addEventListener("click", () => {
     state.selectedSessionId = null;
-    state.tab = "dashboard";
-    render();
+    navigateTo("dashboard", { resetSelection: false });
   });
 
   document.querySelector("[data-delete-session]")?.addEventListener("click", (event) => {
     if (!confirm("Training wirklich löschen?")) return;
     storage.sessions = storage.sessions.filter((session) => session.id !== event.currentTarget.dataset.deleteSession);
     state.selectedSessionId = null;
-    state.tab = "dashboard";
-    render();
+    navigateTo("dashboard", { resetSelection: false });
   });
 
   document.querySelector("[data-save-weight]")?.addEventListener("click", () => {
@@ -7089,6 +7504,84 @@ function bindEvents() {
     });
     storage.machineSettings = [...storage.machineSettings.filter((item) => item.id !== setting.id), setting];
     render();
+  });
+
+  document.querySelector("[data-start-equipment-scan]")?.addEventListener("click", () => {
+    startEquipmentScannerCamera();
+  });
+
+  document.querySelector("[data-stop-equipment-scan]")?.addEventListener("click", async () => {
+    await stopEquipmentScannerCamera();
+    state.equipmentScanner = { ...state.equipmentScanner, active: false, status: "idle", error: "" };
+    render();
+  });
+
+  document.querySelector("[data-manual-equipment-code]")?.addEventListener("input", (event) => {
+    state.equipmentScanner.rawCode = event.target.value;
+  });
+
+  document.querySelector("[data-apply-manual-equipment-code]")?.addEventListener("click", () => {
+    applyScannedEquipmentCode(document.querySelector("[data-manual-equipment-code]")?.value || "");
+    render();
+  });
+
+  document.querySelector("[data-scanner-search]")?.addEventListener("input", (event) => {
+    state.equipmentScanner.search = event.target.value;
+    render();
+  });
+
+  document.querySelectorAll("[data-scanner-exercise]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.equipmentScanner.selectedExerciseId = button.dataset.scannerExercise;
+      render();
+    });
+  });
+
+  document.querySelector("[data-save-scanned-mapping]")?.addEventListener("click", () => {
+    try {
+      saveScannedEquipmentMapping();
+      alert("Geraetezuordnung gespeichert.");
+      render();
+    } catch (error) {
+      alert(error.message || "Zuordnung konnte nicht gespeichert werden.");
+    }
+  });
+
+  document.querySelector("[data-edit-scanned-mapping]")?.addEventListener("click", () => {
+    state.equipmentScanner.status = "unknown";
+    render();
+  });
+
+  document.querySelector("[data-open-scanned-exercise]")?.addEventListener("click", (event) => {
+    stopEquipmentScannerCamera();
+    state.selectedExerciseId = event.currentTarget.dataset.openScannedExercise;
+    navigateTo("exercises", { resetSelection: false });
+  });
+
+  document.querySelectorAll("[data-load-scanned-mapping]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const mapping = storage.scannedEquipmentMappings.find((item) => item.id === button.dataset.loadScannedMapping);
+      if (!mapping) return;
+      state.equipmentScanner = {
+        ...state.equipmentScanner,
+        active: true,
+        rawCode: mapping.rawCode,
+        normalizedCode: mapping.normalizedCode,
+        status: "unknown",
+        error: "",
+        selectedExerciseId: mapping.exerciseId,
+        mappingId: mapping.id
+      };
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-delete-scanned-mapping]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!confirm("Geraetezuordnung wirklich loeschen?")) return;
+      storage.scannedEquipmentMappings = storage.scannedEquipmentMappings.filter((item) => item.id !== button.dataset.deleteScannedMapping);
+      render();
+    });
   });
 
   document.querySelectorAll("[data-export-backup]").forEach((button) => {

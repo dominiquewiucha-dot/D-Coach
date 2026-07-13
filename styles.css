@@ -32,10 +32,13 @@
 
 * { box-sizing: border-box; }
 
-html, body {
+html, body, #app, #app-shell {
   margin: 0;
   min-height: 100%;
   max-width: 100%;
+}
+
+html, body {
   overflow-x: hidden;
   overscroll-behavior-x: none;
   -webkit-overflow-scrolling: touch;
@@ -45,6 +48,7 @@ html, body {
 }
 
 body {
+  min-height: 100dvh;
   padding-top: env(safe-area-inset-top);
 }
 
@@ -73,15 +77,13 @@ select:focus-visible {
   width: 100%;
   max-width: 720px;
   margin: 0 auto;
-  min-height: 100vh;
   min-height: 100dvh;
 }
 
 .app-content {
-  min-height: 100vh;
   min-height: 100dvh;
   touch-action: pan-y;
-  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 18px);
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 24px);
 }
 
 .screen {
@@ -497,11 +499,13 @@ select:focus-visible {
   bottom: 0;
   inset-inline: 0;
   inset-block-end: 0;
-  z-index: 10;
+  z-index: 1000;
   display: flex;
   gap: 4px;
   min-height: var(--bottom-nav-height);
   padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  transform: none;
+  translate: none;
   background: rgba(8, 17, 31, .96);
   border-top: 1px solid var(--border);
   backdrop-filter: blur(16px);
@@ -682,6 +686,88 @@ select:focus-visible {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.25;
+}
+
+.equipment-scanner-card {
+  border-color: rgba(37,99,235,.55);
+}
+
+.scanner-video-wrap {
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--deep);
+}
+
+.scanner-video-wrap video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scanner-result {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--input);
+}
+
+.scanner-result.known {
+  border-color: rgba(16,185,129,.45);
+  background: rgba(16,185,129,.08);
+}
+
+.scanner-field-grid,
+.scanner-exercise-list {
+  display: grid;
+  gap: 8px;
+}
+
+.scanner-field-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.scanner-exercise-option {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  min-height: 56px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  color: var(--text);
+  background: var(--card);
+  text-align: left;
+}
+
+.scanner-exercise-option.active {
+  border-color: var(--blue);
+  background: var(--selected);
+}
+
+.scanner-exercise-option span {
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.scanner-mapping-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: stretch;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+}
+
+.compact-button {
+  width: auto;
+  min-width: 96px;
 }
 
 .input {
@@ -1653,6 +1739,8 @@ select:focus-visible {
   .title { font-size: 30px; }
   .muscle-grid { grid-template-columns: 1fr; }
   .profile-shortcut-grid { grid-template-columns: 1fr; }
+  .scanner-field-grid { grid-template-columns: 1fr; }
+  .scanner-mapping-row { grid-template-columns: 1fr; }
   .muscle-map-list { grid-template-columns: 1fr; }
   .body-map-grid { grid-template-columns: 1fr; }
   .mini-grid { grid-template-columns: 1fr; }
