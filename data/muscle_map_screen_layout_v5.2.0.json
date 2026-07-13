@@ -1,0 +1,14 @@
+{
+  "version": "5.2.0",
+  "type": "muscle_map_screen_layout",
+  "order": [
+    "periodSelector",
+    "frontBackToggle",
+    "largeBodyMap",
+    "overallCoverage",
+    "selectedMuscleSummary",
+    "muscleList",
+    "detailSheet"
+  ],
+  "rule": "Body map is the visual centerpiece, not a small card thumbnail."
+}

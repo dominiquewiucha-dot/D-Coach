@@ -490,7 +490,6 @@ select:focus-visible {
   gap: 4px;
   flex: 1 1 0;
   min-width: 0;
-  max-width: 20%;
   min-height: 56px;
   border-radius: var(--radius-sm);
   padding: 0;
@@ -751,6 +750,30 @@ select:focus-visible {
   min-height: 220px;
 }
 
+.muscle-map-screen {
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 28px);
+}
+
+.screen-header-row {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.muscle-map-stage {
+  min-height: 390px;
+  border: 1px solid rgba(96,165,250,.24);
+  border-radius: var(--radius-lg);
+  padding: 10px;
+  background: radial-gradient(circle at center 34%, rgba(37,99,235,.14), rgba(8,17,31,.86) 68%);
+  overflow: hidden;
+}
+
+.muscle-map-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .coverage-body-map img {
   width: 100%;
   max-height: 260px;
@@ -788,6 +811,50 @@ select:focus-visible {
 .interactive-muscle-map.premium {
   max-width: 330px;
   padding: 4px;
+}
+
+.interactive-muscle-map.premium.inline {
+  max-width: 360px;
+  min-height: 360px;
+}
+
+.muscle-map-stage .interactive-muscle-map.premium.inline {
+  max-width: 420px;
+  min-height: 390px;
+}
+
+.premium-body-svg {
+  display: block;
+  width: 100%;
+  min-height: 360px;
+  max-height: 520px;
+}
+
+.premium-body-base {
+  fill: #202a37;
+  stroke: rgba(167,176,190,.34);
+  stroke-width: 1.5;
+}
+
+.premium-svg-region {
+  cursor: pointer;
+  stroke: rgba(255,255,255,.28);
+  stroke-width: 1.4;
+  transition: opacity .15s ease, stroke-width .15s ease, filter .15s ease;
+}
+
+.premium-svg-region:hover,
+.premium-svg-region:focus-visible {
+  opacity: 1;
+  stroke: rgba(255,255,255,.86);
+  stroke-width: 2.5;
+  outline: none;
+}
+
+.premium-svg-region.selected {
+  opacity: 1;
+  stroke: #ffffff;
+  stroke-width: 3.2;
 }
 
 .interactive-muscle-map.premium img {
@@ -1305,6 +1372,7 @@ select:focus-visible {
   .screen { padding-left: 12px; padding-right: 12px; }
   .title { font-size: 30px; }
   .muscle-grid { grid-template-columns: 1fr; }
+  .muscle-map-list { grid-template-columns: 1fr; }
   .body-map-grid { grid-template-columns: 1fr; }
   .mini-grid { grid-template-columns: 1fr; }
   .set-row { grid-template-columns: 24px 1fr 1fr 54px 38px; gap: 6px; }

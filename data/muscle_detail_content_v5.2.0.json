@@ -1,0 +1,17 @@
+{
+  "version": "5.2.0",
+  "type": "muscle_detail_content",
+  "sections": [
+    "todayCoverage",
+    "weekCoverage",
+    "monthCoverage",
+    "target",
+    "subregions",
+    "mainExerciseContributors",
+    "secondaryExerciseContributors",
+    "trend",
+    "nextPlanRecommendation",
+    "why",
+    "confidence"
+  ]
+}

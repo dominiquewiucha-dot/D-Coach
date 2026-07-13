@@ -1,0 +1,19 @@
+{
+  "version": "5.2.0",
+  "type": "muscle_map_rendering_spec",
+  "bodyRequirements": {
+    "recognizable": true,
+    "athleticProportions": true,
+    "frontAndBack": true,
+    "minimumDisplayHeightPx": 360,
+    "recommendedDisplayHeightPx": 460,
+    "noStickFigure": true,
+    "noTinyThumbnailAsPrimaryView": true
+  },
+  "interaction": {
+    "tapRegion": "select muscle and open detail sheet",
+    "selectedRegion": "white edge + subtle glow",
+    "otherRegions": "dim to 25 percent opacity",
+    "listSync": true
+  }
+}

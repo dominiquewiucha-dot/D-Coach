@@ -89,6 +89,10 @@ const state = {
   layoutRules: null,
   bottomNavigationSpec: null,
   cardHierarchy: null,
+  muscleMapRenderingSpec: null,
+  muscleHeatmapGradient: null,
+  muscleDetailContent: null,
+  muscleMapScreenLayout: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -135,7 +139,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v40";
+const APP_VERSION = "pwa-v41";
 const STORAGE_SCHEMA_VERSION = "5.0.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -746,6 +750,10 @@ async function boot() {
     layoutRules,
     bottomNavigationSpec,
     cardHierarchy,
+    muscleMapRenderingSpec,
+    muscleHeatmapGradient,
+    muscleDetailContent,
+    muscleMapScreenLayout,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -873,6 +881,10 @@ async function boot() {
     fetchOptionalJson("./data/layout_rules_v5.1.0.json"),
     fetchOptionalJson("./data/bottom_navigation_spec_v5.1.0.json"),
     fetchOptionalJson("./data/card_hierarchy_v5.1.0.json"),
+    fetchOptionalJson("./data/muscle_map_rendering_spec_v5.2.0.json"),
+    fetchOptionalJson("./data/muscle_heatmap_gradient_v5.2.0.json"),
+    fetchOptionalJson("./data/muscle_detail_content_v5.2.0.json"),
+    fetchOptionalJson("./data/muscle_map_screen_layout_v5.2.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -988,6 +1000,10 @@ async function boot() {
   state.layoutRules = layoutRules;
   state.bottomNavigationSpec = bottomNavigationSpec;
   state.cardHierarchy = cardHierarchy;
+  state.muscleMapRenderingSpec = muscleMapRenderingSpec;
+  state.muscleHeatmapGradient = muscleHeatmapGradient;
+  state.muscleDetailContent = muscleDetailContent;
+  state.muscleMapScreenLayout = muscleMapScreenLayout;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -1028,6 +1044,7 @@ async function boot() {
   bindPwaEvents();
   restoreWorkoutDraft();
   startTimerLoop();
+  state.tab = tabFromHash() || state.tab;
   render();
 }
 
@@ -1038,6 +1055,16 @@ function bindPwaEvents() {
   });
   window.addEventListener("offline", () => {
     state.isOnline = false;
+    render();
+  });
+  window.addEventListener("hashchange", () => {
+    const tab = tabFromHash();
+    if (!tab || tab === state.tab) return;
+    state.tab = tab;
+    state.activeWorkout = null;
+    state.selectedExerciseId = null;
+    state.selectedSessionId = null;
+    state.moreMenuOpen = false;
     render();
   });
   window.addEventListener("beforeinstallprompt", (event) => {
@@ -1668,11 +1695,42 @@ function coverageCoachTextFor(percent) {
 }
 
 function coverageColorFor(percent) {
+  const gradient = state.muscleHeatmapGradient?.stops || [];
+  if (gradient.length) return interpolatedHeatmapColor(percent, gradient);
   const premiumScale = state.muscleHeatmapColorSystem?.colors || [];
   const premium = premiumScale.find((item) => percent >= item.min && percent <= item.max);
   if (premium) return premium.color;
   const scale = state.muscleMapVisualConfig?.coverageColorScale || state.muscleCoverageVisualMapping?.colorScale || [];
   return scale.find((item) => percent >= item.min && percent <= item.max)?.color || "#2563EB";
+}
+
+function hexToRgb(hex) {
+  const clean = String(hex || "").replace("#", "");
+  if (clean.length !== 6) return [37, 99, 235];
+  return [0, 2, 4].map((index) => parseInt(clean.slice(index, index + 2), 16));
+}
+
+function rgbToHex(rgb) {
+  return `#${rgb.map((value) => Math.round(Math.max(0, Math.min(255, value))).toString(16).padStart(2, "0")).join("")}`;
+}
+
+function interpolatedHeatmapColor(percent, stops) {
+  const sorted = [...stops].sort((a, b) => a.percent - b.percent);
+  const value = Math.max(sorted[0].percent, Math.min(sorted[sorted.length - 1].percent, Number(percent) || 0));
+  let lower = sorted[0];
+  let upper = sorted[sorted.length - 1];
+  for (let index = 0; index < sorted.length - 1; index += 1) {
+    if (value >= sorted[index].percent && value <= sorted[index + 1].percent) {
+      lower = sorted[index];
+      upper = sorted[index + 1];
+      break;
+    }
+  }
+  const span = Math.max(1, upper.percent - lower.percent);
+  const ratio = (value - lower.percent) / span;
+  const low = hexToRgb(lower.color);
+  const high = hexToRgb(upper.color);
+  return rgbToHex(low.map((channel, index) => channel + (high[index] - channel) * ratio));
 }
 
 function coverageItemByMuscle(items, muscleId) {
@@ -2746,12 +2804,19 @@ function renderRoute() {
     case "training": return renderTraining();
     case "coach": return renderCoach();
     case "plans": return renderPlans();
+    case "musclemap": return renderMuscleMapScreen();
     case "exercises": return renderExercises();
     case "weight": return renderWeight();
     case "journal": return renderJournal();
     case "settings": return renderSettings();
     default: return renderDashboard();
   }
+}
+
+function tabFromHash() {
+  const id = String(window.location.hash || "").replace("#", "");
+  const allowed = ["dashboard", "training", "coach", "plans", "musclemap", "exercises", "weight", "journal", "settings"];
+  return allowed.includes(id) ? id : "";
 }
 
 function renderTabs() {
@@ -2773,6 +2838,7 @@ function renderPremiumTabs() {
     ["plans", "Plan", "P"]
   ];
   const moreTabs = [
+    ["musclemap", "Muskelkarte", "M"],
     ["exercises", "Uebungen", "U"],
     ["weight", "Gewicht", "G"],
     ["journal", "Journal", "J"],
@@ -2838,6 +2904,46 @@ function renderCoverageCard() {
         ${hints.length && mode === "week" ? `<ul class="small-list">${hints.map((hint) => `<li>${htmlesc(hint)}</li>`).join("")}</ul>` : ""}
       `}
     </article>
+  `;
+}
+
+function renderMuscleMapScreen() {
+  const mode = state.coverageMode || "week";
+  const view = state.coverageView || "front";
+  const items = mode === "trend" ? premiumCoverageForSessions(sessionsSince(7)) : premiumCoverageForSessions(sessionsForCoverageMode(mode));
+  const regions = premiumRegionsForView(view);
+  const visibleItems = regions.map((region) => coverageItemByPremiumMuscle(items, region.muscleId));
+  const selected = state.selectedMuscleId && visibleItems.some((item) => item.muscleId === state.selectedMuscleId)
+    ? state.selectedMuscleId
+    : visibleItems[0]?.muscleId;
+  const average = visibleItems.length ? Math.round(visibleItems.reduce((sum, item) => sum + item.percent, 0) / visibleItems.length) : 0;
+  return `
+    <section class="screen stack muscle-map-screen">
+      <header class="screen-header-row">
+        <div class="grow">
+          <h1 class="title">Muskelkarte</h1>
+          <p class="subtitle">Belastung, Subregionen und Uebungsbeitraege.</p>
+        </div>
+        <span class="badge blue">${average}%</span>
+      </header>
+      <div class="coverage-switch">
+        ${[
+          ["today", "Heute"],
+          ["week", "Woche"],
+          ["month", "Monat"]
+        ].map(([id, label]) => `<button class="${mode === id ? "active" : ""}" data-coverage-mode="${id}">${label}</button>`).join("")}
+      </div>
+      <div class="coverage-switch compact">
+        ${[["front", "Vorne"], ["back", "Hinten"]].map(([id, label]) => `<button class="${view === id ? "active" : ""}" data-coverage-view="${id}">${label}</button>`).join("")}
+      </div>
+      <article class="muscle-map-stage">
+        ${regions.length ? renderPremiumMuscleSvg(view, items, regions) : `<p class="muted">Muskelkarte konnte nicht geladen werden.</p>`}
+      </article>
+      <div class="coverage-list muscle-map-list" aria-label="Muskelgruppen">
+        ${visibleItems.length ? visibleItems.map(renderCoverageRow).join("") : `<p class="muted">Keine Muskelregionen fuer diese Ansicht.</p>`}
+      </div>
+      ${selected ? renderCoverageDetail(selected) : `<article class="card"><p class="muted">Waehle einen Muskel fuer Details.</p></article>`}
+    </section>
   `;
 }
 
@@ -2909,17 +3015,89 @@ function renderPremiumMuscleSvg(view, items, regions) {
   const regionMarkup = regions.map((region, index) => {
     const item = coverageItemByPremiumMuscle(items, region.muscleId);
     const isSelected = selected === region.muscleId;
-    const opacity = selected && !isSelected ? 0.22 : 1;
-    return premiumRegionShapes(region.svgRegionId, view, index).map((shape) => (
-      `<button class="svg-muscle premium-region ${isSelected ? "selected" : ""}" style="--coverage-color:${coverageColorFor(item.percent)}; --coverage-opacity:${opacity}; ${shape.style}" data-open-coverage-muscle="${htmlesc(region.muscleId)}" title="${htmlesc(region.label)}"><span>${htmlesc(region.label)} ${item.percent}%</span></button>`
-    )).join("");
+    const opacity = selected && !isSelected ? 0.25 : 1;
+    return premiumRegionSvgShapes(region.svgRegionId, view, index).map((shape, shapeIndex) => {
+      const label = `${region.label} ${shape.side || ""}`.trim();
+      return `<ellipse class="premium-svg-region ${isSelected ? "selected" : ""}" cx="${shape.cx}" cy="${shape.cy}" rx="${shape.rx}" ry="${shape.ry}" fill="${coverageColorFor(item.percent)}" opacity="${opacity}" data-open-coverage-muscle="${htmlesc(region.muscleId)}" data-muscle-id="${htmlesc(region.muscleId)}" tabindex="0" role="button" aria-label="${htmlesc(label)} ${item.percent} Prozent" data-region-index="${shapeIndex}"></ellipse>`;
+    }).join("");
   }).join("");
   return `
-    <div class="interactive-muscle-map premium ${view}">
-      <img src="./assets/muscle_maps/premium_muscle_map_${view}_v5.0.0.svg" alt="${view === "front" ? "Athletische Vorderseite" : "Athletische Rueckseite"}">
-      ${regionMarkup}
+    <div class="interactive-muscle-map premium inline ${view}">
+      <svg class="premium-body-svg" viewBox="0 0 220 520" role="img" aria-label="${view === "front" ? "Athletische Muskelkarte Vorderseite" : "Athletische Muskelkarte Rueckseite"}">
+        <defs>
+          <filter id="muscleGlow-${view}" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="4" result="blur"></feGaussianBlur>
+            <feMerge>
+              <feMergeNode in="blur"></feMergeNode>
+              <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+          </filter>
+        </defs>
+        ${renderPremiumBodyBase(view)}
+        <g class="premium-svg-regions" filter="url(#muscleGlow-${view})">
+          ${regionMarkup}
+        </g>
+      </svg>
     </div>
   `;
+}
+
+function renderPremiumBodyBase(view) {
+  const torso = view === "front"
+    ? `<path d="M72 116 C82 92 138 92 148 116 L162 238 C150 276 70 276 58 238 Z"></path>`
+    : `<path d="M70 114 C82 88 138 88 150 114 L164 242 C145 282 75 282 56 242 Z"></path>`;
+  return `
+    <g class="premium-body-base">
+      <circle cx="110" cy="42" r="23"></circle>
+      <path d="M92 66 C100 78 120 78 128 66 L134 96 L86 96 Z"></path>
+      ${torso}
+      <path d="M68 122 C38 138 28 196 24 258 C38 264 49 258 54 240 C57 198 65 166 82 142 Z"></path>
+      <path d="M152 122 C182 138 192 196 196 258 C182 264 171 258 166 240 C163 198 155 166 138 142 Z"></path>
+      <path d="M76 260 C58 306 52 392 58 492 C77 500 91 493 92 474 C91 400 98 333 108 276 Z"></path>
+      <path d="M144 260 C162 306 168 392 162 492 C143 500 129 493 128 474 C129 400 122 333 112 276 Z"></path>
+      <path d="M81 492 L93 492 L91 512 L63 512 C64 501 70 495 81 492 Z"></path>
+      <path d="M139 492 L127 492 L129 512 L157 512 C156 501 150 495 139 492 Z"></path>
+    </g>
+  `;
+}
+
+function premiumRegionSvgShapes(regionId, view, index) {
+  const front = {
+    region_chest_clavicular: [110, 126, 36, 13],
+    region_chest_sternal: [110, 156, 42, 24],
+    region_chest_lower: [110, 188, 34, 15],
+    region_front_delts_l: [72, 132, 17, 22],
+    region_side_delts_l: [148, 132, 17, 22],
+    region_biceps_l: [48, 214, 13, 42],
+    region_abs_upper: [110, 222, 24, 26],
+    region_abs_lower: [110, 268, 22, 30],
+    region_obliques_l: [82, 244, 15, 42],
+    region_quad_rectus_l: [104, 358, 17, 74],
+    region_quad_lateralis_l: [78, 358, 16, 70],
+    region_quad_medialis_l: [123, 365, 14, 58],
+    region_adductors_l: [100, 340, 13, 58]
+  };
+  const back = {
+    region_traps_upper: [110, 112, 34, 16],
+    region_traps_mid: [110, 148, 42, 28],
+    region_rhomboids: [110, 176, 26, 22],
+    region_lats_upper_l: [82, 196, 22, 44],
+    region_lats_lower_l: [78, 244, 21, 50],
+    region_rear_delts_l: [72, 132, 17, 22],
+    region_triceps_l: [48, 218, 13, 44],
+    region_erectors_upper: [110, 226, 16, 52],
+    region_erectors_lower: [110, 280, 16, 48],
+    region_glutes_maximus: [110, 324, 42, 29],
+    region_hamstrings_l: [82, 404, 22, 74],
+    region_calves_l: [80, 480, 18, 42]
+  };
+  const map = view === "front" ? front : back;
+  const [cx, cy, rx, ry] = map[regionId] || [54 + (index % 4) * 36, 120 + Math.floor(index / 4) * 42, 14, 18];
+  const shapes = [{ cx, cy, rx, ry, side: regionId.endsWith("_l") ? "links" : "" }];
+  if (regionId.endsWith("_l")) {
+    shapes.push({ cx: 220 - cx, cy, rx, ry, side: "rechts" });
+  }
+  return shapes;
 }
 
 function premiumRegionShapes(regionId, view, index) {
@@ -3317,7 +3495,7 @@ function renderCoachDashboardPremium() {
         <article class="card stack">
           <div class="row">
             <h3 class="grow">Muscle Coverage</h3>
-            <button class="chip-button" data-coverage-mode="week">Map</button>
+            <button class="chip-button" data-tab="musclemap">Map</button>
           </div>
           <div class="premium-mini-map">
             ${renderDashboardMiniMuscleMap(coverageItems)}
@@ -4885,6 +5063,7 @@ function bindEvents() {
       state.selectedExerciseId = null;
       state.selectedSessionId = null;
       state.moreMenuOpen = false;
+      if (window.location.hash !== `#${state.tab}`) window.history.replaceState(null, "", `#${state.tab}`);
       render();
     });
   });
@@ -4920,6 +5099,12 @@ function bindEvents() {
 
   document.querySelectorAll("[data-open-coverage-muscle]").forEach((button) => {
     button.addEventListener("click", () => {
+      state.selectedMuscleId = button.dataset.openCoverageMuscle;
+      render();
+    });
+    button.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
       state.selectedMuscleId = button.dataset.openCoverageMuscle;
       render();
     });
