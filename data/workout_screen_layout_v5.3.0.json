@@ -1,0 +1,25 @@
+{
+  "version": "5.3.0",
+  "type": "workout_screen_layout",
+  "screens": {
+    "daySelection": [
+      "heroSessionCard",
+      "compactSmartBuilderPreview",
+      "alternativeDays"
+    ],
+    "activeWorkout": [
+      "progressHeader",
+      "currentExercise",
+      "lastPerformance",
+      "setRows",
+      "restTimer",
+      "nextAction"
+    ],
+    "finishSummary": [
+      "sessionResult",
+      "muscleCoverage",
+      "progress",
+      "coachNote"
+    ]
+  }
+}

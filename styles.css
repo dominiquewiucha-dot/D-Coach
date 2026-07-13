@@ -1227,6 +1227,48 @@ select:focus-visible {
   border-color: rgba(37,99,235,.35);
 }
 
+.training-hero {
+  border-color: rgba(37,99,235,.6);
+  background: linear-gradient(180deg, rgba(37,99,235,.18), rgba(18,24,33,.96));
+}
+
+.compact-builder {
+  gap: 10px;
+}
+
+.compact-plan-preview {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  background: var(--input);
+}
+
+.compact-plan-preview summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.training-day-list {
+  display: grid;
+  gap: 8px;
+}
+
+.compact-training-day {
+  min-height: 76px;
+  box-shadow: none;
+}
+
+.workout-screen > header {
+  position: sticky;
+  top: env(safe-area-inset-top);
+  z-index: 4;
+  margin: -18px -16px 0;
+  padding: 14px 16px 10px;
+  background: rgba(11,15,20,.96);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+}
+
 .builder-list {
   display: grid;
   gap: 8px;

@@ -1,0 +1,13 @@
+{
+  "version": "5.3.0",
+  "type": "training_feedback_microcopy",
+  "texts": {
+    "learning": "D-Coach lernt dein Training kennen.",
+    "noHistory": "Noch keine Vergleichsdaten.",
+    "lastWeight": "Zuletzt",
+    "progressHint": "Kleine Steigerung möglich",
+    "occupied": "Gerät besetzt",
+    "alternative": "Alternative",
+    "finish": "Training abschließen"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "version": "5.3.0",
+  "type": "smart_builder_compact_rules",
+  "rules": [
+    "Show a compact summary first.",
+    "Do not display all six exercises as a permanent oversized card on the day-selection screen.",
+    "Use expandable preview or a separate preview screen.",
+    "Show estimated duration and main focus muscles.",
+    "Keep Start Training as the dominant action."
+  ]
+}

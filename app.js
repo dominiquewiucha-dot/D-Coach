@@ -93,6 +93,10 @@ const state = {
   muscleHeatmapGradient: null,
   muscleDetailContent: null,
   muscleMapScreenLayout: null,
+  workoutScreenLayout: null,
+  exerciseCardCompact: null,
+  smartBuilderCompactRules: null,
+  trainingFeedbackMicrocopy: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -139,7 +143,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v41";
+const APP_VERSION = "pwa-v42";
 const STORAGE_SCHEMA_VERSION = "5.0.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -754,6 +758,10 @@ async function boot() {
     muscleHeatmapGradient,
     muscleDetailContent,
     muscleMapScreenLayout,
+    workoutScreenLayout,
+    exerciseCardCompact,
+    smartBuilderCompactRules,
+    trainingFeedbackMicrocopy,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -885,6 +893,10 @@ async function boot() {
     fetchOptionalJson("./data/muscle_heatmap_gradient_v5.2.0.json"),
     fetchOptionalJson("./data/muscle_detail_content_v5.2.0.json"),
     fetchOptionalJson("./data/muscle_map_screen_layout_v5.2.0.json"),
+    fetchOptionalJson("./data/workout_screen_layout_v5.3.0.json"),
+    fetchOptionalJson("./data/exercise_card_compact_v5.3.0.json"),
+    fetchOptionalJson("./data/smart_builder_compact_rules_v5.3.0.json"),
+    fetchOptionalJson("./data/training_feedback_microcopy_v5.3.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -1004,6 +1016,10 @@ async function boot() {
   state.muscleHeatmapGradient = muscleHeatmapGradient;
   state.muscleDetailContent = muscleDetailContent;
   state.muscleMapScreenLayout = muscleMapScreenLayout;
+  state.workoutScreenLayout = workoutScreenLayout;
+  state.exerciseCardCompact = exerciseCardCompact;
+  state.smartBuilderCompactRules = smartBuilderCompactRules;
+  state.trainingFeedbackMicrocopy = trainingFeedbackMicrocopy;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -2801,7 +2817,7 @@ function renderRoute() {
   if (state.activeWorkout) return renderWorkout();
   if (state.selectedSessionId) return renderSessionDetail(state.selectedSessionId);
   switch (state.tab) {
-    case "training": return renderTraining();
+    case "training": return renderTrainingV53();
     case "coach": return renderCoach();
     case "plans": return renderPlans();
     case "musclemap": return renderMuscleMapScreen();
@@ -3972,7 +3988,7 @@ function renderCoach() {
   const improvements = sessionImprovements(session);
   const coverageHints = coverageCoachHints(coverageForSessions(sessionsSince(7)));
   return `
-    <section class="screen stack">
+    <section class="screen stack workout-screen">
       <header><h1 class="title">Coach</h1><p class="subtitle">${htmlesc(session.dayName)} · ${dateText(session.startedAt)}</p></header>
       <div class="grid">
         ${metric(String(sessionDurationMinutes(session)), "Minuten")}
@@ -4085,6 +4101,90 @@ function renderSmartWorkoutPreview(dayName) {
       </ol>
       ${proposal.builderReasons.length ? `<ul class="small-list">${proposal.builderReasons.slice(0, 2).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
       ${proposal.warnings.length ? `<p class="quiet">${htmlesc(proposal.warnings[0])}</p>` : ""}
+      <button class="secondary" data-start-smart-day="${htmlesc(dayName)}">Smart-Training starten</button>
+    </article>
+  `;
+}
+
+function renderTrainingV53() {
+  const plan = activePlan();
+  const draft = storage.activeWorkoutDraft;
+  const primaryDay = plan?.days?.[0] || null;
+  const otherDays = plan?.days?.slice(1) || [];
+  return `
+    <section class="screen stack training-screen">
+      <header><h1 class="title">Training</h1><p class="subtitle">${plan ? htmlesc(plan.planName) : "Kein aktiver Plan"}</p></header>
+      ${draft ? `
+        <article class="card stack">
+          <h2>Training fortsetzen</h2>
+          <p class="muted">${htmlesc(draft.dayName || "Offenes Training")} wurde lokal gesichert.</p>
+          <button class="primary" data-resume-workout>Fortsetzen</button>
+        </article>
+      ` : ""}
+      ${plan && primaryDay ? `
+        <article class="card stack training-hero">
+          <div class="row">
+            <div class="grow">
+              <p class="muted">Naechste Einheit</p>
+              <h2>${htmlesc(primaryDay.name)}</h2>
+              <p class="muted">${primaryDay.exercises.length} Uebungen · ${primaryDay.maxDurationMinutes} Minuten · ${lastDayDate(primaryDay.name) || "noch nicht trainiert"}</p>
+            </div>
+            <span class="badge blue">Start</span>
+          </div>
+          ${renderWarmupHint(primaryDay)}
+          <button class="primary" data-start-day="${htmlesc(primaryDay.name)}">Training starten</button>
+        </article>
+        ${renderSmartWorkoutPreviewV53(primaryDay.name)}
+        ${otherDays.length ? `
+          <details class="disclosure-card stack">
+            <summary><span>Weitere Tage</span><span class="badge">${otherDays.length}</span></summary>
+            <div class="training-day-list">
+              ${otherDays.map(renderTrainingDayCompactV53).join("")}
+            </div>
+          </details>
+        ` : ""}
+      ` : `<article class="card stack">
+        <h2>Kein Training verfuegbar</h2>
+        <p class="muted">Aktiviere zuerst einen Plan.</p>
+        <button class="secondary" data-tab="plans">Plan auswaehlen</button>
+      </article>`}
+    </section>
+  `;
+}
+
+function renderTrainingDayCompactV53(day) {
+  return `
+    <button class="list-button" data-start-day="${htmlesc(day.name)}">
+      <article class="card row compact-training-day">
+        <div class="grow">
+          <h3>${htmlesc(day.name)}</h3>
+          <p class="muted">${day.exercises.length} Uebungen · ${day.maxDurationMinutes} min</p>
+        </div>
+        <span class="badge blue">Start</span>
+      </article>
+    </button>
+  `;
+}
+
+function renderSmartWorkoutPreviewV53(dayName) {
+  const proposal = buildSmartWorkout(dayName);
+  if (!proposal.exercises.length) return "";
+  const focus = [...new Set(proposal.exercises.flatMap((item) => item.exercise.primaryMuscleGroups || []))].slice(0, 3);
+  return `
+    <article class="card stack builder-preview compact-builder">
+      <div class="row">
+        <h3 class="grow">Smart Builder · ${htmlesc(proposal.dayType)}</h3>
+        <span class="badge blue">ca. ${proposal.estimatedDurationMinutes} min</span>
+      </div>
+      <p class="muted">${proposal.exercises.length} Uebungen · Fokus: ${htmlesc(focus.join(", ") || "Ganzkoerper")}</p>
+      ${proposal.builderReasons.length ? `<ul class="small-list">${proposal.builderReasons.slice(0, 2).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
+      ${proposal.warnings.length ? `<p class="quiet">${htmlesc(proposal.warnings[0])}</p>` : ""}
+      <details class="compact-plan-preview">
+        <summary>Planvorschau</summary>
+        <ol class="builder-list">
+          ${proposal.exercises.map((item) => `<li><strong>${htmlesc(item.exercise.displayName)}</strong><span>${item.sets} Saetze · ${htmlesc(item.reps)}</span></li>`).join("")}
+        </ol>
+      </details>
       <button class="secondary" data-start-smart-day="${htmlesc(dayName)}">Smart-Training starten</button>
     </article>
   `;
