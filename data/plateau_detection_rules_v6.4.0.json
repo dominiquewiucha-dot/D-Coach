@@ -1,0 +1,21 @@
+{
+  "version": "6.4.0",
+  "rules": [
+    {
+      "id": "load_plateau",
+      "if": "no load or rep improvement across 6 comparable sessions"
+    },
+    {
+      "id": "rep_plateau",
+      "if": "same load and reps across 5 comparable sessions"
+    },
+    {
+      "id": "fatigue_plateau",
+      "if": "RPE rises while performance is stable"
+    },
+    {
+      "id": "false_plateau",
+      "if": "fewer than 4 comparable sessions"
+    }
+  ]
+}

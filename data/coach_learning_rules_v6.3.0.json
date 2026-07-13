@@ -1,0 +1,22 @@
+{
+  "version": "6.3.0",
+  "type": "coach_learning_rules",
+  "rules": [
+    {
+      "id": "prefer_helpful_rules",
+      "logic": "increase local preference weight for repeatedly helpful recommendation types"
+    },
+    {
+      "id": "reduce_rejected_rules",
+      "logic": "reduce weight for repeatedly rejected recommendation types"
+    },
+    {
+      "id": "never_override_safety",
+      "logic": "feedback cannot disable safety/LWS rules"
+    },
+    {
+      "id": "local_only",
+      "logic": "store feedback locally and include in backup"
+    }
+  ]
+}

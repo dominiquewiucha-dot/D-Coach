@@ -1,0 +1,17 @@
+{
+  "version": "6.4.0",
+  "inputs": [
+    "exerciseHistory",
+    "repHistory",
+    "loadHistory",
+    "rirRpe",
+    "sessionFrequency"
+  ],
+  "outputs": [
+    "plateauStatus",
+    "plateauType",
+    "confidencePercent",
+    "recommendedAction",
+    "why"
+  ]
+}

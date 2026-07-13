@@ -1,0 +1,18 @@
+{
+  "version": "6.3.0",
+  "type": "coach_feedback_schema",
+  "feedbackTypes": [
+    "helpful",
+    "notHelpful",
+    "tooAggressive",
+    "tooConservative",
+    "wrongExercise",
+    "wrongMuscleFocus"
+  ],
+  "fields": [
+    "recommendationId",
+    "feedbackType",
+    "optionalNote",
+    "timestamp"
+  ]
+}

@@ -1,0 +1,13 @@
+---
+project: D-Coach
+version: 6.4.0
+replaces: 6.3.0
+status: Stable
+date: 2026-07-13
+codex_rule: Integrate only. Do not restructure the app.
+resource_rule: Use lowest sufficient mode and stop after checkpoint.
+---
+
+# PROJECT_MEMORY – v6.4.0 PlateauCoach
+
+Erkennt belastbare Plateaus, vermeidet Fehlalarme und schlägt zuerst kleine, nachvollziehbare Anpassungen vor.

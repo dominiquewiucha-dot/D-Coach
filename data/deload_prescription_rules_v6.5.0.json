@@ -1,0 +1,21 @@
+{
+  "version": "6.5.0",
+  "prescriptions": [
+    {
+      "type": "volume_deload",
+      "volumeReductionPercent": 40,
+      "intensityReductionPercent": 10,
+      "durationDays": 7
+    },
+    {
+      "type": "intensity_deload",
+      "volumeReductionPercent": 20,
+      "intensityReductionPercent": 20,
+      "durationDays": 7
+    },
+    {
+      "type": "exercise_deload",
+      "rule": "replace high joint/spine load temporarily"
+    }
+  ]
+}

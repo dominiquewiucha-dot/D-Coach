@@ -1,0 +1,19 @@
+{
+  "version": "6.5.0",
+  "inputs": [
+    "systemicFatigue",
+    "muscleFatigue",
+    "performanceTrend",
+    "readiness",
+    "jointStress"
+  ],
+  "outputs": [
+    "deloadNeeded",
+    "deloadType",
+    "durationDays",
+    "volumeReduction",
+    "intensityReduction",
+    "why",
+    "confidencePercent"
+  ]
+}

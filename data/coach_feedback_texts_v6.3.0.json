@@ -1,0 +1,12 @@
+{
+  "version": "6.3.0",
+  "type": "coach_feedback_texts",
+  "texts": {
+    "helpful": "Hilfreich",
+    "notHelpful": "Nicht hilfreich",
+    "tooAggressive": "Zu aggressiv",
+    "tooConservative": "Zu vorsichtig",
+    "wrongFocus": "Falscher Schwerpunkt",
+    "thanks": "Feedback gespeichert."
+  }
+}

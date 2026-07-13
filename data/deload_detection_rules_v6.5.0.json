@@ -1,0 +1,30 @@
+{
+  "version": "6.5.0",
+  "rules": [
+    {
+      "id": "performance_drop",
+      "score": 30
+    },
+    {
+      "id": "high_fatigue",
+      "score": 25
+    },
+    {
+      "id": "joint_stress",
+      "score": 25
+    },
+    {
+      "id": "readiness_low",
+      "score": 20
+    },
+    {
+      "id": "single_bad_day",
+      "score": 0
+    }
+  ],
+  "thresholds": {
+    "consider": 45,
+    "recommend": 65,
+    "stronglyRecommend": 80
+  }
+}

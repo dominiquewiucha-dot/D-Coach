@@ -1,0 +1,22 @@
+{
+  "version": "6.4.0",
+  "actions": [
+    {
+      "type": "load_plateau",
+      "priority": [
+        "add_reps",
+        "microload",
+        "add_rest",
+        "change_rep_range"
+      ]
+    },
+    {
+      "type": "fatigue_plateau",
+      "priority": [
+        "reduce_volume",
+        "keep_load",
+        "deload_check"
+      ]
+    }
+  ]
+}

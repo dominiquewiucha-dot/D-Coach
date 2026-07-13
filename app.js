@@ -111,6 +111,15 @@ const state = {
   sessionCoachSchema: null,
   sessionCoachRules: null,
   sessionCoachTexts: null,
+  coachFeedbackSchema: null,
+  coachLearningRules: null,
+  coachFeedbackTexts: null,
+  plateauCoachSchema: null,
+  plateauDetectionRules: null,
+  plateauActionRules: null,
+  deloadCoachSchema: null,
+  deloadDetectionRulesV65: null,
+  deloadPrescriptionRules: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -157,8 +166,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v45";
-const STORAGE_SCHEMA_VERSION = "5.0.0";
+const APP_VERSION = "pwa-v48";
+const STORAGE_SCHEMA_VERSION = "6.5.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -171,6 +180,7 @@ const STORAGE_KEYS = [
   { key: "dcoach.customExercises", label: "Eigene Uebungen", type: "array" },
   { key: "dcoach.userSettings", label: "Einstellungen", type: "object" },
   { key: "dcoach.personalProfile", label: "Profil", type: "object" },
+  { key: "dcoach.coachFeedback", label: "Coach-Feedback", type: "array" },
   { key: "dcoach.lastErrors", label: "Fehlerlog", type: "array" },
   { key: "dcoach.activeWorkoutDraft", label: "Trainingsentwurf", type: "object" },
   { key: "dcoach.lastBackupAt", label: "Letztes Backup", type: "string" },
@@ -246,6 +256,12 @@ const storage = {
   set personalProfile(value) {
     if (value) writeJson("dcoach.personalProfile", value);
     else localStorage.removeItem("dcoach.personalProfile");
+  },
+  get coachFeedback() {
+    return readJson("dcoach.coachFeedback", []);
+  },
+  set coachFeedback(value) {
+    writeJson("dcoach.coachFeedback", Array.isArray(value) ? value.slice(-200) : []);
   },
   get lastErrors() {
     return readJson("dcoach.lastErrors", []);
@@ -790,6 +806,15 @@ async function boot() {
     sessionCoachSchema,
     sessionCoachRules,
     sessionCoachTexts,
+    coachFeedbackSchema,
+    coachLearningRules,
+    coachFeedbackTexts,
+    plateauCoachSchema,
+    plateauDetectionRules,
+    plateauActionRules,
+    deloadCoachSchema,
+    deloadDetectionRulesV65,
+    deloadPrescriptionRules,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -939,6 +964,15 @@ async function boot() {
     fetchOptionalJson("./data/session_coach_schema_v6.2.0.json"),
     fetchOptionalJson("./data/session_coach_rules_v6.2.0.json"),
     fetchOptionalJson("./data/session_coach_texts_v6.2.0.json"),
+    fetchOptionalJson("./data/coach_feedback_schema_v6.3.0.json"),
+    fetchOptionalJson("./data/coach_learning_rules_v6.3.0.json"),
+    fetchOptionalJson("./data/coach_feedback_texts_v6.3.0.json"),
+    fetchOptionalJson("./data/plateau_coach_schema_v6.4.0.json"),
+    fetchOptionalJson("./data/plateau_detection_rules_v6.4.0.json"),
+    fetchOptionalJson("./data/plateau_action_rules_v6.4.0.json"),
+    fetchOptionalJson("./data/deload_coach_schema_v6.5.0.json"),
+    fetchOptionalJson("./data/deload_detection_rules_v6.5.0.json"),
+    fetchOptionalJson("./data/deload_prescription_rules_v6.5.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -1076,6 +1110,15 @@ async function boot() {
   state.sessionCoachSchema = sessionCoachSchema;
   state.sessionCoachRules = sessionCoachRules;
   state.sessionCoachTexts = sessionCoachTexts;
+  state.coachFeedbackSchema = coachFeedbackSchema;
+  state.coachLearningRules = coachLearningRules;
+  state.coachFeedbackTexts = coachFeedbackTexts;
+  state.plateauCoachSchema = plateauCoachSchema;
+  state.plateauDetectionRules = plateauDetectionRules;
+  state.plateauActionRules = plateauActionRules;
+  state.deloadCoachSchema = deloadCoachSchema;
+  state.deloadDetectionRulesV65 = deloadDetectionRulesV65;
+  state.deloadPrescriptionRules = deloadPrescriptionRules;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -3698,6 +3741,26 @@ function smartCoachPriority(ruleId) {
   return state.smartCoachPriorityRules?.rules?.find((rule) => rule.id === ruleId)?.priority || 0;
 }
 
+function coachFeedbackText(key, fallback) {
+  return state.coachFeedbackTexts?.texts?.[key] || fallback;
+}
+
+function coachFeedbackForRule(ruleId) {
+  return storage.coachFeedback.filter((item) => item.ruleId === ruleId || String(item.recommendationId || "").endsWith(ruleId));
+}
+
+function coachLearningWeight(ruleId) {
+  if (ruleId === "safety_first") return 0;
+  const feedback = coachFeedbackForRule(ruleId).slice(-20);
+  return feedback.reduce((sum, item) => {
+    if (item.feedbackType === "helpful") return sum + 4;
+    if (item.feedbackType === "tooConservative" && ruleId === "progression_fourth") return sum + 2;
+    if (["notHelpful", "wrongExercise", "wrongMuscleFocus"].includes(item.feedbackType)) return sum - 4;
+    if (item.feedbackType === "tooAggressive") return sum - 3;
+    return sum;
+  }, 0);
+}
+
 function smartCoachInputData() {
   const weekSessions = sessionsSince(7);
   const latestSession = lastSession();
@@ -3753,7 +3816,7 @@ function smartCoachRecommendation() {
     candidates.push({
       ...recommendation,
       ruleId,
-      priority: smartCoachPriority(ruleId)
+      priority: smartCoachPriority(ruleId) + coachLearningWeight(ruleId)
     });
   };
 
@@ -3904,6 +3967,21 @@ function coachRecommendationSummaryV54() {
   };
 }
 
+function renderCoachFeedbackControls(recommendationId, ruleId) {
+  const recent = storage.coachFeedback.filter((item) => item.recommendationId === recommendationId).slice(-1)[0];
+  const options = [
+    ["helpful", coachFeedbackText("helpful", "Hilfreich")],
+    ["notHelpful", coachFeedbackText("notHelpful", "Nicht hilfreich")],
+    ["tooAggressive", coachFeedbackText("tooAggressive", "Zu aggressiv")],
+    ["tooConservative", coachFeedbackText("tooConservative", "Zu vorsichtig")]
+  ];
+  return `
+    <div class="feedback-row" data-coach-feedback-rule="${htmlesc(ruleId)}">
+      ${options.map(([type, label]) => `<button class="chip-button ${recent?.feedbackType === type ? "active" : ""}" data-coach-feedback="${htmlesc(type)}" data-recommendation-id="${htmlesc(recommendationId)}" data-rule-id="${htmlesc(ruleId)}">${htmlesc(label)}</button>`).join("")}
+    </div>
+  `;
+}
+
 function renderCoachDashboardV54() {
   const plan = activePlan();
   const summary = coachRecommendationSummaryV54();
@@ -3932,6 +4010,7 @@ function renderCoachDashboardV54() {
         </details>
         <p class="quiet">${htmlesc(coachDashboardText("notAutomatic", "Aenderungen werden erst nach deiner Bestaetigung uebernommen."))}</p>
         <p class="quiet">Regel: ${htmlesc(summary.smart.ruleId)} · ${summary.smart.requiresConfirmation ? "bestaetigungspflichtig" : "Hinweis ohne Planaenderung"}</p>
+        ${renderCoachFeedbackControls(summary.smart.id, summary.smart.ruleId)}
       </article>
       <div class="premium-card-grid">
         <article class="card stack">
@@ -4487,6 +4566,108 @@ function renderSessionCoachAfterCard(session) {
   `;
 }
 
+function plateauSummary() {
+  const candidates = allExercises().map((exercise) => {
+    const history = exerciseHistory(exercise.id).slice(0, 6);
+    if (history.length < 4) return null;
+    const newest = history[0].exercise;
+    const oldest = history[history.length - 1].exercise;
+    const newestPerf = performanceForExercise(newest);
+    const oldestPerf = performanceForExercise(oldest);
+    const volumeDelta = oldestPerf.volume ? ((newestPerf.volume - oldestPerf.volume) / oldestPerf.volume) * 100 : 0;
+    const loadDelta = newestPerf.bestWeight - oldestPerf.bestWeight;
+    const avgRirNow = newestPerf.sets.length ? newestPerf.sets.reduce((sum, set) => sum + (Number(set.rir) || 0), 0) / newestPerf.sets.length : null;
+    const stable = Math.abs(volumeDelta) <= 3 && loadDelta <= 0;
+    const confidencePercent = history.length >= 6 && stable ? 78 : history.length >= 5 && stable ? 64 : 35;
+    const plateauType = confidencePercent >= 70 ? "load_plateau" : confidencePercent >= 55 ? "rep_plateau" : "false_plateau";
+    return {
+      exercise,
+      plateauStatus: confidencePercent >= 55 ? "detected" : "none",
+      plateauType,
+      confidencePercent,
+      recommendedAction: plateauType === "load_plateau" ? "Erst Wiederholungen sammeln, dann Microload pruefen." : plateauType === "rep_plateau" ? "Pausenzeit oder Rep-Bereich leicht anpassen." : "Noch kein belastbares Plateau.",
+      why: [
+        `${history.length} vergleichbare Einheiten`,
+        `Volumenveraenderung ${Math.round(volumeDelta)}%`,
+        `Lastveraenderung ${kg(loadDelta)}`
+      ].concat(avgRirNow !== null ? [`Ø RIR ${Math.round(avgRirNow * 10) / 10}`] : [])
+    };
+  }).filter(Boolean).sort((a, b) => b.confidencePercent - a.confidencePercent)[0];
+  return candidates || {
+    exercise: null,
+    plateauStatus: "none",
+    plateauType: "false_plateau",
+    confidencePercent: 0,
+    recommendedAction: "Weiter Daten sammeln.",
+    why: ["Weniger als 4 vergleichbare Einheiten."]
+  };
+}
+
+function renderPlateauCoachCard() {
+  const summary = plateauSummary();
+  const active = summary.plateauStatus === "detected";
+  return `
+    <article class="card stack plateau-coach-card">
+      <div class="row">
+        <h3 class="grow">Plateau Coach</h3>
+        <span class="badge ${active ? "amber" : "green"}">${active ? `${summary.confidencePercent}%` : "kein Alarm"}</span>
+      </div>
+      <p class="muted">${summary.exercise ? htmlesc(summary.exercise.displayName) : "Noch keine Uebung belastbar auffaellig."}</p>
+      <p class="muted">${htmlesc(summary.recommendedAction)}</p>
+      <details>
+        <summary>Warum?</summary>
+        <ul class="small-list">${summary.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
+      </details>
+      ${active ? `<button class="secondary" data-confirm-plan-adjust>Plananpassung pruefen</button>` : ""}
+    </article>
+  `;
+}
+
+function deloadCoachSummary() {
+  const recovery = recoveryFatigueSummary();
+  const trend = longTermProgressSummary();
+  const readiness = readinessForJournal(journalEntryForDate(todayIsoDate()) || latestJournalEntry());
+  const scores = [];
+  if (trend.status === "declining") scores.push(["performance_drop", 30, "Leistungstrend faellt."]);
+  if (recovery.systemicFatiguePercent >= 70 || recovery.muscleFatiguePercent >= 80) scores.push(["high_fatigue", 25, "Ermuedung ist hoch."]);
+  if (recovery.jointFlags.length) scores.push(["joint_stress", 25, `Gelenkstress: ${recovery.jointFlags.join(", ")}.`]);
+  if (readiness.color === "red") scores.push(["readiness_low", 20, "Readiness niedrig."]);
+  const score = Math.min(100, scores.reduce((sum, item) => sum + item[1], 0));
+  const thresholds = state.deloadDetectionRulesV65?.thresholds || { consider: 45, recommend: 65, stronglyRecommend: 80 };
+  const deloadNeeded = score >= thresholds.recommend;
+  const type = recovery.jointFlags.includes("LWS") ? "exercise_deload" : trend.status === "declining" ? "volume_deload" : "intensity_deload";
+  const prescription = state.deloadPrescriptionRules?.prescriptions?.find((item) => item.type === type) || {};
+  return {
+    deloadNeeded,
+    deloadType: type,
+    durationDays: prescription.durationDays || 7,
+    volumeReduction: prescription.volumeReductionPercent || (type === "exercise_deload" ? 0 : 20),
+    intensityReduction: prescription.intensityReductionPercent || (type === "exercise_deload" ? 0 : 10),
+    confidencePercent: score,
+    why: scores.map((item) => item[2]).length ? scores.map((item) => item[2]) : ["Einzelner schlechter Tag reicht nicht fuer Deload."]
+  };
+}
+
+function renderDeloadCoachCard() {
+  const summary = deloadCoachSummary();
+  return `
+    <article class="card stack deload-coach-card">
+      <div class="row">
+        <h3 class="grow">Deload Coach</h3>
+        <span class="badge ${summary.deloadNeeded ? "amber" : "green"}">${summary.confidencePercent}%</span>
+      </div>
+      <p class="muted">${summary.deloadNeeded ? `Deload pruefen: ${summary.deloadType}.` : "Kein belastbarer Deload-Bedarf."}</p>
+      <div class="mini-grid">
+        <div class="fatigue-metric"><strong>${summary.durationDays}</strong><span>Tage</span></div>
+        <div class="fatigue-metric"><strong>${summary.volumeReduction}%</strong><span>Volumen runter</span></div>
+        <div class="fatigue-metric"><strong>${summary.intensityReduction}%</strong><span>Intensitaet runter</span></div>
+      </div>
+      <ul class="small-list">${summary.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
+      ${summary.deloadNeeded ? `<button class="secondary" data-confirm-plan-adjust>Deload im Plan pruefen</button>` : ""}
+    </article>
+  `;
+}
+
 function renderPlanOptimizerCard(context = "plans") {
   const summary = planOptimizerSummary();
   return `
@@ -4565,6 +4746,8 @@ function renderDashboard() {
       <header><h1 class="title">D-Coach</h1><p class="subtitle">Heute sauber trainieren.</p></header>
       ${renderCoachDashboardV54()}
       ${renderWeeklyCoachCard()}
+      ${renderPlateauCoachCard()}
+      ${renderDeloadCoachCard()}
       ${plan ? `<article class="card stack">
         <p class="muted">Aktiver Plan</p>
         <h2>${htmlesc(plan.planName)}</h2>
@@ -4629,6 +4812,8 @@ function renderCoach() {
         <header><h1 class="title">Coach</h1><p class="subtitle">Auswertung nach dem Training.</p></header>
         ${renderCoachDashboardV54()}
         ${renderWeeklyCoachCard()}
+        ${renderPlateauCoachCard()}
+        ${renderDeloadCoachCard()}
         <article class="card stack">
           <h2>Training starten</h2>
           <p class="muted">Speichere dein erstes Training, damit der Smart Coach deine Datenbasis aufbauen kann.</p>
@@ -4653,6 +4838,8 @@ function renderCoach() {
       ${renderIntelligenceCoreCard("coach")}
       ${renderRecoveryFatigueCard("coach")}
       ${renderPlanOptimizerCard("coach")}
+      ${renderPlateauCoachCard()}
+      ${renderDeloadCoachCard()}
       ${renderLongTermProgressCard("coach")}
       <article class="card stack">
         <div class="row"><h3 class="grow">Recovery</h3><span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span></div>
@@ -5701,7 +5888,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "5.0.0",
+    backupVersion: "6.5.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),
@@ -5716,6 +5903,7 @@ function createBackup() {
     customPlans: storage.customPlans,
     customExercises: storage.customExercises,
     personalProfile: storage.personalProfile,
+    coachFeedback: storage.coachFeedback,
     userSettings: currentUserSettings(),
     lastErrors: storage.lastErrors,
     archivedPlanNames: storage.archivedPlanNames,
@@ -5786,6 +5974,7 @@ function importBackupFile(file) {
       storage.machineSettings = mergeById(storage.machineSettings, Array.isArray(backup.machineSettings) ? backup.machineSettings : []);
       storage.customPlans = mergeById(storage.customPlans, Array.isArray(backup.customPlans) ? backup.customPlans : []);
       storage.customExercises = mergeById(storage.customExercises, Array.isArray(backup.customExercises) ? backup.customExercises : []);
+      storage.coachFeedback = mergeById(storage.coachFeedback, Array.isArray(backup.coachFeedback) ? backup.coachFeedback : []);
       if (!storage.personalProfile && backup.personalProfile && typeof backup.personalProfile === "object") storage.personalProfile = backup.personalProfile;
       storage.userSettings = { ...currentUserSettings(), ...(backup.userSettings && typeof backup.userSettings === "object" ? backup.userSettings : {}) };
       storage.lastErrors = mergeById(storage.lastErrors, Array.isArray(backup.lastErrors) ? backup.lastErrors : []);
@@ -5810,6 +5999,22 @@ function bindEvents() {
   document.querySelector("[data-toggle-more-menu]")?.addEventListener("click", () => {
     state.moreMenuOpen = !state.moreMenuOpen;
     render();
+  });
+
+  document.querySelectorAll("[data-coach-feedback]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const entry = {
+        id: `coach_feedback_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        recommendationId: button.dataset.recommendationId,
+        ruleId: button.dataset.ruleId,
+        feedbackType: button.dataset.coachFeedback,
+        optionalNote: "",
+        timestamp: new Date().toISOString()
+      };
+      storage.coachFeedback = [...storage.coachFeedback, entry];
+      alert(coachFeedbackText("thanks", "Feedback gespeichert."));
+      render();
+    });
   });
 
   document.querySelectorAll("[data-confirm-plan-adjust]").forEach((button) => button.addEventListener("click", () => {
