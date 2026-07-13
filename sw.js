@@ -1,4 +1,4 @@
-const CACHE_NAME = "dcoach-pwa-v53";
+const CACHE_NAME = "dcoach-pwa-v54";
 const ASSETS = [
   "./",
   "./index.html",
@@ -197,6 +197,7 @@ const ASSETS = [
   "./vendor/MuscleMapJS/browser/widget/muscle-map-widget.js",
   "./assets/icon.svg",
   "./assets/apple-touch-icon.png",
+  "./assets/design_reference/muscle-map-target-2026-07-13.png",
   "./assets/muscle_maps/premium_muscle_map_front_v5.0.0.svg",
   "./assets/muscle_maps/premium_muscle_map_back_v5.0.0.svg",
   "./assets/muscle_maps/muscle_map_front_v3.0.0.svg",
@@ -250,8 +251,29 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
+});
+
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  const url = new URL(event.request.url);
+  const isAppShell = event.request.mode === "navigate"
+    || url.pathname.endsWith("/")
+    || url.pathname.endsWith("/index.html")
+    || url.pathname.endsWith("/app.js")
+    || url.pathname.endsWith("/styles.css")
+    || url.pathname.endsWith("/sw.js");
+  if (isAppShell) {
+    event.respondWith(
+      fetch(event.request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      }).catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html")))
+    );
+    return;
+  }
   event.respondWith(
     caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
       const copy = response.clone();

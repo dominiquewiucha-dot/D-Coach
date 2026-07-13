@@ -178,7 +178,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v53";
+const APP_VERSION = "pwa-v54";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -1201,9 +1201,7 @@ async function boot() {
   if (plan && storage.activePlanName !== plan.planName) {
     storage.activePlanName = plan.planName;
   }
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
-  }
+  registerServiceWorker();
   bindPwaEvents();
   restoreWorkoutDraft();
   startTimerLoop();
@@ -1245,6 +1243,29 @@ function bindPwaEvents() {
   window.addEventListener("unhandledrejection", (event) => {
     logAppError(event.reason?.message || event.reason || "Unhandled promise rejection", "promise");
   });
+}
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  let refreshed = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (refreshed) return;
+    refreshed = true;
+    window.location.reload();
+  });
+  navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" }).then((registration) => {
+    registration.update().catch(() => {});
+    if (registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" });
+    registration.addEventListener("updatefound", () => {
+      const worker = registration.installing;
+      if (!worker) return;
+      worker.addEventListener("statechange", () => {
+        if (worker.state === "installed" && navigator.serviceWorker.controller) {
+          worker.postMessage({ type: "SKIP_WAITING" });
+        }
+      });
+    });
+  }).catch(() => {});
 }
 
 function restoreWorkoutDraft() {
@@ -5163,7 +5184,7 @@ function renderCoach() {
   const improvements = sessionImprovements(session);
   const coverageHints = coverageCoachHints(coverageForSessions(sessionsSince(7)));
   return `
-    <section class="screen stack workout-screen">
+    <section class="screen stack coach-screen">
       <header><h1 class="title">Coach</h1><p class="subtitle">${htmlesc(session.dayName)} · ${dateText(session.startedAt)}</p></header>
       <div class="grid">
         ${metric(String(sessionDurationMinutes(session)), "Minuten")}
