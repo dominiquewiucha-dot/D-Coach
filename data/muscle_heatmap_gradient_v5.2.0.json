@@ -1,39 +1,14 @@
 {
-  "version": "5.2.0",
+  "version": "5.2.1",
   "type": "muscle_heatmap_gradient",
   "stops": [
-    {
-      "percent": 0,
-      "color": "#263241"
-    },
-    {
-      "percent": 15,
-      "color": "#FDE047"
-    },
-    {
-      "percent": 40,
-      "color": "#FACC15"
-    },
-    {
-      "percent": 65,
-      "color": "#FB923C"
-    },
-    {
-      "percent": 85,
-      "color": "#F97316"
-    },
-    {
-      "percent": 105,
-      "color": "#EF4444"
-    },
-    {
-      "percent": 130,
-      "color": "#B91C1C"
-    },
-    {
-      "percent": 160,
-      "color": "#7F1D1D"
-    }
+    { "percent": 0, "color": "#2A2D34" },
+    { "percent": 1, "color": "#FDE047" },
+    { "percent": 35, "color": "#FACC15" },
+    { "percent": 70, "color": "#FB923C" },
+    { "percent": 100, "color": "#F97316" },
+    { "percent": 130, "color": "#EF4444" },
+    { "percent": 160, "color": "#7F1D1D" }
   ],
   "rule": "Interpolate smoothly. Do not use blue shades to represent load."
 }

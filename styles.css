@@ -776,7 +776,7 @@ select:focus-visible {
 }
 
 .muscle-map-screen {
-  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 28px);
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 24px);
 }
 
 .screen-header-row {
@@ -787,12 +787,14 @@ select:focus-visible {
 }
 
 .muscle-map-stage {
-  min-height: 390px;
+  min-height: 430px;
   border: 1px solid rgba(96,165,250,.24);
   border-radius: var(--radius-lg);
-  padding: 10px;
+  padding: 8px;
   background: radial-gradient(circle at center 34%, rgba(37,99,235,.14), rgba(8,17,31,.86) 68%);
   overflow: hidden;
+  display: grid;
+  place-items: center;
 }
 
 .muscle-map-list {
@@ -834,52 +836,66 @@ select:focus-visible {
 }
 
 .interactive-muscle-map.premium {
-  max-width: 330px;
-  padding: 4px;
+  max-width: 340px;
+  padding: 0;
 }
 
 .interactive-muscle-map.premium.inline {
-  max-width: 360px;
-  min-height: 360px;
+  max-width: min(100%, 380px);
+  min-height: 430px;
 }
 
 .muscle-map-stage .interactive-muscle-map.premium.inline {
-  max-width: 420px;
-  min-height: 390px;
+  max-width: min(100%, 430px);
+  min-height: 430px;
 }
 
 .premium-body-svg {
   display: block;
   width: 100%;
-  min-height: 360px;
-  max-height: 520px;
+  height: auto;
+  min-height: 430px;
+  max-height: 500px;
 }
 
 .premium-body-base {
-  fill: #202a37;
-  stroke: rgba(167,176,190,.34);
-  stroke-width: 1.5;
+  fill: #171c24;
+  stroke: rgba(229,231,235,.28);
+  stroke-width: 1.3;
+}
+
+.premium-body-shadow {
+  fill: #171c24;
+}
+
+.premium-body-line {
+  fill: none;
+  stroke: rgba(229,231,235,.22);
+  stroke-width: 1;
 }
 
 .premium-svg-region {
   cursor: pointer;
-  stroke: rgba(255,255,255,.28);
-  stroke-width: 1.4;
-  transition: opacity .15s ease, stroke-width .15s ease, filter .15s ease;
+  stroke: rgba(255,255,255,.22);
+  stroke-width: 1.1;
+  vector-effect: non-scaling-stroke;
+  transition: opacity .15s ease, stroke-width .15s ease, filter .15s ease, stroke .15s ease;
 }
 
 .premium-svg-region:hover,
 .premium-svg-region:focus-visible {
   opacity: 1;
   stroke: rgba(255,255,255,.86);
-  stroke-width: 2.5;
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,.32));
   outline: none;
 }
 
 .premium-svg-region.selected {
   opacity: 1;
   stroke: #ffffff;
-  stroke-width: 3.2;
+  stroke-width: 2.8;
+  filter: drop-shadow(0 0 10px rgba(255,255,255,.42)) drop-shadow(0 0 18px rgba(249,115,22,.42));
 }
 
 .interactive-muscle-map.premium img {

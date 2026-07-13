@@ -151,7 +151,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v44";
+const APP_VERSION = "pwa-v45";
 const STORAGE_SCHEMA_VERSION = "5.0.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -1633,18 +1633,19 @@ function premiumSubregionsForExercise(exercise, mapping) {
     mg_rear_delts: ["mg_rear_delts"],
     mg_biceps: ["mg_biceps_long"],
     mg_triceps: ["mg_triceps_long"],
+    mg_forearms: ["mg_forearm_flexors", "mg_forearm_extensors"],
     mg_abs: ["mg_abs_upper", "mg_abs_lower"],
     mg_obliques: ["mg_obliques"],
-    mg_quads: ["mg_quads_rectus", "mg_quads_vastus_lateralis", "mg_quads_vastus_medialis"],
+    mg_quads: ["mg_quads_rectus", "mg_quads_vastus_lateralis", "mg_quads_vastus_medialis", "mg_tibialis_anterior"],
     mg_adductors: ["mg_adductors"],
     mg_traps: ["mg_traps_upper", "mg_traps_mid"],
     mg_upper_back: ["mg_traps_mid", "mg_rhomboids"],
     mg_rhomboids: ["mg_rhomboids"],
     mg_lats: ["mg_lats_upper", "mg_lats_lower"],
     mg_erectors: ["mg_erectors_upper", "mg_erectors_lower"],
-    mg_glutes: ["mg_glutes_maximus"],
-    mg_hamstrings: ["mg_hamstrings_biceps"],
-    mg_calves: ["mg_calves_gastrocnemius"]
+    mg_glutes: ["mg_glutes_maximus", "mg_glutes_medius"],
+    mg_hamstrings: ["mg_hamstrings_biceps", "mg_hamstrings_inner"],
+    mg_calves: ["mg_calves_gastrocnemius", "mg_soleus"]
   };
   const ids = [
     ...(fallback[mapping?.primaryMuscle] || []),
@@ -3060,29 +3061,19 @@ function renderInteractiveMuscleSvg(view, items) {
 
 function renderPremiumMuscleSvg(view, items, regions) {
   const selected = state.selectedMuscleId;
-  const regionMarkup = regions.map((region, index) => {
+  const regionIds = new Set(regions.map((region) => region.muscleId));
+  const regionMarkup = premiumMusclePathDefinitions(view).filter((region) => regionIds.has(region.muscleId)).map((region) => {
     const item = coverageItemByPremiumMuscle(items, region.muscleId);
+    const label = premiumRegionByMuscleId(region.muscleId)?.label || region.label;
     const isSelected = selected === region.muscleId;
-    const opacity = selected && !isSelected ? 0.25 : 1;
-    return premiumRegionSvgShapes(region.svgRegionId, view, index).map((shape, shapeIndex) => {
-      const label = `${region.label} ${shape.side || ""}`.trim();
-      return `<ellipse class="premium-svg-region ${isSelected ? "selected" : ""}" cx="${shape.cx}" cy="${shape.cy}" rx="${shape.rx}" ry="${shape.ry}" fill="${coverageColorFor(item.percent)}" opacity="${opacity}" data-open-coverage-muscle="${htmlesc(region.muscleId)}" data-muscle-id="${htmlesc(region.muscleId)}" tabindex="0" role="button" aria-label="${htmlesc(label)} ${item.percent} Prozent" data-region-index="${shapeIndex}"></ellipse>`;
-    }).join("");
+    const opacity = selected && !isSelected ? 0.3 : 1;
+    return `<path id="${view}_${region.id}" class="premium-svg-region ${isSelected ? "selected" : ""}" d="${region.d}" fill="${coverageColorFor(item.percent)}" opacity="${opacity}" data-open-coverage-muscle="${htmlesc(region.muscleId)}" data-muscle-id="${htmlesc(region.muscleId)}" data-region-key="${htmlesc(region.id)}" tabindex="0" role="button" aria-label="${htmlesc(label)} ${region.side} ${item.percent} Prozent"></path>`;
   }).join("");
   return `
     <div class="interactive-muscle-map premium inline ${view}">
       <svg class="premium-body-svg" viewBox="0 0 220 520" role="img" aria-label="${view === "front" ? "Athletische Muskelkarte Vorderseite" : "Athletische Muskelkarte Rueckseite"}">
-        <defs>
-          <filter id="muscleGlow-${view}" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="4" result="blur"></feGaussianBlur>
-            <feMerge>
-              <feMergeNode in="blur"></feMergeNode>
-              <feMergeNode in="SourceGraphic"></feMergeNode>
-            </feMerge>
-          </filter>
-        </defs>
         ${renderPremiumBodyBase(view)}
-        <g class="premium-svg-regions" filter="url(#muscleGlow-${view})">
+        <g class="premium-svg-regions">
           ${regionMarkup}
         </g>
       </svg>
@@ -3091,22 +3082,89 @@ function renderPremiumMuscleSvg(view, items, regions) {
 }
 
 function renderPremiumBodyBase(view) {
-  const torso = view === "front"
-    ? `<path d="M72 116 C82 92 138 92 148 116 L162 238 C150 276 70 276 58 238 Z"></path>`
-    : `<path d="M70 114 C82 88 138 88 150 114 L164 242 C145 282 75 282 56 242 Z"></path>`;
   return `
     <g class="premium-body-base">
-      <circle cx="110" cy="42" r="23"></circle>
-      <path d="M92 66 C100 78 120 78 128 66 L134 96 L86 96 Z"></path>
-      ${torso}
-      <path d="M68 122 C38 138 28 196 24 258 C38 264 49 258 54 240 C57 198 65 166 82 142 Z"></path>
-      <path d="M152 122 C182 138 192 196 196 258 C182 264 171 258 166 240 C163 198 155 166 138 142 Z"></path>
-      <path d="M76 260 C58 306 52 392 58 492 C77 500 91 493 92 474 C91 400 98 333 108 276 Z"></path>
-      <path d="M144 260 C162 306 168 392 162 492 C143 500 129 493 128 474 C129 400 122 333 112 276 Z"></path>
-      <path d="M81 492 L93 492 L91 512 L63 512 C64 501 70 495 81 492 Z"></path>
-      <path d="M139 492 L127 492 L129 512 L157 512 C156 501 150 495 139 492 Z"></path>
+      <path class="premium-body-shadow" d="M110 18 C126 18 138 31 136 47 C135 61 124 70 110 70 C96 70 85 61 84 47 C82 31 94 18 110 18 Z"></path>
+      <path class="premium-body-shadow" d="M92 68 C101 77 119 77 128 68 L136 98 C127 104 93 104 84 98 Z"></path>
+      <path class="premium-body-shadow" d="M55 116 C71 91 149 91 165 116 C177 153 174 209 163 252 C153 275 132 286 110 286 C88 286 67 275 57 252 C46 209 43 153 55 116 Z"></path>
+      <path class="premium-body-shadow" d="M54 118 C34 130 27 170 24 219 C23 249 27 272 35 286 C48 284 57 275 59 259 C57 224 58 183 67 150 C71 137 69 126 54 118 Z"></path>
+      <path class="premium-body-shadow" d="M166 118 C186 130 193 170 196 219 C197 249 193 272 185 286 C172 284 163 275 161 259 C163 224 162 183 153 150 C149 137 151 126 166 118 Z"></path>
+      <path class="premium-body-shadow" d="M70 270 C58 314 53 391 60 488 C70 499 88 499 96 486 C94 406 99 339 108 292 C95 291 82 284 70 270 Z"></path>
+      <path class="premium-body-shadow" d="M150 270 C162 314 167 391 160 488 C150 499 132 499 124 486 C126 406 121 339 112 292 C125 291 138 284 150 270 Z"></path>
+      <path class="premium-body-shadow" d="M75 486 L96 486 L93 512 L61 512 C62 499 66 491 75 486 Z"></path>
+      <path class="premium-body-shadow" d="M145 486 L124 486 L127 512 L159 512 C158 499 154 491 145 486 Z"></path>
+      <path class="premium-body-line" d="M110 82 L110 286"></path>
+      ${view === "front" ? `<path class="premium-body-line" d="M81 119 C94 132 126 132 139 119"></path>` : `<path class="premium-body-line" d="M76 118 C94 134 126 134 144 118"></path>`}
     </g>
   `;
+}
+
+function premiumMusclePathDefinitions(view) {
+  const front = [
+    { id: "chest_clavicular_left", muscleId: "mg_chest_clavicular", side: "links", label: "Obere Brust", d: "M73 119 C82 102 101 99 109 112 L109 139 C94 137 80 130 73 119 Z" },
+    { id: "chest_clavicular_right", muscleId: "mg_chest_clavicular", side: "rechts", label: "Obere Brust", d: "M147 119 C138 102 119 99 111 112 L111 139 C126 137 140 130 147 119 Z" },
+    { id: "chest_sternal_left", muscleId: "mg_chest_sternal", side: "links", label: "Mittlere Brust", d: "M72 124 C84 139 95 142 109 142 L109 174 C94 176 78 166 68 148 C67 138 68 130 72 124 Z" },
+    { id: "chest_sternal_right", muscleId: "mg_chest_sternal", side: "rechts", label: "Mittlere Brust", d: "M148 124 C136 139 125 142 111 142 L111 174 C126 176 142 166 152 148 C153 138 152 130 148 124 Z" },
+    { id: "chest_lower_left", muscleId: "mg_chest_lower", side: "links", label: "Untere Brust", d: "M70 154 C82 174 94 181 109 178 L109 197 C94 202 78 194 65 177 C66 168 67 160 70 154 Z" },
+    { id: "chest_lower_right", muscleId: "mg_chest_lower", side: "rechts", label: "Untere Brust", d: "M150 154 C138 174 126 181 111 178 L111 197 C126 202 142 194 155 177 C154 168 153 160 150 154 Z" },
+    { id: "front_delt_left", muscleId: "mg_front_delts", side: "links", label: "Vordere Schulter", d: "M56 116 C64 101 78 102 87 116 C78 123 72 136 69 151 C58 145 52 131 56 116 Z" },
+    { id: "front_delt_right", muscleId: "mg_front_delts", side: "rechts", label: "Vordere Schulter", d: "M164 116 C156 101 142 102 133 116 C142 123 148 136 151 151 C162 145 168 131 164 116 Z" },
+    { id: "side_delt_left", muscleId: "mg_side_delts", side: "links", label: "Seitliche Schulter", d: "M47 127 C50 116 55 112 63 114 C60 128 62 143 69 154 C57 158 45 148 47 127 Z" },
+    { id: "side_delt_right", muscleId: "mg_side_delts", side: "rechts", label: "Seitliche Schulter", d: "M173 127 C170 116 165 112 157 114 C160 128 158 143 151 154 C163 158 175 148 173 127 Z" },
+    { id: "biceps_left", muscleId: "mg_biceps_long", side: "links", label: "Bizeps", d: "M41 159 C52 156 60 166 59 187 C58 209 51 226 42 232 C35 217 34 179 41 159 Z" },
+    { id: "biceps_right", muscleId: "mg_biceps_long", side: "rechts", label: "Bizeps", d: "M179 159 C168 156 160 166 161 187 C162 209 169 226 178 232 C185 217 186 179 179 159 Z" },
+    { id: "brachialis_left", muscleId: "mg_brachialis", side: "links", label: "Brachialis", d: "M56 165 C63 176 63 211 52 231 C49 211 51 181 56 165 Z" },
+    { id: "brachialis_right", muscleId: "mg_brachialis", side: "rechts", label: "Brachialis", d: "M164 165 C157 176 157 211 168 231 C171 211 169 181 164 165 Z" },
+    { id: "forearm_flexors_left", muscleId: "mg_forearm_flexors", side: "links", label: "Unterarmbeuger", d: "M39 234 C51 230 57 239 55 263 C53 285 46 298 35 301 C29 278 31 249 39 234 Z" },
+    { id: "forearm_flexors_right", muscleId: "mg_forearm_flexors", side: "rechts", label: "Unterarmbeuger", d: "M181 234 C169 230 163 239 165 263 C167 285 174 298 185 301 C191 278 189 249 181 234 Z" },
+    { id: "abs_upper", muscleId: "mg_abs_upper", side: "mittig", label: "Oberer Bauch", d: "M88 201 C98 197 122 197 132 201 C135 222 129 241 110 244 C91 241 85 222 88 201 Z" },
+    { id: "abs_lower", muscleId: "mg_abs_lower", side: "mittig", label: "Unterer Bauch", d: "M90 246 C100 250 120 250 130 246 C132 267 124 283 110 286 C96 283 88 267 90 246 Z" },
+    { id: "obliques_left", muscleId: "mg_obliques", side: "links", label: "Obliques", d: "M68 188 C79 205 84 237 87 271 C75 263 66 245 61 221 C61 207 63 196 68 188 Z" },
+    { id: "obliques_right", muscleId: "mg_obliques", side: "rechts", label: "Obliques", d: "M152 188 C141 205 136 237 133 271 C145 263 154 245 159 221 C159 207 157 196 152 188 Z" },
+    { id: "adductors_left", muscleId: "mg_adductors", side: "links", label: "Adduktoren", d: "M95 293 C104 314 106 356 98 401 C88 368 84 326 88 296 C90 294 92 293 95 293 Z" },
+    { id: "adductors_right", muscleId: "mg_adductors", side: "rechts", label: "Adduktoren", d: "M125 293 C116 314 114 356 122 401 C132 368 136 326 132 296 C130 294 128 293 125 293 Z" },
+    { id: "rectus_femoris_left", muscleId: "mg_quads_rectus", side: "links", label: "Rectus femoris", d: "M77 292 C87 303 92 360 88 427 C76 409 70 342 73 307 C74 301 75 296 77 292 Z" },
+    { id: "rectus_femoris_right", muscleId: "mg_quads_rectus", side: "rechts", label: "Rectus femoris", d: "M143 292 C133 303 128 360 132 427 C144 409 150 342 147 307 C146 301 145 296 143 292 Z" },
+    { id: "vastus_lateralis_left", muscleId: "mg_quads_vastus_lateralis", side: "links", label: "Vastus lateralis", d: "M66 282 C73 299 73 375 77 437 C64 424 58 348 62 306 C63 297 64 289 66 282 Z" },
+    { id: "vastus_lateralis_right", muscleId: "mg_quads_vastus_lateralis", side: "rechts", label: "Vastus lateralis", d: "M154 282 C147 299 147 375 143 437 C156 424 162 348 158 306 C157 297 156 289 154 282 Z" },
+    { id: "vastus_medialis_left", muscleId: "mg_quads_vastus_medialis", side: "links", label: "Vastus medialis", d: "M88 382 C99 393 98 425 90 448 C80 437 80 400 88 382 Z" },
+    { id: "vastus_medialis_right", muscleId: "mg_quads_vastus_medialis", side: "rechts", label: "Vastus medialis", d: "M132 382 C121 393 122 425 130 448 C140 437 140 400 132 382 Z" },
+    { id: "tibialis_left", muscleId: "mg_tibialis_anterior", side: "links", label: "Tibialis", d: "M70 437 C82 444 86 478 81 503 C68 494 64 462 70 437 Z" },
+    { id: "tibialis_right", muscleId: "mg_tibialis_anterior", side: "rechts", label: "Tibialis", d: "M150 437 C138 444 134 478 139 503 C152 494 156 462 150 437 Z" }
+  ];
+  const back = [
+    { id: "rear_delt_left", muscleId: "mg_rear_delts", side: "links", label: "Hintere Schulter", d: "M55 116 C66 101 82 105 88 120 C79 127 72 139 68 153 C56 148 50 130 55 116 Z" },
+    { id: "rear_delt_right", muscleId: "mg_rear_delts", side: "rechts", label: "Hintere Schulter", d: "M165 116 C154 101 138 105 132 120 C141 127 148 139 152 153 C164 148 170 130 165 116 Z" },
+    { id: "traps_upper", muscleId: "mg_traps_upper", side: "mittig", label: "Oberer Trapez", d: "M84 91 C98 82 122 82 136 91 C131 112 121 125 110 128 C99 125 89 112 84 91 Z" },
+    { id: "traps_mid", muscleId: "mg_traps_mid", side: "mittig", label: "Mittlerer Trapez", d: "M80 126 C97 119 123 119 140 126 C134 158 123 185 110 197 C97 185 86 158 80 126 Z" },
+    { id: "rhomboids_left", muscleId: "mg_rhomboids", side: "links", label: "Rhomboiden", d: "M82 139 C93 140 103 155 109 178 C93 176 82 164 76 148 Z" },
+    { id: "rhomboids_right", muscleId: "mg_rhomboids", side: "rechts", label: "Rhomboiden", d: "M138 139 C127 140 117 155 111 178 C127 176 138 164 144 148 Z" },
+    { id: "lat_upper_left", muscleId: "mg_lats_upper", side: "links", label: "Lat oben", d: "M68 145 C83 160 91 194 91 225 C75 221 62 195 59 167 C61 157 64 150 68 145 Z" },
+    { id: "lat_upper_right", muscleId: "mg_lats_upper", side: "rechts", label: "Lat oben", d: "M152 145 C137 160 129 194 129 225 C145 221 158 195 161 167 C159 157 156 150 152 145 Z" },
+    { id: "lat_lower_left", muscleId: "mg_lats_lower", side: "links", label: "Lat unten", d: "M65 200 C82 218 91 247 88 273 C75 270 63 252 57 226 C58 215 61 206 65 200 Z" },
+    { id: "lat_lower_right", muscleId: "mg_lats_lower", side: "rechts", label: "Lat unten", d: "M155 200 C138 218 129 247 132 273 C145 270 157 252 163 226 C162 215 159 206 155 200 Z" },
+    { id: "triceps_left", muscleId: "mg_triceps_long", side: "links", label: "Trizeps", d: "M41 158 C53 155 60 169 58 203 C57 226 50 239 40 243 C33 221 33 178 41 158 Z" },
+    { id: "triceps_right", muscleId: "mg_triceps_long", side: "rechts", label: "Trizeps", d: "M179 158 C167 155 160 169 162 203 C163 226 170 239 180 243 C187 221 187 178 179 158 Z" },
+    { id: "forearm_extensors_left", muscleId: "mg_forearm_extensors", side: "links", label: "Unterarmstrecker", d: "M39 244 C50 240 56 250 54 274 C52 294 46 304 35 306 C29 284 31 257 39 244 Z" },
+    { id: "forearm_extensors_right", muscleId: "mg_forearm_extensors", side: "rechts", label: "Unterarmstrecker", d: "M181 244 C170 240 164 250 166 274 C168 294 174 304 185 306 C191 284 189 257 181 244 Z" },
+    { id: "erectors_upper_left", muscleId: "mg_erectors_upper", side: "links", label: "Rueckenstrecker oben", d: "M97 191 C106 208 107 244 103 270 C94 258 92 216 97 191 Z" },
+    { id: "erectors_upper_right", muscleId: "mg_erectors_upper", side: "rechts", label: "Rueckenstrecker oben", d: "M123 191 C114 208 113 244 117 270 C126 258 128 216 123 191 Z" },
+    { id: "erectors_lower_left", muscleId: "mg_erectors_lower", side: "links", label: "Rueckenstrecker unten", d: "M101 268 C107 283 106 305 99 326 C89 312 91 286 101 268 Z" },
+    { id: "erectors_lower_right", muscleId: "mg_erectors_lower", side: "rechts", label: "Rueckenstrecker unten", d: "M119 268 C113 283 114 305 121 326 C131 312 129 286 119 268 Z" },
+    { id: "gluteus_maximus_left", muscleId: "mg_glutes_maximus", side: "links", label: "Gluteus maximus", d: "M73 305 C91 292 107 301 108 323 C104 348 82 358 65 340 C63 325 66 313 73 305 Z" },
+    { id: "gluteus_maximus_right", muscleId: "mg_glutes_maximus", side: "rechts", label: "Gluteus maximus", d: "M147 305 C129 292 113 301 112 323 C116 348 138 358 155 340 C157 325 154 313 147 305 Z" },
+    { id: "gluteus_medius_left", muscleId: "mg_glutes_medius", side: "links", label: "Gluteus medius", d: "M65 285 C78 279 94 287 101 304 C84 300 72 304 63 316 C60 304 60 293 65 285 Z" },
+    { id: "gluteus_medius_right", muscleId: "mg_glutes_medius", side: "rechts", label: "Gluteus medius", d: "M155 285 C142 279 126 287 119 304 C136 300 148 304 157 316 C160 304 160 293 155 285 Z" },
+    { id: "hamstrings_outer_left", muscleId: "mg_hamstrings_biceps", side: "links", label: "Hamstrings aussen", d: "M64 347 C76 360 78 424 73 458 C61 442 57 378 64 347 Z" },
+    { id: "hamstrings_outer_right", muscleId: "mg_hamstrings_biceps", side: "rechts", label: "Hamstrings aussen", d: "M156 347 C144 360 142 424 147 458 C159 442 163 378 156 347 Z" },
+    { id: "hamstrings_inner_left", muscleId: "mg_hamstrings_inner", side: "links", label: "Hamstrings innen", d: "M88 348 C96 367 97 425 89 462 C80 442 79 382 88 348 Z" },
+    { id: "hamstrings_inner_right", muscleId: "mg_hamstrings_inner", side: "rechts", label: "Hamstrings innen", d: "M132 348 C124 367 123 425 131 462 C140 442 141 382 132 348 Z" },
+    { id: "gastrocnemius_left", muscleId: "mg_calves_gastrocnemius", side: "links", label: "Gastrocnemius", d: "M68 444 C83 450 89 482 82 503 C68 502 61 467 68 444 Z" },
+    { id: "gastrocnemius_right", muscleId: "mg_calves_gastrocnemius", side: "rechts", label: "Gastrocnemius", d: "M152 444 C137 450 131 482 138 503 C152 502 159 467 152 444 Z" },
+    { id: "soleus_left", muscleId: "mg_soleus", side: "links", label: "Soleus", d: "M88 455 C96 466 94 493 86 506 C80 488 81 466 88 455 Z" },
+    { id: "soleus_right", muscleId: "mg_soleus", side: "rechts", label: "Soleus", d: "M132 455 C124 466 126 493 134 506 C140 488 139 466 132 455 Z" }
+  ];
+  return view === "front" ? front : back;
 }
 
 function premiumRegionSvgShapes(regionId, view, index) {
