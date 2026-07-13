@@ -178,7 +178,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v52";
+const APP_VERSION = "pwa-v53";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -3043,31 +3043,14 @@ function renderTabs() {
 
 function renderPremiumTabs() {
   const primaryTabs = [
-    ["dashboard", "Start", "D"],
-    ["training", "Train", "T"],
+    ["dashboard", "Dashboard", "D"],
+    ["training", "Training", "T"],
     ["coach", "Coach", "C"],
-    ["plans", "Plan", "P"]
-  ];
-  const moreTabs = [
-    ["musclemap", "Muskelkarte", "M"],
-    ["exercises", "Uebungen", "U"],
-    ["weight", "Gewicht", "G"],
-    ["journal", "Journal", "J"],
+    ["plans", "Plaene", "P"],
     ["settings", "Profil", "S"]
   ];
   const tabIsActive = (id) => state.tab === id && !state.activeWorkout && !state.selectedExerciseId && !state.selectedSessionId;
-  const moreActive = moreTabs.some(([id]) => state.tab === id);
   return `
-    ${state.moreMenuOpen ? `
-      <div class="more-menu" role="menu" aria-label="Weitere Bereiche">
-        ${moreTabs.map(([id, label, icon]) => `
-          <button class="more-menu-item ${tabIsActive(id) ? "active" : ""}" data-tab="${id}" role="menuitem">
-            <span class="tab-icon">${icon}</span>
-            <span>${label}</span>
-          </button>
-        `).join("")}
-      </div>
-    ` : ""}
     <nav class="bottom-nav tabs" aria-label="Hauptnavigation">
       ${primaryTabs.map(([id, label, icon]) => `
         <button class="tab ${tabIsActive(id) ? "active" : ""}" data-tab="${id}">
@@ -3075,10 +3058,6 @@ function renderPremiumTabs() {
           <span>${label}</span>
         </button>
       `).join("")}
-      <button class="tab ${state.moreMenuOpen || moreActive ? "active" : ""}" data-toggle-more-menu aria-expanded="${state.moreMenuOpen ? "true" : "false"}">
-        <span class="tab-icon">M</span>
-        <span>Mehr</span>
-      </button>
     </nav>
   `;
 }
