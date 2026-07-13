@@ -1,0 +1,22 @@
+{
+  "version": "6.7.0",
+  "requiredModules": [
+    "SmartCoachFoundation",
+    "WeeklyCoach",
+    "SessionCoach",
+    "CoachLearningFeedback",
+    "PlateauCoach",
+    "DeloadCoach",
+    "AdaptiveMesocycleCoach"
+  ],
+  "gates": [
+    "offline",
+    "no external API",
+    "why and confidence",
+    "safety overrides progression",
+    "plan changes require confirmation",
+    "backup includes feedback",
+    "no quick-training regression",
+    "no navigation clipping"
+  ]
+}

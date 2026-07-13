@@ -1,0 +1,30 @@
+{
+  "version": "6.6.0",
+  "rules": [
+    {
+      "id": "increase_volume",
+      "if": "coverage below target and recovery good",
+      "then": "add 1-2 weekly sets"
+    },
+    {
+      "id": "hold_volume",
+      "if": "coverage on target and progression positive",
+      "then": "keep plan"
+    },
+    {
+      "id": "reduce_volume",
+      "if": "fatigue high or performance falling",
+      "then": "reduce 10-20 percent"
+    },
+    {
+      "id": "weak_point_focus",
+      "if": "weak point persists 3+ weeks",
+      "then": "increase priority for 3-4 weeks"
+    },
+    {
+      "id": "early_deload",
+      "if": "deload score high",
+      "then": "end accumulation early"
+    }
+  ]
+}

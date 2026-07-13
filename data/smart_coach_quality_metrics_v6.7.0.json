@@ -1,0 +1,12 @@
+{
+  "version": "6.7.0",
+  "metrics": [
+    "recommendationAcceptanceRate",
+    "recommendationHelpfulnessRate",
+    "falsePlateauRate",
+    "deloadAcceptanceRate",
+    "planChangeRollbackRate",
+    "coachErrorCount"
+  ],
+  "privacy": "local only"
+}

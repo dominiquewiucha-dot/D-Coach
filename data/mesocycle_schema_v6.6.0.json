@@ -1,0 +1,16 @@
+{
+  "version": "6.6.0",
+  "fields": [
+    "id",
+    "name",
+    "goal",
+    "startDate",
+    "plannedWeeks",
+    "currentWeek",
+    "weeklyVolumeTargets",
+    "exercisePriorities",
+    "progressionStrategy",
+    "deloadStrategy",
+    "status"
+  ]
+}

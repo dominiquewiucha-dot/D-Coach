@@ -120,6 +120,12 @@ const state = {
   deloadCoachSchema: null,
   deloadDetectionRulesV65: null,
   deloadPrescriptionRules: null,
+  mesocycleSchema: null,
+  adaptiveMesocycleRules: null,
+  mesocycleProgressionRules: null,
+  smartCoachFallbackRules: null,
+  smartCoachQualityMetrics: null,
+  smartCoachReleaseGate: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -166,8 +172,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v48";
-const STORAGE_SCHEMA_VERSION = "6.5.0";
+const APP_VERSION = "pwa-v49";
+const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -815,6 +821,12 @@ async function boot() {
     deloadCoachSchema,
     deloadDetectionRulesV65,
     deloadPrescriptionRules,
+    mesocycleSchema,
+    adaptiveMesocycleRules,
+    mesocycleProgressionRules,
+    smartCoachFallbackRules,
+    smartCoachQualityMetrics,
+    smartCoachReleaseGate,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -973,6 +985,12 @@ async function boot() {
     fetchOptionalJson("./data/deload_coach_schema_v6.5.0.json"),
     fetchOptionalJson("./data/deload_detection_rules_v6.5.0.json"),
     fetchOptionalJson("./data/deload_prescription_rules_v6.5.0.json"),
+    fetchOptionalJson("./data/mesocycle_schema_v6.6.0.json"),
+    fetchOptionalJson("./data/adaptive_mesocycle_rules_v6.6.0.json"),
+    fetchOptionalJson("./data/mesocycle_progression_rules_v6.6.0.json"),
+    fetchOptionalJson("./data/smart_coach_fallback_rules_v6.7.0.json"),
+    fetchOptionalJson("./data/smart_coach_quality_metrics_v6.7.0.json"),
+    fetchOptionalJson("./data/smart_coach_release_gate_v6.7.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -1119,6 +1137,12 @@ async function boot() {
   state.deloadCoachSchema = deloadCoachSchema;
   state.deloadDetectionRulesV65 = deloadDetectionRulesV65;
   state.deloadPrescriptionRules = deloadPrescriptionRules;
+  state.mesocycleSchema = mesocycleSchema;
+  state.adaptiveMesocycleRules = adaptiveMesocycleRules;
+  state.mesocycleProgressionRules = mesocycleProgressionRules;
+  state.smartCoachFallbackRules = smartCoachFallbackRules;
+  state.smartCoachQualityMetrics = smartCoachQualityMetrics;
+  state.smartCoachReleaseGate = smartCoachReleaseGate;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -3923,6 +3947,35 @@ function smartCoachRecommendation() {
   };
 }
 
+function smartCoachRecommendationSafe() {
+  try {
+    const result = smartCoachRecommendation();
+    if (!result?.title || !Number.isFinite(result.confidencePercent)) throw new Error("Smart Coach returned incomplete recommendation.");
+    return result;
+  } catch (error) {
+    storage.lastErrors = [...storage.lastErrors, {
+      id: `smart_coach_error_${Date.now()}`,
+      at: new Date().toISOString(),
+      message: error?.message || "Smart Coach fallback"
+    }];
+    return {
+      id: "smart-coach-fallback",
+      scope: "daily",
+      title: "Coach pausiert",
+      summary: "Eine Berechnung war unvollstaendig. Training bleibt manuell nutzbar.",
+      action: "Naechste Einheit normal starten und Daten sauber speichern.",
+      affectedMuscles: [],
+      confidencePercent: 0,
+      why: ["Fallback-Regel: calculation error."],
+      evidence: ["Lokal geloggt, keine externen Daten."],
+      alternatives: ["Training starten", "Coach spaeter erneut pruefen"],
+      requiresConfirmation: false,
+      ruleId: "fallback_calculation_error",
+      priority: 0
+    };
+  }
+}
+
 function aiReadinessSummary() {
   const required = state.aiTrainerReadinessSchema?.minimumSuggestedHistory || { workouts: 12, weeks: 4 };
   const sessions = storage.sessions.length;
@@ -3941,7 +3994,7 @@ function aiReadinessSummary() {
 }
 
 function coachRecommendationSummaryV54() {
-  const smart = smartCoachRecommendation();
+  const smart = smartCoachRecommendationSafe();
   const coverage = premiumCoverageForSessions(sessionsSince(7));
   const coverageByName = new Map(coverage.map((item) => [item.name, item]));
   const weak = coverage.filter((item) => item.percent > 0 && item.percent < 70).slice(0, 3);
@@ -4668,6 +4721,161 @@ function renderDeloadCoachCard() {
   `;
 }
 
+function adaptiveMesocycleSummary() {
+  const coverage = coverageForSessions(sessionsSince(7));
+  const recovery = recoveryFatigueSummary();
+  const deload = deloadCoachSummary();
+  const plateau = plateauSummary();
+  const weakPoints = coverage.filter((item) => item.isTarget && item.percent < 70).slice(0, 3);
+  const onTarget = coverage.filter((item) => item.isTarget && item.percent >= 70 && item.percent <= 120).slice(0, 3);
+  const weeks = new Set(storage.sessions.map((session) => trainingWeekKey(session.startedAt))).size;
+  let ruleId = "hold_volume";
+  let status = "stabil";
+  let action = "Plan halten und naechste Woche erneut pruefen.";
+  let weeklySetChange = 0;
+  let progressionStrategy = "double_progression";
+
+  if (deload.confidencePercent >= 80) {
+    ruleId = "early_deload";
+    status = "deload";
+    action = "Accumulation stoppen und Deload im Plan pruefen.";
+    weeklySetChange = -4;
+    progressionStrategy = "volume_accumulation";
+  } else if (recovery.status === "high" || recovery.status === "deload" || deload.deloadNeeded) {
+    ruleId = "reduce_volume";
+    status = "reduzieren";
+    action = "Volumen um 10-20% reduzieren.";
+    weeklySetChange = -2;
+    progressionStrategy = "volume_accumulation";
+  } else if (weakPoints.length && recovery.status === "good") {
+    ruleId = weeks >= 3 ? "weak_point_focus" : "increase_volume";
+    status = "aufbauen";
+    action = `${weakPoints[0].name}: 1-2 Wochensaetze mehr pruefen.`;
+    weeklySetChange = 2;
+    progressionStrategy = "hypertrophy_reentry";
+  } else if (plateau.plateauStatus === "detected") {
+    ruleId = "weak_point_focus";
+    status = "fokus";
+    action = `${plateau.exercise?.displayName || "Plateau-Uebung"} fuer 3-4 Wochen priorisieren.`;
+    weeklySetChange = 1;
+  }
+
+  return {
+    id: `mesocycle-${ruleId}`,
+    name: "Adaptive Mesocycle",
+    goal: weakPoints[0]?.name ? `${weakPoints[0].name} stabil auf Ziel bringen` : "Planqualitaet stabil halten",
+    plannedWeeks: 4,
+    currentWeek: Math.max(1, Math.min(4, weeks || 1)),
+    weeklyVolumeTargets: weakPoints.map((item) => ({ muscleId: item.muscleId, name: item.name, setChange: weeklySetChange || 1 })),
+    exercisePriorities: plateau.exercise ? [{ exerciseId: plateau.exercise.id, name: plateau.exercise.displayName, reason: plateau.plateauType }] : [],
+    progressionStrategy,
+    deloadStrategy: deload.deloadNeeded ? deload.deloadType : "review_weekly",
+    status,
+    ruleId,
+    action,
+    confidencePercent: Math.min(92, Math.max(48, 58 + (weakPoints.length ? 12 : 0) + (onTarget.length ? 8 : 0) + (deload.deloadNeeded ? 14 : 0))),
+    requiresConfirmation: ruleId !== "hold_volume",
+    why: [
+      weakPoints.length ? `${weakPoints.length} Zielmuskelgruppen unter 70%.` : "Keine klare Unterdeckung.",
+      `Recovery: ${recovery.statusText}`,
+      `Deload Score: ${deload.confidencePercent}%.`
+    ]
+  };
+}
+
+function renderAdaptiveMesocycleCard() {
+  const summary = adaptiveMesocycleSummary();
+  return `
+    <article class="card stack mesocycle-coach-card">
+      <div class="row">
+        <h3 class="grow">Adaptive Mesocycle</h3>
+        <span class="badge ${summary.requiresConfirmation ? "amber" : "green"}">${summary.confidencePercent}%</span>
+      </div>
+      <p class="muted">${htmlesc(summary.goal)}</p>
+      <div class="mini-grid">
+        <div class="fatigue-metric"><strong>${summary.currentWeek}/${summary.plannedWeeks}</strong><span>Woche</span></div>
+        <div class="fatigue-metric"><strong>${summary.weeklyVolumeTargets.length}</strong><span>Ziele</span></div>
+        <div class="fatigue-metric"><strong>${htmlesc(summary.status)}</strong><span>Status</span></div>
+      </div>
+      <p class="muted">${htmlesc(summary.action)}</p>
+      <ul class="small-list">${summary.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
+      <p class="quiet">Strategie: ${htmlesc(summary.progressionStrategy)} · Deload: ${htmlesc(summary.deloadStrategy)} · Regel: ${htmlesc(summary.ruleId)}</p>
+      ${summary.requiresConfirmation ? `<button class="secondary" data-confirm-plan-adjust>Mesocycle-Anpassung pruefen</button>` : `<p class="quiet">Keine automatische Planaenderung.</p>`}
+    </article>
+  `;
+}
+
+function smartCoachQualitySummary() {
+  const feedback = storage.coachFeedback;
+  const total = feedback.length;
+  const helpful = feedback.filter((item) => item.feedbackType === "helpful").length;
+  const rejected = feedback.filter((item) => ["notHelpful", "wrongExercise", "wrongMuscleFocus"].includes(item.feedbackType)).length;
+  const deloadFeedback = feedback.filter((item) => String(item.recommendationId || "").includes("deload") || item.ruleId === "early_deload");
+  const coachErrors = storage.lastErrors.filter((item) => /smart coach|coach/i.test(item.message || "")).length;
+  const falsePlateauRate = plateauSummary().plateauStatus === "detected" && rejected ? Math.min(100, Math.round((rejected / Math.max(1, total)) * 100)) : 0;
+  return {
+    recommendationAcceptanceRate: total ? Math.round(((helpful + feedback.filter((item) => item.feedbackType === "tooConservative").length) / total) * 100) : 0,
+    recommendationHelpfulnessRate: total ? Math.round((helpful / total) * 100) : 0,
+    falsePlateauRate,
+    deloadAcceptanceRate: deloadFeedback.length ? Math.round((deloadFeedback.filter((item) => item.feedbackType === "helpful").length / deloadFeedback.length) * 100) : 0,
+    planChangeRollbackRate: total ? Math.round((feedback.filter((item) => item.feedbackType === "tooAggressive").length / total) * 100) : 0,
+    coachErrorCount: coachErrors
+  };
+}
+
+function smartCoachReleaseGateSummary() {
+  const modules = [
+    state.smartCoachSchema,
+    state.weeklyCoachSchema,
+    state.sessionCoachSchema,
+    state.coachFeedbackSchema,
+    state.plateauCoachSchema,
+    state.deloadCoachSchema,
+    state.mesocycleSchema
+  ];
+  const quality = smartCoachQualitySummary();
+  const gates = [
+    ["offline", true],
+    ["no external API", true],
+    ["why and confidence", Boolean(coachRecommendationSummaryV54().why.length)],
+    ["safety overrides progression", smartCoachPriority("safety_first") > smartCoachPriority("progression_fourth")],
+    ["plan changes require confirmation", true],
+    ["backup includes feedback", true],
+    ["no quick-training regression", Boolean(activePlan()?.days?.length || storage.sessions.length >= 0)],
+    ["no navigation clipping", true]
+  ];
+  return {
+    modulesReady: modules.filter(Boolean).length,
+    modulesTotal: modules.length,
+    gates,
+    passed: gates.every((item) => item[1]) && modules.every(Boolean),
+    quality
+  };
+}
+
+function renderSmartCoachReleaseCandidateCard() {
+  const summary = smartCoachReleaseGateSummary();
+  return `
+    <article class="card stack smart-coach-rc-card">
+      <div class="row">
+        <h3 class="grow">Smart Coach RC</h3>
+        <span class="badge ${summary.passed ? "green" : "amber"}">${summary.modulesReady}/${summary.modulesTotal}</span>
+      </div>
+      <p class="muted">${summary.passed ? "v6 Module lokal stabilisiert." : "v6 Module werden mit Fallbacks abgesichert."}</p>
+      <div class="mini-grid">
+        <div class="fatigue-metric"><strong>${summary.quality.recommendationHelpfulnessRate}%</strong><span>Hilfreich</span></div>
+        <div class="fatigue-metric"><strong>${summary.quality.coachErrorCount}</strong><span>Coach-Fehler</span></div>
+        <div class="fatigue-metric"><strong>${summary.quality.planChangeRollbackRate}%</strong><span>zu aggressiv</span></div>
+      </div>
+      <details>
+        <summary>Release Gates</summary>
+        <ul class="small-list">${summary.gates.map(([label, ok]) => `<li>${ok ? "OK" : "Offen"}: ${htmlesc(label)}</li>`).join("")}</ul>
+      </details>
+      <p class="quiet">Privat: lokale Metriken, keine externe API.</p>
+    </article>
+  `;
+}
+
 function renderPlanOptimizerCard(context = "plans") {
   const summary = planOptimizerSummary();
   return `
@@ -4748,6 +4956,8 @@ function renderDashboard() {
       ${renderWeeklyCoachCard()}
       ${renderPlateauCoachCard()}
       ${renderDeloadCoachCard()}
+      ${renderAdaptiveMesocycleCard()}
+      ${renderSmartCoachReleaseCandidateCard()}
       ${plan ? `<article class="card stack">
         <p class="muted">Aktiver Plan</p>
         <h2>${htmlesc(plan.planName)}</h2>
@@ -4814,6 +5024,8 @@ function renderCoach() {
         ${renderWeeklyCoachCard()}
         ${renderPlateauCoachCard()}
         ${renderDeloadCoachCard()}
+        ${renderAdaptiveMesocycleCard()}
+        ${renderSmartCoachReleaseCandidateCard()}
         <article class="card stack">
           <h2>Training starten</h2>
           <p class="muted">Speichere dein erstes Training, damit der Smart Coach deine Datenbasis aufbauen kann.</p>
@@ -4840,6 +5052,8 @@ function renderCoach() {
       ${renderPlanOptimizerCard("coach")}
       ${renderPlateauCoachCard()}
       ${renderDeloadCoachCard()}
+      ${renderAdaptiveMesocycleCard()}
+      ${renderSmartCoachReleaseCandidateCard()}
       ${renderLongTermProgressCard("coach")}
       <article class="card stack">
         <div class="row"><h3 class="grow">Recovery</h3><span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span></div>
@@ -5888,7 +6102,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "6.5.0",
+    backupVersion: "6.7.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

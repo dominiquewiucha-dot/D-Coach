@@ -1,0 +1,21 @@
+{
+  "version": "6.7.0",
+  "fallbacks": [
+    {
+      "condition": "missing history",
+      "result": "learning state"
+    },
+    {
+      "condition": "missing muscle mappings",
+      "result": "group-level recommendation only"
+    },
+    {
+      "condition": "conflicting rules",
+      "result": "conservative recommendation"
+    },
+    {
+      "condition": "calculation error",
+      "result": "hide recommendation and log debug event"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "version": "6.6.0",
+  "strategies": [
+    {
+      "id": "double_progression",
+      "sequence": [
+        "reps",
+        "load"
+      ]
+    },
+    {
+      "id": "volume_accumulation",
+      "sequence": [
+        "base",
+        "add sets",
+        "peak",
+        "deload"
+      ]
+    },
+    {
+      "id": "hypertrophy_reentry",
+      "sequence": [
+        "technique",
+        "stable volume",
+        "small progression",
+        "review"
+      ]
+    }
+  ]
+}
