@@ -172,7 +172,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v49";
+const APP_VERSION = "pwa-v50";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -2939,6 +2939,7 @@ function render() {
 
 function renderRoute() {
   if (!state.seed) return `<section class="screen"><h1 class="title">D-Coach</h1><p class="subtitle">Lade Daten...</p></section>`;
+  if (isMuscleMapPrototypeRoute()) return renderMuscleMapJsPrototypeScreen();
   if (state.selectedExerciseId) return renderExerciseDetail(state.selectedExerciseId);
   if (state.activeWorkout) return renderWorkout();
   if (state.selectedSessionId) return renderSessionDetail(state.selectedSessionId);
@@ -2957,8 +2958,52 @@ function renderRoute() {
 
 function tabFromHash() {
   const id = String(window.location.hash || "").replace("#", "");
-  const allowed = ["dashboard", "training", "coach", "plans", "musclemap", "exercises", "weight", "journal", "settings"];
+  const allowed = ["dashboard", "training", "coach", "plans", "musclemap", "exercises", "weight", "journal", "settings", "debug-muscle-map-prototype"];
   return allowed.includes(id) ? id : "";
+}
+
+function isMuscleMapPrototypeRoute() {
+  return state.tab === "debug-muscle-map-prototype" || window.location.pathname.endsWith("/debug/muscle-map-prototype");
+}
+
+function renderMuscleMapJsPrototypeScreen() {
+  return `
+    <section class="screen prototype-screen">
+      <div class="screen-header-row">
+        <div class="grow">
+          <p class="eyebrow">v6.8 Debug</p>
+          <h1 class="title">MuscleMapJS Prototyp</h1>
+          <p class="subtitle">Isolierter Vergleich mit lokal gebundener Male MuscleMapJS-Karte. Die produktive Muscle Map bleibt unveraendert.</p>
+        </div>
+        <span class="badge blue">MIT lokal</span>
+      </div>
+      <div class="prototype-toolbar" data-musclemapjs-prototype>
+        <div class="segmented">
+          <button data-prototype-side data-prototype-value="front">Vorne</button>
+          <button data-prototype-side data-prototype-value="back">Hinten</button>
+        </div>
+        <div class="segmented">
+          <button data-prototype-style data-prototype-value="neon">Neon</button>
+          <button data-prototype-style data-prototype-value="medical">Medical</button>
+          <button data-prototype-style data-prototype-value="default">Default</button>
+        </div>
+      </div>
+      <div class="prototype-layout" data-musclemapjs-prototype>
+        <article class="prototype-map-panel">
+          <div class="prototype-map" data-prototype-map></div>
+          <div class="prototype-legend" data-prototype-legend></div>
+        </article>
+        <article class="card prototype-detail" data-prototype-detail>
+          <h3>Lade Prototyp...</h3>
+          <p class="muted">MuscleMapJS wird lokal geladen.</p>
+        </article>
+      </div>
+      <article class="card prototype-compare">
+        <h3>Vergleich zur aktuellen Karte</h3>
+        <p class="muted">Diese Seite ist nur Debug/Proof-of-Concept. Kein produktives Mapping, keine Trainingsdaten und keine Storage-Schluessel werden veraendert.</p>
+      </article>
+    </section>
+  `;
 }
 
 function renderTabs() {
@@ -6210,6 +6255,10 @@ function importBackupFile(file) {
 }
 
 function bindEvents() {
+  if (isMuscleMapPrototypeRoute()) {
+    mountMuscleMapJsPrototype();
+  }
+
   document.querySelector("[data-toggle-more-menu]")?.addEventListener("click", () => {
     state.moreMenuOpen = !state.moreMenuOpen;
     render();
@@ -6669,6 +6718,20 @@ function bindEvents() {
     await clearPwaCache().catch((error) => logAppError(error.message, "cache"));
     alert("Cache wurde geleert. Lade die App danach neu.");
   });
+}
+
+function mountMuscleMapJsPrototype() {
+  const container = document.querySelector("[data-musclemapjs-prototype]");
+  if (!container) return;
+  import("./prototype/musclemapjs-prototype.js?v=6.8.0")
+    .then((module) => module.mountDCoachMuscleMapJsPrototype(container.closest(".prototype-screen")))
+    .catch((error) => {
+      logAppError(error?.message || error, "musclemapjs-prototype");
+      const detail = document.querySelector("[data-prototype-detail]");
+      if (detail) {
+        detail.innerHTML = `<h3>Prototyp konnte nicht geladen werden</h3><p class="muted">${htmlesc(error?.message || String(error))}</p>`;
+      }
+    });
 }
 
 boot().catch((error) => {

@@ -1,0 +1,147 @@
+{
+  "version": "6.8.0",
+  "type": "musclemapjs_dcoach_adapter_seed",
+  "note": "Source IDs must be verified against the actual installed repository.",
+  "mappings": [
+    {
+      "sourceMuscleId": "chest",
+      "dcoachMuscleId": "mg_chest_sternal",
+      "labelDe": "Brust",
+      "view": "front",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "upper-chest",
+      "dcoachMuscleId": "mg_chest_clavicular",
+      "labelDe": "Obere Brust",
+      "view": "front",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "front-deltoid",
+      "dcoachMuscleId": "mg_front_delts",
+      "labelDe": "Vordere Schulter",
+      "view": "front",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "deltoids",
+      "dcoachMuscleId": "mg_side_delts",
+      "labelDe": "Seitliche Schulter",
+      "view": "front",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "rear-deltoid",
+      "dcoachMuscleId": "mg_rear_delts",
+      "labelDe": "Hintere Schulter",
+      "view": "back",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "biceps",
+      "dcoachMuscleId": "mg_biceps_long",
+      "labelDe": "Bizeps",
+      "view": "front",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "triceps",
+      "dcoachMuscleId": "mg_triceps_long",
+      "labelDe": "Trizeps",
+      "view": "back",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "forearm",
+      "dcoachMuscleId": "mg_forearms",
+      "labelDe": "Unterarme",
+      "view": "both",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "abs",
+      "dcoachMuscleId": "mg_abs",
+      "labelDe": "Bauch",
+      "view": "front",
+      "side": "center"
+    },
+    {
+      "sourceMuscleId": "obliques",
+      "dcoachMuscleId": "mg_obliques",
+      "labelDe": "Obliques",
+      "view": "front",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "trapezius",
+      "dcoachMuscleId": "mg_traps",
+      "labelDe": "Trapez",
+      "view": "back",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "upper-back",
+      "dcoachMuscleId": "mg_upper_back",
+      "labelDe": "Oberer Rücken",
+      "view": "back",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "rhomboids",
+      "dcoachMuscleId": "mg_rhomboids",
+      "labelDe": "Rhomboiden",
+      "view": "back",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "lower-back",
+      "dcoachMuscleId": "mg_erectors_lower",
+      "labelDe": "Unterer Rücken",
+      "view": "back",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "gluteal",
+      "dcoachMuscleId": "mg_glutes_maximus",
+      "labelDe": "Gluteus",
+      "view": "back",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "quadriceps",
+      "dcoachMuscleId": "mg_quads",
+      "labelDe": "Quadrizeps",
+      "view": "front",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "adductors",
+      "dcoachMuscleId": "mg_adductors",
+      "labelDe": "Adduktoren",
+      "view": "front",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "hamstring",
+      "dcoachMuscleId": "mg_hamstrings",
+      "labelDe": "Hamstrings",
+      "view": "back",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "calves",
+      "dcoachMuscleId": "mg_calves",
+      "labelDe": "Waden",
+      "view": "back",
+      "side": "bilateral"
+    },
+    {
+      "sourceMuscleId": "tibialis",
+      "dcoachMuscleId": "mg_tibialis",
+      "labelDe": "Schienbein",
+      "view": "front",
+      "side": "bilateral"
+    }
+  ]
+}

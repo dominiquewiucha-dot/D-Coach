@@ -1,4 +1,12 @@
 .DS_Store
 Thumbs.db
 *.log
+node_modules/
+_codex_work/
+vendor/MuscleMapJS/node_modules/
+vendor/MuscleMapJS/.gitignore
+vendor/MuscleMapJS/demo/
+vendor/MuscleMapJS/screenshots/
+vendor/MuscleMapJS/pnpm-lock.yaml
+vendor/MuscleMapJS/pnpm-workspace.yaml
 Dateien von ChatGPT/

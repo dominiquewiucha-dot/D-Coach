@@ -1,0 +1,32 @@
+{
+  "version": "6.8.0",
+  "type": "dcoach_musclemapjs_heatmap",
+  "stops": [
+    {
+      "maxPercent": 0,
+      "color": "#263241"
+    },
+    {
+      "maxPercent": 35,
+      "color": "#FACC15"
+    },
+    {
+      "maxPercent": 70,
+      "color": "#FB923C"
+    },
+    {
+      "maxPercent": 100,
+      "color": "#F97316"
+    },
+    {
+      "maxPercent": 130,
+      "color": "#EF4444"
+    },
+    {
+      "maxPercent": 999,
+      "color": "#991B1B"
+    }
+  ],
+  "interpolation": "smooth",
+  "nonMuscleUI": "D-Coach blue design system"
+}

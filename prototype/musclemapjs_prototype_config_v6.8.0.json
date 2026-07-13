@@ -1,0 +1,17 @@
+{
+  "version": "6.8.0",
+  "type": "musclemapjs_prototype_config",
+  "gender": "male",
+  "initialSide": "front",
+  "styleCandidates": [
+    "neon",
+    "medical",
+    "default"
+  ],
+  "interactive": true,
+  "multiSelect": false,
+  "showSubGroups": true,
+  "locale": "de",
+  "route": "/debug/muscle-map-prototype",
+  "productionReplacementAllowed": false
+}

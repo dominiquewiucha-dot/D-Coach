@@ -1,0 +1,17 @@
+{
+  "version": "6.8.0",
+  "type": "musclemapjs_prototype_test_data",
+  "coverage": {
+    "mg_chest_sternal": 82,
+    "mg_chest_clavicular": 68,
+    "mg_front_delts": 118,
+    "mg_side_delts": 64,
+    "mg_triceps_long": 58,
+    "mg_lats": 47,
+    "mg_upper_back": 126,
+    "mg_quads": 92,
+    "mg_hamstrings": 41,
+    "mg_glutes_maximus": 33,
+    "mg_calves": 74
+  }
+}

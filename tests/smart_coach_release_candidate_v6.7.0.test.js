@@ -23,7 +23,9 @@ assert(app.includes("function smartCoachReleaseGateSummary()"), "release gate mi
 assert(app.includes("safety overrides progression"), "safety gate missing");
 assert(app.includes("backup includes feedback"), "backup feedback gate missing");
 assert(app.includes("Privat: lokale Metriken, keine externe API."), "local-only privacy copy missing");
-assert(app.includes('const APP_VERSION = "pwa-v49"'), "app version not bumped");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v49"'), "cache version not bumped");
+const appVersion = app.match(/const APP_VERSION = "pwa-v(\d+)"/)?.[1];
+const cacheVersion = sw.match(/const CACHE_NAME = "dcoach-pwa-v(\d+)"/)?.[1];
+assert(Number(appVersion) >= 49, "app version not bumped");
+assert(Number(cacheVersion) >= 49, "cache version not bumped");
 
 console.log("smart coach release candidate v6.7.0 tests passed");
