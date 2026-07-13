@@ -1,0 +1,28 @@
+{
+  "version": "6.12.0",
+  "type": "coach_plan_proposal_schema",
+  "fields": [
+    "id",
+    "createdAt",
+    "scope",
+    "title",
+    "summary",
+    "affectedMuscles",
+    "currentPlanSnapshot",
+    "proposedChanges",
+    "prediction",
+    "why",
+    "evidence",
+    "alternatives",
+    "riskNotes",
+    "requiresConfirmation",
+    "status"
+  ],
+  "statuses": [
+    "pending",
+    "accepted",
+    "rejected",
+    "cancelled",
+    "reverted"
+  ]
+}

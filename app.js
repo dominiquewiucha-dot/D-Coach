@@ -158,6 +158,9 @@ const state = {
   productionMuscleDetailSchema: null,
   productionMuscleMapReleaseGate: null,
   lifeFitnessScannerConfig: null,
+  coachPlanProposalSchema: null,
+  coachProposalApplyRules: null,
+  coachProposalReviewUi: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -180,6 +183,8 @@ const state = {
     selectedExerciseId: "",
     mappingId: ""
   },
+  activeCoachProposalId: "",
+  showProposalAlternative: false,
   isOnline: navigator.onLine,
   deferredInstallPrompt: null,
   restTimer: {
@@ -189,7 +194,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v62";
+const APP_VERSION = "pwa-v63";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -205,6 +210,8 @@ const STORAGE_KEYS = [
   { key: "dcoach.userSettings", label: "Einstellungen", type: "object" },
   { key: "dcoach.personalProfile", label: "Profil", type: "object" },
   { key: "dcoach.coachFeedback", label: "Coach-Feedback", type: "array" },
+  { key: "dcoach.coachPlanProposals", label: "Coach-Vorschlaege", type: "array" },
+  { key: "dcoach.coachPlanUndo", label: "Coach-Undo", type: "object" },
   { key: "dcoach.lastErrors", label: "Fehlerlog", type: "array" },
   { key: "dcoach.activeWorkoutDraft", label: "Trainingsentwurf", type: "object" },
   { key: "dcoach.lastBackupAt", label: "Letztes Backup", type: "string" },
@@ -292,6 +299,19 @@ const storage = {
   },
   set coachFeedback(value) {
     writeJson("dcoach.coachFeedback", Array.isArray(value) ? value.slice(-200) : []);
+  },
+  get coachPlanProposals() {
+    return readJson("dcoach.coachPlanProposals", []);
+  },
+  set coachPlanProposals(value) {
+    writeJson("dcoach.coachPlanProposals", Array.isArray(value) ? value.slice(-100) : []);
+  },
+  get coachPlanUndo() {
+    return readJson("dcoach.coachPlanUndo", null);
+  },
+  set coachPlanUndo(value) {
+    if (value) writeJson("dcoach.coachPlanUndo", value);
+    else localStorage.removeItem("dcoach.coachPlanUndo");
   },
   get lastErrors() {
     return readJson("dcoach.lastErrors", []);
@@ -895,7 +915,10 @@ async function boot() {
     productionMuscleMapAdapterRules,
     productionMuscleDetailSchema,
     productionMuscleMapReleaseGate,
-    lifeFitnessScannerConfig
+    lifeFitnessScannerConfig,
+    coachPlanProposalSchema,
+    coachProposalApplyRules,
+    coachProposalReviewUi
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -1066,7 +1089,10 @@ async function boot() {
     fetchOptionalJson("./data/production_muscle_map_adapter_rules_v6.9.0.json"),
     fetchOptionalJson("./data/production_muscle_detail_schema_v6.9.0.json"),
     fetchOptionalJson("./production/production_muscle_map_release_gate_v6.9.0.json"),
-    fetchOptionalJson("./data/life_fitness_scanner_config_v6.11.0.json")
+    fetchOptionalJson("./data/life_fitness_scanner_config_v6.11.0.json"),
+    fetchOptionalJson("./data/coach_plan_proposal_schema_v6.12.0.json"),
+    fetchOptionalJson("./data/coach_proposal_apply_rules_v6.12.0.json"),
+    fetchOptionalJson("./data/coach_proposal_review_ui_v6.12.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -1226,6 +1252,9 @@ async function boot() {
   state.productionMuscleDetailSchema = productionMuscleDetailSchema;
   state.productionMuscleMapReleaseGate = productionMuscleMapReleaseGate;
   state.lifeFitnessScannerConfig = lifeFitnessScannerConfig;
+  state.coachPlanProposalSchema = coachPlanProposalSchema;
+  state.coachProposalApplyRules = coachProposalApplyRules;
+  state.coachProposalReviewUi = coachProposalReviewUi;
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
@@ -3304,6 +3333,7 @@ function render() {
         ${renderRoute()}
       </main>
       ${renderPremiumTabs()}
+      ${state.activeCoachProposalId ? renderCoachProposalReview() : ""}
     </div>
   `;
   bindEvents();
@@ -4492,6 +4522,237 @@ function coachRecommendationSummaryV54() {
     optimizer,
     smart
   };
+}
+
+function planFingerprint(plan) {
+  return JSON.stringify({
+    planName: plan?.planName || "",
+    days: (plan?.days || []).map((day) => ({
+      name: day.name,
+      exercises: (day.exercises || []).map((entry) => ({
+        exerciseId: entry.exerciseId,
+        sets: Number(entry.sets) || 0,
+        sortOrder: Number(entry.sortOrder) || 0
+      }))
+    }))
+  });
+}
+
+function activePlanSnapshot() {
+  const plan = activePlan();
+  return plan ? JSON.parse(JSON.stringify(plan)) : null;
+}
+
+function findProposalSetChange(plan, weakMuscle) {
+  if (!plan || !weakMuscle) return null;
+  for (const day of plan.days || []) {
+    for (const planned of day.exercises || []) {
+      const mapping = muscleMappingForExercise(planned.exerciseId);
+      const primary = mapping?.primaryMuscle ? canonicalizeMuscleId(mapping.primaryMuscle) : "";
+      const secondary = (mapping?.secondaryMuscles || []).map(canonicalizeMuscleId);
+      if (primary !== weakMuscle.muscleId && !secondary.includes(weakMuscle.muscleId)) continue;
+      const exercise = exerciseById(planned.exerciseId);
+      const before = Number(planned.sets) || 0;
+      return {
+        type: "set_count",
+        dayName: day.name,
+        exerciseId: planned.exerciseId,
+        exerciseNameSnapshot: exercise?.displayName || planned.exerciseId,
+        before,
+        after: before + 1
+      };
+    }
+  }
+  return null;
+}
+
+function buildCoachPlanProposal() {
+  const plan = activePlan();
+  const summary = coachRecommendationSummaryV54();
+  const coverage = coverageForSessions(sessionsSince(7)).filter((item) => item.isTarget || item.percent < 70).sort((a, b) => a.percent - b.percent);
+  const weak = coverage[0] || coverageForSessions(sessionsSince(7)).sort((a, b) => a.percent - b.percent)[0] || null;
+  const change = findProposalSetChange(plan, weak);
+  const current = weak?.percent ?? null;
+  const target = Math.max(70, current || 70);
+  const predicted = current === null ? null : Math.min(100, Math.max(target, current + 18));
+  return {
+    id: `proposal_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    createdAt: new Date().toISOString(),
+    scope: "exercise",
+    title: weak ? `${weak.name} priorisieren` : summary.recommendation,
+    summary: change ? `${change.exerciseNameSnapshot}: ${change.before} auf ${change.after} Saetze` : "Es liegt noch kein vollstaendiger Planvorschlag vor.",
+    affectedMuscles: weak ? [{
+      muscleId: weak.muscleId,
+      label: weak.name,
+      currentCoveragePercent: current,
+      targetCoveragePercent: target,
+      predictedCoveragePercent: predicted
+    }] : [],
+    currentPlanSnapshot: activePlanSnapshot(),
+    currentPlanFingerprint: planFingerprint(plan),
+    proposedChanges: change ? [change] : [],
+    prediction: weak ? {
+      before: { [weak.muscleId]: current || 0 },
+      after: { [weak.muscleId]: predicted || current || 0 },
+      confidencePercent: summary.confidence
+    } : null,
+    why: summary.why.length ? summary.why : ["Die Empfehlung basiert auf Wochenabdeckung, Readiness und Planstruktur."],
+    evidence: summary.smart?.evidence || [],
+    alternatives: change ? [{ title: "Alternative", summary: `${change.exerciseNameSnapshot} unveraendert lassen und die naechste Einheit auswerten.` }] : [],
+    riskNotes: ["Nur uebernehmen, wenn Technik und LWS aktuell stabil sind.", "Bei Schmerz oder schlechter Readiness nicht erhoehen."],
+    requiresConfirmation: true,
+    status: "pending"
+  };
+}
+
+function openCoachProposalReview() {
+  const proposal = buildCoachPlanProposal();
+  storage.coachPlanProposals = [...storage.coachPlanProposals, proposal];
+  state.activeCoachProposalId = proposal.id;
+  state.showProposalAlternative = false;
+  render();
+}
+
+function activeCoachProposal() {
+  return storage.coachPlanProposals.find((item) => item.id === state.activeCoachProposalId) || null;
+}
+
+function proposalCanApply(proposal) {
+  return Boolean(proposal?.currentPlanSnapshot && proposal?.proposedChanges?.length && proposal.proposedChanges.every((change) => change.type && change.exerciseId));
+}
+
+function applyCoachPlanProposal() {
+  const proposal = activeCoachProposal();
+  if (!proposalCanApply(proposal)) return alert("Dieser Vorschlag ist unvollstaendig und kann nicht uebernommen werden.");
+  const currentPlan = activePlan();
+  if (planFingerprint(currentPlan) !== proposal.currentPlanFingerprint) {
+    alert("Der Plan wurde inzwischen geaendert. Bitte Vorschlag neu berechnen.");
+    return;
+  }
+  const previous = {
+    id: `undo_${proposal.id}`,
+    proposalId: proposal.id,
+    createdAt: new Date().toISOString(),
+    activePlanName: storage.activePlanName,
+    customPlans: JSON.parse(JSON.stringify(storage.customPlans)),
+    planSnapshot: proposal.currentPlanSnapshot
+  };
+  const nextPlan = JSON.parse(JSON.stringify(currentPlan));
+  proposal.proposedChanges.forEach((change) => {
+    if (change.type !== "set_count") return;
+    const day = nextPlan.days.find((item) => item.name === change.dayName);
+    const entry = day?.exercises?.find((item) => item.exerciseId === change.exerciseId);
+    if (entry) entry.sets = change.after;
+  });
+  if (!storage.customPlans.some((plan) => plan.planName === nextPlan.planName)) {
+    nextPlan.id = `${nextPlan.id || nextPlan.planName}-coach-${Date.now()}`;
+    nextPlan.planName = `${nextPlan.planName} Coach`;
+  }
+  nextPlan.description = `${nextPlan.description || ""} Coach-Anpassung v6.12.`.trim();
+  storage.customPlans = [...storage.customPlans.filter((plan) => plan.planName !== nextPlan.planName), nextPlan];
+  storage.activePlanName = nextPlan.planName;
+  storage.coachPlanUndo = previous;
+  storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === proposal.id ? { ...item, status: "accepted", appliedAt: new Date().toISOString() } : item);
+  render();
+}
+
+function rejectCoachPlanProposal() {
+  const proposal = activeCoachProposal();
+  if (!proposal) return;
+  storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === proposal.id ? { ...item, status: "rejected", rejectedAt: new Date().toISOString() } : item);
+  storage.coachFeedback = [...storage.coachFeedback, {
+    id: `coach_feedback_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    recommendationId: proposal.id,
+    ruleId: "coach_plan_proposal_review",
+    feedbackType: "notHelpful",
+    timestamp: new Date().toISOString()
+  }];
+  state.activeCoachProposalId = "";
+  render();
+}
+
+function cancelCoachPlanProposal() {
+  const proposal = activeCoachProposal();
+  if (proposal) storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === proposal.id && item.status === "pending" ? { ...item, status: "cancelled" } : item);
+  state.activeCoachProposalId = "";
+  render();
+}
+
+function undoCoachPlanProposal() {
+  const undo = storage.coachPlanUndo;
+  if (!undo) return;
+  storage.customPlans = undo.customPlans || [];
+  storage.activePlanName = undo.activePlanName || undo.planSnapshot?.planName || "";
+  storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === undo.proposalId ? { ...item, status: "reverted", revertedAt: new Date().toISOString() } : item);
+  storage.coachPlanUndo = null;
+  state.activeCoachProposalId = "";
+  ensureActivePlan();
+  render();
+}
+
+function renderCoachProposalReview() {
+  const proposal = activeCoachProposal();
+  if (!proposal) return "";
+  const canApply = proposalCanApply(proposal) && proposal.status === "pending";
+  const undo = storage.coachPlanUndo?.proposalId === proposal.id;
+  const confidence = proposal.prediction?.confidencePercent ?? 0;
+  return `
+    <div class="proposal-backdrop" role="dialog" aria-modal="true" aria-label="Coach Vorschlag pruefen">
+      <section class="proposal-sheet stack">
+        <div class="row">
+          <div class="grow">
+            <p class="eyebrow">Coach Review</p>
+            <h2>${htmlesc(proposal.title)}</h2>
+            <p class="muted">${htmlesc(proposal.summary)}</p>
+          </div>
+          <span class="badge ${proposal.status === "accepted" ? "green" : proposal.status === "rejected" ? "amber" : "blue"}">${htmlesc(proposal.status)}</span>
+        </div>
+        <article class="proposal-block">
+          <h3>Betroffene Muskeln</h3>
+          ${proposal.affectedMuscles.length ? proposal.affectedMuscles.map((muscle) => `
+            <div class="history-row">
+              <div><strong>${htmlesc(muscle.label)}</strong><p class="muted">Ziel ${muscle.targetCoveragePercent ?? "-"}%</p></div>
+              <span class="badge blue">${muscle.currentCoveragePercent ?? 0}% -> ca. ${muscle.predictedCoveragePercent ?? muscle.currentCoveragePercent ?? 0}%</span>
+            </div>
+          `).join("") : `<p class="muted">Keine Muskelgruppe eindeutig berechenbar.</p>`}
+        </article>
+        <article class="proposal-block">
+          <h3>Vorher / Nachher</h3>
+          ${proposal.proposedChanges.length ? proposal.proposedChanges.map((change) => `
+            <div class="compare-row">
+              <div><span>Vorher</span><strong>${htmlesc(change.exerciseNameSnapshot || change.exerciseId)} - ${change.before ?? "-"} Saetze</strong></div>
+              <div><span>Nachher</span><strong>${htmlesc(change.exerciseNameSnapshot || change.exerciseId)} - ${change.after ?? "-"} Saetze</strong></div>
+            </div>
+          `).join("") : `<p class="muted">Keine konkrete Planaenderung vorhanden.</p>`}
+        </article>
+        <article class="proposal-block">
+          <h3>Warum?</h3>
+          <ul class="small-list">${proposal.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
+          ${proposal.evidence?.length ? `<ul class="small-list">${proposal.evidence.slice(0, 4).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
+        </article>
+        <article class="proposal-block">
+          <div class="row">
+            <h3 class="grow">Confidence</h3>
+            <span class="badge blue">${confidence}% ${htmlesc(confidenceBand(confidence))}</span>
+          </div>
+          <div class="confidence-bar"><span style="width:${confidence}%"></span></div>
+        </article>
+        <article class="proposal-block">
+          <h3>Sicherheit</h3>
+          <ul class="small-list">${(proposal.riskNotes || []).map((item) => `<li>${htmlesc(item)}</li>`).join("") || "<li>Keine zusaetzlichen Hinweise.</li>"}</ul>
+        </article>
+        ${state.showProposalAlternative ? `<article class="proposal-block"><h3>Alternative</h3>${(proposal.alternatives || []).map((item) => `<p class="muted"><strong>${htmlesc(item.title || "Alternative")}</strong><br>${htmlesc(item.summary || item)}</p>`).join("") || `<p class="muted">Keine Alternative hinterlegt.</p>`}</article>` : ""}
+        ${!canApply && proposal.status === "pending" ? `<p class="warning compact-warning">Uebernehmen ist deaktiviert, weil der Vorschlag unvollstaendig ist oder der Plan nicht mehr passt.</p>` : ""}
+        <div class="proposal-actions">
+          <button class="primary" data-apply-coach-proposal ${canApply ? "" : "disabled"}>Aenderung uebernehmen</button>
+          <button class="secondary" data-show-proposal-alternative>Alternative anzeigen</button>
+          <button class="secondary" data-reject-coach-proposal>Ablehnen</button>
+          <button class="secondary" data-cancel-coach-proposal>Abbrechen</button>
+          ${undo ? `<button class="danger" data-undo-coach-proposal>Undo</button>` : ""}
+        </div>
+      </section>
+    </div>
+  `;
 }
 
 function renderCoachFeedbackControls(recommendationId, ruleId) {
@@ -7003,6 +7264,8 @@ function createBackup() {
     customExercises: storage.customExercises,
     personalProfile: storage.personalProfile,
     coachFeedback: storage.coachFeedback,
+    coachPlanProposals: storage.coachPlanProposals,
+    coachPlanUndo: storage.coachPlanUndo,
     userSettings: currentUserSettings(),
     lastErrors: storage.lastErrors,
     archivedPlanNames: storage.archivedPlanNames,
@@ -7076,6 +7339,8 @@ function importBackupFile(file) {
       storage.customPlans = mergeById(storage.customPlans, Array.isArray(backup.customPlans) ? backup.customPlans : []);
       storage.customExercises = mergeById(storage.customExercises, Array.isArray(backup.customExercises) ? backup.customExercises : []);
       storage.coachFeedback = mergeById(storage.coachFeedback, Array.isArray(backup.coachFeedback) ? backup.coachFeedback : []);
+      storage.coachPlanProposals = mergeById(storage.coachPlanProposals, Array.isArray(backup.coachPlanProposals) ? backup.coachPlanProposals : []);
+      if (!storage.coachPlanUndo && backup.coachPlanUndo && typeof backup.coachPlanUndo === "object") storage.coachPlanUndo = backup.coachPlanUndo;
       if (!storage.personalProfile && backup.personalProfile && typeof backup.personalProfile === "object") storage.personalProfile = backup.personalProfile;
       storage.userSettings = { ...currentUserSettings(), ...(backup.userSettings && typeof backup.userSettings === "object" ? backup.userSettings : {}) };
       storage.lastErrors = mergeById(storage.lastErrors, Array.isArray(backup.lastErrors) ? backup.lastErrors : []);
@@ -7124,13 +7389,17 @@ function bindEvents() {
   });
 
   document.querySelectorAll("[data-confirm-plan-adjust]").forEach((button) => button.addEventListener("click", () => {
-    const weekly = weeklyCoachSummary();
-    const summary = coachRecommendationSummaryV54();
-    const action = weekly.requiresConfirmation ? weekly.recommendedPlanAdjustment : summary.proposedPlanChange;
-    const message = `${action}\n\nNoch wird kein Plan automatisch geaendert. Moechtest du den Vorschlag im Planbereich pruefen?`;
-    if (!confirm(message)) return;
-    navigateTo("plans");
+    openCoachProposalReview();
   }));
+
+  document.querySelector("[data-apply-coach-proposal]")?.addEventListener("click", applyCoachPlanProposal);
+  document.querySelector("[data-reject-coach-proposal]")?.addEventListener("click", rejectCoachPlanProposal);
+  document.querySelector("[data-cancel-coach-proposal]")?.addEventListener("click", cancelCoachPlanProposal);
+  document.querySelector("[data-undo-coach-proposal]")?.addEventListener("click", undoCoachPlanProposal);
+  document.querySelector("[data-show-proposal-alternative]")?.addEventListener("click", () => {
+    state.showProposalAlternative = true;
+    render();
+  });
 
   document.querySelectorAll("[data-tab]").forEach((button) => {
     button.addEventListener("click", () => {

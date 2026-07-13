@@ -1,0 +1,15 @@
+{
+  "version": "6.12.0",
+  "type": "coach_proposal_apply_rules",
+  "rules": [
+    "require explicit confirmation",
+    "block apply if proposal incomplete",
+    "block apply if plan snapshot changed",
+    "apply only displayed changes",
+    "persist change history",
+    "recalculate dashboard after apply",
+    "recalculate smart coach after apply",
+    "support full snapshot undo",
+    "hide internal rule IDs outside debug mode"
+  ]
+}
