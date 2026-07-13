@@ -3796,6 +3796,7 @@ function aiReadinessSummary() {
 function coachRecommendationSummaryV54() {
   const smart = smartCoachRecommendation();
   const coverage = premiumCoverageForSessions(sessionsSince(7));
+  const coverageByName = new Map(coverage.map((item) => [item.name, item]));
   const weak = coverage.filter((item) => item.percent > 0 && item.percent < 70).slice(0, 3);
   const over = coverage.filter((item) => item.percent > 120).slice(0, 3);
   const optimizer = planOptimizerSummary();
@@ -3809,7 +3810,9 @@ function coachRecommendationSummaryV54() {
     recommendation: smart.title,
     mainReason: smart.summary,
     confidence: smart.confidencePercent,
-    affected: smart.affectedMuscles.length ? smart.affectedMuscles.map((name) => ({ name, percent: 0 })) : affected,
+    affected: smart.affectedMuscles.length
+      ? smart.affectedMuscles.map((name) => coverageByName.get(name) || { name, percent: 0 })
+      : affected,
     proposedPlanChange: smart.action || optimizer.action,
     why,
     optimizer,
@@ -4288,9 +4291,10 @@ function renderCoach() {
     return `
       <section class="screen stack">
         <header><h1 class="title">Coach</h1><p class="subtitle">Auswertung nach dem Training.</p></header>
+        ${renderCoachDashboardV54()}
         <article class="card stack">
-          <h2>Noch keine Trainingsdaten</h2>
-          <p class="muted">Speichere dein erstes Training, dann erscheinen hier Fortschritt, Volumen und Empfehlungen.</p>
+          <h2>Training starten</h2>
+          <p class="muted">Speichere dein erstes Training, damit der Smart Coach deine Datenbasis aufbauen kann.</p>
           <button class="primary" data-tab="training">Training starten</button>
         </article>
       </section>

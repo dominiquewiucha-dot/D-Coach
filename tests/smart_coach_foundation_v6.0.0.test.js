@@ -1,4 +1,8 @@
 const assert = require("assert");
+const fs = require("fs");
+const path = require("path");
+
+const appSource = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
 
 const rules = [
   { id: "safety_first", priority: 100 },
@@ -50,5 +54,9 @@ const recommendation = {
   "alternatives",
   "requiresConfirmation"
 ].forEach((field) => assert(Object.prototype.hasOwnProperty.call(recommendation, field)));
+
+assert(appSource.includes("${renderCoachDashboardV54()}"), "Coach must show the learning dashboard without history");
+assert(appSource.includes("const coverageByName = new Map(coverage.map((item) => [item.name, item]))"), "Coach must retain muscle coverage values");
+assert(appSource.includes("coverageByName.get(name) || { name, percent: 0 }"), "Affected muscles must use measured percentages");
 
 console.log("smart coach foundation v6.0.0 tests passed");
