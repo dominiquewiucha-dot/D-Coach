@@ -178,7 +178,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v55";
+const APP_VERSION = "pwa-v56";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -3033,6 +3033,7 @@ function renderRoute() {
     case "plans": return renderPlans();
     case "musclemap": return renderMuscleMapScreen();
     case "exercises": return renderExercises();
+    case "machines": return renderMachines();
     case "weight": return renderWeight();
     case "journal": return renderJournal();
     case "settings": return renderSettings();
@@ -3042,7 +3043,7 @@ function renderRoute() {
 
 function tabFromHash() {
   const id = String(window.location.hash || "").replace("#", "");
-  const allowed = ["dashboard", "training", "coach", "plans", "musclemap", "exercises", "weight", "journal", "settings", "debug-muscle-map-prototype"];
+  const allowed = ["dashboard", "training", "coach", "plans", "musclemap", "exercises", "machines", "weight", "journal", "settings", "debug-muscle-map-prototype"];
   return allowed.includes(id) ? id : "";
 }
 
@@ -6339,6 +6340,74 @@ function renderJournal() {
   `;
 }
 
+function renderProfileShortcuts() {
+  const shortcuts = [
+    { tab: "weight", icon: "G", title: "Gewicht", text: "Gewichtstracking und Verlauf" },
+    { tab: "journal", icon: "J", title: "Journal", text: "Schlaf, Energie, Stress und Notizen" },
+    { tab: "machines", icon: "M", title: "Geraete", text: "Sitz, Griff und Maschinen-Setup" },
+    { tab: "musclemap", icon: "K", title: "Muskelmapping", text: "Muskelkarte und Wochenabdeckung" },
+    { tab: "exercises", icon: "U", title: "Uebungen", text: "Uebungsdatenbank und Details" }
+  ];
+  return `
+    <article class="card stack">
+      <h3>Profil-Menue</h3>
+      <div class="profile-shortcut-grid">
+        ${shortcuts.map((item) => `
+          <button class="profile-shortcut" data-tab="${item.tab}">
+            <span class="profile-shortcut-icon">${item.icon}</span>
+            <span>
+              <strong>${item.title}</strong>
+              <small>${item.text}</small>
+            </span>
+          </button>
+        `).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderMachines() {
+  const settings = [...storage.machineSettings].sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+  return `
+    <section class="screen stack">
+      <button class="secondary" data-tab="settings">Zurueck zum Profil</button>
+      <header><h1 class="title">Geraete</h1><p class="subtitle">Sitz, Griff und Setup pro Uebung.</p></header>
+      <article class="card stack">
+        <h3>Geraeteeinstellungen</h3>
+        <p class="muted">Neue Werte speicherst du im Detail einer Uebung oder direkt im Training.</p>
+        <button class="primary" data-tab="exercises">Uebung suchen</button>
+      </article>
+      ${settings.length ? settings.map((setting) => {
+        const exercise = exerciseById(setting.exerciseId);
+        return `
+          <button class="list-button" data-exercise-id="${htmlesc(setting.exerciseId)}">
+            <article class="card stack">
+              <div class="row">
+                <h3 class="grow">${htmlesc(exercise?.displayName || setting.exerciseId)}</h3>
+                <span class="badge blue">${dateText(setting.updatedAt)}</span>
+              </div>
+              <div class="storage-table">
+                <div><span>Maschine</span><strong>${htmlesc(setting.machineName || "-")}</strong></div>
+                <div><span>Sitz</span><strong>${htmlesc(setting.seatPosition || "-")}</strong></div>
+                <div><span>Griff</span><strong>${htmlesc(setting.gripPosition || setting.handlePosition || "-")}</strong></div>
+                <div><span>Breite</span><strong>${htmlesc(setting.gripWidth || "-")}</strong></div>
+                <div><span>Aufsatz</span><strong>${htmlesc(setting.attachment || "-")}</strong></div>
+                <div><span>Ruecken</span><strong>${htmlesc(setting.backrestPosition || "-")}</strong></div>
+              </div>
+              ${setting.note ? `<p class="muted">${htmlesc(setting.note)}</p>` : ""}
+            </article>
+          </button>
+        `;
+      }).join("") : `
+        <article class="card stack">
+          <h3>Noch keine Geraete gespeichert</h3>
+          <p class="muted">Oeffne eine Uebung, trage Sitz/Griff ein und speichere die Einstellung.</p>
+        </article>
+      `}
+    </section>
+  `;
+}
+
 function renderSettings() {
   const lastBackupAt = storage.lastBackupAt;
   const backupAge = daysSince(lastBackupAt);
@@ -6350,6 +6419,7 @@ function renderSettings() {
   return `
     <section class="screen stack">
       <header><h1 class="title">Einstellungen</h1><p class="subtitle">Lokale Offline-Daten.</p></header>
+      ${renderProfileShortcuts()}
       <article class="card stack">
         <div class="row">
           <h3 class="grow">PWA-Status</h3>

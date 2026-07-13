@@ -629,6 +629,50 @@ select:focus-visible {
   padding: 0;
 }
 
+.profile-shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.profile-shortcut {
+  min-height: 92px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  color: var(--text);
+  background: rgba(18, 27, 39, .92);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.profile-shortcut-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--blue), var(--blue-2));
+  color: white;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.profile-shortcut strong,
+.profile-shortcut small {
+  display: block;
+}
+
+.profile-shortcut small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
 .input {
   width: 100%;
   min-height: 52px;
@@ -1591,6 +1635,7 @@ select:focus-visible {
   .screen { padding-left: 12px; padding-right: 12px; }
   .title { font-size: 30px; }
   .muscle-grid { grid-template-columns: 1fr; }
+  .profile-shortcut-grid { grid-template-columns: 1fr; }
   .muscle-map-list { grid-template-columns: 1fr; }
   .body-map-grid { grid-template-columns: 1fr; }
   .mini-grid { grid-template-columns: 1fr; }
