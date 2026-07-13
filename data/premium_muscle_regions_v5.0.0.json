@@ -1,0 +1,181 @@
+{
+  "version": "5.0.0",
+  "type": "premium_muscle_regions",
+  "regions": [
+    {
+      "muscleId": "mg_chest_clavicular",
+      "label": "Obere Brust",
+      "view": "front",
+      "svgRegionId": "region_chest_clavicular",
+      "group": "chest"
+    },
+    {
+      "muscleId": "mg_chest_sternal",
+      "label": "Mittlere Brust",
+      "view": "front",
+      "svgRegionId": "region_chest_sternal",
+      "group": "chest"
+    },
+    {
+      "muscleId": "mg_chest_lower",
+      "label": "Untere Brust",
+      "view": "front",
+      "svgRegionId": "region_chest_lower",
+      "group": "chest"
+    },
+    {
+      "muscleId": "mg_front_delts",
+      "label": "Vordere Schulter",
+      "view": "front",
+      "svgRegionId": "region_front_delts_l",
+      "group": "shoulders"
+    },
+    {
+      "muscleId": "mg_side_delts",
+      "label": "Seitliche Schulter",
+      "view": "front",
+      "svgRegionId": "region_side_delts_l",
+      "group": "shoulders"
+    },
+    {
+      "muscleId": "mg_biceps_long",
+      "label": "Bizeps langer Kopf",
+      "view": "front",
+      "svgRegionId": "region_biceps_l",
+      "group": "arms"
+    },
+    {
+      "muscleId": "mg_abs_upper",
+      "label": "Oberer Bauch",
+      "view": "front",
+      "svgRegionId": "region_abs_upper",
+      "group": "core"
+    },
+    {
+      "muscleId": "mg_abs_lower",
+      "label": "Unterer Bauch",
+      "view": "front",
+      "svgRegionId": "region_abs_lower",
+      "group": "core"
+    },
+    {
+      "muscleId": "mg_obliques",
+      "label": "Seitliche Bauchmuskeln",
+      "view": "front",
+      "svgRegionId": "region_obliques_l",
+      "group": "core"
+    },
+    {
+      "muscleId": "mg_quads_rectus",
+      "label": "Gerader Oberschenkel",
+      "view": "front",
+      "svgRegionId": "region_quad_rectus_l",
+      "group": "legs"
+    },
+    {
+      "muscleId": "mg_quads_vastus_lateralis",
+      "label": "Äußerer Quadrizeps",
+      "view": "front",
+      "svgRegionId": "region_quad_lateralis_l",
+      "group": "legs"
+    },
+    {
+      "muscleId": "mg_quads_vastus_medialis",
+      "label": "Innerer Quadrizeps",
+      "view": "front",
+      "svgRegionId": "region_quad_medialis_l",
+      "group": "legs"
+    },
+    {
+      "muscleId": "mg_adductors",
+      "label": "Adduktoren",
+      "view": "front",
+      "svgRegionId": "region_adductors_l",
+      "group": "legs"
+    },
+    {
+      "muscleId": "mg_traps_upper",
+      "label": "Oberer Trapez",
+      "view": "back",
+      "svgRegionId": "region_traps_upper",
+      "group": "back"
+    },
+    {
+      "muscleId": "mg_traps_mid",
+      "label": "Mittlerer Trapez",
+      "view": "back",
+      "svgRegionId": "region_traps_mid",
+      "group": "back"
+    },
+    {
+      "muscleId": "mg_lats_upper",
+      "label": "Oberer Lat",
+      "view": "back",
+      "svgRegionId": "region_lats_upper_l",
+      "group": "back"
+    },
+    {
+      "muscleId": "mg_lats_lower",
+      "label": "Unterer Lat",
+      "view": "back",
+      "svgRegionId": "region_lats_lower_l",
+      "group": "back"
+    },
+    {
+      "muscleId": "mg_rhomboids",
+      "label": "Rhomboiden",
+      "view": "back",
+      "svgRegionId": "region_rhomboids",
+      "group": "back"
+    },
+    {
+      "muscleId": "mg_rear_delts",
+      "label": "Hintere Schulter",
+      "view": "back",
+      "svgRegionId": "region_rear_delts_l",
+      "group": "shoulders"
+    },
+    {
+      "muscleId": "mg_triceps_long",
+      "label": "Trizeps langer Kopf",
+      "view": "back",
+      "svgRegionId": "region_triceps_l",
+      "group": "arms"
+    },
+    {
+      "muscleId": "mg_erectors_upper",
+      "label": "Rückenstrecker oben",
+      "view": "back",
+      "svgRegionId": "region_erectors_upper",
+      "group": "back"
+    },
+    {
+      "muscleId": "mg_erectors_lower",
+      "label": "Rückenstrecker unten",
+      "view": "back",
+      "svgRegionId": "region_erectors_lower",
+      "group": "back"
+    },
+    {
+      "muscleId": "mg_glutes_maximus",
+      "label": "Gluteus Maximus",
+      "view": "back",
+      "svgRegionId": "region_glutes_maximus",
+      "group": "legs"
+    },
+    {
+      "muscleId": "mg_hamstrings_biceps",
+      "label": "Beinbeuger außen",
+      "view": "back",
+      "svgRegionId": "region_hamstrings_l",
+      "group": "legs"
+    },
+    {
+      "muscleId": "mg_calves_gastrocnemius",
+      "label": "Wade Gastrocnemius",
+      "view": "back",
+      "svgRegionId": "region_calves_l",
+      "group": "legs"
+    }
+  ]
+}

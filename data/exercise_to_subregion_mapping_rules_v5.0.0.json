@@ -1,0 +1,59 @@
+{
+  "version": "5.0.0",
+  "type": "exercise_to_subregion_mapping_rules",
+  "rules": [
+    {
+      "pattern": "Incline Push",
+      "primarySubregions": [
+        "mg_chest_clavicular"
+      ]
+    },
+    {
+      "pattern": "Horizontal Push",
+      "primarySubregions": [
+        "mg_chest_sternal"
+      ]
+    },
+    {
+      "pattern": "Vertical Pull Neutral",
+      "primarySubregions": [
+        "mg_lats_upper",
+        "mg_lats_lower"
+      ]
+    },
+    {
+      "pattern": "Horizontal Pull Supported",
+      "primarySubregions": [
+        "mg_traps_mid",
+        "mg_rhomboids",
+        "mg_lats_upper"
+      ]
+    },
+    {
+      "pattern": "Shoulder Abduction",
+      "primarySubregions": [
+        "mg_side_delts"
+      ]
+    },
+    {
+      "pattern": "Knee Extension",
+      "primarySubregions": [
+        "mg_quads_rectus",
+        "mg_quads_vastus_medialis",
+        "mg_quads_vastus_lateralis"
+      ]
+    },
+    {
+      "pattern": "Knee Flexion",
+      "primarySubregions": [
+        "mg_hamstrings_biceps"
+      ]
+    },
+    {
+      "pattern": "Hip Extension",
+      "primarySubregions": [
+        "mg_glutes_maximus"
+      ]
+    }
+  ]
+}

@@ -79,6 +79,12 @@ const state = {
   trendAnalysisRules: null,
   progressForecastRules: null,
   longTermTexts: null,
+  premiumMuscleMapSchema: null,
+  premiumMuscleRegions: null,
+  premiumMuscleMapUiRules: null,
+  premiumMuscleDetailSchema: null,
+  muscleHeatmapColorSystem: null,
+  exerciseToSubregionMappingRules: null,
   performanceScoreRules: null,
   coachDecisionRules: null,
   personalRecordRules: null,
@@ -124,8 +130,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v38";
-const STORAGE_SCHEMA_VERSION = "4.3.0";
+const APP_VERSION = "pwa-v39";
+const STORAGE_SCHEMA_VERSION = "5.0.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -725,6 +731,12 @@ async function boot() {
     trendAnalysisRules,
     progressForecastRules,
     longTermTexts,
+    premiumMuscleMapSchema,
+    premiumMuscleRegions,
+    premiumMuscleMapUiRules,
+    premiumMuscleDetailSchema,
+    muscleHeatmapColorSystem,
+    exerciseToSubregionMappingRules,
     performanceScoreRules,
     coachDecisionRules,
     personalRecordRules,
@@ -842,6 +854,12 @@ async function boot() {
     fetchOptionalJson("./data/trend_analysis_rules_v4.3.0.json"),
     fetchOptionalJson("./data/progress_forecast_rules_v4.3.0.json"),
     fetchOptionalJson("./data/long_term_texts_v4.3.0.json"),
+    fetchOptionalJson("./data/premium_muscle_map_schema_v5.0.0.json"),
+    fetchOptionalJson("./data/premium_muscle_regions_v5.0.0.json"),
+    fetchOptionalJson("./data/premium_muscle_map_ui_rules_v5.0.0.json"),
+    fetchOptionalJson("./data/premium_muscle_detail_schema_v5.0.0.json"),
+    fetchOptionalJson("./data/muscle_heatmap_color_system_v5.0.0.json"),
+    fetchOptionalJson("./data/exercise_to_subregion_mapping_rules_v5.0.0.json"),
     fetchOptionalJson("./data/performance_score_rules_v2.5.0.json"),
     fetchOptionalJson("./data/coach_decision_rules_v2.5.0.json"),
     fetchOptionalJson("./data/personal_record_rules_v2.5.0.json"),
@@ -947,6 +965,12 @@ async function boot() {
   state.trendAnalysisRules = trendAnalysisRules;
   state.progressForecastRules = progressForecastRules;
   state.longTermTexts = longTermTexts;
+  state.premiumMuscleMapSchema = premiumMuscleMapSchema;
+  state.premiumMuscleRegions = premiumMuscleRegions;
+  state.premiumMuscleMapUiRules = premiumMuscleMapUiRules;
+  state.premiumMuscleDetailSchema = premiumMuscleDetailSchema;
+  state.muscleHeatmapColorSystem = muscleHeatmapColorSystem;
+  state.exerciseToSubregionMappingRules = exerciseToSubregionMappingRules;
   state.performanceScoreRules = performanceScoreRules;
   state.coachDecisionRules = coachDecisionRules;
   state.personalRecordRules = personalRecordRules;
@@ -1489,6 +1513,83 @@ function completedSetCoverageFactor(set) {
   return repsFactor * weightFactor;
 }
 
+function premiumRegionsForView(view) {
+  return state.premiumMuscleRegions?.regions?.filter((region) => region.view === view) || [];
+}
+
+function premiumRegionByMuscleId(muscleId) {
+  return state.premiumMuscleRegions?.regions?.find((region) => region.muscleId === muscleId) || null;
+}
+
+function premiumSubregionsForExercise(exercise, mapping) {
+  const haystack = [
+    exercise?.movementPattern,
+    exercise?.displayName,
+    exercise?.category,
+    ...(exercise?.tags || [])
+  ].filter(Boolean).join(" ").toLowerCase();
+  const rules = state.exerciseToSubregionMappingRules?.rules || [];
+  const matched = rules.filter((rule) => haystack.includes(String(rule.pattern || "").toLowerCase()));
+  const direct = matched.flatMap((rule) => rule.primarySubregions || []);
+  if (direct.length) return [...new Set(direct)];
+  const fallback = {
+    mg_chest_upper: ["mg_chest_clavicular"],
+    mg_chest_middle: ["mg_chest_sternal"],
+    mg_chest_lower: ["mg_chest_lower"],
+    mg_front_delts: ["mg_front_delts"],
+    mg_side_delts: ["mg_side_delts"],
+    mg_rear_delts: ["mg_rear_delts"],
+    mg_biceps: ["mg_biceps_long"],
+    mg_triceps: ["mg_triceps_long"],
+    mg_abs: ["mg_abs_upper", "mg_abs_lower"],
+    mg_obliques: ["mg_obliques"],
+    mg_quads: ["mg_quads_rectus", "mg_quads_vastus_lateralis", "mg_quads_vastus_medialis"],
+    mg_adductors: ["mg_adductors"],
+    mg_traps: ["mg_traps_upper", "mg_traps_mid"],
+    mg_upper_back: ["mg_traps_mid", "mg_rhomboids"],
+    mg_rhomboids: ["mg_rhomboids"],
+    mg_lats: ["mg_lats_upper", "mg_lats_lower"],
+    mg_erectors: ["mg_erectors_upper", "mg_erectors_lower"],
+    mg_glutes: ["mg_glutes_maximus"],
+    mg_hamstrings: ["mg_hamstrings_biceps"],
+    mg_calves: ["mg_calves_gastrocnemius"]
+  };
+  const ids = [
+    ...(fallback[mapping?.primaryMuscle] || []),
+    ...(mapping?.secondaryMuscles || []).flatMap((item) => fallback[item.muscleId] || []),
+    ...(mapping?.stabilizers || []).flatMap((item) => fallback[item.muscleId] || [])
+  ];
+  return [...new Set(ids)];
+}
+
+function premiumCoverageForSessions(sessions) {
+  const points = new Map();
+  const add = (muscleId, value) => {
+    if (!muscleId || !Number.isFinite(value) || value <= 0) return;
+    points.set(muscleId, (points.get(muscleId) || 0) + value);
+  };
+  sessions.forEach((session) => {
+    (session.completedExercises || []).forEach((completedExercise) => {
+      const exercise = exerciseById(completedExercise.exerciseId);
+      const mapping = muscleMappingForExercise(completedExercise.exerciseId);
+      const subregions = premiumSubregionsForExercise(exercise, mapping);
+      if (!subregions.length) return;
+      const setPoints = (completedExercise.sets || []).reduce((sum, set) => sum + completedSetCoverageFactor(set), 0);
+      const share = setPoints / Math.max(1, subregions.length);
+      subregions.forEach((muscleId) => add(muscleId, share));
+    });
+  });
+  return (state.premiumMuscleRegions?.regions || []).map((region) => ({
+    muscleId: region.muscleId,
+    name: region.label,
+    points: points.get(region.muscleId) || 0,
+    percent: Math.round(((points.get(region.muscleId) || 0) / 3) * 100),
+    isTarget: points.has(region.muscleId),
+    group: region.group,
+    view: region.view
+  })).sort((a, b) => b.percent - a.percent || a.name.localeCompare(b.name));
+}
+
 function coverageForSessions(sessions) {
   const points = new Map();
   const targetMuscles = activePlanTargetMuscles();
@@ -1550,6 +1651,9 @@ function coverageCoachTextFor(percent) {
 }
 
 function coverageColorFor(percent) {
+  const premiumScale = state.muscleHeatmapColorSystem?.colors || [];
+  const premium = premiumScale.find((item) => percent >= item.min && percent <= item.max);
+  if (premium) return premium.color;
   const scale = state.muscleMapVisualConfig?.coverageColorScale || state.muscleCoverageVisualMapping?.colorScale || [];
   return scale.find((item) => percent >= item.min && percent <= item.max)?.color || "#2563EB";
 }
@@ -1561,6 +1665,19 @@ function coverageItemByMuscle(items, muscleId) {
     points: 0,
     percent: 0,
     isTarget: activePlanTargetMuscles().has(muscleId)
+  };
+}
+
+function coverageItemByPremiumMuscle(items, muscleId) {
+  const region = premiumRegionByMuscleId(muscleId);
+  return items.find((item) => item.muscleId === muscleId) || {
+    muscleId,
+    name: region?.label || muscleName(muscleId),
+    points: 0,
+    percent: 0,
+    isTarget: false,
+    group: region?.group || "",
+    view: region?.view || ""
   };
 }
 
@@ -1596,6 +1713,26 @@ function coverageContributors(muscleId, sessions) {
 }
 
 function coverageDetailForMuscle(muscleId) {
+  const premiumRegion = premiumRegionByMuscleId(muscleId);
+  if (premiumRegion) {
+    const today = coverageItemByPremiumMuscle(premiumCoverageForSessions(sessionsForToday()), muscleId);
+    const week = coverageItemByPremiumMuscle(premiumCoverageForSessions(sessionsSince(7)), muscleId);
+    const month = coverageItemByPremiumMuscle(premiumCoverageForSessions(sessionsSince(30)), muscleId);
+    return {
+      muscleId,
+      muscleName: premiumRegion.label,
+      todayCoveragePercent: today.percent,
+      weekCoveragePercent: week.percent,
+      monthCoveragePercent: month.percent,
+      targetPercent: 100,
+      status: coverageStatus(week.percent),
+      mainExerciseContributors: coverageContributorsForPremiumMuscle(muscleId, sessionsSince(7)),
+      secondaryExerciseContributors: [],
+      history: premiumCoverageHistoryForMuscle(muscleId),
+      subregions: [premiumRegion.group],
+      coachText: coverageCoachTextFor(week.percent)
+    };
+  }
   const today = coverageItemByMuscle(coverageForSessions(sessionsForToday()), muscleId);
   const week = coverageItemByMuscle(coverageForSessions(sessionsSince(7)), muscleId);
   const month = coverageItemByMuscle(coverageForSessions(sessionsSince(30)), muscleId);
@@ -1614,6 +1751,42 @@ function coverageDetailForMuscle(muscleId) {
     subregions: muscleSubregions(muscleId),
     coachText: coverageCoachTextFor(week.percent)
   };
+}
+
+function coverageContributorsForPremiumMuscle(muscleId, sessions) {
+  const contributors = new Map();
+  sessions.forEach((session) => {
+    (session.completedExercises || []).forEach((completedExercise) => {
+      const exercise = exerciseById(completedExercise.exerciseId);
+      const mapping = muscleMappingForExercise(completedExercise.exerciseId);
+      if (!premiumSubregionsForExercise(exercise, mapping).includes(muscleId)) return;
+      const points = (completedExercise.sets || []).reduce((sum, set) => sum + completedSetCoverageFactor(set), 0);
+      const existing = contributors.get(completedExercise.exerciseId) || {
+        exerciseId: completedExercise.exerciseId,
+        name: completedExercise.exerciseNameSnapshot || exercise?.displayName || completedExercise.exerciseId,
+        points: 0,
+        role: "Zielbereich"
+      };
+      existing.points += points;
+      contributors.set(completedExercise.exerciseId, existing);
+    });
+  });
+  return [...contributors.values()].sort((a, b) => b.points - a.points).slice(0, 6);
+}
+
+function premiumCoverageHistoryForMuscle(muscleId) {
+  const weeks = [];
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  for (let index = 5; index >= 0; index -= 1) {
+    const start = new Date(now);
+    start.setDate(start.getDate() - (index * 7) - 6);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 7);
+    const item = coverageItemByPremiumMuscle(premiumCoverageForSessions(sessionsBetween(start, end)), muscleId);
+    weeks.push({ label: `${start.getDate()}.${start.getMonth() + 1}.`, percent: item.percent });
+  }
+  return weeks;
 }
 
 function coverageHistoryForMuscle(muscleId) {
@@ -2566,21 +2739,20 @@ function renderRoute() {
 
 function renderTabs() {
   const tabs = [
-    ["dashboard", "Dashboard"],
-    ["training", "Training"],
-    ["coach", "Coach"],
-    ["plans", "Pläne"],
-    ["exercises", "Übungen"],
-    ["weight", "Gewicht"],
-    ["journal", "Journal"],
-    ["settings", "Setup"]
+    ["dashboard", "Dashboard", "⌂"],
+    ["training", "Training", "↻"],
+    ["coach", "Coach", "D"],
+    ["plans", "Pläne", "▥"],
+    ["settings", "Profil", "♙"]
   ];
-  return `<nav class="tabs">${tabs.map(([id, label]) => `<button class="tab ${state.tab === id && !state.activeWorkout && !state.selectedExerciseId && !state.selectedSessionId ? "active" : ""}" data-tab="${id}">${label}</button>`).join("")}</nav>`;
+  return `<nav class="tabs">${tabs.map(([id, label, icon]) => `<button class="tab ${state.tab === id && !state.activeWorkout && !state.selectedExerciseId && !state.selectedSessionId ? "active" : ""}" data-tab="${id}"><span class="tab-icon">${icon}</span><span>${label}</span></button>`).join("")}</nav>`;
 }
 
 function renderCoverageCard() {
   const mode = state.coverageMode || "week";
-  const items = mode === "trend" ? [] : coverageForSessions(sessionsForCoverageMode(mode));
+  const standardItems = mode === "trend" ? [] : coverageForSessions(sessionsForCoverageMode(mode));
+  const premiumItems = mode === "trend" ? [] : premiumCoverageForSessions(sessionsForCoverageMode(mode));
+  const items = premiumItems.length ? premiumItems : standardItems;
   const visibleItems = items.slice(0, 8);
   const hints = coverageCoachHints(coverageForSessions(sessionsSince(7)));
   const texts = state.muscleMapTexts?.texts || {};
@@ -2628,7 +2800,7 @@ function renderCoverageRow(item) {
 function renderCoverageBodyView(items) {
   const view = state.coverageView || "front";
   const texts = state.muscleMapTexts?.texts || {};
-  const regions = state.muscleMapRegions?.regions?.filter((item) => item.view === view) || [];
+  const regions = premiumRegionsForView(view).length ? premiumRegionsForView(view) : state.muscleMapRegions?.regions?.filter((item) => item.view === view) || [];
   const muscleIds = [...new Set(regions.map((item) => item.muscleId))];
   return `
     <div class="coverage-body">
@@ -2639,9 +2811,9 @@ function renderCoverageBodyView(items) {
         ${renderInteractiveMuscleSvg(view, items)}
         <div class="coverage-body-chips">
           ${muscleIds.map((muscleId) => {
-            const item = coverageItemByMuscle(items, muscleId);
+            const item = coverageItemByPremiumMuscle(items, muscleId);
             const selected = state.selectedMuscleId === muscleId;
-            return `<button class="${selected ? "selected" : ""}" style="--coverage-color:${coverageColorFor(item.percent)}" data-open-coverage-muscle="${htmlesc(muscleId)}">${htmlesc(muscleName(muscleId))}</button>`;
+            return `<button class="${selected ? "selected" : ""}" style="--coverage-color:${coverageColorFor(item.percent)}" data-open-coverage-muscle="${htmlesc(muscleId)}">${htmlesc(item.name)}</button>`;
           }).join("")}
         </div>
       </div>
@@ -2651,6 +2823,8 @@ function renderCoverageBodyView(items) {
 }
 
 function renderInteractiveMuscleSvg(view, items) {
+  const premiumRegions = premiumRegionsForView(view);
+  if (premiumRegions.length) return renderPremiumMuscleSvg(view, items, premiumRegions);
   const regions = state.muscleMapRegions?.regions?.filter((item) => item.view === view) || [];
   if (!regions.length) {
     return `<img src="./assets/muscle_maps/muscle_map_${view}_v3.0.0.svg" alt="${view === "front" ? "Vorderseite" : "Rueckseite"}">`;
@@ -2670,6 +2844,63 @@ function renderInteractiveMuscleSvg(view, items) {
       ${regionMarkup}
     </div>
   `;
+}
+
+function renderPremiumMuscleSvg(view, items, regions) {
+  const selected = state.selectedMuscleId;
+  const regionMarkup = regions.map((region, index) => {
+    const item = coverageItemByPremiumMuscle(items, region.muscleId);
+    const isSelected = selected === region.muscleId;
+    const opacity = selected && !isSelected ? 0.22 : 1;
+    return premiumRegionShapes(region.svgRegionId, view, index).map((shape) => (
+      `<button class="svg-muscle premium-region ${isSelected ? "selected" : ""}" style="--coverage-color:${coverageColorFor(item.percent)}; --coverage-opacity:${opacity}; ${shape.style}" data-open-coverage-muscle="${htmlesc(region.muscleId)}" title="${htmlesc(region.label)}"><span>${htmlesc(region.label)} ${item.percent}%</span></button>`
+    )).join("");
+  }).join("");
+  return `
+    <div class="interactive-muscle-map premium ${view}">
+      <img src="./assets/muscle_maps/premium_muscle_map_${view}_v5.0.0.svg" alt="${view === "front" ? "Athletische Vorderseite" : "Athletische Rueckseite"}">
+      ${regionMarkup}
+    </div>
+  `;
+}
+
+function premiumRegionShapes(regionId, view, index) {
+  const front = {
+    region_chest_clavicular: [50, 22, 31, 7],
+    region_chest_sternal: [50, 30, 34, 10],
+    region_chest_lower: [50, 38, 28, 8],
+    region_front_delts_l: [33, 27, 13, 12],
+    region_side_delts_l: [68, 27, 13, 12],
+    region_biceps_l: [24, 43, 12, 20],
+    region_abs_upper: [50, 46, 18, 12],
+    region_abs_lower: [50, 57, 16, 13],
+    region_obliques_l: [36, 52, 13, 20],
+    region_quad_rectus_l: [48, 72, 15, 28],
+    region_quad_lateralis_l: [37, 72, 13, 27],
+    region_quad_medialis_l: [56, 73, 12, 24],
+    region_adductors_l: [50, 70, 12, 22]
+  };
+  const back = {
+    region_traps_upper: [50, 21, 26, 8],
+    region_traps_mid: [50, 29, 31, 12],
+    region_rhomboids: [50, 34, 20, 11],
+    region_lats_upper_l: [38, 39, 18, 18],
+    region_lats_lower_l: [36, 51, 18, 20],
+    region_rear_delts_l: [31, 28, 13, 12],
+    region_triceps_l: [24, 43, 12, 21],
+    region_erectors_upper: [50, 45, 13, 20],
+    region_erectors_lower: [50, 56, 13, 20],
+    region_glutes_maximus: [50, 64, 32, 16],
+    region_hamstrings_l: [39, 79, 18, 27],
+    region_calves_l: [39, 91, 15, 17]
+  };
+  const map = view === "front" ? front : back;
+  const [left, top, width, height] = map[regionId] || [20 + (index % 4) * 16, 18 + Math.floor(index / 4) * 12, 12, 10];
+  const shapes = [{ style: `left:${left}%; top:${top}%; width:${width}%; height:${height}%;` }];
+  if (regionId.endsWith("_l")) {
+    shapes.push({ style: `left:${100 - left}%; top:${top}%; width:${width}%; height:${height}%;` });
+  }
+  return shapes;
 }
 
 function frontRegionShape(regionId, index) {
@@ -4471,7 +4702,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "4.3.0",
+    backupVersion: "5.0.0",
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),

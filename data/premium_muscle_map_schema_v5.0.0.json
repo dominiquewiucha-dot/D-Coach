@@ -1,0 +1,15 @@
+{
+  "version": "5.0.0",
+  "type": "premium_muscle_map_schema",
+  "qualityTarget": "recognizable athletic human body, not stick figure",
+  "views": [
+    "front",
+    "back"
+  ],
+  "detailLevels": [
+    "group",
+    "region",
+    "subregion"
+  ],
+  "displayRule": "Coach/Dashboard/Analysis only"
+}

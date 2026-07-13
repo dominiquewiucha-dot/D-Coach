@@ -1,4 +1,4 @@
-const CACHE_NAME = "dcoach-pwa-v38";
+const CACHE_NAME = "dcoach-pwa-v39";
 const ASSETS = [
   "./",
   "./index.html",
@@ -122,8 +122,16 @@ const ASSETS = [
   "./data/trend_analysis_rules_v4.3.0.json",
   "./data/progress_forecast_rules_v4.3.0.json",
   "./data/long_term_texts_v4.3.0.json",
+  "./data/premium_muscle_map_schema_v5.0.0.json",
+  "./data/premium_muscle_regions_v5.0.0.json",
+  "./data/premium_muscle_map_ui_rules_v5.0.0.json",
+  "./data/premium_muscle_detail_schema_v5.0.0.json",
+  "./data/muscle_heatmap_color_system_v5.0.0.json",
+  "./data/exercise_to_subregion_mapping_rules_v5.0.0.json",
   "./assets/icon.svg",
   "./assets/apple-touch-icon.png",
+  "./assets/muscle_maps/premium_muscle_map_front_v5.0.0.svg",
+  "./assets/muscle_maps/premium_muscle_map_back_v5.0.0.svg",
   "./assets/muscle_maps/muscle_map_front_v3.0.0.svg",
   "./assets/muscle_maps/muscle_map_back_v3.0.0.svg",
   "./assets/muscle_maps/coverage_front_placeholder_v2.4.0.svg",

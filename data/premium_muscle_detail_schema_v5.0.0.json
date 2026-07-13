@@ -1,0 +1,17 @@
+{
+  "version": "5.0.0",
+  "type": "premium_muscle_detail_schema",
+  "fields": [
+    "muscleGroup",
+    "subRegion",
+    "todayPercent",
+    "weekPercent",
+    "monthPercent",
+    "target",
+    "mainContributors",
+    "secondaryContributors",
+    "recommendedNextPlanChange",
+    "confidence",
+    "why"
+  ]
+}

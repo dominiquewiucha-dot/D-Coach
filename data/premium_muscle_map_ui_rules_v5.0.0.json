@@ -1,0 +1,12 @@
+{
+  "version": "5.0.0",
+  "type": "premium_muscle_map_ui_rules",
+  "rules": [
+    "selected muscle gets glow",
+    "non-selected muscles dim",
+    "tap opens detail",
+    "list and body map sync",
+    "body must be recognizable on iPhone",
+    "do not use stick figure"
+  ]
+}
