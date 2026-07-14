@@ -1,0 +1,22 @@
+{
+  "version": "6.13.0",
+  "regions": [
+    "Nacken",
+    "Schulter links",
+    "Schulter rechts",
+    "Ellenbogen links",
+    "Ellenbogen rechts",
+    "Handgelenk links",
+    "Handgelenk rechts",
+    "Brust",
+    "Oberer Rücken",
+    "LWS",
+    "Hüfte links",
+    "Hüfte rechts",
+    "Knie links",
+    "Knie rechts",
+    "Sprunggelenk links",
+    "Sprunggelenk rechts",
+    "Sonstige Stelle"
+  ]
+}

@@ -161,6 +161,9 @@ const state = {
   coachPlanProposalSchema: null,
   coachProposalApplyRules: null,
   coachProposalReviewUi: null,
+  dailyCheckinSchema: null,
+  dailyCheckinStartupRules: null,
+  dailyPainRegions: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -185,6 +188,8 @@ const state = {
   },
   activeCoachProposalId: "",
   showProposalAlternative: false,
+  dailyCheckinActive: false,
+  dailyCheckinStep: "sleep",
   isOnline: navigator.onLine,
   deferredInstallPrompt: null,
   restTimer: {
@@ -194,7 +199,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v63";
+const APP_VERSION = "pwa-v64";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -212,6 +217,8 @@ const STORAGE_KEYS = [
   { key: "dcoach.coachFeedback", label: "Coach-Feedback", type: "array" },
   { key: "dcoach.coachPlanProposals", label: "Coach-Vorschlaege", type: "array" },
   { key: "dcoach.coachPlanUndo", label: "Coach-Undo", type: "object" },
+  { key: "dcoach.dailyCheckins", label: "Daily Check-ins", type: "array" },
+  { key: "dcoach.dailyCheckinDraft", label: "Daily Check-in Draft", type: "object" },
   { key: "dcoach.lastErrors", label: "Fehlerlog", type: "array" },
   { key: "dcoach.activeWorkoutDraft", label: "Trainingsentwurf", type: "object" },
   { key: "dcoach.lastBackupAt", label: "Letztes Backup", type: "string" },
@@ -312,6 +319,19 @@ const storage = {
   set coachPlanUndo(value) {
     if (value) writeJson("dcoach.coachPlanUndo", value);
     else localStorage.removeItem("dcoach.coachPlanUndo");
+  },
+  get dailyCheckins() {
+    return readJson("dcoach.dailyCheckins", []);
+  },
+  set dailyCheckins(value) {
+    writeJson("dcoach.dailyCheckins", Array.isArray(value) ? value : []);
+  },
+  get dailyCheckinDraft() {
+    return readJson("dcoach.dailyCheckinDraft", null);
+  },
+  set dailyCheckinDraft(value) {
+    if (value) writeJson("dcoach.dailyCheckinDraft", value);
+    else localStorage.removeItem("dcoach.dailyCheckinDraft");
   },
   get lastErrors() {
     return readJson("dcoach.lastErrors", []);
@@ -918,7 +938,10 @@ async function boot() {
     lifeFitnessScannerConfig,
     coachPlanProposalSchema,
     coachProposalApplyRules,
-    coachProposalReviewUi
+    coachProposalReviewUi,
+    dailyCheckinSchema,
+    dailyCheckinStartupRules,
+    dailyPainRegions
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -1092,7 +1115,10 @@ async function boot() {
     fetchOptionalJson("./data/life_fitness_scanner_config_v6.11.0.json"),
     fetchOptionalJson("./data/coach_plan_proposal_schema_v6.12.0.json"),
     fetchOptionalJson("./data/coach_proposal_apply_rules_v6.12.0.json"),
-    fetchOptionalJson("./data/coach_proposal_review_ui_v6.12.0.json")
+    fetchOptionalJson("./data/coach_proposal_review_ui_v6.12.0.json"),
+    fetchOptionalJson("./data/daily_checkin_schema_v6.13.0.json"),
+    fetchOptionalJson("./data/daily_checkin_startup_rules_v6.13.0.json"),
+    fetchOptionalJson("./data/daily_pain_regions_v6.13.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -1255,6 +1281,9 @@ async function boot() {
   state.coachPlanProposalSchema = coachPlanProposalSchema;
   state.coachProposalApplyRules = coachProposalApplyRules;
   state.coachProposalReviewUi = coachProposalReviewUi;
+  state.dailyCheckinSchema = dailyCheckinSchema;
+  state.dailyCheckinStartupRules = dailyCheckinStartupRules;
+  state.dailyPainRegions = dailyPainRegions;
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
@@ -1273,6 +1302,7 @@ async function boot() {
     window.history.scrollRestoration = "manual";
   }
   state.tab = tabFromHash() || state.tab;
+  maybeOpenDailyCheckin();
   render();
 }
 
@@ -1666,6 +1696,13 @@ function todayIsoDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function localIsoDate(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function dateTimeText(value) {
   if (!value) return "Noch nie";
   return new Intl.DateTimeFormat("de-DE", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
@@ -1699,18 +1736,306 @@ function journalEntryForDate(date) {
   return storage.journalEntries.find((entry) => entry.date === date) || null;
 }
 
+function dailyCheckinForDate(date = localIsoDate()) {
+  return storage.dailyCheckins.find((entry) => entry.localDate === date) || null;
+}
+
+function dailyCheckinStartupState(date = localIsoDate()) {
+  const entry = dailyCheckinForDate(date);
+  if (entry?.status === "completed") return "completed";
+  if (entry?.status === "skipped") return "skipped";
+  if (storage.dailyCheckinDraft?.localDate === date && storage.dailyCheckinDraft?.status === "draft") return "draft";
+  return "required";
+}
+
+function createDailyCheckinDraft(source = "morning_flow") {
+  const now = new Date().toISOString();
+  return {
+    id: crypto.randomUUID ? crypto.randomUUID() : `daily_checkin_${Date.now()}`,
+    localDate: localIsoDate(),
+    startedAt: now,
+    status: "draft",
+    sleepQuality: 6,
+    energy: 6,
+    stress: 4,
+    recovery: 6,
+    painPresent: false,
+    painEntries: [],
+    source,
+    updatedAt: now
+  };
+}
+
+function ensureDailyCheckinDraft() {
+  const today = localIsoDate();
+  if (storage.dailyCheckinDraft?.localDate === today) return storage.dailyCheckinDraft;
+  const draft = createDailyCheckinDraft();
+  storage.dailyCheckinDraft = draft;
+  return draft;
+}
+
+function maybeOpenDailyCheckin() {
+  const status = dailyCheckinStartupState();
+  if (status === "required" || status === "draft") {
+    ensureDailyCheckinDraft();
+    state.dailyCheckinActive = true;
+    state.dailyCheckinStep = status === "draft" ? "draft" : "sleep";
+  }
+}
+
+function updateDailyCheckinDraftFromDom() {
+  const draft = ensureDailyCheckinDraft();
+  document.querySelectorAll("[data-checkin-field]").forEach((input) => {
+    const key = input.dataset.checkinField;
+    draft[key] = input.type === "number" || input.type === "range" ? Number(input.value) : input.value.trim();
+  });
+  draft.painPresent = document.querySelector("[data-checkin-pain-present='true']")?.checked || false;
+  const hours = Number(document.querySelector("[data-checkin-sleep-hours]")?.value || 0);
+  const minutes = Number(document.querySelector("[data-checkin-sleep-minutes]")?.value || 0);
+  if (hours || minutes) draft.sleepDurationMinutes = Math.max(0, hours * 60 + minutes);
+  const painEntries = [];
+  document.querySelectorAll("[data-pain-region]:checked").forEach((input) => {
+    const region = dailyPainRegions().find((item) => item.id === input.value);
+    const intensity = Number(document.querySelector(`[data-pain-intensity="${input.value}"]`)?.value || 0);
+    painEntries.push({
+      regionId: input.value,
+      regionLabelSnapshot: region?.label || input.value,
+      side: region?.side || "none",
+      intensity,
+      painType: document.querySelector(`[data-pain-type="${input.value}"]`)?.value.trim() || "",
+      note: document.querySelector(`[data-pain-note-region="${input.value}"]`)?.value.trim() || ""
+    });
+  });
+  draft.painEntries = draft.painPresent ? painEntries : [];
+  draft.updatedAt = new Date().toISOString();
+  storage.dailyCheckinDraft = draft;
+  return draft;
+}
+
+function dailyPainRegions() {
+  return state.dailyPainRegions?.regions || [
+    { id: "neck", label: "Nacken", side: "center" },
+    { id: "shoulder_left", label: "Schulter links", side: "left" },
+    { id: "shoulder_right", label: "Schulter rechts", side: "right" },
+    { id: "elbow_left", label: "Ellenbogen links", side: "left" },
+    { id: "elbow_right", label: "Ellenbogen rechts", side: "right" },
+    { id: "wrist_left", label: "Handgelenk links", side: "left" },
+    { id: "wrist_right", label: "Handgelenk rechts", side: "right" },
+    { id: "chest", label: "Brust", side: "center" },
+    { id: "upper_back", label: "oberer Ruecken", side: "center" },
+    { id: "lws", label: "LWS", side: "center" },
+    { id: "hip_left", label: "Huefte links", side: "left" },
+    { id: "hip_right", label: "Huefte rechts", side: "right" },
+    { id: "knee_left", label: "Knie links", side: "left" },
+    { id: "knee_right", label: "Knie rechts", side: "right" },
+    { id: "ankle_left", label: "Sprunggelenk links", side: "left" },
+    { id: "ankle_right", label: "Sprunggelenk rechts", side: "right" },
+    { id: "other", label: "sonstige Stelle", side: "none" }
+  ];
+}
+
+function skipDailyCheckin() {
+  const draft = ensureDailyCheckinDraft();
+  const skipped = { ...draft, status: "skipped", completedAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  storage.dailyCheckins = [...storage.dailyCheckins.filter((entry) => entry.localDate !== skipped.localDate), skipped];
+  storage.dailyCheckinDraft = null;
+  state.dailyCheckinActive = false;
+  render();
+}
+
+function completeDailyCheckin() {
+  const draft = updateDailyCheckinDraftFromDom();
+  const completed = { ...draft, status: "completed", completedAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  storage.dailyCheckins = [...storage.dailyCheckins.filter((entry) => entry.localDate !== completed.localDate), completed];
+  storage.dailyCheckinDraft = null;
+  upsertJournalFromDailyCheckin(completed);
+  if (Number(completed.weightKg) > 0) upsertWeightFromDailyCheckin(completed);
+  state.dailyCheckinActive = false;
+  state.tab = "dashboard";
+  render();
+}
+
+function upsertJournalFromDailyCheckin(entry) {
+  const current = journalEntryForDate(entry.localDate);
+  const journal = {
+    id: current?.id || (crypto.randomUUID ? crypto.randomUUID() : `journal_${Date.now()}`),
+    date: entry.localDate,
+    sleepQuality: normalizeTenToFive(entry.sleepQuality),
+    energy: normalizeTenToFive(entry.energy),
+    stress: normalizeTenToFive(entry.stress),
+    soreness: entry.painPresent ? Math.max(3, normalizeTenToFive(Math.max(0, ...(entry.painEntries || []).map((item) => item.intensity || 0)))) : (current?.soreness || 1),
+    mood: normalizeTenToFive(entry.recovery),
+    painNote: [entry.painNote, ...(entry.painEntries || []).map((item) => `${item.regionLabelSnapshot} ${item.intensity}/10${item.note ? `: ${item.note}` : ""}`)].filter(Boolean).join(" | "),
+    nutritionNote: current?.nutritionNote || "",
+    notes: [entry.sleepNote, entry.generalNote].filter(Boolean).join(" | "),
+    dailyCheckinId: entry.id,
+    updatedAt: new Date().toISOString()
+  };
+  storage.journalEntries = [...storage.journalEntries.filter((item) => item.date !== entry.localDate), journal];
+}
+
+function normalizeTenToFive(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return 3;
+  return Math.max(1, Math.min(5, Math.round(number / 2)));
+}
+
+function upsertWeightFromDailyCheckin(entry) {
+  const dateKey = entry.localDate;
+  const existing = storage.weights.find((item) => String(item.date || "").slice(0, 10) === dateKey);
+  const next = {
+    id: existing?.id || (crypto.randomUUID ? crypto.randomUUID() : `weight_${Date.now()}`),
+    date: new Date(`${dateKey}T08:00:00`).toISOString(),
+    weightKg: Number(entry.weightKg),
+    source: "morning_flow"
+  };
+  storage.weights = [...storage.weights.filter((item) => String(item.date || "").slice(0, 10) !== dateKey), next];
+}
+
+function renderDailyCheckinFlow() {
+  const draft = ensureDailyCheckinDraft();
+  const step = state.dailyCheckinStep;
+  return `
+    <main class="daily-checkin-shell">
+      <section class="daily-checkin-card stack">
+        <header>
+          <p class="eyebrow">Guten Morgen</p>
+          <h1 class="title">Kurzer Tages-Check-in</h1>
+          <p class="subtitle">ca. 30 Sekunden</p>
+        </header>
+        <div class="checkin-progress"><span style="width:${step === "sleep" || step === "draft" ? 25 : step === "pain" ? 50 : step === "weight" ? 75 : 100}%"></span></div>
+        ${step === "draft" ? renderDailyCheckinDraftStep(draft)
+          : step === "pain" ? renderDailyCheckinPainStep(draft)
+          : step === "weight" ? renderDailyCheckinWeightStep(draft)
+          : step === "summary" ? renderDailyCheckinSummaryStep(draft)
+          : renderDailyCheckinSleepStep(draft)}
+      </section>
+    </main>
+  `;
+}
+
+function renderDailyCheckinDraftStep(draft) {
+  return `
+    <article class="stack">
+      <h2>Check-in fortsetzen?</h2>
+      <p class="muted">Du hast deinen Tages-Check-in noch nicht abgeschlossen.</p>
+      <button class="primary" data-checkin-go="sleep">Fortsetzen</button>
+      <button class="secondary" data-checkin-new>Neu beginnen</button>
+      <button class="secondary" data-checkin-skip>Fuer heute ueberspringen</button>
+    </article>
+  `;
+}
+
+function renderDailyCheckinSleepStep(draft) {
+  return `
+    <article class="stack">
+      <h2>Schlaf und Erholung</h2>
+      <div class="mini-grid">
+        <label>Stunden<input class="input" type="number" min="0" max="14" value="${Math.floor((draft.sleepDurationMinutes || 0) / 60) || ""}" data-checkin-sleep-hours></label>
+        <label>Minuten<input class="input" type="number" min="0" max="59" value="${(draft.sleepDurationMinutes || 0) % 60 || ""}" data-checkin-sleep-minutes></label>
+      </div>
+      ${renderCheckinRange("sleepQuality", "Schlafqualitaet", draft.sleepQuality)}
+      ${renderCheckinRange("energy", "Energie", draft.energy)}
+      ${renderCheckinRange("stress", "Stress", draft.stress)}
+      ${renderCheckinRange("recovery", "Erholung", draft.recovery)}
+      <textarea class="input area" placeholder="Schlafnotiz" data-checkin-field="sleepNote">${htmlesc(draft.sleepNote || "")}</textarea>
+      <div class="button-row">
+        <button class="secondary" data-checkin-skip>Ueberspringen</button>
+        <button class="primary" data-checkin-go="pain">Weiter</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderCheckinRange(key, label, value = 5) {
+  return `<label class="range-field"><span>${label}: ${Number(value) || 0}/10</span><input type="range" min="1" max="10" value="${htmlesc(value || 5)}" data-checkin-field="${key}"></label>`;
+}
+
+function renderDailyCheckinPainStep(draft) {
+  return `
+    <article class="stack">
+      <h2>Schmerzen oder Beschwerden?</h2>
+      <div class="button-row">
+        <label class="checkin-choice"><input type="radio" name="painPresent" ${draft.painPresent ? "" : "checked"} data-checkin-pain-present="false"> Nein</label>
+        <label class="checkin-choice"><input type="radio" name="painPresent" ${draft.painPresent ? "checked" : ""} data-checkin-pain-present="true"> Ja</label>
+      </div>
+      <div class="pain-region-grid">
+        ${dailyPainRegions().map((region) => {
+          const entry = (draft.painEntries || []).find((item) => item.regionId === region.id);
+          return `
+            <div class="pain-region">
+              <label><input type="checkbox" value="${htmlesc(region.id)}" ${entry ? "checked" : ""} data-pain-region> ${htmlesc(region.label)}</label>
+              <input class="input" type="number" min="0" max="10" value="${entry?.intensity ?? 0}" data-pain-intensity="${htmlesc(region.id)}">
+              <input class="input" placeholder="Art" value="${htmlesc(entry?.painType || "")}" data-pain-type="${htmlesc(region.id)}">
+              <input class="input" placeholder="Notiz" value="${htmlesc(entry?.note || "")}" data-pain-note-region="${htmlesc(region.id)}">
+            </div>
+          `;
+        }).join("")}
+      </div>
+      <textarea class="input area" placeholder="Schmerznotiz fuer heute" data-checkin-field="painNote">${htmlesc(draft.painNote || "")}</textarea>
+      <p class="quiet">D-Coach nutzt diese Angaben nur fuer Trainingshinweise, nicht fuer Diagnosen.</p>
+      <div class="button-row">
+        <button class="secondary" data-checkin-go="sleep">Zurueck</button>
+        <button class="primary" data-checkin-go="weight">Weiter</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderDailyCheckinWeightStep(draft) {
+  const latest = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  const current = Number(draft.weightKg) || "";
+  const delta = latest && current ? Number(current) - Number(latest.weightKg) : null;
+  return `
+    <article class="stack">
+      <h2>Heutiges Gewicht</h2>
+      <p class="muted">Letzter Wert: ${latest ? kg(latest.weightKg) : "-"}</p>
+      <p class="quiet">Veraenderung: ${delta === null ? "-" : `${delta >= 0 ? "+" : ""}${kg(delta)}`}</p>
+      <input class="input" inputmode="decimal" placeholder="kg" value="${htmlesc(current)}" data-checkin-field="weightKg">
+      <textarea class="input area" placeholder="Tagesnotiz optional" data-checkin-field="generalNote">${htmlesc(draft.generalNote || "")}</textarea>
+      <div class="button-row">
+        <button class="secondary" data-checkin-go="pain">Zurueck</button>
+        <button class="primary" data-checkin-go="summary">Speichern und weiter</button>
+      </div>
+      <button class="secondary" data-checkin-go="summary" data-checkin-skip-weight>Gewicht heute ueberspringen</button>
+    </article>
+  `;
+}
+
+function renderDailyCheckinSummaryStep(draft) {
+  const pain = draft.painPresent ? (draft.painEntries || []).map((item) => `${item.regionLabelSnapshot} ${item.intensity}/10`).join(", ") : "Nein";
+  return `
+    <article class="stack">
+      <h2>Tages-Check-in gespeichert</h2>
+      <div class="storage-table">
+        <div><span>Schlaf</span><strong>${draft.sleepDurationMinutes ? `${Math.floor(draft.sleepDurationMinutes / 60)} h ${draft.sleepDurationMinutes % 60} min` : "-"}</strong></div>
+        <div><span>Schlafqualitaet</span><strong>${draft.sleepQuality || "-"}/10</strong></div>
+        <div><span>Energie</span><strong>${draft.energy || "-"}/10</strong></div>
+        <div><span>Erholung</span><strong>${draft.recovery || "-"}/10</strong></div>
+        <div><span>Schmerz</span><strong>${htmlesc(pain || "-")}</strong></div>
+        <div><span>Gewicht</span><strong>${draft.weightKg ? kg(draft.weightKg) : "-"}</strong></div>
+      </div>
+      <button class="primary" data-checkin-complete>Zur App</button>
+      <button class="secondary" data-checkin-go="weight">Zurueck</button>
+    </article>
+  `;
+}
+
 function readinessForJournal(entry) {
-  if (!entry) return { color: "amber", label: "Nicht erfasst", score: null, hint: "Tagesform noch nicht eingetragen." };
-  const sleep = Number(entry.sleepQuality || 0);
-  const energy = Number(entry.energy || 0);
-  const mood = Number(entry.mood || 0);
-  const stress = Number(entry.stress || 0);
-  const soreness = Number(entry.soreness || 0);
+  const checkin = entry?.date ? dailyCheckinForDate(entry.date) : dailyCheckinForDate(localIsoDate());
+  if (!entry && !checkin) return { color: "amber", label: "Nicht erfasst", score: null, hint: "Tagesform noch nicht eingetragen." };
+  const sleep = Number(entry?.sleepQuality || normalizeTenToFive(checkin?.sleepQuality) || 3);
+  const energy = Number(entry?.energy || normalizeTenToFive(checkin?.energy) || 3);
+  const mood = Number(entry?.mood || normalizeTenToFive(checkin?.recovery) || 3);
+  const stress = Number(entry?.stress || normalizeTenToFive(checkin?.stress) || 3);
+  const painIntensity = Math.max(0, ...(checkin?.painEntries || []).map((item) => Number(item.intensity) || 0));
+  const soreness = Number(entry?.soreness || (checkin?.painPresent ? normalizeTenToFive(painIntensity) : 1));
   const base = (sleep + energy + mood) / 3;
   const score = Math.max(1, Math.min(5, base - Math.max(0, stress - 3) * 0.45 - Math.max(0, soreness - 3) * 0.35));
-  if (score >= 3.7) return { color: "green", label: "Gut", score, hint: "Heute normal trainieren." };
-  if (score >= 2.6) return { color: "amber", label: "Moderat", score, hint: "Heute moderat starten." };
-  return { color: "red", label: "Leicht", score, hint: "Heute leichter trainieren und Regeneration beachten." };
+  const source = checkin ? " Check-in: Schlaf, Energie, Stress, Erholung und Schmerzen wurden beruecksichtigt." : "";
+  if (score >= 3.7) return { color: "green", label: "Gut", score, hint: `Heute normal trainieren.${source}` };
+  if (score >= 2.6) return { color: "amber", label: "Moderat", score, hint: `Heute moderat starten.${source}` };
+  return { color: "red", label: "Leicht", score, hint: `Heute leichter trainieren und Regeneration beachten.${source}` };
 }
 
 function completedSetsOnly(exercise) {
@@ -3329,11 +3654,13 @@ function exerciseKnowledge(exercise) {
 function render() {
   document.getElementById("app").innerHTML = `
     <div id="app-shell" class="app-shell">
-      <main id="app-content" class="app-content">
-        ${renderRoute()}
-      </main>
-      ${renderPremiumTabs()}
-      ${state.activeCoachProposalId ? renderCoachProposalReview() : ""}
+      ${state.dailyCheckinActive ? renderDailyCheckinFlow() : `
+        <main id="app-content" class="app-content">
+          ${renderRoute()}
+        </main>
+        ${renderPremiumTabs()}
+        ${state.activeCoachProposalId ? renderCoachProposalReview() : ""}
+      `}
     </div>
   `;
   bindEvents();
@@ -5685,10 +6012,11 @@ function renderDashboard() {
   const session = lastSession();
   const nextDay = nextPlanDayAfterLastSession(plan)?.name || "-";
   const latestSessions = [...storage.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).slice(0, 3);
-  const readiness = readinessForJournal(journalEntryForDate(todayIsoDate()) || latestJournalEntry());
+  const readiness = readinessForJournal(journalEntryForDate(localIsoDate()) || latestJournalEntry());
   return `
     <section class="screen stack">
       <header><h1 class="title">D-Coach</h1><p class="subtitle">Heute sauber trainieren.</p></header>
+      ${renderDailyCheckinDashboardCard()}
       ${renderCoachDashboardV54()}
       ${renderWeeklyCoachCard()}
       ${renderPlateauCoachCard()}
@@ -6008,6 +6336,33 @@ function renderWarmupCard(day) {
 function lastWarmupDefaults() {
   const warmups = storage.sessions.flatMap((session) => Array.isArray(session.warmups) ? session.warmups : []).filter((item) => item && item.equipment);
   return warmups[warmups.length - 1] || null;
+}
+
+function renderDailyCheckinDashboardCard() {
+  const checkin = dailyCheckinForDate(localIsoDate());
+  if (!checkin || checkin.status !== "completed") {
+    return `
+      <article class="card stack daily-checkin-dashboard-card">
+        <div class="row"><h3 class="grow">Tages-Check-in</h3><span class="badge amber">offen</span></div>
+        <p class="muted">Heute noch nicht eingecheckt.</p>
+        <button class="secondary" data-open-daily-checkin>Jetzt einchecken</button>
+      </article>
+    `;
+  }
+  const pain = checkin.painPresent ? (checkin.painEntries || []).map((item) => `${item.regionLabelSnapshot} ${item.intensity}/10`).join(", ") : "";
+  return `
+    <article class="card stack daily-checkin-dashboard-card">
+      <div class="row"><h3 class="grow">Heute eingecheckt</h3><span class="badge green">ok</span></div>
+      <div class="storage-table">
+        ${checkin.sleepDurationMinutes ? `<div><span>Schlaf</span><strong>${Math.floor(checkin.sleepDurationMinutes / 60)} h ${checkin.sleepDurationMinutes % 60} min</strong></div>` : ""}
+        ${checkin.energy ? `<div><span>Energie</span><strong>${checkin.energy}/10</strong></div>` : ""}
+        ${checkin.recovery ? `<div><span>Erholung</span><strong>${checkin.recovery}/10</strong></div>` : ""}
+        ${pain ? `<div><span>Schmerz</span><strong>${htmlesc(pain)}</strong></div>` : ""}
+        ${checkin.weightKg ? `<div><span>Gewicht</span><strong>${kg(checkin.weightKg)}</strong></div>` : ""}
+      </div>
+      <button class="secondary" data-edit-daily-checkin>Check-in bearbeiten</button>
+    </article>
+  `;
 }
 
 function latestWarmupEquipmentMapping() {
@@ -6901,6 +7256,7 @@ function renderRatingInput(id, label, value = 3) {
 
 function renderJournal() {
   const today = todayIsoDate();
+  const checkin = dailyCheckinForDate(localIsoDate());
   const entry = journalEntryForDate(today) || {};
   const latest = latestJournalEntry();
   const readiness = readinessForJournal(journalEntryForDate(today) || latest);
@@ -6914,6 +7270,7 @@ function renderJournal() {
           <span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span>
         </div>
         <p class="muted">${htmlesc(readiness.hint)}</p>
+        <button class="secondary" data-edit-daily-checkin>${checkin ? "Heutigen Check-in bearbeiten" : "Tages-Check-in starten"}</button>
       </article>
       <article class="card stack">
         <h3>Heute</h3>
@@ -7266,6 +7623,8 @@ function createBackup() {
     coachFeedback: storage.coachFeedback,
     coachPlanProposals: storage.coachPlanProposals,
     coachPlanUndo: storage.coachPlanUndo,
+    dailyCheckins: storage.dailyCheckins,
+    dailyCheckinDraft: storage.dailyCheckinDraft,
     userSettings: currentUserSettings(),
     lastErrors: storage.lastErrors,
     archivedPlanNames: storage.archivedPlanNames,
@@ -7341,6 +7700,8 @@ function importBackupFile(file) {
       storage.coachFeedback = mergeById(storage.coachFeedback, Array.isArray(backup.coachFeedback) ? backup.coachFeedback : []);
       storage.coachPlanProposals = mergeById(storage.coachPlanProposals, Array.isArray(backup.coachPlanProposals) ? backup.coachPlanProposals : []);
       if (!storage.coachPlanUndo && backup.coachPlanUndo && typeof backup.coachPlanUndo === "object") storage.coachPlanUndo = backup.coachPlanUndo;
+      storage.dailyCheckins = mergeById(storage.dailyCheckins, Array.isArray(backup.dailyCheckins) ? backup.dailyCheckins : []);
+      if (!storage.dailyCheckinDraft && backup.dailyCheckinDraft && typeof backup.dailyCheckinDraft === "object") storage.dailyCheckinDraft = backup.dailyCheckinDraft;
       if (!storage.personalProfile && backup.personalProfile && typeof backup.personalProfile === "object") storage.personalProfile = backup.personalProfile;
       storage.userSettings = { ...currentUserSettings(), ...(backup.userSettings && typeof backup.userSettings === "object" ? backup.userSettings : {}) };
       storage.lastErrors = mergeById(storage.lastErrors, Array.isArray(backup.lastErrors) ? backup.lastErrors : []);
@@ -7362,6 +7723,8 @@ function importBackupFile(file) {
 }
 
 function bindEvents() {
+  bindDailyCheckinEvents();
+  if (state.dailyCheckinActive) return;
   if (isMuscleMapPrototypeRoute()) {
     mountMuscleMapJsPrototype();
   }
@@ -7399,6 +7762,16 @@ function bindEvents() {
   document.querySelector("[data-show-proposal-alternative]")?.addEventListener("click", () => {
     state.showProposalAlternative = true;
     render();
+  });
+
+  document.querySelectorAll("[data-open-daily-checkin], [data-edit-daily-checkin]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const existing = dailyCheckinForDate(localIsoDate());
+      storage.dailyCheckinDraft = existing ? { ...existing, status: "draft", updatedAt: new Date().toISOString() } : createDailyCheckinDraft("journal");
+      state.dailyCheckinActive = true;
+      state.dailyCheckinStep = "sleep";
+      render();
+    });
   });
 
   document.querySelectorAll("[data-tab]").forEach((button) => {
@@ -7923,6 +8296,39 @@ function bindEvents() {
     await clearPwaCache().catch((error) => logAppError(error.message, "cache"));
     alert("Cache wurde geleert. Lade die App danach neu.");
   });
+}
+
+function bindDailyCheckinEvents() {
+  if (!state.dailyCheckinActive) return;
+  document.querySelectorAll("[data-checkin-field], [data-checkin-sleep-hours], [data-checkin-sleep-minutes], [data-pain-region], [data-pain-intensity], [data-pain-type], [data-pain-note-region], [data-checkin-pain-present]").forEach((input) => {
+    input.addEventListener("input", () => {
+      updateDailyCheckinDraftFromDom();
+    });
+    input.addEventListener("change", () => {
+      updateDailyCheckinDraftFromDom();
+      if (input.dataset.checkinPainPresent) render();
+    });
+  });
+  document.querySelectorAll("[data-checkin-go]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const draft = updateDailyCheckinDraftFromDom();
+      if (button.dataset.checkinSkipWeight) {
+        delete draft.weightKg;
+        storage.dailyCheckinDraft = draft;
+      }
+      state.dailyCheckinStep = button.dataset.checkinGo;
+      render();
+    });
+  });
+  document.querySelector("[data-checkin-new]")?.addEventListener("click", () => {
+    storage.dailyCheckinDraft = createDailyCheckinDraft();
+    state.dailyCheckinStep = "sleep";
+    render();
+  });
+  document.querySelectorAll("[data-checkin-skip]").forEach((button) => {
+    button.addEventListener("click", skipDailyCheckin);
+  });
+  document.querySelector("[data-checkin-complete]")?.addEventListener("click", completeDailyCheckin);
 }
 
 function mountMuscleMapJsPrototype() {

@@ -1,0 +1,11 @@
+{
+  "version": "6.13.0",
+  "rules": [
+    "local calendar date",
+    "once per day",
+    "resume draft",
+    "completed suppresses reopen",
+    "skipped suppresses reopen",
+    "preserve existing navigation"
+  ]
+}

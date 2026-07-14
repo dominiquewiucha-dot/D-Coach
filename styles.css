@@ -819,6 +819,66 @@ select:focus-visible {
   gap: 8px;
 }
 
+.daily-checkin-shell {
+  min-height: 100dvh;
+  padding: calc(env(safe-area-inset-top) + 18px) 16px calc(env(safe-area-inset-bottom) + 18px);
+  display: grid;
+  place-items: center;
+}
+
+.daily-checkin-card {
+  width: min(100%, 680px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  background: var(--card);
+  box-shadow: 0 18px 52px rgba(0,0,0,.32);
+}
+
+.checkin-progress {
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--input);
+}
+
+.checkin-progress span {
+  display: block;
+  height: 100%;
+  background: var(--blue);
+}
+
+.checkin-choice {
+  min-height: 52px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: var(--input);
+  font-weight: 800;
+}
+
+.pain-region-grid {
+  display: grid;
+  gap: 8px;
+  max-height: 330px;
+  overflow-y: auto;
+}
+
+.pain-region {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) 72px minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input);
+}
+
+.daily-checkin-dashboard-card {
+  border-color: rgba(16,185,129,.35);
+}
+
 .compact-button {
   width: auto;
   min-width: 96px;
@@ -1796,6 +1856,7 @@ select:focus-visible {
   .scanner-field-grid { grid-template-columns: 1fr; }
   .scanner-mapping-row { grid-template-columns: 1fr; }
   .compare-row { grid-template-columns: 1fr; }
+  .pain-region { grid-template-columns: 1fr; }
   .muscle-map-list { grid-template-columns: 1fr; }
   .body-map-grid { grid-template-columns: 1fr; }
   .mini-grid { grid-template-columns: 1fr; }

@@ -1,0 +1,13 @@
+{
+  "version": "6.13.0",
+  "type": "daily_checkin_schema",
+  "storageKeys": [
+    "dcoach.dailyCheckins",
+    "dcoach.dailyCheckinDraft"
+  ],
+  "status": [
+    "draft",
+    "completed",
+    "skipped"
+  ]
+}
