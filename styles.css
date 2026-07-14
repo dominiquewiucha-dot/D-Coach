@@ -84,7 +84,7 @@ select:focus-visible {
 
 .app-content {
   min-height: 100dvh;
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
   padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 24px);
 }
 
@@ -1084,7 +1084,7 @@ select:focus-visible {
 
 .muscle-map-screen {
   padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 24px);
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
 }
 
 .prototype-screen {
@@ -1187,7 +1187,7 @@ select:focus-visible {
   overflow: hidden;
   display: grid;
   place-items: center;
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
 }
 
 .production-muscle-map-shell {
@@ -1196,7 +1196,7 @@ select:focus-visible {
   display: grid;
   grid-template-rows: minmax(400px, 1fr) auto auto;
   gap: 10px;
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
 }
 
 .production-muscle-map {
@@ -1204,7 +1204,7 @@ select:focus-visible {
   height: min(62vh, 560px);
   min-height: 400px;
   overflow: hidden;
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
 }
 
 .production-muscle-map canvas {

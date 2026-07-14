@@ -1,0 +1,34 @@
+{
+  "version": "6.17.2",
+  "groupAliases": {
+    "chest": "mg_chest",
+    "upper_chest": "mg_chest",
+    "middle_chest": "mg_chest",
+    "lower_chest": "mg_chest",
+    "mg_chest_clavicular": "mg_chest",
+    "mg_chest_sternal": "mg_chest",
+    "mg_chest_lower": "mg_chest",
+    "abs": "mg_abs",
+    "upper_abs": "mg_abs",
+    "lower_abs": "mg_abs",
+    "mg_abs_upper": "mg_abs",
+    "mg_abs_lower": "mg_abs",
+    "obliques": "mg_obliques"
+  },
+  "regionAliases": {
+    "chest": "mg_chest_sternal",
+    "upper_chest": "mg_chest_clavicular",
+    "middle_chest": "mg_chest_sternal",
+    "lower_chest": "mg_chest_lower",
+    "mg_chest_upper": "mg_chest_clavicular",
+    "mg_chest_middle": "mg_chest_sternal",
+    "abs": "mg_abs_upper",
+    "upper_abs": "mg_abs_upper",
+    "lower_abs": "mg_abs_lower",
+    "obliques": "mg_obliques"
+  },
+  "notes": [
+    "Gruppen- und Subregionsnormalisierung sind bewusst getrennt.",
+    "Dashboard und Muscle Map lesen aus derselben Canonical-Coverage-Quelle."
+  ]
+}

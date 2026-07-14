@@ -1,5 +1,6 @@
-let activeWidget = null;
+﻿let activeWidget = null;
 let activeContainer = null;
+let gestureState = null;
 
 function hexToRgb(hex) {
   const clean = String(hex || "").replace("#", "");
@@ -87,14 +88,42 @@ function preferredDcoachId(sourceId, adapter, coverage) {
 function updateStatus(container, payload) {
   const target = container.querySelector("[data-production-muscle-map-status]");
   if (!target) return;
-  const coach = payload.coach;
   const selected = payload.coverage.find((item) => item.muscleId === payload.selectedMuscleId);
   target.innerHTML = `
     <span class="badge blue">MuscleMapJS</span>
-    <span>${payload.view === "front" ? "Vorne" : "Hinten"} · ${payload.mode}</span>
+    <span>${payload.view === "front" ? "Vorne" : "Hinten"} - ${payload.modeLabel || payload.mode}</span>
+    <span>Muskelabdeckung</span>
     ${selected ? `<strong>${selected.name}: ${selected.percent}%</strong>` : ""}
-    ${coach ? `<span class="production-coach-link">${coach.confidencePercent}% Coach</span>` : ""}
   `;
+}
+
+function installGestureGuard(container) {
+  const canvas = container.querySelector("canvas");
+  if (!canvas || canvas.dataset.dcoachGestureGuard === "true") return;
+  canvas.dataset.dcoachGestureGuard = "true";
+  canvas.style.touchAction = "pan-y pinch-zoom";
+  canvas.addEventListener("pointerdown", (event) => {
+    gestureState = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      moved: false,
+      startedAt: Date.now()
+    };
+  }, { passive: true });
+  canvas.addEventListener("pointermove", (event) => {
+    if (!gestureState || gestureState.pointerId !== event.pointerId) return;
+    const dx = Math.abs(event.clientX - gestureState.startX);
+    const dy = Math.abs(event.clientY - gestureState.startY);
+    if (dx > 10 || dy > 10) gestureState.moved = true;
+  }, { passive: true });
+  ["pointerup", "pointercancel", "lostpointercapture"].forEach((type) => {
+    canvas.addEventListener(type, (event) => {
+      if (!gestureState || gestureState.pointerId !== event.pointerId) return;
+      if (gestureState.moved && event.type === "pointerup") event.stopImmediatePropagation();
+      gestureState = null;
+    }, true);
+  });
 }
 
 function applyHeatmap(widget, adapter, payload) {
@@ -145,6 +174,7 @@ export async function mountProductionMuscleMap(container, payload) {
   }
 
   activeWidget.setSide(payload.view || "front");
+  installGestureGuard(container);
   const adapter = buildAdapter(payload.adapter);
   applyHeatmap(activeWidget, adapter, payload);
   updateStatus(container, payload);

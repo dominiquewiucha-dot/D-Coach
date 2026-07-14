@@ -202,10 +202,11 @@
   route: null
 };
 
-const APP_VERSION = "pwa-v68";
-const BACKUP_FORMAT_VERSION = "6.17.0";
+const APP_VERSION = "pwa-v70";
+const BACKUP_FORMAT_VERSION = "6.17.2";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
+const MUSCLE_MAPPING_VERSION = "muscle-mapping-v3";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -2497,8 +2498,8 @@ function activePlanTargetMuscles() {
     day.exercises.forEach((planned) => {
       const mapping = muscleMappingForExercise(planned.exerciseId);
       if (!mapping) return;
-      if (mapping.primaryMuscle) ids.add(canonicalizeMuscleId(mapping.primaryMuscle));
-      (mapping.secondaryMuscles || []).forEach((item) => ids.add(canonicalizeMuscleId(item.muscleId)));
+      if (mapping.primaryMuscle) ids.add(canonicalizeMuscleGroup(mapping.primaryMuscle));
+      (mapping.secondaryMuscles || []).forEach((item) => ids.add(canonicalizeMuscleGroup(item.muscleId)));
     });
   });
   return ids;
@@ -2531,8 +2532,9 @@ function premiumSubregionsForExercise(exercise, mapping) {
   const rules = state.exerciseToSubregionMappingRules?.rules || [];
   const matched = rules.filter((rule) => haystack.includes(String(rule.pattern || "").toLowerCase()));
   const direct = matched.flatMap((rule) => rule.primarySubregions || []);
-  if (direct.length) return [...new Set(direct)];
+  if (direct.length) return [...new Set(direct.map(canonicalizeMuscleRegionId))];
   const fallback = {
+    mg_chest: ["mg_chest_sternal"],
     mg_chest_upper: ["mg_chest_clavicular"],
     mg_chest_middle: ["mg_chest_sternal"],
     mg_chest_lower: ["mg_chest_lower"],
@@ -2556,72 +2558,167 @@ function premiumSubregionsForExercise(exercise, mapping) {
     mg_calves: ["mg_calves_gastrocnemius", "mg_soleus"]
   };
   const ids = [
-    ...(fallback[mapping?.primaryMuscle] || []),
-    ...(mapping?.secondaryMuscles || []).flatMap((item) => fallback[item.muscleId] || []),
-    ...(mapping?.stabilizers || []).flatMap((item) => fallback[item.muscleId] || [])
+    ...(fallback[canonicalizeMuscleGroup(mapping?.primaryMuscle)] || fallback[mapping?.primaryMuscle] || []),
+    ...(mapping?.secondaryMuscles || [])
+      .filter((item) => !["mg_abs", "mg_obliques"].includes(canonicalizeMuscleGroup(item.muscleId)))
+      .flatMap((item) => fallback[canonicalizeMuscleGroup(item.muscleId)] || fallback[item.muscleId] || [])
   ];
-  return [...new Set(ids)];
+  return [...new Set(ids.map(canonicalizeMuscleRegionId))];
 }
 
-function premiumCoverageForSessions(sessions) {
-  const points = new Map();
-  const add = (muscleId, value) => {
-    muscleId = canonicalizeMuscleId(muscleId);
+function canonicalCoverageContributionTargets(exercise, mapping) {
+  const groupTargets = [];
+  const regionTargets = [];
+  const addGroup = (muscleId, weight, role) => {
+    const id = canonicalizeMuscleGroup(muscleId);
+    if (!id || !Number.isFinite(weight) || weight <= 0) return;
+    groupTargets.push({ muscleId: id, weight, role });
+  };
+  const addRegion = (muscleId, weight, role) => {
+    const id = canonicalizeMuscleRegionId(muscleId);
+    if (!id || !Number.isFinite(weight) || weight <= 0) return;
+    regionTargets.push({ muscleId: id, weight, role });
+  };
+  addGroup(mapping?.primaryMuscle, 1, "primary");
+  (mapping?.secondaryMuscles || []).forEach((item) => addGroup(item.muscleId, Number(item.intensityWeight) || 0, "secondary"));
+  (mapping?.stabilizers || []).forEach((item) => {
+    const group = canonicalizeMuscleGroup(item.muscleId);
+    if (group === "mg_abs" || group === "mg_obliques") return;
+    addGroup(group, (Number(item.intensityWeight) || 0) * 0.25, "stabilizer");
+  });
+  const primaryRegions = premiumSubregionsForExercise(exercise, mapping);
+  primaryRegions.forEach((muscleId) => addRegion(muscleId, 1 / Math.max(1, primaryRegions.length), "primary_region"));
+  (mapping?.secondaryMuscles || []).forEach((item) => {
+    const group = canonicalizeMuscleGroup(item.muscleId);
+    if (group === "mg_abs" || group === "mg_obliques") return;
+    const regions = premiumSubregionsForExercise(null, { primaryMuscle: group, secondaryMuscles: [] });
+    regions.forEach((muscleId) => addRegion(muscleId, (Number(item.intensityWeight) || 0) / Math.max(1, regions.length), "secondary_region"));
+  });
+  return { groupTargets, regionTargets };
+}
+
+function getCanonicalMuscleCoverage({ sessions, context = "week", referenceDate = new Date(), planId = null } = {}) {
+  const groupPoints = new Map();
+  const regionPoints = new Map();
+  const diagnostics = [];
+  const warnings = [];
+  const add = (map, muscleId, value) => {
     if (!muscleId || !Number.isFinite(value) || value <= 0) return;
-    points.set(muscleId, (points.get(muscleId) || 0) + value);
+    map.set(muscleId, (map.get(muscleId) || 0) + value);
   };
   sessions.forEach((session) => {
     (session.completedExercises || []).forEach((completedExercise) => {
       const exercise = exerciseById(completedExercise.exerciseId);
       const mapping = muscleMappingForExercise(completedExercise.exerciseId);
-      const subregions = premiumSubregionsForExercise(exercise, mapping);
-      if (!subregions.length) return;
+      if (!mapping) {
+        warnings.push(`Mapping fehlt: ${completedExercise.exerciseId}`);
+        return;
+      }
       const setPoints = (completedExercise.sets || []).reduce((sum, set) => sum + completedSetCoverageFactor(set), 0);
-      const share = setPoints / Math.max(1, subregions.length);
-      subregions.forEach((muscleId) => add(muscleId, share));
+      const targets = canonicalCoverageContributionTargets(exercise, mapping);
+      targets.groupTargets.forEach((target) => add(groupPoints, target.muscleId, setPoints * target.weight));
+      targets.regionTargets.forEach((target) => add(regionPoints, target.muscleId, setPoints * target.weight));
+      diagnostics.push({
+        sessionId: session.id,
+        exerciseId: completedExercise.exerciseId,
+        groupTargets: targets.groupTargets,
+        regionTargets: targets.regionTargets,
+        rawSetScore: Number(setPoints.toFixed(3))
+      });
     });
   });
-  return (state.premiumMuscleRegions?.regions || []).map((region) => ({
-    muscleId: region.muscleId,
-    name: region.label,
-    points: points.get(region.muscleId) || 0,
-    percent: Math.round(((points.get(region.muscleId) || 0) / 3) * 100),
-    isTarget: points.has(region.muscleId),
-    group: region.group,
-    view: region.view
+  const targetMuscles = activePlanTargetMuscles();
+  targetMuscles.forEach((muscleId) => {
+    if (!groupPoints.has(muscleId)) groupPoints.set(muscleId, 0);
+  });
+  const groupItems = [...groupPoints.entries()].map(([muscleId, value]) => ({
+    muscleId,
+    label: muscleName(muscleId),
+    coveragePercent: Math.round((value / 8) * 100),
+    weightedSetScore: value,
+    sourceExerciseIds: [...new Set(diagnostics.filter((row) => row.groupTargets.some((target) => target.muscleId === muscleId)).map((row) => row.exerciseId))],
+    sourceSessionIds: [...new Set(diagnostics.filter((row) => row.groupTargets.some((target) => target.muscleId === muscleId)).map((row) => row.sessionId))]
+  }));
+  const regionItems = (state.premiumMuscleRegions?.regions || []).map((region) => {
+    const value = regionPoints.get(region.muscleId) || 0;
+    return {
+      muscleId: region.muscleId,
+      label: region.label,
+      coveragePercent: Math.round((value / 3) * 100),
+      weightedSetScore: value,
+      sourceExerciseIds: [...new Set(diagnostics.filter((row) => row.regionTargets.some((target) => target.muscleId === region.muscleId)).map((row) => row.exerciseId))],
+      sourceSessionIds: [...new Set(diagnostics.filter((row) => row.regionTargets.some((target) => target.muscleId === region.muscleId)).map((row) => row.sessionId))],
+      group: region.group,
+      view: region.view
+    };
+  });
+  return {
+    context,
+    generatedAt: new Date().toISOString(),
+    referenceDate: new Date(referenceDate).toISOString(),
+    planId,
+    mappingVersion: MUSCLE_MAPPING_VERSION,
+    muscleGroups: Object.fromEntries(groupItems.map((item) => [item.muscleId, item])),
+    premiumRegions: Object.fromEntries(regionItems.map((item) => [item.muscleId, item])),
+    diagnostics,
+    warnings,
+    cacheKey: `${context}|${todayIsoDate()}|${sessions.map((session) => session.id).join(",")}|${MUSCLE_MAPPING_VERSION}`
+  };
+}
+
+function premiumCoverageForSessions(sessions) {
+  const coverage = getCanonicalMuscleCoverage({ sessions, context: "week" });
+  return Object.values(coverage.premiumRegions).map((item) => ({
+    muscleId: item.muscleId,
+    name: item.label,
+    points: item.weightedSetScore,
+    percent: item.coveragePercent,
+    isTarget: item.weightedSetScore > 0,
+    group: item.group,
+    view: item.view,
+    sourceExerciseIds: item.sourceExerciseIds
   })).sort((a, b) => b.percent - a.percent || a.name.localeCompare(b.name));
 }
 
 function coverageForSessions(sessions) {
-  const points = new Map();
+  const coverage = getCanonicalMuscleCoverage({ sessions, context: "week" });
   const targetMuscles = activePlanTargetMuscles();
-  const add = (muscleId, value) => {
-    if (!muscleId || !Number.isFinite(value) || value <= 0) return;
-    points.set(muscleId, (points.get(muscleId) || 0) + value);
-  };
-
-  sessions.forEach((session) => {
-    (session.completedExercises || []).forEach((completedExercise) => {
-      const mapping = muscleMappingForExercise(completedExercise.exerciseId);
-      if (!mapping) return;
-      const setPoints = (completedExercise.sets || []).reduce((sum, set) => sum + completedSetCoverageFactor(set), 0);
-      add(mapping.primaryMuscle, setPoints);
-      (mapping.secondaryMuscles || []).forEach((item) => add(item.muscleId, setPoints * (Number(item.intensityWeight) || 0)));
-      (mapping.stabilizers || []).forEach((item) => add(item.muscleId, setPoints * (Number(item.intensityWeight) || 0) * 0.5));
-    });
-  });
-
-  targetMuscles.forEach((muscleId) => {
-    if (!points.has(muscleId)) points.set(muscleId, 0);
-  });
-
-  return [...points.entries()].map(([muscleId, value]) => ({
-    muscleId,
-    name: muscleName(muscleId),
-    points: value,
-    percent: Math.round((value / 8) * 100),
-    isTarget: targetMuscles.has(muscleId)
+  return Object.values(coverage.muscleGroups).map((item) => ({
+    muscleId: item.muscleId,
+    name: item.label,
+    points: item.weightedSetScore,
+    percent: item.coveragePercent,
+    isTarget: targetMuscles.has(item.muscleId),
+    sourceExerciseIds: item.sourceExerciseIds
   })).sort((a, b) => Number(b.isTarget) - Number(a.isTarget) || b.percent - a.percent || a.name.localeCompare(b.name));
+}
+
+function canonicalCoverageDiagnosticsForMode(mode = state.coverageMode || "week") {
+  const sessions = sessionsForCoverageMode(mode);
+  const coverage = getCanonicalMuscleCoverage({ sessions, context: mode });
+  return {
+    version: "6.17.2",
+    mappingVersion: MUSCLE_MAPPING_VERSION,
+    context: mode,
+    sessionIds: sessions.map((session) => session.id),
+    cacheKey: coverage.cacheKey,
+    warnings: coverage.warnings,
+    diagnostics: coverage.diagnostics,
+    groups: Object.values(coverage.muscleGroups).map((item) => ({
+      muscleId: item.muscleId,
+      label: item.label,
+      rawScore: Number(item.weightedSetScore.toFixed(3)),
+      percent: item.coveragePercent,
+      sourceExerciseIds: item.sourceExerciseIds
+    })),
+    premiumRegions: Object.values(coverage.premiumRegions).filter((item) => item.weightedSetScore > 0).map((item) => ({
+      muscleId: item.muscleId,
+      label: item.label,
+      rawScore: Number(item.weightedSetScore.toFixed(3)),
+      percent: item.coveragePercent,
+      sourceExerciseIds: item.sourceExerciseIds
+    }))
+  };
 }
 
 function coverageCoachHints(items) {
@@ -3430,12 +3527,45 @@ function muscleName(id) {
 }
 
 function canonicalizeMuscleId(id) {
+  return canonicalizeMuscleGroup(id);
+}
+
+function canonicalizeMuscleRegionId(id) {
+  const aliases = {
+    chest: "mg_chest_sternal",
+    upper_chest: "mg_chest_clavicular",
+    middle_chest: "mg_chest_sternal",
+    lower_chest: "mg_chest_lower",
+    mg_chest_upper: "mg_chest_clavicular",
+    mg_chest_middle: "mg_chest_sternal",
+    pectoralis_major: "mg_chest_sternal",
+    abs: "mg_abs_upper",
+    upper_abs: "mg_abs_upper",
+    lower_abs: "mg_abs_lower",
+    obliques: "mg_obliques"
+  };
+  return aliases[id] || id;
+}
+
+function canonicalizeMuscleGroup(id) {
   const aliases = {
     chest: "mg_chest",
+    mg_chest: "mg_chest",
     mg_chest_sternal: "mg_chest",
     mg_chest_clavicular: "mg_chest",
     mg_chest_lower: "mg_chest",
-    mg_chest_upper: "mg_chest"
+    mg_chest_upper: "mg_chest",
+    mg_chest_middle: "mg_chest",
+    upper_chest: "mg_chest",
+    middle_chest: "mg_chest",
+    lower_chest: "mg_chest",
+    pectoralis_major: "mg_chest",
+    abs: "mg_abs",
+    mg_abs_upper: "mg_abs",
+    mg_abs_lower: "mg_abs",
+    upper_abs: "mg_abs",
+    lower_abs: "mg_abs",
+    obliques: "mg_obliques"
   };
   return aliases[id] || id;
 }
@@ -4012,11 +4142,11 @@ function premiumTrendCoverageItems() {
 }
 
 function productionMuscleMapPayload(view, mode, items, visibleItems) {
-  const smart = smartCoachRecommendationSafe();
   return {
-    version: "6.9.0",
+    version: "6.17.2",
     view,
     mode,
+    modeLabel: mode === "trend" ? "Trend" : mode === "today" ? "Heute" : mode === "month" ? "Monat" : "Diese Woche",
     selectedMuscleId: state.selectedMuscleId || visibleItems[0]?.muscleId || null,
     coverage: items.map((item) => ({
       muscleId: item.muscleId,
@@ -4026,14 +4156,7 @@ function productionMuscleMapPayload(view, mode, items, visibleItems) {
     })),
     adapter: state.muscleMapJsAdapterSeed,
     heatmap: state.muscleMapJsHeatmap,
-    config: state.productionMuscleMapConfig,
-    coach: {
-      title: smart.title,
-      summary: smart.summary,
-      confidencePercent: smart.confidencePercent,
-      why: smart.why || [],
-      affectedMuscles: smart.affectedMuscles || []
-    }
+    config: state.productionMuscleMapConfig
   };
 }
 
@@ -8572,6 +8695,7 @@ function renderDebugPanel(manifest) {
       <button class="secondary" data-load-test-data>Testdaten laden</button>
       <button class="secondary" data-clear-cache>Cache leeren</button>
       ${renderDeviceValidationPanel()}
+      ${renderMuscleCoverageDiagnosticsPanel()}
       <ul class="small-list">${storage.lastErrors.slice(-5).map((item) => `<li>${dateTimeText(item.at)}: ${htmlesc(item.message)}</li>`).join("") || "<li>Keine Fehler protokolliert.</li>"}</ul>
     </div>
   `;
@@ -8647,6 +8771,37 @@ function renderDeviceValidationPanel() {
       </div>
       <button class="secondary" data-export-device-validation>Pruefbericht exportieren</button>
       <p class="quiet">Letzter Bericht: ${latest ? dateTimeText(latest.createdAt) : "Noch keiner"}</p>
+    </article>
+  `;
+}
+
+function exportMuscleCoverageDiagnostics() {
+  const diagnostics = canonicalCoverageDiagnosticsForMode(state.coverageMode || "week");
+  const blob = new Blob([JSON.stringify(diagnostics, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "DCoach_v6.17.2_MuscleCoverage_Diagnostics.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function renderMuscleCoverageDiagnosticsPanel() {
+  const diagnostics = canonicalCoverageDiagnosticsForMode(state.coverageMode || "week");
+  return `
+    <article class="card stack" data-muscle-coverage-diagnostics>
+      <div class="row">
+        <h3 class="grow">Muscle Coverage Diagnostics</h3>
+        <span class="badge blue">${htmlesc(diagnostics.mappingVersion)}</span>
+      </div>
+      <p class="quiet">Kontext: ${htmlesc(diagnostics.context)} | Cache-Key: ${htmlesc(diagnostics.cacheKey)}</p>
+      <div class="storage-table">
+        ${diagnostics.groups.slice(0, 8).map((item) => `<div><span>${htmlesc(item.label)}</span><strong>${item.percent}%</strong></div>`).join("")}
+      </div>
+      ${diagnostics.warnings.length ? `<ul class="small-list">${diagnostics.warnings.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : `<p class="quiet">Keine Mapping-Warnungen.</p>`}
+      <button class="secondary" data-export-muscle-coverage-diagnostics>Diagnostics exportieren</button>
     </article>
   `;
 }
@@ -8973,11 +9128,24 @@ function bindEvents() {
     });
   });
 
+  const muscleTapGestures = new WeakMap();
   document.querySelectorAll("[data-open-coverage-muscle]").forEach((button) => {
     button.addEventListener("click", () => {
+      const gesture = muscleTapGestures.get(button);
+      if (gesture?.moved) return;
       state.selectedMuscleId = button.dataset.openCoverageMuscle;
       render();
     });
+    button.addEventListener("pointerdown", (event) => {
+      muscleTapGestures.set(button, { startX: event.clientX, startY: event.clientY, moved: false });
+    }, { passive: true });
+    button.addEventListener("pointermove", (event) => {
+      const gesture = muscleTapGestures.get(button);
+      if (!gesture) return;
+      const dx = Math.abs(event.clientX - gesture.startX);
+      const dy = Math.abs(event.clientY - gesture.startY);
+      if (dx > 10 || dy > 10) gesture.moved = true;
+    }, { passive: true });
     button.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
@@ -9458,6 +9626,7 @@ function bindEvents() {
   });
 
   document.querySelector("[data-export-device-validation]")?.addEventListener("click", exportDeviceValidationReport);
+  document.querySelector("[data-export-muscle-coverage-diagnostics]")?.addEventListener("click", exportMuscleCoverageDiagnostics);
 }
 
 function bindDailyCheckinEvents() {
@@ -9510,7 +9679,7 @@ function mountMuscleMapJsPrototype() {
 function mountProductionMuscleMap() {
   const container = document.querySelector("[data-production-muscle-map]");
   if (!container || !window.dcoachProductionMuscleMapPayload) return;
-  import("./production/production-muscle-map.js?v=6.9.0")
+  import("./production/production-muscle-map.js?v=6.17.2")
     .then((module) => module.mountProductionMuscleMap(container, window.dcoachProductionMuscleMapPayload))
     .catch((error) => {
       logAppError(error?.message || error, "production-muscle-map");
