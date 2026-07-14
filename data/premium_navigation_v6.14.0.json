@@ -1,0 +1,38 @@
+{
+  "version": "6.14.0",
+  "type": "premium_bottom_navigation",
+  "order": [
+    {
+      "id": "training",
+      "label": "Training",
+      "icon": "dumbbell"
+    },
+    {
+      "id": "coach",
+      "label": "Coach",
+      "icon": "compass"
+    },
+    {
+      "id": "dashboard",
+      "label": "Dashboard",
+      "icon": "brand-d",
+      "center": true
+    },
+    {
+      "id": "plans",
+      "label": "Pläne",
+      "icon": "calendar-list"
+    },
+    {
+      "id": "profile",
+      "label": "Tracking",
+      "icon": "activity-chart",
+      "internalRouteMayRemain": "profile"
+    }
+  ],
+  "centerTab": "dashboard",
+  "offlineIcons": true,
+  "letterPlaceholdersAllowed": [
+    "brand-d"
+  ]
+}

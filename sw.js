@@ -1,4 +1,4 @@
-const CACHE_NAME = "dcoach-pwa-v64";
+const CACHE_NAME = "dcoach-pwa-v65";
 const ASSETS = [
   "./",
   "./index.html",
@@ -236,7 +236,10 @@ const ASSETS = [
   "./assets/movement_patterns/isolation.svg",
   "./assets/movement_patterns/squat_pattern.svg",
   "./assets/movement_patterns/vertical_pull.svg",
-  "./assets/movement_patterns/vertical_push.svg"
+  "./assets/movement_patterns/vertical_push.svg",
+  "./data/premium_navigation_v6.14.0.json",
+  "./data/dashboard_priority_v6.14.0.json",
+  "./data/tracking_information_architecture_v6.14.0.json"
 ];
 
 self.addEventListener("install", (event) => {

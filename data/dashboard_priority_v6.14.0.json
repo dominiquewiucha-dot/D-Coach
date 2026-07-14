@@ -1,0 +1,14 @@
+{
+  "version": "6.14.0",
+  "type": "dashboard_information_priority",
+  "sections": [
+    "dailyStatus",
+    "nextWorkout",
+    "readiness",
+    "weeklyCoverage",
+    "primaryCoachRecommendation",
+    "recentActivity"
+  ],
+  "maxPrimaryCoachRecommendations": 1,
+  "detailsDestination": "coach"
+}

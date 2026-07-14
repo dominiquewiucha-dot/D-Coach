@@ -1,0 +1,19 @@
+{
+  "version": "6.14.0",
+  "type": "tracking_navigation",
+  "visibleLabel": "Tracking",
+  "items": [
+    "weight",
+    "journal",
+    "dailyCheckins",
+    "trainingHistory",
+    "progress",
+    "bodyMetrics",
+    "muscleMap",
+    "exercises",
+    "equipment",
+    "scannerMappings",
+    "settings",
+    "backupRestore"
+  ]
+}
