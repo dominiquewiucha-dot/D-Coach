@@ -12,9 +12,11 @@ assert(app.includes("function renderTrainingHistory()"), "training history scree
 ["weight", "journal", "history", "machines", "musclemap", "exercises", "settings"].forEach((tab) => {
   assert(app.includes(`tab: "${tab}"`), `${tab} tracking shortcut missing`);
 });
-["Gewicht", "Journal", "Trainingshistorie", "Fortschritt", "Koerperwerte", "Geräte", "Muskelmapping", "Übungen", "Einstellungen"].forEach((label) => {
+["Gewicht", "Journal", "Trainingshistorie", "Fortschritt", "Koerperwerte", "Muskelmapping", "Einstellungen"].forEach((label) => {
   assert(app.includes(label), `${label} label missing`);
 });
+assert(app.includes("Ger\\u00e4te") || app.includes("Geräte"), "Geraete label missing");
+assert(app.includes("\\u00dcbungen") || app.includes("Übungen"), "Uebungen label missing");
 assert(app.includes("<h3>Tracking</h3>"), "tracking shortcut title missing");
 assert(app.includes("iconSvg(item.icon)"), "tracking shortcuts must use inline svg icons");
 assert(app.includes("${renderProfileShortcuts()}"), "tracking shortcuts must render in settings/tracking");

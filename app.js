@@ -1,4 +1,4 @@
-const state = {
+﻿const state = {
   seed: null,
   muscles: null,
   exerciseMuscleMap: null,
@@ -202,7 +202,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v65";
+const APP_VERSION = "pwa-v66";
+const BACKUP_FORMAT_VERSION = "6.15.1";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -724,7 +725,7 @@ function generatePlanCandidate() {
     });
   const groups = [
     ["Push", ["push", "brust", "schulter", "trizeps"]],
-    ["Pull", ["pull", "ruecken", "rücken", "bizeps"]],
+    ["Pull", ["pull", "ruecken", "rÃ¼cken", "bizeps"]],
     ["Beine + Core", ["bein", "quad", "glute", "hamstring", "core", "bauch"]]
   ];
   const days = groups.map(([name, needles]) => {
@@ -1374,11 +1375,24 @@ function registerServiceWorker() {
 
 function restoreWorkoutDraft() {
   const draft = storage.activeWorkoutDraft;
-  if (!draft || typeof draft !== "object") return;
-  if (!draft.planName || !draft.dayName || !Array.isArray(draft.entries)) return;
-  if (!Number.isInteger(draft.index) || draft.index < 0 || draft.index >= draft.entries.length) return;
+  if (!isValidActiveWorkoutDraft(draft)) return;
   state.activeWorkout = draft;
   state.tab = "training";
+}
+
+function isValidActiveWorkoutDraft(value) {
+  return Boolean(
+    value &&
+    typeof value === "object" &&
+    value.planName &&
+    value.dayName &&
+    value.startedAt &&
+    Array.isArray(value.entries) &&
+    value.entries.length > 0 &&
+    Number.isInteger(value.index) &&
+    value.index >= 0 &&
+    value.index < value.entries.length
+  );
 }
 
 function persistWorkoutDraft() {
@@ -1778,6 +1792,26 @@ function createDailyCheckinDraft(source = "morning_flow") {
   };
 }
 
+function createTrainingResumeCheckinDraft(existing = null) {
+  const base = existing && typeof existing === "object" ? { ...existing } : createDailyCheckinDraft("training");
+  return {
+    ...base,
+    localDate: localIsoDate(),
+    status: "draft",
+    source: base.source || "training",
+    resumeAction: "start_training",
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function consumeDailyCheckinResumeAction(entry = null) {
+  const action = entry?.resumeAction || storage.dailyCheckinDraft?.resumeAction || "";
+  if (storage.dailyCheckinDraft?.resumeAction) {
+    storage.dailyCheckinDraft = { ...storage.dailyCheckinDraft, resumeAction: null, updatedAt: new Date().toISOString() };
+  }
+  return action;
+}
+
 function ensureDailyCheckinDraft() {
   const today = localIsoDate();
   if (storage.dailyCheckinDraft?.localDate === today) return storage.dailyCheckinDraft;
@@ -1848,21 +1882,31 @@ function dailyPainRegions() {
 
 function skipDailyCheckin() {
   const draft = ensureDailyCheckinDraft();
-  const skipped = { ...draft, status: "skipped", completedAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  const resumeAction = consumeDailyCheckinResumeAction(draft);
+  const skipped = { ...draft, resumeAction: null, status: "skipped", completedAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
   storage.dailyCheckins = [...storage.dailyCheckins.filter((entry) => entry.localDate !== skipped.localDate), skipped];
   storage.dailyCheckinDraft = null;
   state.dailyCheckinActive = false;
+  if (resumeAction === "start_training") {
+    startTrainingFlow();
+    return;
+  }
   render();
 }
 
 function completeDailyCheckin() {
   const draft = updateDailyCheckinDraftFromDom();
-  const completed = { ...draft, status: "completed", completedAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  const resumeAction = consumeDailyCheckinResumeAction(draft);
+  const completed = { ...draft, resumeAction: null, status: "completed", completedAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
   storage.dailyCheckins = [...storage.dailyCheckins.filter((entry) => entry.localDate !== completed.localDate), completed];
   storage.dailyCheckinDraft = null;
   upsertJournalFromDailyCheckin(completed);
   if (Number(completed.weightKg) > 0) upsertWeightFromDailyCheckin(completed);
   state.dailyCheckinActive = false;
+  if (resumeAction === "start_training") {
+    startTrainingFlow();
+    return;
+  }
   state.tab = "dashboard";
   render();
 }
@@ -3079,7 +3123,7 @@ function occupiedAlternativesForExercise(exercise) {
 function dayTypeFromName(value) {
   const text = String(value || "").toLowerCase();
   if (text.includes("push") || text.includes("brust") || text.includes("schulter") || text.includes("trizeps")) return "Push";
-  if (text.includes("pull") || text.includes("ruecken") || text.includes("rücken") || text.includes("bizeps")) return "Pull";
+  if (text.includes("pull") || text.includes("ruecken") || text.includes("rÃ¼cken") || text.includes("bizeps")) return "Pull";
   if (text.includes("leg") || text.includes("bein") || text.includes("unter")) return "Legs";
   return "FullBody";
 }
@@ -3303,14 +3347,14 @@ function upperRepTarget(text) {
 function progressionHint(exercise, plannedReps, previousSets) {
   const texts = coachingTexts();
   if (exerciseIsCritical(exercise)) {
-    return texts.lwsCaution || "Nur schmerzfrei ausführen oder Alternative wählen.";
+    return texts.lwsCaution || "Nur schmerzfrei ausfÃ¼hren oder Alternative wÃ¤hlen.";
   }
   const target = upperRepTarget(plannedReps);
   if (!target || !previousSets?.length) {
     return texts.noHistory || "Sauber arbeiten und moderat starten.";
   }
   const allReached = previousSets.every((set) => Number(set.actualReps || 0) >= target);
-  return allReached ? (texts.increaseSuggested || "Letztes Mal Ziel erreicht. Beim nächsten Mal leicht steigern.") : (texts.holdWeight || "Gewicht beibehalten und Technik priorisieren.");
+  return allReached ? (texts.increaseSuggested || "Letztes Mal Ziel erreicht. Beim nÃ¤chsten Mal leicht steigern.") : (texts.holdWeight || "Gewicht beibehalten und Technik priorisieren.");
 }
 
 function lwsBadge(value) {
@@ -3751,11 +3795,11 @@ function renderMuscleMapJsPrototypeScreen() {
 
 function renderTabs() {
   const tabs = [
-    ["dashboard", "Dashboard", "⌂"],
-    ["training", "Training", "↻"],
+    ["dashboard", "Dashboard", "âŒ‚"],
+    ["training", "Training", "â†»"],
     ["coach", "Coach", "D"],
-    ["plans", "Pläne", "▥"],
-    ["settings", "Tracking", "♙"]
+    ["plans", "PlÃ¤ne", "â–¥"],
+    ["settings", "Tracking", "â™™"]
   ];
   return `<nav class="tabs">${tabs.map(([id, label, icon]) => `<button class="tab ${state.tab === id && !state.activeWorkout && !state.selectedExerciseId && !state.selectedSessionId ? "active" : ""}" data-tab="${id}"><span class="tab-icon">${icon}</span><span>${label}</span></button>`).join("")}</nav>`;
 }
@@ -4317,7 +4361,7 @@ function renderPerformanceCoachCard(session) {
             <span class="badge ${progression.decisionType === "change_exercise" || insight.performance.classification === "drop" ? "amber" : insight.records.length ? "green" : "blue"}">${htmlesc(insight.records[0] || progression.label)}</span>
           </div>
           <p class="muted">${htmlesc(smartNote)}</p>
-          <p class="quiet">${htmlesc(progression.coachText)}${progression.nextWeightKg ? ` Naechstes Ziel: ${kg(progression.nextWeightKg)}.` : ""} · ${progression.confidencePercent}% ${htmlesc(progression.confidenceLabel)}</p>
+          <p class="quiet">${htmlesc(progression.coachText)}${progression.nextWeightKg ? ` Naechstes Ziel: ${kg(progression.nextWeightKg)}.` : ""} Â· ${progression.confidencePercent}% ${htmlesc(progression.confidenceLabel)}</p>
           <details>
             <summary>Warum?</summary>
             <ul class="small-list">
@@ -5149,7 +5193,7 @@ function renderCoachDashboardV54() {
       <article class="card stack coach-hero-v54">
         <div class="row">
           <div class="grow">
-            <p class="muted">Smart Coach · offline</p>
+            <p class="muted">Smart Coach Â· offline</p>
             <h2>${htmlesc(summary.recommendation)}</h2>
           </div>
           <span class="badge ${summary.confidence >= 75 ? "green" : "amber"}">${summary.confidence}%</span>
@@ -5195,7 +5239,7 @@ function renderCoachDashboardV54() {
             <span class="badge ${readiness.ready ? "green" : "amber"}">${readiness.ready ? "bereit" : "lernt"}</span>
           </div>
           <div class="confidence-bar"><span style="width:${readiness.percent}%"></span></div>
-          <p class="muted">${readiness.sessions}/${readiness.requiredWorkouts} Trainings · ${readiness.weeks}/${readiness.requiredWeeks} Wochen.</p>
+          <p class="muted">${readiness.sessions}/${readiness.requiredWorkouts} Trainings Â· ${readiness.weeks}/${readiness.requiredWeeks} Wochen.</p>
           <p class="quiet">v6 Smart Coach bleibt offline und regelbasiert. v7 AI Trainer erst nach stabiler Datenbasis.</p>
         </article>
       </div>
@@ -5227,11 +5271,11 @@ function renderTrainingDnaCard() {
       </div>
       <div class="dna-grid">
         <div><span>Rep-Bereich</span><strong>${htmlesc(dna.topRepRange || "-")}</strong></div>
-        <div><span>Ø Dauer</span><strong>${dna.averageSessionDurationMinutes || "-"} min</strong></div>
+        <div><span>Ã˜ Dauer</span><strong>${dna.averageSessionDurationMinutes || "-"} min</strong></div>
       </div>
-      ${dna.exerciseAffinity.length ? `<div class="stack"><h4>Hohe Uebungs-Affinitaet</h4>${dna.exerciseAffinity.map((item) => `<p class="quiet">${htmlesc(item.exercise.displayName)} · ${item.count} Einheiten</p>`).join("")}</div>` : ""}
-      ${dna.stagnating.length ? `<div class="stack"><h4>Stagnation moeglich</h4>${dna.stagnating.map((item) => `<p class="quiet">${htmlesc(item.exercise.displayName)} · ${trainingDnaText("stagnation_detected", "Diese Uebung stagniert seit mehreren vergleichbaren Einheiten.")}</p>`).join("")}</div>` : ""}
-      ${dna.undertrainedMuscles.length ? `<div class="stack"><h4>Unter Ziel</h4>${dna.undertrainedMuscles.map((item) => `<p class="quiet">${htmlesc(item.name)} · ${item.percent}%</p>`).join("")}</div>` : ""}
+      ${dna.exerciseAffinity.length ? `<div class="stack"><h4>Hohe Uebungs-Affinitaet</h4>${dna.exerciseAffinity.map((item) => `<p class="quiet">${htmlesc(item.exercise.displayName)} Â· ${item.count} Einheiten</p>`).join("")}</div>` : ""}
+      ${dna.stagnating.length ? `<div class="stack"><h4>Stagnation moeglich</h4>${dna.stagnating.map((item) => `<p class="quiet">${htmlesc(item.exercise.displayName)} Â· ${trainingDnaText("stagnation_detected", "Diese Uebung stagniert seit mehreren vergleichbaren Einheiten.")}</p>`).join("")}</div>` : ""}
+      ${dna.undertrainedMuscles.length ? `<div class="stack"><h4>Unter Ziel</h4>${dna.undertrainedMuscles.map((item) => `<p class="quiet">${htmlesc(item.name)} Â· ${item.percent}%</p>`).join("")}</div>` : ""}
       ${memory.length ? `<ul class="small-list">${memory.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
       ${events.length ? `<details><summary>Timeline</summary><ul class="small-list">${events.map((event) => `<li>${dateText(event.date)}: ${htmlesc(event.title)} - ${htmlesc(event.description)}</li>`).join("")}</ul></details>` : ""}
     </article>
@@ -5433,7 +5477,7 @@ function renderRecoveryFatigueCard(context = "coach") {
         <div class="fatigue-metric"><strong>${summary.muscleFatiguePercent}%</strong><span>Lokal</span></div>
         <div class="fatigue-metric"><strong>${summary.jointFlags.length}</strong><span>Gelenkflags</span></div>
       </div>
-      ${summary.topMuscle ? `<p class="muted">Höchste lokale Belastung: ${htmlesc(summary.topMuscle.name)} mit ${summary.topMuscle.percent}% Wochenabdeckung.</p>` : `<p class="muted">Noch nicht genug Muskeldaten fuer lokale Ermuedung.</p>`}
+      ${summary.topMuscle ? `<p class="muted">HÃ¶chste lokale Belastung: ${htmlesc(summary.topMuscle.name)} mit ${summary.topMuscle.percent}% Wochenabdeckung.</p>` : `<p class="muted">Noch nicht genug Muskeldaten fuer lokale Ermuedung.</p>`}
       ${summary.jointFlags.length ? `<p class="quiet">Gelenkstress: ${summary.jointFlags.map(htmlesc).join(", ")}</p>` : `<p class="quiet">Keine harte Gelenkstress-Regel aktiv.</p>`}
       <details>
         <summary>Warum?</summary>
@@ -5746,7 +5790,7 @@ function plateauSummary() {
         `${history.length} vergleichbare Einheiten`,
         `Volumenveraenderung ${Math.round(volumeDelta)}%`,
         `Lastveraenderung ${kg(loadDelta)}`
-      ].concat(avgRirNow !== null ? [`Ø RIR ${Math.round(avgRirNow * 10) / 10}`] : [])
+      ].concat(avgRirNow !== null ? [`Ã˜ RIR ${Math.round(avgRirNow * 10) / 10}`] : [])
     };
   }).filter(Boolean).sort((a, b) => b.confidencePercent - a.confidencePercent)[0];
   return candidates || {
@@ -5902,7 +5946,7 @@ function renderAdaptiveMesocycleCard() {
       </div>
       <p class="muted">${htmlesc(summary.action)}</p>
       <ul class="small-list">${summary.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
-      <p class="quiet">Strategie: ${htmlesc(summary.progressionStrategy)} · Deload: ${htmlesc(summary.deloadStrategy)} · Regel: ${htmlesc(summary.ruleId)}</p>
+      <p class="quiet">Strategie: ${htmlesc(summary.progressionStrategy)} Â· Deload: ${htmlesc(summary.deloadStrategy)} Â· Regel: ${htmlesc(summary.ruleId)}</p>
       ${summary.requiresConfirmation ? `<button class="secondary" data-confirm-plan-adjust>Mesocycle-Anpassung pruefen</button>` : `<p class="quiet">Keine automatische Planaenderung.</p>`}
     </article>
   `;
@@ -6094,69 +6138,7 @@ function renderDashboard() {
             <div class="history-row">
               <div>
                 <strong>${htmlesc(item.dayName)}</strong>
-                <p class="muted">${dateText(item.startedAt)} · ${item.completedExercises.length} Uebungen · ${sessionSetCount(item)} Saetze</p>
-              </div>
-              <span class="badge blue">${Math.round(sessionVolume(item))} kg</span>
-            </div>
-          </button>
-        `).join("") : `<p class="muted">Noch kein Training gespeichert.</p>`}
-      </article>
-    </section>
-  `;
-  return `
-    <section class="screen stack">
-      <header><h1 class="title">D-Coach</h1><p class="subtitle">Heute sauber trainieren.</p></header>
-      ${renderDailyCheckinDashboardCard()}
-      ${renderCoachDashboardV54()}
-      ${renderWeeklyCoachCard()}
-      ${renderPlateauCoachCard()}
-      ${renderDeloadCoachCard()}
-      ${renderAdaptiveMesocycleCard()}
-      ${renderSmartCoachReleaseCandidateCard()}
-      ${plan ? `<article class="card stack">
-        <p class="muted">Aktiver Plan</p>
-        <h2>${htmlesc(plan.planName)}</h2>
-        <p class="muted">Nächstes Training: ${htmlesc(nextDay)}</p>
-        <button class="primary" data-start-training-flow>Training starten</button>
-      </article>` : `<article class="card stack">
-        <h2>Kein aktiver Plan</h2>
-        <p class="muted">Aktiviere oder stelle einen Plan im Tab Pläne wieder her.</p>
-        <button class="secondary" data-tab="plans">Zu den Plänen</button>
-      </article>`}
-      <div class="grid">
-        ${metric(kg(latestWeight?.weightKg), "Aktuelles Gewicht")}
-        ${metric(kg(averageWeight(7)), "7-Tage-Schnitt")}
-        ${metric(session?.dayName || "-", "Letztes Training")}
-        ${metric(`${Math.round(weeklyVolume())} kg`, "7-Tage-Volumen")}
-      </div>
-      <div class="grid">
-        ${metric(String(sessionsSince(7).length), "Trainings diese Woche")}
-        ${metric(String(storage.sessions.length), "Gespeicherte Einheiten")}
-      </div>
-      <details class="disclosure-card stack">
-        <summary>
-          <span>Muscle Map</span>
-          <span class="badge blue">Woche</span>
-        </summary>
-        ${renderCoverageCard()}
-      </details>
-      <article class="card">
-        <h3>Hinweis</h3>
-        <p class="muted">Bewerte nicht einzelne Tageswerte. Gewicht und Training zählen als Trend.</p>
-      </article>
-      <article class="card stack">
-        <div class="row"><h3 class="grow">Readiness</h3><span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span></div>
-        <p class="muted">${htmlesc(readiness.hint)}</p>
-        <button class="secondary" data-tab="journal">Journal öffnen</button>
-      </article>
-      <article class="card stack">
-        <h3>Letzte Trainings</h3>
-        ${latestSessions.length ? latestSessions.map((item) => `
-          <button class="list-button" data-session-id="${htmlesc(item.id)}">
-            <div class="history-row">
-              <div>
-                <strong>${htmlesc(item.dayName)}</strong>
-                <p class="muted">${dateText(item.startedAt)} · ${item.completedExercises.length} Übungen · ${sessionSetCount(item)} Sätze</p>
+                <p class="muted">${dateText(item.startedAt)} Â· ${item.completedExercises.length} Uebungen Â· ${sessionSetCount(item)} Saetze</p>
               </div>
               <span class="badge blue">${Math.round(sessionVolume(item))} kg</span>
             </div>
@@ -6193,7 +6175,7 @@ function renderCoach() {
   const coverageHints = coverageCoachHints(coverageForSessions(sessionsSince(7)));
   return `
     <section class="screen stack coach-screen">
-      <header><h1 class="title">Coach</h1><p class="subtitle">${htmlesc(session.dayName)} · ${dateText(session.startedAt)}</p></header>
+      <header><h1 class="title">Coach</h1><p class="subtitle">${htmlesc(session.dayName)} Â· ${dateText(session.startedAt)}</p></header>
       <div class="grid">
         ${metric(String(sessionDurationMinutes(session)), "Minuten")}
         ${metric(String(session.completedExercises.length), "Uebungen")}
@@ -6280,7 +6262,7 @@ function renderTraining() {
           <article class="card row">
             <div class="grow">
               <h2>${htmlesc(day.name)}</h2>
-              <p class="muted">${day.exercises.length} Übungen · ${day.maxDurationMinutes} Minuten</p>
+              <p class="muted">${day.exercises.length} Ãœbungen Â· ${day.maxDurationMinutes} Minuten</p>
               <p class="quiet">${lastDayDate(day.name) || "Noch nicht trainiert"}</p>
               ${renderWarmupHint(day)}
             </div>
@@ -6289,9 +6271,9 @@ function renderTraining() {
         </button>
         ${renderSmartWorkoutPreview(day.name)}
       `).join("") : `<article class="card stack">
-        <h2>Kein Training verfügbar</h2>
+        <h2>Kein Training verfÃ¼gbar</h2>
         <p class="muted">Aktiviere zuerst einen Plan.</p>
-        <button class="secondary" data-tab="plans">Plan auswählen</button>
+        <button class="secondary" data-tab="plans">Plan auswÃ¤hlen</button>
       </article>`}
     </section>
   `;
@@ -6303,11 +6285,11 @@ function renderSmartWorkoutPreview(dayName) {
   return `
     <article class="card stack builder-preview">
       <div class="row">
-        <h3 class="grow">Smart Builder · ${htmlesc(proposal.dayType)}</h3>
+        <h3 class="grow">Smart Builder Â· ${htmlesc(proposal.dayType)}</h3>
         <span class="badge blue">ca. ${proposal.estimatedDurationMinutes} min</span>
       </div>
       <ol class="builder-list">
-        ${proposal.exercises.map((item) => `<li><strong>${htmlesc(item.exercise.displayName)}</strong><span>${item.sets} Saetze · ${htmlesc(item.reps)}</span></li>`).join("")}
+        ${proposal.exercises.map((item) => `<li><strong>${htmlesc(item.exercise.displayName)}</strong><span>${item.sets} Saetze Â· ${htmlesc(item.reps)}</span></li>`).join("")}
       </ol>
       ${proposal.builderReasons.length ? `<ul class="small-list">${proposal.builderReasons.slice(0, 2).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
       ${proposal.warnings.length ? `<p class="quiet">${htmlesc(proposal.warnings[0])}</p>` : ""}
@@ -6337,7 +6319,7 @@ function renderTrainingV53() {
             <div class="grow">
               <p class="muted">Naechste Einheit</p>
               <h2>${htmlesc(primaryDay.name)}</h2>
-              <p class="muted">${primaryDay.exercises.length} Uebungen · ${primaryDay.maxDurationMinutes} Minuten · ${lastDayDate(primaryDay.name) || "noch nicht trainiert"}</p>
+              <p class="muted">${primaryDay.exercises.length} Uebungen Â· ${primaryDay.maxDurationMinutes} Minuten Â· ${lastDayDate(primaryDay.name) || "noch nicht trainiert"}</p>
             </div>
             <span class="badge blue">Start</span>
           </div>
@@ -6369,7 +6351,7 @@ function renderTrainingDayCompactV53(day) {
       <article class="card row compact-training-day">
         <div class="grow">
           <h3>${htmlesc(day.name)}</h3>
-          <p class="muted">${day.exercises.length} Uebungen · ${day.maxDurationMinutes} min</p>
+          <p class="muted">${day.exercises.length} Uebungen Â· ${day.maxDurationMinutes} min</p>
         </div>
         <span class="badge blue">Start</span>
       </article>
@@ -6384,16 +6366,16 @@ function renderSmartWorkoutPreviewV53(dayName) {
   return `
     <article class="card stack builder-preview compact-builder">
       <div class="row">
-        <h3 class="grow">Smart Builder · ${htmlesc(proposal.dayType)}</h3>
+        <h3 class="grow">Smart Builder Â· ${htmlesc(proposal.dayType)}</h3>
         <span class="badge blue">ca. ${proposal.estimatedDurationMinutes} min</span>
       </div>
-      <p class="muted">${proposal.exercises.length} Uebungen · Fokus: ${htmlesc(focus.join(", ") || "Ganzkoerper")}</p>
+      <p class="muted">${proposal.exercises.length} Uebungen Â· Fokus: ${htmlesc(focus.join(", ") || "Ganzkoerper")}</p>
       ${proposal.builderReasons.length ? `<ul class="small-list">${proposal.builderReasons.slice(0, 2).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
       ${proposal.warnings.length ? `<p class="quiet">${htmlesc(proposal.warnings[0])}</p>` : ""}
       <details class="compact-plan-preview">
         <summary>Planvorschau</summary>
         <ol class="builder-list">
-          ${proposal.exercises.map((item) => `<li><strong>${htmlesc(item.exercise.displayName)}</strong><span>${item.sets} Saetze · ${htmlesc(item.reps)}</span></li>`).join("")}
+          ${proposal.exercises.map((item) => `<li><strong>${htmlesc(item.exercise.displayName)}</strong><span>${item.sets} Saetze Â· ${htmlesc(item.reps)}</span></li>`).join("")}
         </ol>
       </details>
       <button class="secondary" data-start-smart-day="${htmlesc(dayName)}">Smart-Training starten</button>
@@ -6537,12 +6519,12 @@ function workoutEntryFromPlanned(planned) {
 
 function startTrainingFlow() {
   const todayCheckin = dailyCheckinForDate(localIsoDate());
-  if (!todayCheckin || todayCheckin.status !== "completed") {
-    storage.dailyCheckinDraft = todayCheckin
-      ? { ...todayCheckin, status: "draft", updatedAt: new Date().toISOString() }
-      : createDailyCheckinDraft("training");
+  const checkinDone = todayCheckin?.status === "completed" || todayCheckin?.status === "skipped";
+  if (!checkinDone) {
+    const existingDraft = storage.dailyCheckinDraft?.localDate === localIsoDate() ? storage.dailyCheckinDraft : null;
+    storage.dailyCheckinDraft = createTrainingResumeCheckinDraft(existingDraft);
     state.dailyCheckinActive = true;
-    state.dailyCheckinStep = "sleep";
+    state.dailyCheckinStep = existingDraft ? "draft" : "sleep";
     render();
     return;
   }
@@ -6641,16 +6623,16 @@ function renderWorkout() {
     <section class="screen stack">
       <header>
         <h1 class="title">${htmlesc(workout.dayName)}</h1>
-        <p class="subtitle">Übung ${workout.index + 1} von ${workout.entries.length}</p>
+        <p class="subtitle">Ãœbung ${workout.index + 1} von ${workout.entries.length}</p>
       </header>
       <div class="progress"><span style="width:${progress}%"></span></div>
       ${renderWorkoutWarmupSummary(workout)}
       ${renderSessionCoachDuringCard(workout, entry, exercise)}
       <article class="card stack">
         <h2>${htmlesc(exercise.displayName)}</h2>
-        <p class="muted">${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].slice(0, 3).join(" · "))}</p>
+        <p class="muted">${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].slice(0, 3).join(" Â· "))}</p>
         <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} <span class="badge blue">${htmlesc(entry.reps)} Wdh.</span> <span class="badge">${entry.restSeconds} s Pause</span></div>
-        ${machineSetting ? `<p class="quiet">Setup: Sitz ${htmlesc(machineSetting.seatPosition || "-")} · Griff ${htmlesc(machineSetting.handlePosition || "-")} · Ruecken ${htmlesc(machineSetting.backrestPosition || "-")}</p>` : ""}
+        ${machineSetting ? `<p class="quiet">Setup: Sitz ${htmlesc(machineSetting.seatPosition || "-")} Â· Griff ${htmlesc(machineSetting.handlePosition || "-")} Â· Ruecken ${htmlesc(machineSetting.backrestPosition || "-")}</p>` : ""}
         ${scannedMapping ? `<p class="quiet">Life Fitness: ${htmlesc(scannedMapping.machineLabel || scannedMapping.machineSerial || "Zuordnung gespeichert")} - Sitz ${htmlesc(entry.seatPosition || "-")} - Griff ${htmlesc(entry.gripPosition || "-")}</p>` : ""}
         ${exerciseIsCritical(exercise) ? `<p class="warning compact-warning">${lwsWarning(exercise)}</p>` : ""}
         <div class="button-grid">
@@ -6666,17 +6648,17 @@ function renderWorkout() {
         ` : `<p class="muted">Noch keine vorherige Leistung vorhanden. Starte moderat.</p>`}
       </article>
       <article class="card stack">
-        <div class="row"><h3 class="grow">Sätze</h3><span class="quiet">kg · Wdh. · RIR</span></div>
+        <div class="row"><h3 class="grow">SÃ¤tze</h3><span class="quiet">kg Â· Wdh. Â· RIR</span></div>
         ${entry.sets.map((set, index) => renderSetRow(set, index)).join("")}
       </article>
       ${renderExerciseSetupFields(entry)}
-      <p class="quiet">Dieses Training wird automatisch auf diesem Gerät gesichert.</p>
+      <p class="quiet">Dieses Training wird automatisch auf diesem GerÃ¤t gesichert.</p>
       ${state.restTimer.remaining > 0 || state.restTimer.running ? renderRestTimer() : ""}
       ${state.showAlternatives ? renderAlternativePicker(alternatives) : ""}
       <div class="actions">
         <button class="secondary" data-toggle-alternatives>${state.showAlternatives ? "Alternativen ausblenden" : machineText("device_occupied", "Geraet besetzt? Alternative anzeigen.")}</button>
         ${workout.index > 0 ? `<button class="secondary" data-prev-exercise>Vorherige Uebung</button>` : ""}
-        <button class="primary" data-next-exercise>${workout.index < workout.entries.length - 1 ? "Nächste Übung" : "Training speichern"}</button>
+        <button class="primary" data-next-exercise>${workout.index < workout.entries.length - 1 ? "NÃ¤chste Ãœbung" : "Training speichern"}</button>
         <button class="secondary" data-cancel-workout>Training abbrechen</button>
       </div>
     </section>
@@ -6785,7 +6767,7 @@ function renderSetRow(set, index) {
       <input inputmode="decimal" placeholder="kg" value="${htmlesc(set.weightText)}" data-set="${index}" data-field="weightText">
       <input inputmode="numeric" placeholder="Wdh." value="${htmlesc(set.repsText)}" data-set="${index}" data-field="repsText">
       <input inputmode="numeric" placeholder="RIR" value="${htmlesc(set.rirText)}" data-set="${index}" data-field="rirText">
-      <button class="check ${set.completed ? "done" : ""}" data-check-set="${index}">${set.completed ? "✓" : ""}</button>
+      <button class="check ${set.completed ? "done" : ""}" data-check-set="${index}">${set.completed ? "âœ“" : ""}</button>
     </div>
   `;
 }
@@ -6795,8 +6777,8 @@ function exerciseIsCritical(exercise) {
 }
 
 function lwsWarning(exercise) {
-  let text = "Diese Übung kann die Lendenwirbelsäule stärker belasten. Wenn du Schmerzen hast, wähle eine Alternative.";
-  if (exercise.lumbarDiscSuitability === "avoidInitially") text += " Für den Wiedereinstieg zunächst besser vermeiden.";
+  let text = "Diese Ãœbung kann die LendenwirbelsÃ¤ule stÃ¤rker belasten. Wenn du Schmerzen hast, wÃ¤hle eine Alternative.";
+  if (exercise.lumbarDiscSuitability === "avoidInitially") text += " FÃ¼r den Wiedereinstieg zunÃ¤chst besser vermeiden.";
   return htmlesc(text);
 }
 
@@ -6984,7 +6966,7 @@ function renderSessionDetail(id) {
   if (!session) {
     return `
       <section class="screen stack">
-        <button class="secondary" data-back-dashboard>Zurück</button>
+        <button class="secondary" data-back-dashboard>ZurÃ¼ck</button>
         <article class="card"><p class="muted">Training nicht gefunden.</p></article>
       </section>
     `;
@@ -6992,15 +6974,15 @@ function renderSessionDetail(id) {
   const improvements = sessionImprovements(session);
   return `
     <section class="screen stack">
-      <button class="secondary" data-back-dashboard>Zurück</button>
+      <button class="secondary" data-back-dashboard>ZurÃ¼ck</button>
       <header>
         <h1 class="title">Auswertung</h1>
-        <p class="subtitle">${htmlesc(session.dayName)} · ${dateText(session.startedAt)}</p>
+        <p class="subtitle">${htmlesc(session.dayName)} Â· ${dateText(session.startedAt)}</p>
       </header>
       <div class="grid">
         ${metric(String(sessionDurationMinutes(session)), "Minuten")}
-        ${metric(String(session.completedExercises.length), "Übungen")}
-        ${metric(String(sessionSetCount(session)), "Sätze")}
+        ${metric(String(session.completedExercises.length), "Ãœbungen")}
+        ${metric(String(sessionSetCount(session)), "SÃ¤tze")}
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
       ${renderWorkoutTimelineCard(session)}
@@ -7017,19 +6999,19 @@ function renderSessionDetail(id) {
             </div>
             <span class="badge ${item.isRecord ? "green" : "blue"}">${item.isRecord ? "Rekord" : "Plus"}</span>
           </div>
-        `).join("") : `<p class="muted">Keine Verbesserung gegenüber der letzten gespeicherten Ausführung erkannt.</p>`}
+        `).join("") : `<p class="muted">Keine Verbesserung gegenÃ¼ber der letzten gespeicherten AusfÃ¼hrung erkannt.</p>`}
       </article>
       ${session.completedExercises.sort((a, b) => a.sortOrder - b.sortOrder).map((exercise) => `
         <article class="card stack">
           <h3>${htmlesc(exercise.exerciseNameSnapshot)}</h3>
           <ul class="small-list">
-            ${exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}${set.rir !== null && set.rir !== undefined ? ` · RIR ${set.rir}` : ""}</li>`).join("")}
+            ${exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}${set.rir !== null && set.rir !== undefined ? ` Â· RIR ${set.rir}` : ""}</li>`).join("")}
           </ul>
           <p class="green">Volumen: ${Math.round(totalVolume(exercise))} kg</p>
-          ${previousExerciseBefore(exercise.exerciseId, session.id) ? `<p class="muted">Vorher: ${Math.round(totalVolume(previousExerciseBefore(exercise.exerciseId, session.id).exercise))} kg</p>` : `<p class="muted">Erste gespeicherte Ausführung.</p>`}
+          ${previousExerciseBefore(exercise.exerciseId, session.id) ? `<p class="muted">Vorher: ${Math.round(totalVolume(previousExerciseBefore(exercise.exerciseId, session.id).exercise))} kg</p>` : `<p class="muted">Erste gespeicherte AusfÃ¼hrung.</p>`}
         </article>
       `).join("")}
-      <button class="danger" data-delete-session="${htmlesc(session.id)}">Training löschen</button>
+      <button class="danger" data-delete-session="${htmlesc(session.id)}">Training lÃ¶schen</button>
     </section>
   `;
 }
@@ -7042,7 +7024,7 @@ function renderPlans() {
   const qrLimit = state.qrSchema?.maxRecommendedCharacters || 2500;
   return `
     <section class="screen stack">
-      <header><h1 class="title">Pläne</h1><p class="subtitle">Aktiver Plan und Bibliothek.</p></header>
+      <header><h1 class="title">PlÃ¤ne</h1><p class="subtitle">Aktiver Plan und Bibliothek.</p></header>
       <article class="card stack">
         <div class="row">
           <div class="grow">
@@ -7060,7 +7042,7 @@ function renderPlans() {
             <span>Plan verwalten</span>
             <span class="badge blue">${plans.length}</span>
           </summary>
-          <p class="muted">Duplizieren, Archivieren, Löschen, Import, Export, Plan-Code, QR und Wiederherstellen bleiben darunter erhalten.</p>
+          <p class="muted">Duplizieren, Archivieren, LÃ¶schen, Import, Export, Plan-Code, QR und Wiederherstellen bleiben darunter erhalten.</p>
         </details>
       </article>
       ${renderIntelligenceCoreCard("plans")}
@@ -7087,7 +7069,7 @@ function renderPlans() {
         <article class="card stack">
           <h2>${htmlesc(plan.planName)}</h2>
           <p class="muted">${htmlesc(plan.description)}</p>
-          <p>${plan.days.length} Tage · ${Math.max(...plan.days.map((day) => day.maxDurationMinutes))} Minuten</p>
+          <p>${plan.days.length} Tage Â· ${Math.max(...plan.days.map((day) => day.maxDurationMinutes))} Minuten</p>
           <span class="badge ${planStatus(plan) === "Aktiv" ? "green" : isPlanArchived(plan.planName) ? "amber" : ""}">${planStatus(plan)}</span>
           <div class="button-row">
             ${!isPlanArchived(plan.planName) ? `<button class="secondary" data-activate-plan="${htmlesc(plan.planName)}">Aktivieren</button>` : ""}
@@ -7096,16 +7078,16 @@ function renderPlans() {
               : `<button class="secondary" data-archive-plan="${htmlesc(plan.planName)}">Archivieren</button>`}
           </div>
           <button class="secondary" data-duplicate-plan="${htmlesc(plan.planName)}">Plan duplizieren</button>
-          <button class="danger" data-delete-plan="${htmlesc(plan.planName)}">Plan löschen</button>
+          <button class="danger" data-delete-plan="${htmlesc(plan.planName)}">Plan lÃ¶schen</button>
         </article>
       `).join("") : `<article class="card stack">
-        <h2>Keine Pläne</h2>
-        <p class="muted">Alle Pläne wurden gelöscht. Trainingshistorie bleibt erhalten.</p>
+        <h2>Keine PlÃ¤ne</h2>
+        <p class="muted">Alle PlÃ¤ne wurden gelÃ¶scht. Trainingshistorie bleibt erhalten.</p>
       </article>`}
       ${deletedCount ? `<article class="card stack">
-        <h3>Gelöschte Pläne</h3>
-        <p class="muted">${deletedCount} Plan/Pläne ausgeblendet.</p>
-        <button class="secondary" data-restore-plans>Gelöschte Pläne wiederherstellen</button>
+        <h3>GelÃ¶schte PlÃ¤ne</h3>
+        <p class="muted">${deletedCount} Plan/PlÃ¤ne ausgeblendet.</p>
+        <button class="secondary" data-restore-plans>GelÃ¶schte PlÃ¤ne wiederherstellen</button>
       </article>` : ""}
     </section>
   `;
@@ -7116,7 +7098,7 @@ function renderExercises() {
   const filters = [
     ["all", "Alle"],
     ["Brust", "Brust"],
-    ["Rücken", "Rücken"],
+    ["RÃ¼cken", "RÃ¼cken"],
     ["Beine", "Beine"],
     ["Schulter", "Schulter"],
     ["Core", "Core"],
@@ -7132,9 +7114,9 @@ function renderExercises() {
   }).sort((a, b) => a.displayName.localeCompare(b.displayName, "de"));
   return `
     <section class="screen stack">
-      <header><h1 class="title">Übungen</h1><p class="subtitle">${exercises.length} Einträge</p></header>
+      <header><h1 class="title">Ãœbungen</h1><p class="subtitle">${exercises.length} EintrÃ¤ge</p></header>
       <div class="search stack">
-        <input class="input" placeholder="Übung suchen" value="${htmlesc(state.exerciseSearch)}" data-search-exercise>
+        <input class="input" placeholder="Ãœbung suchen" value="${htmlesc(state.exerciseSearch)}" data-search-exercise>
         <div class="chip-row">
           ${filters.map(([id, label]) => `<button class="chip ${state.exerciseFilter === id ? "active" : ""}" data-exercise-filter="${htmlesc(id)}">${htmlesc(label)}</button>`).join("")}
         </div>
@@ -7160,7 +7142,7 @@ function renderExercises() {
           <article class="card stack">
             <h3>${htmlesc(exercise.displayName)}</h3>
             <p class="quiet">${htmlesc(exerciseListMuscleText(exercise))}</p>
-            <p class="muted">${htmlesc(exercise.primaryMuscleGroups.join(", "))} · ${htmlesc(exercise.equipment.join(", "))}</p>
+            <p class="muted">${htmlesc(exercise.primaryMuscleGroups.join(", "))} Â· ${htmlesc(exercise.equipment.join(", "))}</p>
             <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} ${bestWeightForExercise(exercise.id) ? `<span class="badge blue">Best: ${kg(bestWeightForExercise(exercise.id))}</span>` : ""}</div>
           </article>
         </button>
@@ -7284,7 +7266,7 @@ function renderExerciseDetail(id) {
   const machineSetting = latestMachineSetting(id) || {};
   return `
     <section class="screen stack">
-      <button class="secondary" data-back-exercises>Zurück</button>
+      <button class="secondary" data-back-exercises>ZurÃ¼ck</button>
       <header><h1 class="title">${htmlesc(exercise.displayName)}</h1><p class="subtitle">${htmlesc(exercise.movementPattern)}</p></header>
       <article class="card stack">
         <div class="row">
@@ -7298,12 +7280,12 @@ function renderExerciseDetail(id) {
       ${renderExerciseDetailPremium(exercise, last, history, alternatives)}
       ${renderMuscleMap(exercise)}
       <article class="card stack">
-        <p>${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].join(" · "))}</p>
-        <p class="muted">${htmlesc(exercise.equipment.join(" · "))}</p>
+        <p>${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].join(" Â· "))}</p>
+        <p class="muted">${htmlesc(exercise.equipment.join(" Â· "))}</p>
         ${lwsBadge(exercise.lumbarDiscSuitability)}
       </article>
       <article class="card stack">
-        <h3>Geräteeinstellung</h3>
+        <h3>GerÃ¤teeinstellung</h3>
         <input class="input" placeholder="Maschinenname / Studio" value="${htmlesc(machineSetting.machineName || "")}" data-machine-field="machineName" data-machine-exercise="${htmlesc(id)}">
         <div class="mini-grid">
           <input class="input" placeholder="Sitz" value="${htmlesc(machineSetting.seatPosition || "")}" data-machine-field="seatPosition" data-machine-exercise="${htmlesc(id)}">
@@ -7324,8 +7306,8 @@ function renderExerciseDetail(id) {
         <ul class="small-list">${exerciseKnowledge(exercise).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
       </article>
       ${renderExerciseRatingCard(exercise)}
-      <article class="card stack"><h3>Ausführung</h3><p class="muted">${htmlesc(exercise.techniqueNotes || "Keine Technikhinweise hinterlegt.")}</p></article>
-      <article class="card stack"><h3>Häufige Fehler</h3>${exercise.commonMistakes?.length ? `<ul class="small-list">${exercise.commonMistakes.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : `<p class="muted">Keine Fehlerhinweise hinterlegt.</p>`}</article>
+      <article class="card stack"><h3>AusfÃ¼hrung</h3><p class="muted">${htmlesc(exercise.techniqueNotes || "Keine Technikhinweise hinterlegt.")}</p></article>
+      <article class="card stack"><h3>HÃ¤ufige Fehler</h3>${exercise.commonMistakes?.length ? `<ul class="small-list">${exercise.commonMistakes.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : `<p class="muted">Keine Fehlerhinweise hinterlegt.</p>`}</article>
       <article class="card stack"><h3>Letzte Leistung</h3>${last ? `<p class="muted">Letztes Mal am ${dateText(last.session.endedAt || last.session.startedAt)}</p><ul class="small-list">${last.exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}</li>`).join("")}</ul>` : `<p class="muted">Noch keine vorherige Leistung vorhanden.</p>`}</article>
       <article class="card stack">
         <h3>Verlauf</h3>
@@ -7333,7 +7315,7 @@ function renderExerciseDetail(id) {
           <div class="history-row">
             <div>
               <strong>${dateText(item.session.startedAt)}</strong>
-              <p class="muted">${item.exercise.sets.map((set) => `${kg(set.actualWeightKg)} x ${set.actualReps || "-"}`).join(" · ")}</p>
+              <p class="muted">${item.exercise.sets.map((set) => `${kg(set.actualWeightKg)} x ${set.actualReps || "-"}`).join(" Â· ")}</p>
             </div>
             <span class="badge blue">${Math.round(totalVolume(item.exercise))} kg</span>
           </div>
@@ -7387,7 +7369,7 @@ function renderWeight() {
         ${metric(kg(entries[0]?.weightKg), "Aktuell")}
         ${metric(kg(averageWeight(7)), "7-Tage-Schnitt")}
         ${metric(kg(averageWeight(30)), "30-Tage-Schnitt")}
-        ${metric(String(entries.length), "Einträge")}
+        ${metric(String(entries.length), "EintrÃ¤ge")}
       </div>
       <article class="card stack">
         <h3>Trend</h3>
@@ -7403,7 +7385,7 @@ function renderWeight() {
           <div class="grow"><h3>${kg(entry.weightKg)}</h3><p class="muted">${dateText(entry.date)}</p></div>
           <div class="compact-actions">
             <button class="secondary" data-edit-weight="${htmlesc(entry.id)}">Bearbeiten</button>
-            <button class="danger" data-delete-weight="${htmlesc(entry.id)}">Löschen</button>
+            <button class="danger" data-delete-weight="${htmlesc(entry.id)}">LÃ¶schen</button>
           </div>
         </article>
       `).join("") : `<article class="card"><p class="muted">Noch kein Gewicht eingetragen.</p></article>`}
@@ -7680,7 +7662,7 @@ function renderTrainingHistory() {
             <div class="row">
               <div class="grow">
                 <h3>${htmlesc(session.dayName)}</h3>
-                <p class="muted">${dateTimeText(session.startedAt)} · ${session.completedExercises.length} Uebungen · ${sessionSetCount(session)} Saetze</p>
+                <p class="muted">${dateTimeText(session.startedAt)} Â· ${session.completedExercises.length} Uebungen Â· ${sessionSetCount(session)} Saetze</p>
               </div>
               <span class="badge blue">${Math.round(sessionVolume(session))} kg</span>
             </div>
@@ -7721,7 +7703,7 @@ function renderSettings() {
           <h3 class="grow">Backup</h3>
           <span class="badge ${needsBackup ? "amber" : "green"}">${needsBackup ? "Faellig" : "Ok"}</span>
         </div>
-        <p class="muted">Exportiere regelmäßig deine Trainingsdaten. GitHub speichert deine Fortschritte nicht.</p>
+        <p class="muted">Exportiere regelmÃ¤ÃŸig deine Trainingsdaten. GitHub speichert deine Fortschritte nicht.</p>
         <p class="quiet">Letztes Backup: ${dateTimeText(lastBackupAt)}</p>
         <button class="primary" data-export-backup>Backup exportieren</button>
         <label class="secondary file-label">
@@ -7745,9 +7727,9 @@ function renderSettings() {
         <button class="secondary" data-prepare-indexeddb>IndexedDB vorbereiten</button>
       </article>
       <article class="card stack">
-        <h3>Zurücksetzen</h3>
-        <p class="muted">Löscht nur die lokalen Trainings- und Gewichtsdaten auf diesem Gerät.</p>
-        <button class="danger" data-reset-app>App-Daten zurücksetzen</button>
+        <h3>ZurÃ¼cksetzen</h3>
+        <p class="muted">LÃ¶scht nur die lokalen Trainings- und Gewichtsdaten auf diesem GerÃ¤t.</p>
+        <button class="danger" data-reset-app>App-Daten zurÃ¼cksetzen</button>
       </article>
       <article class="card stack">
         <div class="row">
@@ -7801,7 +7783,7 @@ function createBackup() {
     app: "D-Coach",
     schemaVersion: 1,
     appVersion: APP_VERSION,
-    backupVersion: "6.11.0",
+    backupVersion: BACKUP_FORMAT_VERSION,
     storageVersion: storage.storageVersion,
     exportedAt: new Date().toISOString(),
     exportDate: new Date().toISOString(),
@@ -7857,12 +7839,28 @@ async function installPwa() {
 }
 
 function validateBackup(backup) {
-  if (!backup || typeof backup !== "object") return "Backup-Datei ist ungültig.";
+  if (!backup || typeof backup !== "object") return "Backup-Datei ist ungÃ¼ltig.";
   if (backup.app !== "D-Coach") return "Diese Datei ist kein D-Coach-Backup.";
-  if (backup.schemaVersion !== 1) return "Diese Backup-Version wird nicht unterstützt.";
-  if (!Array.isArray(backup.sessions)) return "Backup enthält keine gültigen Trainingsdaten.";
-  if (!Array.isArray(backup.weights)) return "Backup enthält keine gültigen Gewichtsdaten.";
+  if (backup.schemaVersion !== 1) return "Diese Backup-Version wird nicht unterstÃ¼tzt.";
+  if (!Array.isArray(backup.sessions)) return "Backup enthÃ¤lt keine gÃ¼ltigen Trainingsdaten.";
+  if (!Array.isArray(backup.weights)) return "Backup enthÃ¤lt keine gÃ¼ltigen Gewichtsdaten.";
   return null;
+}
+
+function mergeBackupActiveWorkoutDraft(backupDraft) {
+  const localDraft = storage.activeWorkoutDraft;
+  const localValid = isValidActiveWorkoutDraft(localDraft);
+  const backupValid = isValidActiveWorkoutDraft(backupDraft);
+  if (localValid) {
+    return backupValid
+      ? "Dein aktuell geoeffnetes Training wurde geschuetzt und beibehalten. Ein Trainingsentwurf aus dem Backup wurde nicht uebernommen."
+      : "Dein aktuell geoeffnetes Training wurde geschuetzt und beibehalten.";
+  }
+  if (backupValid) {
+    storage.activeWorkoutDraft = backupDraft;
+    return "Trainingsentwurf aus dem Backup wurde uebernommen.";
+  }
+  return "";
 }
 
 function importBackupFile(file) {
@@ -7879,7 +7877,7 @@ function importBackupFile(file) {
         "Backup importieren?",
         "",
         `Trainings: ${backup.sessions.length}`,
-        `Gewichtseinträge: ${backup.weights.length}`,
+        `GewichtseintrÃ¤ge: ${backup.weights.length}`,
         `Journal: ${Array.isArray(backup.journalEntries) ? backup.journalEntries.length : 0}`,
         `Geraeteeinstellungen: ${Array.isArray(backup.machineSettings) ? backup.machineSettings.length : 0}`,
         `Geraetezuordnungen: ${Array.isArray(backup.scannedEquipmentMappings) ? backup.scannedEquipmentMappings.length : 0}`,
@@ -7906,17 +7904,74 @@ function importBackupFile(file) {
       if (!storage.storageVersion && backup.storageVersion) storage.storageVersion = backup.storageVersion;
       storage.archivedPlanNames = uniqueValues(storage.archivedPlanNames, Array.isArray(backup.archivedPlanNames) ? backup.archivedPlanNames : []);
       storage.deletedPlanNames = uniqueValues(storage.deletedPlanNames, Array.isArray(backup.deletedPlanNames) ? backup.deletedPlanNames : []);
-      storage.activeWorkoutDraft = backup.activeWorkoutDraft || null;
+      const draftMessage = mergeBackupActiveWorkoutDraft(backup.activeWorkoutDraft);
       if (backup.activePlanName) storage.activePlanName = backup.activePlanName;
       restoreWorkoutDraft();
       ensureActivePlan();
-      alert("Backup importiert.");
+      alert(["Backup importiert.", draftMessage].filter(Boolean).join("\n\n"));
       render();
     } catch {
       alert("Backup konnte nicht gelesen werden.");
     }
   };
   reader.readAsText(file);
+}
+
+const FULL_RESET_CONFIRMATION_TEXT = [
+  "Alle lokalen D-Coach-Daten loeschen?",
+  "",
+  "Dabei werden dauerhaft geloescht:",
+  "",
+  "- Trainings und offene Trainingsentwuerfe",
+  "- Gewicht und Journal",
+  "- Tages-Check-ins, Schlaf- und Schmerzangaben",
+  "- Geraete-, Sitz- und Griffdaten",
+  "- Life-Fitness-Scanner-Zuordnungen",
+  "- eigene Plaene und eigene Uebungen",
+  "- Coach-Feedback und Vorschlagsverlauf",
+  "- persoenliche Einstellungen, technische Logs und lokale App-Daten",
+  "",
+  "Diese Aktion kann ohne Backup nicht rueckgaengig gemacht werden.",
+  "",
+  "Tippe BACKUP fuer Backup erstellen.",
+  "Tippe LOESCHEN fuer endgueltig loeschen.",
+  "Lasse ABBRECHEN stehen, um nichts zu loeschen."
+].join("\n");
+
+function resetAllLocalAppData() {
+  STORAGE_KEYS.forEach((item) => localStorage.removeItem(item.key));
+  storage.storageVersion = STORAGE_SCHEMA_VERSION;
+  appendMigrationLog({
+    id: `full-reset-${Date.now()}`,
+    from: STORAGE_SCHEMA_VERSION,
+    to: STORAGE_SCHEMA_VERSION,
+    at: new Date().toISOString(),
+    action: "full-local-reset",
+    destructive: true
+  });
+  state.activeWorkout = null;
+  state.selectedExerciseId = null;
+  state.selectedSessionId = null;
+  state.dailyCheckinActive = false;
+  state.activeCoachProposalId = "";
+  state.showProposalAlternative = false;
+  state.restTimer.remaining = 0;
+  state.restTimer.running = false;
+  ensureActivePlan();
+}
+
+function handleFullAppReset() {
+  const choice = prompt(FULL_RESET_CONFIRMATION_TEXT, "ABBRECHEN");
+  const normalized = String(choice || "ABBRECHEN").trim().toUpperCase();
+  if (normalized === "BACKUP") {
+    exportBackup();
+    alert("Backup wurde erstellt. Es wurden keine Daten geloescht. Starte den Reset erneut, wenn du danach wirklich loeschen willst.");
+    return;
+  }
+  if (normalized !== "LOESCHEN") return;
+  if (!confirm("Wirklich alle lokalen D-Coach-Daten endgueltig loeschen?")) return;
+  resetAllLocalAppData();
+  render();
 }
 
 function bindEvents() {
@@ -7964,7 +8019,7 @@ function bindEvents() {
   document.querySelectorAll("[data-open-daily-checkin], [data-edit-daily-checkin]").forEach((button) => {
     button.addEventListener("click", () => {
       const existing = dailyCheckinForDate(localIsoDate());
-      storage.dailyCheckinDraft = existing ? { ...existing, status: "draft", updatedAt: new Date().toISOString() } : createDailyCheckinDraft("journal");
+      storage.dailyCheckinDraft = existing ? { ...existing, resumeAction: null, status: "draft", updatedAt: new Date().toISOString() } : createDailyCheckinDraft("journal");
       state.dailyCheckinActive = true;
       state.dailyCheckinStep = "sleep";
       render();
@@ -8187,7 +8242,7 @@ function bindEvents() {
   document.querySelectorAll("[data-delete-plan]").forEach((button) => {
     button.addEventListener("click", () => {
       const planName = button.dataset.deletePlan;
-      if (!confirm("Trainingsplan wirklich löschen? Deine gespeicherten Trainingseinheiten bleiben erhalten.")) return;
+      if (!confirm("Trainingsplan wirklich lÃ¶schen? Deine gespeicherten Trainingseinheiten bleiben erhalten.")) return;
       storage.deletedPlanNames = [...new Set([...storage.deletedPlanNames, planName])];
       storage.archivedPlanNames = storage.archivedPlanNames.filter((name) => name !== planName);
       if (storage.activePlanName === planName) ensureActivePlan();
@@ -8258,7 +8313,7 @@ function bindEvents() {
   });
 
   document.querySelector("[data-delete-session]")?.addEventListener("click", (event) => {
-    if (!confirm("Training wirklich löschen?")) return;
+    if (!confirm("Training wirklich lÃ¶schen?")) return;
     storage.sessions = storage.sessions.filter((session) => session.id !== event.currentTarget.dataset.deleteSession);
     state.selectedSessionId = null;
     navigateTo("dashboard", { resetSelection: false });
@@ -8268,7 +8323,7 @@ function bindEvents() {
     const input = document.querySelector("[data-weight-input]");
     const value = parseNumber(input.value);
     if (!value || value <= 0) {
-      alert("Bitte gültiges Gewicht eingeben.");
+      alert("Bitte gÃ¼ltiges Gewicht eingeben.");
       return;
     }
     const today = new Date();
@@ -8294,7 +8349,7 @@ function bindEvents() {
       if (value === null) return;
       const parsed = parseNumber(value);
       if (!parsed || parsed <= 0) {
-        alert("Bitte gültiges Gewicht eingeben.");
+        alert("Bitte gÃ¼ltiges Gewicht eingeben.");
         return;
       }
       storage.weights = storage.weights.map((item) => item.id === entry.id ? { ...item, weightKg: parsed } : item);
@@ -8395,10 +8450,18 @@ function bindEvents() {
     render();
   });
 
-  document.querySelector("[data-open-scanned-exercise]")?.addEventListener("click", (event) => {
-    stopEquipmentScannerCamera();
-    state.selectedExerciseId = event.currentTarget.dataset.openScannedExercise;
-    navigateTo("exercises", { resetSelection: false });
+  document.querySelectorAll("[data-open-scanned-exercise]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const exerciseId = button.dataset.openScannedExercise;
+      if (!exerciseById(exerciseId)) {
+        alert("Diese Uebung ist nicht mehr in der Uebungsdatenbank vorhanden.");
+        return;
+      }
+      persistWorkoutDraft();
+      stopEquipmentScannerCamera();
+      state.selectedExerciseId = exerciseId;
+      navigateTo("exercises", { resetSelection: false });
+    });
   });
 
   document.querySelectorAll("[data-load-scanned-mapping]").forEach((button) => {
@@ -8466,19 +8529,7 @@ function bindEvents() {
   });
 
   document.querySelector("[data-reset-app]")?.addEventListener("click", () => {
-    if (!confirm("Alle Trainings- und Gewichtsdaten löschen?")) return;
-    storage.sessions = [];
-    storage.weights = [];
-    storage.journalEntries = [];
-    storage.machineSettings = [];
-    storage.customPlans = [];
-    storage.customExercises = [];
-    storage.personalProfile = null;
-    storage.lastErrors = [];
-    clearWorkoutDraft();
-    storage.lastBackupAt = null;
-    state.activeWorkout = null;
-    render();
+    handleFullAppReset();
   });
 
   document.querySelector("[data-toggle-debug]")?.addEventListener("change", (event) => {

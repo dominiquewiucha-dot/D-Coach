@@ -1,0 +1,63 @@
+{
+  "project": "D-Coach",
+  "handoffVersion": "6.15.1",
+  "status": "remediation_complete",
+  "v6_16_started": false,
+  "preRepairCommit": "f35a404",
+  "postRepairCommit": "see_git_commit_after_handoff",
+  "versions": {
+    "app": "pwa-v66",
+    "backupFormat": "6.15.1",
+    "storage": "6.7.0",
+    "serviceWorkerCache": "dcoach-pwa-v66"
+  },
+  "repairedFindings": [
+    {
+      "severity": "critical",
+      "id": "backup_draft_protection",
+      "rootCause": "Backup import could assign a missing backup draft as null over an existing local draft.",
+      "change": "Added draft validation and merge helper. Local valid draft wins by default."
+    },
+    {
+      "severity": "critical",
+      "id": "full_reset_confirmation",
+      "rootCause": "Reset confirmation named fewer categories than the reset deleted.",
+      "change": "Added explicit BACKUP/LOESCHEN flow with second destructive confirmation."
+    },
+    {
+      "severity": "high",
+      "id": "checkin_skipped_training_start",
+      "rootCause": "Training start accepted completed check-ins only.",
+      "change": "Skipped check-ins now count as done for training start."
+    },
+    {
+      "severity": "high",
+      "id": "checkin_resume_training",
+      "rootCause": "Training-start initiated check-in returned to Dashboard.",
+      "change": "Added one-shot resumeAction for start_training."
+    },
+    {
+      "severity": "high",
+      "id": "scanner_open_all_mappings",
+      "rootCause": "Only the first scanner mapping open button was bound.",
+      "change": "All scanner open buttons are bound and validate target exercise."
+    },
+    {
+      "severity": "medium",
+      "id": "dashboard_dead_code",
+      "rootCause": "Old unreachable Dashboard return remained.",
+      "change": "Removed old unreachable Dashboard block."
+    },
+    {
+      "severity": "medium",
+      "id": "backup_version",
+      "rootCause": "Backup version still reported 6.11.0.",
+      "change": "Backup format constant set to 6.15.1."
+    }
+  ],
+  "privacy": {
+    "containsPrivateJournalText": false,
+    "containsSleepPainNotes": false,
+    "containsPersonalIdentifiers": false
+  }
+}

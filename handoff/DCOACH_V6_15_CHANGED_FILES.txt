@@ -1,0 +1,14 @@
+app.js
+index.html
+sw.js
+tests/profile_shortcuts.test.js
+tests/v6_14_workflow_navigation.test.js
+tests/v6_15_1_audit_remediation.test.js
+docs/DCoach_v6.15_Audit_Report.md
+handoff/DCOACH_V6_15_CHATGPT_HANDOFF.md
+handoff/DCOACH_V6_15_CHATGPT_HANDOFF.json
+handoff/DCOACH_V6_15_CHANGED_FILES.txt
+handoff/DCOACH_V6_15_TEST_RESULTS.json
+handoff/DCOACH_V6_15_STORAGE_SNAPSHOT.json
+handoff/DCOACH_V6_15_COACH_SNAPSHOT.json
+handoff/DCOACH_V6_15_MANUAL_TESTS.md

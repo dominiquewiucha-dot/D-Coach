@@ -1,0 +1,24 @@
+{
+  "syntax": {
+    "command": "node --check app.js",
+    "status": "passed"
+  },
+  "automatedTests": {
+    "command": "node tests/*.test.js",
+    "status": "passed",
+    "coverage": [
+      "navigation",
+      "daily_checkin",
+      "training_integrity",
+      "scanner",
+      "backup_static_regression",
+      "coach_proposal",
+      "muscle_map",
+      "pwa_version"
+    ]
+  },
+  "manualPwaVisualTests": {
+    "status": "blocked",
+    "reason": "Codex in-app browser could not attach a local tab in this environment."
+  }
+}
