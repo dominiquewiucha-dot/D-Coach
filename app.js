@@ -202,9 +202,10 @@
   route: null
 };
 
-const APP_VERSION = "pwa-v67";
-const BACKUP_FORMAT_VERSION = "6.16.0";
+const APP_VERSION = "pwa-v68";
+const BACKUP_FORMAT_VERSION = "6.17.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
+const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -226,6 +227,7 @@ const STORAGE_KEYS = [
   { key: "dcoach.coachContextFeedback", label: "Kontextbezogenes Coach-Feedback", type: "array" },
   { key: "dcoach.coachConflictLog", label: "Coach-Konfliktlog", type: "array" },
   { key: "dcoach.coachCalibrationState", label: "Coach-Kalibrierung", type: "object" },
+  { key: "dcoach.deviceValidationReports", label: "Geraetepruefungsberichte", type: "array" },
   { key: "dcoach.dailyCheckins", label: "Daily Check-ins", type: "array" },
   { key: "dcoach.dailyCheckinDraft", label: "Daily Check-in Draft", type: "object" },
   { key: "dcoach.lastErrors", label: "Fehlerlog", type: "array" },
@@ -362,6 +364,12 @@ const storage = {
   set coachCalibrationState(value) {
     if (value) writeJson("dcoach.coachCalibrationState", value);
     else localStorage.removeItem("dcoach.coachCalibrationState");
+  },
+  get deviceValidationReports() {
+    return readJson("dcoach.deviceValidationReports", []);
+  },
+  set deviceValidationReports(value) {
+    writeJson("dcoach.deviceValidationReports", Array.isArray(value) ? value.slice(-20) : []);
   },
   get dailyCheckins() {
     return readJson("dcoach.dailyCheckins", []);
@@ -5041,8 +5049,11 @@ function upsertCoachRecommendationRecord(recommendation, context = {}) {
     dataQualityFlags: calibration.dataQuality.flags,
     confidenceAtCreation: calibration.percent,
     status: existing?.status || "pending",
+    applicationState: existing?.applicationState || "not_applied",
     acceptedAt: existing?.acceptedAt,
     rejectedAt: existing?.rejectedAt,
+    appliedAt: existing?.appliedAt,
+    appliedPlanChangeId: existing?.appliedPlanChangeId,
     evaluationDueAfter: existing?.evaluationDueAfter || new Date(Date.now() + 86400000).toISOString(),
     sourceRuleIds: [recommendation.ruleId].filter(Boolean)
   };
@@ -5090,18 +5101,118 @@ function coachTimeBudgetConflict(day, extraSetCount = 0) {
   };
 }
 
+function coachRecommendationApplicationState(record) {
+  if (!record || ["reverted", "rejected", "expired"].includes(record.status)) return record?.status === "reverted" ? "reverted" : "not_applied";
+  if (record.applicationState === "applied") return "applied";
+  if (record.applicationState === "partially_applied") return "partially_applied";
+  if (record.applicationState === "reverted") return "reverted";
+  if (record.status === "accepted" && (record.appliedAt || record.appliedPlanChangeId)) return "applied";
+  return "not_applied";
+}
+
+function recommendationOutcomeEligible(record) {
+  const applicationState = coachRecommendationApplicationState(record);
+  return Boolean(record?.status === "accepted" && ["applied", "partially_applied"].includes(applicationState) && (record.appliedAt || record.appliedPlanChangeId));
+}
+
+function recommendationOutcomeEvaluationKey(record, session) {
+  return [record?.id || "unknown_recommendation", session?.id || "unknown_session", OUTCOME_EVALUATOR_VERSION].join("|");
+}
+
+function outcomeExistsForEvaluation(record, session) {
+  const key = recommendationOutcomeEvaluationKey(record, session);
+  return storage.recommendationOutcomes.some((outcome) => outcome.evaluationKey === key || (outcome.recommendationId === record?.id && outcome.evaluatedSessionId === session?.id));
+}
+
+function completedExerciseForRecommendation(record, session) {
+  if (!record?.exerciseId) return null;
+  return (session?.completedExercises || []).find((exercise) => exercise.exerciseId === record.exerciseId) || null;
+}
+
+function compareRecommendationContext(recommendation, session, currentPlan = activePlan()) {
+  const reasons = [];
+  const blockingReasons = [];
+  let score = 100;
+  const applicationState = coachRecommendationApplicationState(recommendation);
+  if (applicationState !== "applied") {
+    blockingReasons.push("recommendation_not_applied");
+    score -= 60;
+  }
+  const exercise = recommendation?.exerciseId ? completedExerciseForRecommendation(recommendation, session) : null;
+  if (recommendation?.exerciseId && !exercise) {
+    blockingReasons.push("exercise_changed");
+    score -= 45;
+  } else if (exercise) {
+    reasons.push("target_exercise_matched");
+  }
+  if (recommendation?.appliedAt && session?.startedAt && new Date(session.startedAt) < new Date(recommendation.appliedAt)) {
+    blockingReasons.push("session_before_application");
+    score -= 50;
+  }
+  if (outcomeExistsForEvaluation(recommendation, session)) {
+    blockingReasons.push("session_already_used");
+    score -= 50;
+  }
+  const targetSets = exercise ? (exercise.sets || []) : (session?.completedExercises || []).flatMap((item) => item.sets || []);
+  const completeSets = targetSets.filter((set) => set.completed === true && !setHasMissingReps(set) && !setHasMissingWeight(set));
+  if (!completeSets.length) {
+    blockingReasons.push("insufficient_data");
+    score -= 45;
+  } else if (completeSets.length < Math.max(1, Math.ceil(targetSets.length * 0.6))) {
+    reasons.push("limited_set_completeness");
+    score -= 25;
+  } else {
+    reasons.push("session_completed");
+  }
+  if (recommendation?.planId && session?.planId && recommendation.planId !== session.planId && recommendation.planId !== session.planName) {
+    reasons.push("plan_changed");
+    score -= 12;
+  } else {
+    reasons.push("same_plan_or_unknown");
+  }
+  if (recommendation?.planDayId && session?.dayName && recommendation.planDayId !== session.dayName) {
+    reasons.push("different_training_day");
+    score -= 10;
+  }
+  if (currentPlan && recommendation?.planId && ![currentPlan.id, currentPlan.planName].includes(recommendation.planId)) {
+    reasons.push("current_plan_differs");
+    score -= 8;
+  }
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  return {
+    comparable: score >= 75 && !blockingReasons.length,
+    score,
+    reasons,
+    blockingReasons
+  };
+}
+
+function outcomeReasonCodesForEvaluation(record, session, comparison, result) {
+  const codes = new Set([...comparison.reasons, ...comparison.blockingReasons]);
+  if (result === "positive") codes.add("weight_progressed");
+  if (result === "neutral") codes.add("session_completed");
+  if (result === "negative") codes.add("target_reps_missed");
+  if (result === "inconclusive" && comparison.score < 75) codes.add("context_not_comparable");
+  return [...codes];
+}
+
 function evaluateRecommendationOutcome(record, session = lastSession()) {
   if (!record || !session) return null;
-  const exerciseChanged = record.exerciseId && !(session.completedExercises || []).some((exercise) => exercise.exerciseId === record.exerciseId);
-  const incomplete = (session.completedExercises || []).some((exercise) => (exercise.sets || []).some((set) => set.completed !== true || setHasMissingReps(set)));
+  if (!recommendationOutcomeEligible(record)) return null;
+  if (outcomeExistsForEvaluation(record, session)) return storage.recommendationOutcomes.find((outcome) => outcome.evaluationKey === recommendationOutcomeEvaluationKey(record, session)) || null;
+  const comparison = compareRecommendationContext(record, session, activePlan());
+  if (comparison.score < 60) return null;
+  const exerciseChanged = comparison.blockingReasons.includes("exercise_changed");
+  const incomplete = comparison.blockingReasons.includes("insufficient_data") || comparison.reasons.includes("limited_set_completeness");
   const beforeVolume = Number(record.baselineMetrics?.lastVolumeKg) || null;
   const afterVolume = sessionVolume(session) || null;
   let result = "neutral";
   const reasons = [];
-  if (exerciseChanged || incomplete) {
+  if (exerciseChanged || incomplete || comparison.score < 75 || coachRecommendationApplicationState(record) === "partially_applied") {
     result = "inconclusive";
     if (exerciseChanged) reasons.push("Uebung wurde gewechselt.");
     if (incomplete) reasons.push("Session enthaelt unvollstaendige Saetze.");
+    if (comparison.score < 75) reasons.push("Kontext ist nur eingeschraenkt vergleichbar.");
   } else if (afterVolume && beforeVolume && afterVolume > beforeVolume * 1.03) {
     result = "positive";
     reasons.push("Leistung oder Volumen nach Empfehlung verbessert.");
@@ -5111,13 +5222,20 @@ function evaluateRecommendationOutcome(record, session = lastSession()) {
   } else {
     reasons.push("Keine klare positive oder negative Veraenderung.");
   }
+  const evaluationKey = recommendationOutcomeEvaluationKey(record, session);
   const outcome = {
+    id: `outcome_${evaluationKey.replace(/[^a-zA-Z0-9_-]/g, "_")}`,
     recommendationId: record.id,
+    evaluatedSessionId: session.id,
+    evaluatorVersion: OUTCOME_EVALUATOR_VERSION,
+    evaluationKey,
     evaluatedAt: new Date().toISOString(),
     result,
     metricsBefore: { volumeKg: beforeVolume },
     metricsAfter: { volumeKg: afterVolume },
+    reasonCodes: outcomeReasonCodesForEvaluation(record, session, comparison, result),
     reasons,
+    comparability: comparison,
     painChange: null,
     completionImpact: incomplete ? -1 : 0,
     timeBudgetMet: null
@@ -5130,9 +5248,10 @@ function evaluateRecommendationOutcome(record, session = lastSession()) {
 
 function evaluateDueCoachRecommendations(session) {
   const due = storage.coachRecommendationHistory.filter((record) => {
-    if (!["accepted", "pending"].includes(record.status)) return false;
-    if (!record.evaluationDueAfter) return true;
-    return new Date(record.evaluationDueAfter).getTime() <= Date.now();
+    if (!recommendationOutcomeEligible(record)) return false;
+    if (record.applicationState === "reverted" || record.status === "reverted") return false;
+    if (record.appliedAt && session?.startedAt && new Date(session.startedAt) < new Date(record.appliedAt)) return false;
+    return !outcomeExistsForEvaluation(record, session);
   }).slice(0, 6);
   due.forEach((record) => evaluateRecommendationOutcome(record, session));
 }
@@ -5603,16 +5722,18 @@ function applyCoachPlanProposal() {
   storage.customPlans = [...storage.customPlans.filter((plan) => plan.planName !== nextPlan.planName), nextPlan];
   storage.activePlanName = nextPlan.planName;
   storage.coachPlanUndo = previous;
-  storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === proposal.id ? { ...item, status: "accepted", appliedAt: new Date().toISOString() } : item);
-  storage.coachRecommendationHistory = storage.coachRecommendationHistory.map((item) => item.id === proposal.id ? { ...item, status: "accepted", acceptedAt: new Date().toISOString(), updatedAt: new Date().toISOString() } : item);
+  const appliedAt = new Date().toISOString();
+  const appliedPlanChangeId = previous.id;
+  storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === proposal.id ? { ...item, status: "accepted", applicationState: "applied", appliedAt, appliedPlanChangeId } : item);
+  storage.coachRecommendationHistory = storage.coachRecommendationHistory.map((item) => item.id === proposal.id ? { ...item, status: "accepted", applicationState: "applied", acceptedAt: appliedAt, appliedAt, appliedPlanChangeId, evaluationDueAfter: appliedAt, updatedAt: appliedAt } : item);
   render();
 }
 
 function rejectCoachPlanProposal() {
   const proposal = activeCoachProposal();
   if (!proposal) return;
-  storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === proposal.id ? { ...item, status: "rejected", rejectedAt: new Date().toISOString() } : item);
-  storage.coachRecommendationHistory = storage.coachRecommendationHistory.map((item) => item.id === proposal.id ? { ...item, status: "rejected", rejectedAt: new Date().toISOString(), updatedAt: new Date().toISOString() } : item);
+  storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === proposal.id ? { ...item, status: "rejected", applicationState: "not_applied", rejectedAt: new Date().toISOString() } : item);
+  storage.coachRecommendationHistory = storage.coachRecommendationHistory.map((item) => item.id === proposal.id ? { ...item, status: "rejected", applicationState: "not_applied", rejectedAt: new Date().toISOString(), updatedAt: new Date().toISOString() } : item);
   storage.coachFeedback = [...storage.coachFeedback, {
     id: `coach_feedback_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     recommendationId: proposal.id,
@@ -5646,8 +5767,8 @@ function undoCoachPlanProposal() {
   if (!undo) return;
   storage.customPlans = undo.customPlans || [];
   storage.activePlanName = undo.activePlanName || undo.planSnapshot?.planName || "";
-  storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === undo.proposalId ? { ...item, status: "reverted", revertedAt: new Date().toISOString() } : item);
-  storage.coachRecommendationHistory = storage.coachRecommendationHistory.map((item) => item.id === undo.proposalId ? { ...item, status: "reverted", updatedAt: new Date().toISOString() } : item);
+  storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === undo.proposalId ? { ...item, status: "reverted", applicationState: "reverted", revertedAt: new Date().toISOString() } : item);
+  storage.coachRecommendationHistory = storage.coachRecommendationHistory.map((item) => item.id === undo.proposalId ? { ...item, status: "reverted", applicationState: "reverted", updatedAt: new Date().toISOString() } : item);
   storage.coachPlanUndo = null;
   state.activeCoachProposalId = "";
   ensureActivePlan();
@@ -8450,8 +8571,83 @@ function renderDebugPanel(manifest) {
       </div>
       <button class="secondary" data-load-test-data>Testdaten laden</button>
       <button class="secondary" data-clear-cache>Cache leeren</button>
+      ${renderDeviceValidationPanel()}
       <ul class="small-list">${storage.lastErrors.slice(-5).map((item) => `<li>${dateTimeText(item.at)}: ${htmlesc(item.message)}</li>`).join("") || "<li>Keine Fehler protokolliert.</li>"}</ul>
     </div>
+  `;
+}
+
+function deviceValidationTestCases() {
+  return [
+    ["nav_bottom_fixed", "Bottom Navigation bleibt fixiert"],
+    ["nav_safe_area", "Safe Area korrekt"],
+    ["nav_dashboard_coach_tracking", "Dashboard Coach Tracking"],
+    ["musclemap_scroll_top", "Muscle Map startet oben"],
+    ["keyboard_daily_checkin", "Tastatur Daily Check-in"],
+    ["keyboard_workout_inputs", "Tastatur Workout Eingaben"],
+    ["keyboard_coach_feedback", "Tastatur Coach Feedback"],
+    ["training_skip_checkin_once", "Check-in ueberspringen startet einmal"],
+    ["training_complete_checkin_once", "Check-in abschliessen startet einmal"],
+    ["training_draft_resume", "Draft-Wiederaufnahme"],
+    ["scanner_first_middle_last", "Scanner erster mittlerer letzter Eintrag"],
+    ["scanner_camera_closed", "Kamera-Stream geschlossen"],
+    ["pwa_offline_restart", "Offline-PWA startet"],
+    ["pwa_update_v68", "Update auf pwa-v68"],
+    ["coach_confidence_readable", "Confidence Gruende lesbar"],
+    ["coach_hard_gate_apply_disabled", "Hard Gate deaktiviert Apply"],
+    ["outcome_only_applied", "Outcome nur angewendet"],
+    ["outcome_no_duplicate", "Keine doppelte Outcome-Auswertung"]
+  ];
+}
+
+function createDeviceValidationReport() {
+  const displayMode = isStandaloneApp() ? "standalone" : "browser";
+  return {
+    id: `device_validation_${Date.now()}`,
+    version: "6.17.0",
+    appVersion: APP_VERSION,
+    platform: navigator.platform || "unknown",
+    displayMode,
+    viewport: {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      devicePixelRatio: window.devicePixelRatio || 1
+    },
+    tests: deviceValidationTestCases().map(([id]) => ({ id, status: "not_tested" })),
+    createdAt: new Date().toISOString()
+  };
+}
+
+function exportDeviceValidationReport() {
+  const report = createDeviceValidationReport();
+  storage.deviceValidationReports = [...storage.deviceValidationReports, report];
+  const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "DCoach_v6.17_DeviceValidation_Report.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  render();
+}
+
+function renderDeviceValidationPanel() {
+  const latest = storage.deviceValidationReports.slice(-1)[0];
+  return `
+    <article class="card stack" data-device-validation-panel>
+      <div class="row">
+        <h3 class="grow">Geraetepruefung v6.17</h3>
+        <span class="badge amber">manuell</span>
+      </div>
+      <p class="muted">Diese Debug-Checkliste veraendert keine Trainingsdaten. Echte iPhone/PWA-Tests muessen manuell bewertet werden.</p>
+      <div class="storage-table">
+        ${deviceValidationTestCases().slice(0, 6).map(([id, label]) => `<div><span>${htmlesc(label)}</span><strong>not_tested</strong></div>`).join("")}
+      </div>
+      <button class="secondary" data-export-device-validation>Pruefbericht exportieren</button>
+      <p class="quiet">Letzter Bericht: ${latest ? dateTimeText(latest.createdAt) : "Noch keiner"}</p>
+    </article>
   `;
 }
 
@@ -8484,6 +8680,7 @@ function createBackup() {
     coachContextFeedback: storage.coachContextFeedback,
     coachConflictLog: storage.coachConflictLog,
     coachCalibrationState: storage.coachCalibrationState,
+    deviceValidationReports: storage.deviceValidationReports,
     dailyCheckins: storage.dailyCheckins,
     dailyCheckinDraft: storage.dailyCheckinDraft,
     userSettings: currentUserSettings(),
@@ -8545,6 +8742,17 @@ function mergeBackupActiveWorkoutDraft(backupDraft) {
   return "";
 }
 
+function mergeRecommendationOutcomes(existing, incoming) {
+  const byKey = new Map();
+  [...(Array.isArray(existing) ? existing : []), ...(Array.isArray(incoming) ? incoming : [])].forEach((item) => {
+    if (!item || typeof item !== "object") return;
+    const key = item.evaluationKey || [item.recommendationId, item.evaluatedSessionId, item.evaluatorVersion || OUTCOME_EVALUATOR_VERSION].join("|");
+    if (!key) return;
+    byKey.set(key, { ...item, evaluationKey: key });
+  });
+  return [...byKey.values()];
+}
+
 function importBackupFile(file) {
   const reader = new FileReader();
   reader.onload = () => {
@@ -8578,10 +8786,11 @@ function importBackupFile(file) {
       storage.coachPlanProposals = mergeById(storage.coachPlanProposals, Array.isArray(backup.coachPlanProposals) ? backup.coachPlanProposals : []);
       if (!storage.coachPlanUndo && backup.coachPlanUndo && typeof backup.coachPlanUndo === "object") storage.coachPlanUndo = backup.coachPlanUndo;
       storage.coachRecommendationHistory = mergeById(storage.coachRecommendationHistory, Array.isArray(backup.coachRecommendationHistory) ? backup.coachRecommendationHistory : []);
-      storage.recommendationOutcomes = mergeById(storage.recommendationOutcomes, Array.isArray(backup.recommendationOutcomes) ? backup.recommendationOutcomes : []);
+      storage.recommendationOutcomes = mergeRecommendationOutcomes(storage.recommendationOutcomes, Array.isArray(backup.recommendationOutcomes) ? backup.recommendationOutcomes : []);
       storage.coachContextFeedback = mergeById(storage.coachContextFeedback, Array.isArray(backup.coachContextFeedback) ? backup.coachContextFeedback : []);
       storage.coachConflictLog = mergeById(storage.coachConflictLog, Array.isArray(backup.coachConflictLog) ? backup.coachConflictLog : []);
       if (!storage.coachCalibrationState && backup.coachCalibrationState && typeof backup.coachCalibrationState === "object") storage.coachCalibrationState = backup.coachCalibrationState;
+      storage.deviceValidationReports = mergeById(storage.deviceValidationReports, Array.isArray(backup.deviceValidationReports) ? backup.deviceValidationReports : []);
       storage.dailyCheckins = mergeById(storage.dailyCheckins, Array.isArray(backup.dailyCheckins) ? backup.dailyCheckins : []);
       if (!storage.dailyCheckinDraft && backup.dailyCheckinDraft && typeof backup.dailyCheckinDraft === "object") storage.dailyCheckinDraft = backup.dailyCheckinDraft;
       if (!storage.personalProfile && backup.personalProfile && typeof backup.personalProfile === "object") storage.personalProfile = backup.personalProfile;
@@ -8617,6 +8826,7 @@ const FULL_RESET_CONFIRMATION_TEXT = [
   "- eigene Plaene und eigene Uebungen",
   "- Coach-Feedback, Vorschlagsverlauf, Empfehlungshistorie und Outcome-Lernen",
   "- Coach-Konflikte, Kontextfeedback und Kalibrierungsdaten",
+  "- Geraetepruefungsberichte",
   "- persoenliche Einstellungen, technische Logs und lokale App-Daten",
   "",
   "Diese Aktion kann ohne Backup nicht rueckgaengig gemacht werden.",
@@ -9246,6 +9456,8 @@ function bindEvents() {
     await clearPwaCache().catch((error) => logAppError(error.message, "cache"));
     alert("Cache wurde geleert. Lade die App danach neu.");
   });
+
+  document.querySelector("[data-export-device-validation]")?.addEventListener("click", exportDeviceValidationReport);
 }
 
 function bindDailyCheckinEvents() {

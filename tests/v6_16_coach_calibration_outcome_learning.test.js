@@ -7,11 +7,11 @@ const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
 const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v67";'), "app version must be pwa-v67");
-assert(app.includes('const BACKUP_FORMAT_VERSION = "6.16.0";'), "backup version must be 6.16.0");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v67";'), "cache version must be pwa-v67");
-assert(html.includes("app.js?v=pwa-v67"), "app cache buster must be pwa-v67");
-assert(html.includes("styles.css?v=pwa-v67"), "style cache buster must be pwa-v67");
+assert(app.includes('const APP_VERSION = "pwa-v68";'), "app version must be pwa-v68");
+assert(app.includes('const BACKUP_FORMAT_VERSION = "6.17.0";'), "backup version must be 6.17.0");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v68";'), "cache version must be pwa-v68");
+assert(html.includes("app.js?v=pwa-v68"), "app cache buster must be pwa-v68");
+assert(html.includes("styles.css?v=pwa-v68"), "style cache buster must be pwa-v68");
 
 [
   "dcoach.coachRecommendationHistory",
@@ -66,7 +66,7 @@ assert(app.includes("Prioritaet: Sicherheit, Datenqualitaet, Recovery, Zeitlimit
 assert(app.includes("coachRecommendationHistory: storage.coachRecommendationHistory"), "backup export history missing");
 assert(app.includes("recommendationOutcomes: storage.recommendationOutcomes"), "backup export outcomes missing");
 assert(app.includes("storage.coachRecommendationHistory = mergeById"), "backup import history missing");
-assert(app.includes("storage.recommendationOutcomes = mergeById"), "backup import outcomes missing");
+assert(app.includes("storage.recommendationOutcomes = mergeRecommendationOutcomes"), "backup import outcomes missing");
 assert(app.includes("Coach-Feedback, Vorschlagsverlauf, Empfehlungshistorie und Outcome-Lernen"), "reset disclosure missing new coach data");
 
 assert(!app.includes("storage.activeWorkoutDraft = backup.activeWorkoutDraft || null"), "v6.15.1 draft protection regressed");

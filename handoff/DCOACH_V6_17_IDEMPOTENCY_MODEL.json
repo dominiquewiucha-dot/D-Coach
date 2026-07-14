@@ -1,0 +1,17 @@
+{
+  "version": "6.17.0",
+  "evaluatorVersion": "v6.17.0",
+  "evaluationKey": "recommendationId + evaluatedSessionId + evaluatorVersion",
+  "outcomeFields": [
+    "id",
+    "recommendationId",
+    "evaluatedSessionId",
+    "evaluatorVersion",
+    "evaluationKey",
+    "evaluatedAt",
+    "result",
+    "reasonCodes"
+  ],
+  "restoreBehavior": "Recommendation outcomes are deduplicated by evaluationKey.",
+  "repeatProcessingBehavior": "Same recommendation/session/evaluator returns existing outcome and does not create a duplicate."
+}
