@@ -1733,6 +1733,33 @@ select:focus-visible {
   gap: 8px;
 }
 
+.training-day-selector .list-button.active article,
+.workout-overview .list-button.active article {
+  border-color: rgba(37,99,235,.75);
+  background: rgba(37,99,235,.16);
+}
+
+.workout-plan-list {
+  padding-right: 4px;
+}
+
+.workout-overview-list {
+  display: grid;
+  gap: 8px;
+}
+
+.custom-plan-builder {
+  border-color: rgba(37,99,235,.45);
+}
+
+.custom-plan-builder .compact-card {
+  box-shadow: none;
+}
+
+.warning-card {
+  border-color: rgba(245,158,11,.55);
+}
+
 .compact-training-day {
   min-height: 76px;
   box-shadow: none;

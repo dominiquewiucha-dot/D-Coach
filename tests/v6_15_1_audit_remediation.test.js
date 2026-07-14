@@ -3,7 +3,7 @@ const app = fs.readFileSync("app.js", "utf8");
 const sw = fs.readFileSync("sw.js", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
 
-assert(app.includes('const BACKUP_FORMAT_VERSION = "6.17.2";'), "backup format version missing");
+assert(app.includes('const BACKUP_FORMAT_VERSION = "6.18.0";'), "backup format version missing");
 assert(app.includes("backupVersion: BACKUP_FORMAT_VERSION"), "backup export must use backup format constant");
 assert(!app.includes("storage.activeWorkoutDraft = backup.activeWorkoutDraft || null"), "backup import must not delete local draft");
 assert(app.includes("function isValidActiveWorkoutDraft(value)"), "workout draft validation missing");
@@ -29,10 +29,10 @@ assert(app.includes("persistWorkoutDraft();\n      stopEquipmentScannerCamera();
 assert(app.includes("Diese Übung ist nicht mehr in der Übungsdatenbank vorhanden."), "missing scanner exercise warning missing");
 
 assert(!/function renderDashboard\(\)[\s\S]*?\$\{renderCoachDashboardV54\(\)\}[\s\S]*?function renderCoach\(\)/.test(app), "dashboard must not contain old coach dashboard block");
-assert(app.includes('const APP_VERSION = "pwa-v71";'), "app version must be pwa-v71");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v71";'), "service worker cache must be pwa-v71");
-assert(html.includes("app.js?v=pwa-v71"), "index app cache buster must be pwa-v71");
-assert(html.includes("styles.css?v=pwa-v71"), "index style cache buster must be pwa-v71");
+assert(app.includes('const APP_VERSION = "pwa-v72";'), "app version must be pwa-v72");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v72";'), "service worker cache must be pwa-v72");
+assert(html.includes("app.js?v=pwa-v72"), "index app cache buster must be pwa-v72");
+assert(html.includes("styles.css?v=pwa-v72"), "index style cache buster must be pwa-v72");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

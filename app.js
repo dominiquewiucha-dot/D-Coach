@@ -191,6 +191,14 @@
   },
   activeCoachProposalId: "",
   showProposalAlternative: false,
+  manualTrainingDayId: "",
+  pendingWorkoutReview: null,
+  trainingDayError: null,
+  workoutOverviewOpen: false,
+  customPlanBuilderOpen: false,
+  customPlanBuilderStep: "basics",
+  customPlanBuilderSelectedDayId: "",
+  customPlanBuilderExerciseSearch: "",
   dailyCheckinActive: false,
   dailyCheckinStep: "sleep",
   isOnline: navigator.onLine,
@@ -202,8 +210,8 @@
   route: null
 };
 
-const APP_VERSION = "pwa-v71";
-const BACKUP_FORMAT_VERSION = "6.17.2";
+const APP_VERSION = "pwa-v72";
+const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
 const MUSCLE_MAPPING_VERSION = "muscle-mapping-v3";
@@ -218,6 +226,7 @@ const STORAGE_KEYS = [
   { key: "dcoach.deletedPlanNames", label: "Geloeschte Pläne", type: "array" },
   { key: "dcoach.customPlans", label: "Eigene Pläne", type: "array" },
   { key: "dcoach.customExercises", label: "Eigene Übungen", type: "array" },
+  { key: "dcoach.customPlanBuilderDraft", label: "Eigener Planentwurf", type: "object" },
   { key: "dcoach.userSettings", label: "Einstellungen", type: "object" },
   { key: "dcoach.personalProfile", label: "Persönliche Daten", type: "object" },
   { key: "dcoach.coachFeedback", label: "Coach-Feedback", type: "array" },
@@ -299,6 +308,13 @@ const storage = {
   },
   set customExercises(value) {
     writeJson("dcoach.customExercises", value);
+  },
+  get customPlanBuilderDraft() {
+    return readJson("dcoach.customPlanBuilderDraft", null);
+  },
+  set customPlanBuilderDraft(value) {
+    if (value) writeJson("dcoach.customPlanBuilderDraft", value);
+    else localStorage.removeItem("dcoach.customPlanBuilderDraft");
   },
   get userSettings() {
     return readJson("dcoach.userSettings", {});
@@ -606,7 +622,8 @@ function normalizePlanPreset(plan) {
     description: plan.description || plan.goal || "Trainingsplan",
     goal: plan.goal || "",
     maxDurationMinutes: plan.maxDurationMinutes || 60,
-    days: (plan.days || []).map((day) => ({
+    days: (plan.days || []).map((day, dayIndex) => ({
+      id: day.id || stablePlanDayId(plan, day, dayIndex),
       name: day.name,
       maxDurationMinutes: day.maxDurationMinutes || plan.maxDurationMinutes || 60,
       exercises: (day.exercises || []).map((item, index) => {
@@ -726,7 +743,7 @@ function planQrPayload(plan) {
       name: plan.planName,
       description: plan.description || "",
       goal: plan.goal || "",
-      days: plan.days || []
+      days: normalizedPlanDays(plan)
     }
   });
 }
@@ -760,6 +777,37 @@ function importPlanPayload(text) {
   storage.activePlanName = plan.planName;
 }
 
+const PULL_LWS_TEMPLATE_V618 = [
+  { exerciseId: "ex_lat_pulldown", sets: 3, reps: "8-12", restSeconds: 90, priority: "required" },
+  { exerciseId: "ex_chest_supported_row", sets: 3, reps: "8-12", restSeconds: 90, priority: "required" },
+  { exerciseId: "ex_seated_row", sets: 2, reps: "8-12", restSeconds: 90, priority: "important" },
+  { exerciseId: "ex_reverse_pec_deck", sets: 2, reps: "12-15", restSeconds: 60, priority: "important" },
+  { exerciseId: "ex_face_pull", sets: 2, reps: "12-20", restSeconds: 60, priority: "optional" },
+  { exerciseId: "ex_cable_biceps_curl", sets: 3, reps: "10-15", restSeconds: 60, priority: "required" }
+];
+
+function setPolicyDefaultForExercise(exercise, index = 0, dayName = "", priority = "") {
+  if (priority === "optional") return 2;
+  const text = `${dayName} ${exercise?.displayName || ""} ${exercise?.category || ""} ${exercise?.movementPattern || ""} ${(exercise?.tags || []).join(" ")}`.toLowerCase();
+  const isolation = /curl|bizeps|trizeps|seitheben|face pull|reverse|butterfly|fly|waden|plank|core|bauch/.test(text);
+  if (priority === "required") return 3;
+  if (index <= 1) return 3;
+  if (index === 2 && !isolation) return 2;
+  return 2;
+}
+
+function generatedPullDayV618() {
+  return {
+    id: "day_generated_pull_lws_v618",
+    name: "Pull",
+    maxDurationMinutes: 60,
+    exercises: PULL_LWS_TEMPLATE_V618.map((entry, index) => ({
+      ...entry,
+      sortOrder: index + 1
+    }))
+  };
+}
+
 function generatePlanCandidate() {
   const profile = currentPersonalProfile();
   const avoidIds = new Set(profile.avoidExerciseIds || []);
@@ -776,17 +824,19 @@ function generatePlanCandidate() {
     ["Pull", ["pull", "ruecken", "ruecken", "bizeps"]],
     ["Beine + Core", ["bein", "quad", "glute", "hamstring", "core", "bauch"]]
   ];
-  const days = groups.map(([name, needles]) => {
+  const days = groups.map(([name, needles], dayIndex) => {
+    if (name === "Pull") return generatedPullDayV618();
     const chosen = exercises.filter((exercise) => {
       const text = `${exercise.displayName} ${exercise.category} ${exercise.movementPattern} ${exercise.tags.join(" ")} ${exercise.primaryMuscleGroups.join(" ")}`.toLowerCase();
       return needles.some((needle) => text.includes(needle));
     }).slice(0, 6);
     return {
+      id: `day_generated_${stableIdPart(name)}_${dayIndex + 1}`,
       name,
       maxDurationMinutes: 60,
       exercises: chosen.map((exercise, index) => ({
         exerciseId: exercise.id,
-        sets: exercise.defaultSets || 2,
+        sets: setPolicyDefaultForExercise(exercise, index, name, index < 4 ? "required" : "important"),
         reps: exercise.defaultRepRange || "8-12",
         restSeconds: exercise.defaultRestSeconds || 90,
         priority: index < 4 ? "required" : "important",
@@ -1557,6 +1607,8 @@ function planDayMatchScore(day, session) {
 
 function planDayIndexFromSession(plan, session) {
   if (!plan?.days?.length || !session) return -1;
+  const idIndex = session.dayId ? plan.days.findIndex((day, index) => stablePlanDayId(plan, day, index) === session.dayId || day.id === session.dayId) : -1;
+  if (idIndex >= 0) return idIndex;
   const exactIndex = plan.days.findIndex((day) => day.name === session.dayName || day.name === session.dayNameSnapshot);
   if (exactIndex >= 0) return exactIndex;
 
@@ -1582,6 +1634,173 @@ function nextPlanDayAfterLastSession(plan = activePlan()) {
   const index = planDayIndexFromSession(plan, latest);
   if (index < 0) return plan.days[0];
   return plan.days[(index + 1) % plan.days.length];
+}
+
+function stableIdPart(value, fallback = "item") {
+  const normalized = String(value || fallback)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  return normalized || fallback;
+}
+
+function stablePlanId(plan) {
+  return String(plan?.id || plan?.planName || "plan");
+}
+
+function stablePlanDayId(plan, day, index = 0) {
+  return String(day?.id || `day_${stableIdPart(stablePlanId(plan))}_${stableIdPart(day?.name || `tag_${index + 1}`)}_${index + 1}`);
+}
+
+function normalizedPlannedExercise(entry, index = 0) {
+  return {
+    exerciseId: entry?.exerciseId || "",
+    sets: Math.max(1, Number(entry?.sets) || 1),
+    reps: entry?.reps || "8-12",
+    restSeconds: Math.max(0, Number(entry?.restSeconds) || 90),
+    priority: entry?.priority || (index < 4 ? "required" : "important"),
+    sortOrder: Number(entry?.sortOrder) || index + 1,
+    alternativeExerciseIds: Array.isArray(entry?.alternativeExerciseIds) ? entry.alternativeExerciseIds : [],
+    note: entry?.note || ""
+  };
+}
+
+function normalizedPlanDay(plan, day, index = 0) {
+  if (!day) return null;
+  const exercises = (day.exercises || []).map(normalizedPlannedExercise).sort((a, b) => a.sortOrder - b.sortOrder);
+  return {
+    ...day,
+    id: stablePlanDayId(plan, day, index),
+    name: day.name || `Tag ${index + 1}`,
+    maxDurationMinutes: Number(day.maxDurationMinutes) || Number(plan?.maxDurationMinutes) || 60,
+    exercises
+  };
+}
+
+function normalizedPlanDays(plan) {
+  return (plan?.days || []).map((day, index) => normalizedPlanDay(plan, day, index)).filter(Boolean);
+}
+
+function findPlanDayByStableId(plan, dayIdOrName) {
+  const value = String(dayIdOrName || "");
+  return normalizedPlanDays(plan).find((day) => day.id === value || day.name === value) || null;
+}
+
+function plannedExerciseIsValid(entry) {
+  return Boolean(entry?.exerciseId && exerciseById(entry.exerciseId));
+}
+
+function invalidPlannedExercises(day) {
+  return (day?.exercises || []).filter((entry) => !plannedExerciseIsValid(entry));
+}
+
+function workEntriesAsPlannedExercises(entries = []) {
+  return entries.map((entry, index) => normalizedPlannedExercise({
+    exerciseId: entry.exerciseId,
+    sets: entry.sets?.length || 1,
+    reps: entry.reps,
+    restSeconds: entry.restSeconds,
+    priority: entry.priority,
+    sortOrder: entry.sortOrder || index + 1
+  }, index));
+}
+
+function resolveTrainingDay({
+  plan = activePlan(),
+  sessions = storage.sessions,
+  activeWorkoutDraft = storage.activeWorkoutDraft,
+  manuallySelectedDayId = state.manualTrainingDayId
+} = {}) {
+  if (!plan?.days?.length) return null;
+  const planId = stablePlanId(plan);
+  if (isValidActiveWorkoutDraft(activeWorkoutDraft)) {
+    const draftDay = findPlanDayByStableId(plan, activeWorkoutDraft.dayId || activeWorkoutDraft.dayName);
+    return {
+      planId,
+      planName: plan.planName,
+      dayId: activeWorkoutDraft.dayId || draftDay?.id || stablePlanDayId(plan, { name: activeWorkoutDraft.dayName }, 0),
+      dayName: activeWorkoutDraft.dayName,
+      dayIndex: draftDay ? normalizedPlanDays(plan).findIndex((day) => day.id === draftDay.id) : -1,
+      reason: "active_draft",
+      exercises: draftDay?.exercises?.length ? draftDay.exercises : workEntriesAsPlannedExercises(activeWorkoutDraft.entries),
+      maxDurationMinutes: draftDay?.maxDurationMinutes || Number(plan.maxDurationMinutes) || 60,
+      sourceDay: draftDay || null,
+      lastSessionId: lastSession()?.id || null
+    };
+  }
+
+  const days = normalizedPlanDays(plan);
+  let selected = manuallySelectedDayId ? days.find((day) => day.id === manuallySelectedDayId || day.name === manuallySelectedDayId) : null;
+  let reason = selected ? "manual_selection" : "";
+
+  if (!selected) {
+    const latest = [...sessions].sort((a, b) => new Date(b.startedAt || b.completedAt || b.date || 0) - new Date(a.startedAt || a.completedAt || a.date || 0))[0] || null;
+    const latestIndex = latest ? planDayIndexFromSession({ ...plan, days }, latest) : -1;
+    const next = latestIndex >= 0 ? days[(latestIndex + 1) % days.length] : null;
+    selected = next ? days.find((day) => day.name === next.name || day.id === next.id) : null;
+    reason = latest && selected ? "next_after_last_session" : "";
+  }
+
+  if (!selected) {
+    selected = days[0] || null;
+    reason = selected ? "first_day_fallback" : "";
+  }
+
+  if (!selected) return null;
+  return {
+    planId,
+    planName: plan.planName,
+    dayId: selected.id,
+    dayName: selected.name,
+    dayIndex: days.findIndex((day) => day.id === selected.id),
+    reason,
+    exercises: selected.exercises,
+    maxDurationMinutes: selected.maxDurationMinutes,
+    sourceDay: selected,
+    lastSessionId: lastSession()?.id || null
+  };
+}
+
+function trainingDaySetCount(dayOrResolved) {
+  return (dayOrResolved?.exercises || []).reduce((sum, entry) => sum + (Number(entry.sets) || 0), 0);
+}
+
+function estimatedPlanDayMinutes(dayOrResolved) {
+  const exercises = dayOrResolved?.exercises || [];
+  return Math.max(10, exercises.reduce((sum, entry) => {
+    const exercise = exerciseById(entry.exerciseId) || {};
+    return sum + estimateExerciseMinutes(exercise, Number(entry.sets) || 1);
+  }, 0));
+}
+
+function trainingDayDiagnostics(resolved = resolveTrainingDay()) {
+  const draft = storage.activeWorkoutDraft;
+  return {
+    version: "6.18.0",
+    generatedAt: new Date().toISOString(),
+    activePlan: resolved?.planName || activePlan()?.planName || null,
+    selectedDay: resolved ? { dayId: resolved.dayId, dayName: resolved.dayName, reason: resolved.reason, dayIndex: resolved.dayIndex } : null,
+    lastSession: lastSession() ? { id: lastSession().id, dayName: lastSession().dayName, startedAt: lastSession().startedAt } : null,
+    planExerciseIds: (resolved?.exercises || []).map((entry) => entry.exerciseId),
+    draftExerciseIds: isValidActiveWorkoutDraft(draft) ? draft.entries.map((entry) => entry.exerciseId) : [],
+    draftDayId: draft?.dayId || null,
+    draftDayName: draft?.dayName || null
+  };
+}
+
+function exportTrainingDayDiagnostics() {
+  const diagnostics = trainingDayDiagnostics(resolveTrainingDay({ activeWorkoutDraft: null }));
+  const blob = new Blob([JSON.stringify(diagnostics, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "DCoach_v6.18_TrainingDay_Diagnostics.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function availablePlans() {
@@ -5724,11 +5943,12 @@ function buildCoachPlanProposal() {
   const coverage = coverageForSessions(sessionsSince(7)).filter((item) => item.isTarget || item.percent < 70).sort((a, b) => a.percent - b.percent);
   const weak = coverage[0] || coverageForSessions(sessionsSince(7)).sort((a, b) => a.percent - b.percent)[0] || null;
   const change = findProposalSetChange(plan, weak);
+  const proposalId = `proposal_${stableIdPart([planFingerprint(plan), weak?.muscleId || "none", change?.dayName || "none", change?.exerciseId || "none", change?.before ?? "x", change?.after ?? "x"].join("_"))}`;
   const current = weak?.percent ?? null;
   const target = Math.max(70, current || 70);
   const predicted = current === null ? null : Math.min(100, Math.max(target, current + 18));
   const baseProposal = {
-    id: `proposal_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    id: proposalId,
     createdAt: new Date().toISOString(),
     scope: "exercise",
     title: weak ? `${weak.name} priorisieren` : summary.recommendation,
@@ -5778,14 +5998,34 @@ function buildCoachPlanProposal() {
   };
 }
 
+function coachProposalReviewState(proposal) {
+  const hasConcreteChange = Boolean(proposal?.proposedChanges?.length && proposal.proposedChanges.every((change) => change.type && change.exerciseId && change.dayName && change.before !== undefined && change.after !== undefined));
+  const planFresh = proposal?.currentPlanFingerprint ? planFingerprint(activePlan()) === proposal.currentPlanFingerprint : false;
+  const hardGates = proposal?.hardGates || [];
+  const blockedReasons = [];
+  if (!hasConcreteChange) blockedReasons.push("Keine konkrete Planänderung berechnet.");
+  if (!planFresh) blockedReasons.push("Der aktive Plan hat sich seit der Berechnung geändert.");
+  hardGates.forEach((item) => blockedReasons.push(item));
+  return {
+    hasConcreteChange,
+    planFresh,
+    blockedReasons,
+    canApply: hasConcreteChange && planFresh && !hardGates.length,
+    primaryActionLabel: hasConcreteChange ? "Änderungsvorschlag prüfen" : "Details ansehen",
+    statusLabel: hasConcreteChange ? "konkrete Änderung" : "nur Hinweis"
+  };
+}
+
 function openCoachProposalReview() {
   const proposal = buildCoachPlanProposal();
+  const reviewState = coachProposalReviewState(proposal);
   const conflict = resolveCoachConflicts([
     { id: proposal.id, title: proposal.title, priorityClass: proposal.hardGates?.length ? "data_quality" : "progression", confidencePercent: proposal.confidencePercent },
     { id: "time_budget_guard", title: "Zeitbudget schützen", priorityClass: coachTimeBudgetConflict(activePlan()?.days?.find((day) => day.name === proposal.proposedChanges?.[0]?.dayName), 1).conflict ? "time_limit" : "preferences", confidencePercent: 70 }
   ], { unresolvedSafetyConflict: proposal.hardGates?.some((item) => item.includes("Schmerz")) });
   proposal.conflictResolutionId = conflict.id;
-  storage.coachPlanProposals = [...storage.coachPlanProposals, proposal];
+  proposal.reviewState = reviewState;
+  storage.coachPlanProposals = [...storage.coachPlanProposals.filter((item) => item.id !== proposal.id), proposal];
   upsertCoachRecommendationRecord({
     id: proposal.id,
     ruleId: "coach_plan_proposal_review",
@@ -5811,7 +6051,8 @@ function activeCoachProposal() {
 }
 
 function proposalCanApply(proposal) {
-  return Boolean(proposal?.currentPlanSnapshot && proposal?.proposedChanges?.length && proposal.proposedChanges.every((change) => change.type && change.exerciseId) && !(proposal.hardGates || []).length);
+  const reviewState = coachProposalReviewState(proposal);
+  return Boolean(proposal?.currentPlanSnapshot && reviewState.canApply);
 }
 
 function applyCoachPlanProposal() {
@@ -5901,7 +6142,8 @@ function undoCoachPlanProposal() {
 function renderCoachProposalReview() {
   const proposal = activeCoachProposal();
   if (!proposal) return "";
-  const canApply = proposalCanApply(proposal) && proposal.status === "pending";
+  const reviewState = coachProposalReviewState(proposal);
+  const canApply = reviewState.canApply && proposal.status === "pending";
   const undo = storage.coachPlanUndo?.proposalId === proposal.id;
   const confidence = proposal.confidencePercent ?? proposal.prediction?.confidencePercent ?? 0;
   const conflict = storage.coachConflictLog.find((item) => item.id === proposal.conflictResolutionId);
@@ -5914,8 +6156,17 @@ function renderCoachProposalReview() {
             <h2>${htmlesc(proposal.title)}</h2>
             <p class="muted">${htmlesc(proposal.summary)}</p>
           </div>
-          <span class="badge ${proposal.status === "accepted" ? "green" : proposal.status === "rejected" ? "amber" : "blue"}">${htmlesc(proposal.status)}</span>
+          <span class="badge ${proposal.status === "accepted" ? "green" : proposal.status === "rejected" ? "amber" : reviewState.hasConcreteChange ? "blue" : "amber"}">${htmlesc(reviewState.statusLabel)}</span>
         </div>
+        <article class="proposal-block">
+          <h3>Status des Vorschlags</h3>
+          <div class="storage-table">
+            <div><span>Konkrete Änderung</span><strong>${reviewState.hasConcreteChange ? "Ja" : "Nein"}</strong></div>
+            <div><span>Plan aktuell</span><strong>${reviewState.planFresh ? "Ja" : "Nein"}</strong></div>
+            <div><span>Übernehmen</span><strong>${reviewState.canApply ? "möglich" : "gesperrt"}</strong></div>
+          </div>
+          ${reviewState.blockedReasons.length ? `<ul class="small-list">${reviewState.blockedReasons.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : `<p class="quiet">Der Vorschlag kann übernommen werden.</p>`}
+        </article>
         <article class="proposal-block">
           <h3>Betroffene Muskeln</h3>
           ${proposal.affectedMuscles.length ? proposal.affectedMuscles.map((muscle) => `
@@ -5932,7 +6183,7 @@ function renderCoachProposalReview() {
               <div><span>Vorher</span><strong>${htmlesc(change.exerciseNameSnapshot || change.exerciseId)} - ${change.before ?? "-"} Sätze</strong></div>
               <div><span>Nachher</span><strong>${htmlesc(change.exerciseNameSnapshot || change.exerciseId)} - ${change.after ?? "-"} Sätze</strong></div>
             </div>
-          `).join("") : `<p class="muted">Keine konkrete Planänderung vorhanden.</p>`}
+          `).join("") : `<p class="muted">Aktuell gibt es keinen konkreten Planänderungsvorschlag. Der Coach zeigt hier nur die Auswertung und Gründe.</p>`}
         </article>
         <article class="proposal-block">
           <h3>Warum?</h3>
@@ -5965,7 +6216,7 @@ function renderCoachProposalReview() {
           <ul class="small-list">${(proposal.riskNotes || []).map((item) => `<li>${htmlesc(item)}</li>`).join("") || "<li>Keine zusätzlichen Hinweise.</li>"}</ul>
         </article>
         ${state.showProposalAlternative ? `<article class="proposal-block"><h3>Alternative</h3>${(proposal.alternatives || []).map((item) => `<p class="muted"><strong>${htmlesc(item.title || "Alternative")}</strong><br>${htmlesc(item.summary || item)}</p>`).join("") || `<p class="muted">Keine Alternative hinterlegt.</p>`}</article>` : ""}
-        ${!canApply && proposal.status === "pending" ? `<p class="warning compact-warning">Übernehmen ist deaktiviert, weil Hard Gates offen sind, der Vorschlag unvollständig ist oder der Plan nicht mehr passt.</p>` : ""}
+        ${!canApply && proposal.status === "pending" ? `<p class="warning compact-warning">Übernehmen ist deaktiviert: ${htmlesc(reviewState.blockedReasons[0] || "Vorschlag nicht anwendbar.")}</p>` : ""}
         <div class="proposal-actions">
           <button class="primary" data-apply-coach-proposal ${canApply ? "" : "disabled"}>Änderung übernehmen</button>
           <button class="secondary" data-show-proposal-alternative>Alternative anzeigen</button>
@@ -5996,6 +6247,8 @@ function renderCoachFeedbackControls(recommendationId, ruleId) {
 function renderCoachDashboardV54() {
   const plan = activePlan();
   const summary = coachRecommendationSummaryV54();
+  const proposalPreview = buildCoachPlanProposal();
+  const proposalState = coachProposalReviewState(proposalPreview);
   const readiness = aiReadinessSummary();
   const coverage = premiumCoverageForSessions(sessionsSince(7));
   const chest = coverage.find((item) => item.muscleId === "mg_chest");
@@ -6014,7 +6267,7 @@ function renderCoachDashboardV54() {
         <p class="muted">${htmlesc(summary.mainReason)}</p>
         <div class="coach-action-row">
           <button class="primary" ${plan ? "data-start-training-flow" : "data-tab=\"plans\""}>${plan ? "Training starten" : "Plan auswählen"}</button>
-          <button class="secondary" data-confirm-plan-adjust>${htmlesc(coachDashboardText("review", "Vorschlag prüfen"))}</button>
+          <button class="secondary" data-confirm-plan-adjust>${htmlesc(proposalState.primaryActionLabel)}</button>
         </div>
         <details>
           <summary>${htmlesc(coachDashboardText("why", "Warum?"))}</summary>
@@ -7221,11 +7474,15 @@ function renderSmartWorkoutPreview(dayName) {
 function renderTrainingV53() {
   const plan = activePlan();
   const draft = storage.activeWorkoutDraft;
-  const primaryDay = plan?.days?.[0] || null;
-  const otherDays = plan?.days?.slice(1) || [];
+  const resolved = resolveTrainingDay({ plan, activeWorkoutDraft: null });
+  const days = normalizedPlanDays(plan);
+  const primaryDay = resolved?.sourceDay || null;
+  const otherDays = days.filter((day) => day.id !== resolved?.dayId);
+  if (state.pendingWorkoutReview) return renderPreWorkoutReview(state.pendingWorkoutReview);
   return `
     <section class="screen stack training-screen">
       <header><h1 class="title">Training</h1><p class="subtitle">${plan ? htmlesc(plan.planName) : "Kein aktiver Plan"}</p></header>
+      ${state.trainingDayError ? renderTrainingDayError(state.trainingDayError) : ""}
       ${draft ? `
         <article class="card stack">
           <h2>Training fortsetzen</h2>
@@ -7239,20 +7496,26 @@ function renderTrainingV53() {
             <div class="grow">
               <p class="muted">Nächste Einheit</p>
               <h2>${htmlesc(primaryDay.name)}</h2>
-              <p class="muted">${primaryDay.exercises.length} Übungen · ${primaryDay.maxDurationMinutes} Minuten · ${lastDayDate(primaryDay.name) || "noch nicht trainiert"}</p>
+              <p class="muted">${primaryDay.exercises.length} Übungen · ${trainingDaySetCount(resolved)} Sätze · ca. ${estimatedPlanDayMinutes(resolved)} Minuten</p>
+              <p class="quiet">Quelle: ${trainingDayReasonText(resolved.reason)} · ${lastDayDate(primaryDay.name) || "noch nicht trainiert"}</p>
             </div>
             <span class="badge blue">Start</span>
           </div>
           ${renderWarmupHint(primaryDay)}
-          <button class="primary" data-start-day="${htmlesc(primaryDay.name)}">Training starten</button>
+          ${renderPlannedExerciseList(resolved.exercises)}
+          <div class="button-row">
+            <button class="primary" data-start-day-id="${htmlesc(resolved.dayId)}">Training prüfen und starten</button>
+            <button class="secondary" data-export-training-day-diagnostics>Diagnostics exportieren</button>
+          </div>
         </article>
         ${renderSessionCoachPreWorkoutCard(primaryDay)}
         ${renderSmartWorkoutPreviewV53(primaryDay.name)}
+        ${renderTrainingDaySelector(plan, resolved)}
         ${otherDays.length ? `
           <details class="disclosure-card stack">
             <summary><span>Weitere Tage</span><span class="badge">${otherDays.length}</span></summary>
             <div class="training-day-list">
-              ${otherDays.map(renderTrainingDayCompactV53).join("")}
+              ${otherDays.map((day) => renderTrainingDayCompactV53(day, resolved?.dayId)).join("")}
             </div>
           </details>
         ` : ""}
@@ -7265,13 +7528,103 @@ function renderTrainingV53() {
   `;
 }
 
+function trainingDayReasonText(reason) {
+  return {
+    active_draft: "offener Entwurf",
+    manual_selection: "manuelle Auswahl",
+    next_after_last_session: "nächster Tag nach letzter Einheit",
+    first_day_fallback: "erster Plantag"
+  }[reason] || "Plan";
+}
+
+function renderTrainingDayError(error) {
+  return `
+    <article class="card stack warning-card">
+      <h3>Trainingstag nicht startklar</h3>
+      <p class="muted">${htmlesc(error.message || "Der gewählte Trainingstag enthält ungültige Übungen.")}</p>
+      ${error.details?.length ? `<ul class="small-list">${error.details.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
+      <button class="secondary" data-clear-training-day-error>Hinweis ausblenden</button>
+    </article>
+  `;
+}
+
+function renderPlannedExerciseList(exercises = []) {
+  return `
+    <ol class="builder-list workout-plan-list">
+      ${exercises.map((entry) => {
+        const exercise = exerciseById(entry.exerciseId);
+        return `<li>
+          <strong>${htmlesc(exercise?.displayName || entry.exerciseId)}</strong>
+          <span>${entry.sets} Sätze · ${htmlesc(entry.reps)} · ${entry.restSeconds} s Pause · ${htmlesc(entry.priority || "important")}</span>
+        </li>`;
+      }).join("")}
+    </ol>
+  `;
+}
+
+function renderTrainingDaySelector(plan, resolved) {
+  const days = normalizedPlanDays(plan);
+  if (days.length <= 1) return "";
+  return `
+    <article class="card stack training-day-selector" data-training-day-selector>
+      <div class="row">
+        <h3 class="grow">Trainingstag wählen</h3>
+        <span class="badge blue">${days.length}</span>
+      </div>
+      <div class="training-day-list">
+        ${days.map((day) => `
+          <button class="list-button ${day.id === resolved?.dayId ? "active" : ""}" data-select-training-day="${htmlesc(day.id)}">
+            <article class="card row compact-training-day">
+              <div class="grow">
+                <h3>${htmlesc(day.name)}</h3>
+                <p class="muted">${day.exercises.length} Übungen · ${trainingDaySetCount(day)} Sätze · ca. ${estimatedPlanDayMinutes(day)} min</p>
+              </div>
+              <span class="badge ${day.id === resolved?.dayId ? "green" : "blue"}">${day.id === resolved?.dayId ? "gewählt" : "wählen"}</span>
+            </article>
+          </button>
+        `).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderPreWorkoutReview(review) {
+  const invalid = invalidPlannedExercises(review);
+  return `
+    <section class="screen stack training-screen">
+      <header>
+        <h1 class="title">Training prüfen</h1>
+        <p class="subtitle">${htmlesc(review.planName)} · ${htmlesc(review.dayName)}</p>
+      </header>
+      <article class="card stack training-hero">
+        <div class="row">
+          <div class="grow">
+            <p class="muted">Vor dem Start</p>
+            <h2>${htmlesc(review.dayName)}</h2>
+            <p class="muted">${review.exercises.length} Übungen · ${trainingDaySetCount(review)} Sätze · ca. ${estimatedPlanDayMinutes(review)} Minuten</p>
+            <p class="quiet">Quelle: ${trainingDayReasonText(review.reason)}</p>
+          </div>
+          <span class="badge ${invalid.length ? "amber" : "green"}">${invalid.length ? "prüfen" : "startklar"}</span>
+        </div>
+        ${review.warmups?.length ? `<p class="quiet">Warm-up: ${review.warmups.map((item) => `${htmlesc(item.equipment)} ${Number(item.durationMinutes) || 0} min`).join(", ")}</p>` : `<p class="quiet">Kein Warm-up eingetragen.</p>`}
+        ${renderPlannedExerciseList(review.exercises)}
+        ${invalid.length ? `<p class="warning compact-warning">Ungültige Übung im Plan. Training wird nicht gestartet: ${invalid.map((item) => htmlesc(item.exerciseId || "ohne ID")).join(", ")}</p>` : ""}
+        <div class="button-row">
+          <button class="primary" data-confirm-workout-review ${invalid.length ? "disabled" : ""}>Diese Einheit starten</button>
+          <button class="secondary" data-cancel-workout-review>Zurück</button>
+        </div>
+      </article>
+    </section>
+  `;
+}
+
 function renderTrainingDayCompactV53(day) {
   return `
-    <button class="list-button" data-start-day="${htmlesc(day.name)}">
+    <button class="list-button" data-start-day-id="${htmlesc(day.id)}">
       <article class="card row compact-training-day">
         <div class="grow">
           <h3>${htmlesc(day.name)}</h3>
-          <p class="muted">${day.exercises.length} Übungen · ${day.maxDurationMinutes} min</p>
+          <p class="muted">${day.exercises.length} Übungen · ${trainingDaySetCount(day)} Sätze · ${day.maxDurationMinutes} min</p>
         </div>
         <span class="badge blue">Start</span>
       </article>
@@ -7359,6 +7712,8 @@ function renderDailyCheckinDashboardCard() {
 
 function renderPrimaryCoachRecommendationCard() {
   const summary = coachRecommendationSummaryV54();
+  const proposalPreview = buildCoachPlanProposal();
+  const proposalState = coachProposalReviewState(proposalPreview);
   return `
     <article class="card stack">
       <div class="row">
@@ -7369,7 +7724,7 @@ function renderPrimaryCoachRecommendationCard() {
       <p class="quiet">${htmlesc(summary.mainReason)}</p>
       <div class="button-row">
         <button class="secondary" data-tab="coach">Details im Coach</button>
-        <button class="secondary" data-confirm-plan-adjust>${htmlesc(coachDashboardText("review", "Vorschlag prüfen"))}</button>
+        <button class="secondary" data-confirm-plan-adjust>${htmlesc(proposalState.primaryActionLabel)}</button>
       </div>
     </article>
   `;
@@ -7413,10 +7768,12 @@ function workoutEntryFromPlanned(planned) {
   const scannedMapping = latestScannedEquipmentMappingForExercise(planned.exerciseId);
   return {
     exerciseId: planned.exerciseId,
+    plannedSets: Math.max(Number(planned.sets) || 1, 1),
     reps: planned.reps,
     restSeconds: planned.restSeconds,
     priority: planned.priority,
     sortOrder: planned.sortOrder,
+    sourceDayId: planned.sourceDayId || "",
     seatPosition: scannedMapping?.seatPosition || setting?.seatPosition || "",
     gripPosition: scannedMapping?.gripPosition || setting?.gripPosition || setting?.handlePosition || "",
     gripWidth: scannedMapping?.gripWidth || setting?.gripWidth || "",
@@ -7435,6 +7792,93 @@ function workoutEntryFromPlanned(planned) {
       };
     })
   };
+}
+
+function buildTrainingDayError(resolved, invalid) {
+  return {
+    message: `${resolved?.dayName || "Trainingstag"} kann nicht gestartet werden. Der Plan enthält ungültige Übungen.`,
+    details: invalid.map((entry) => `${entry.exerciseId || "ohne ID"} ist nicht in der Übungsdatenbank vorhanden.`)
+  };
+}
+
+function openPreWorkoutReview(dayIdOrName = "") {
+  const plan = activePlan();
+  if (!plan) {
+    navigateTo("plans");
+    return;
+  }
+  const selectedDay = dayIdOrName ? findPlanDayByStableId(plan, dayIdOrName) : null;
+  const manualDayId = selectedDay?.id || dayIdOrName || state.manualTrainingDayId;
+  const resolved = resolveTrainingDay({ plan, activeWorkoutDraft: null, manuallySelectedDayId: manualDayId });
+  if (!resolved) {
+    state.trainingDayError = { message: "Kein Trainingstag gefunden.", details: ["Aktiviere oder erstelle zuerst einen Plan."] };
+    state.pendingWorkoutReview = null;
+    state.tab = "training";
+    render();
+    return;
+  }
+  const invalid = invalidPlannedExercises(resolved);
+  if (invalid.length) {
+    state.trainingDayError = buildTrainingDayError(resolved, invalid);
+    state.pendingWorkoutReview = null;
+    state.manualTrainingDayId = resolved.dayId;
+    state.tab = "training";
+    render();
+    return;
+  }
+  const warmup = askWarmupBeforeWorkout();
+  state.pendingWorkoutReview = {
+    id: `workout_review_${Date.now()}`,
+    planId: resolved.planId,
+    planName: resolved.planName,
+    dayId: resolved.dayId,
+    dayName: resolved.dayName,
+    dayIndex: resolved.dayIndex,
+    reason: resolved.reason,
+    maxDurationMinutes: resolved.maxDurationMinutes,
+    exercises: resolved.exercises.map((entry) => ({ ...entry, sourceDayId: resolved.dayId })),
+    warmups: warmup ? [warmup] : [],
+    createdAt: new Date().toISOString()
+  };
+  state.trainingDayError = null;
+  state.manualTrainingDayId = resolved.dayId;
+  state.tab = "training";
+  render();
+}
+
+function confirmPreWorkoutReview() {
+  const review = state.pendingWorkoutReview;
+  if (!review) return;
+  const invalid = invalidPlannedExercises(review);
+  if (invalid.length) {
+    state.trainingDayError = buildTrainingDayError(review, invalid);
+    state.pendingWorkoutReview = null;
+    render();
+    return;
+  }
+  state.showAlternatives = false;
+  state.restTimer.remaining = 0;
+  state.restTimer.running = false;
+  state.activeWorkout = {
+    planId: review.planId,
+    planName: review.planName,
+    dayId: review.dayId,
+    dayName: review.dayName,
+    startedAt: new Date().toISOString(),
+    warmups: review.warmups || [],
+    sessionNote: "",
+    index: 0,
+    overviewOpen: false,
+    entries: review.exercises.map(workoutEntryFromPlanned)
+  };
+  state.pendingWorkoutReview = null;
+  persistWorkoutDraft();
+  render();
+}
+
+function cancelPreWorkoutReview() {
+  state.pendingWorkoutReview = null;
+  render();
 }
 
 function startTrainingFlow() {
@@ -7466,13 +7910,13 @@ function startTrainingFlow() {
     return;
   }
 
-  const dayName = nextPlanDayAfterLastSession(plan)?.name || plan.days?.[0]?.name;
-  if (!dayName) {
+  const resolved = resolveTrainingDay({ plan, activeWorkoutDraft: null });
+  if (!resolved) {
     navigateTo("plans");
     return;
   }
 
-  startDay(dayName);
+  startDay(resolved.dayId);
 }
 
 function renderCooldownCard() {
@@ -7487,23 +7931,7 @@ function renderCooldownCard() {
 }
 
 function startDay(dayName) {
-  const plan = activePlan();
-  const day = plan.days.find((item) => item.name === dayName);
-  const warmup = askWarmupBeforeWorkout();
-  state.showAlternatives = false;
-  state.restTimer.remaining = 0;
-  state.restTimer.running = false;
-  state.activeWorkout = {
-    planName: plan.planName,
-    dayName: day.name,
-    startedAt: new Date().toISOString(),
-    warmups: warmup ? [warmup] : [],
-    sessionNote: "",
-    index: 0,
-    entries: day.exercises.sort((a, b) => a.sortOrder - b.sortOrder).map(workoutEntryFromPlanned)
-  };
-  persistWorkoutDraft();
-  render();
+  openPreWorkoutReview(dayName);
 }
 
 function startSmartDay(dayName) {
@@ -7547,6 +7975,7 @@ function renderWorkout() {
       </header>
       <div class="progress"><span style="width:${progress}%"></span></div>
       ${renderWorkoutWarmupSummary(workout)}
+      ${renderWorkoutOverview(workout)}
       ${renderSessionCoachDuringCard(workout, entry, exercise)}
       <article class="card stack">
         <h2>${htmlesc(exercise.displayName)}</h2>
@@ -7582,6 +8011,32 @@ function renderWorkout() {
         <button class="secondary" data-cancel-workout>Training abbrechen</button>
       </div>
     </section>
+  `;
+}
+
+function renderWorkoutOverview(workout) {
+  return `
+    <details class="disclosure-card stack workout-overview" ${workout.overviewOpen ? "open" : ""}>
+      <summary><span>Workout-Übersicht</span><span class="badge blue">${workout.entries.length}</span></summary>
+      <div class="workout-overview-list">
+        ${workout.entries.map((entry, index) => {
+          const exercise = exerciseById(entry.exerciseId);
+          const completed = (entry.sets || []).filter((set) => set.completed).length;
+          const active = index === workout.index;
+          return `
+            <button class="list-button ${active ? "active" : ""}" data-jump-workout-exercise="${index}">
+              <article class="card row compact-training-day">
+                <div class="grow">
+                  <h3>${index + 1}. ${htmlesc(exercise?.displayName || entry.exerciseId)}</h3>
+                  <p class="muted">${completed}/${entry.sets.length} Sätze · ${htmlesc(entry.reps)} · ${entry.restSeconds} s</p>
+                </div>
+                <span class="badge ${active ? "green" : completed === entry.sets.length ? "blue" : ""}">${active ? "aktuell" : completed === entry.sets.length ? "fertig" : "offen"}</span>
+              </article>
+            </button>
+          `;
+        }).join("")}
+      </div>
+    </details>
   `;
 }
 
@@ -7775,8 +8230,23 @@ function allIncompleteWorkoutSets(workout) {
 function goToPreviousExercise() {
   const workout = state.activeWorkout;
   if (!workout || workout.index <= 0) return;
+  if (!handleIncompleteSetsBeforeLeaving(workout.entries[workout.index])) return;
   persistWorkoutDraft();
   workout.index -= 1;
+  state.showAlternatives = false;
+  state.restTimer.remaining = 0;
+  state.restTimer.running = false;
+  persistWorkoutDraft();
+  render();
+}
+
+function jumpToWorkoutExercise(index) {
+  const workout = state.activeWorkout;
+  const target = Number(index);
+  if (!workout || !Number.isInteger(target) || target < 0 || target >= workout.entries.length || target === workout.index) return;
+  if (!handleIncompleteSetsBeforeLeaving(workout.entries[workout.index])) return;
+  workout.index = target;
+  workout.overviewOpen = true;
   state.showAlternatives = false;
   state.restTimer.remaining = 0;
   state.restTimer.running = false;
@@ -7837,6 +8307,7 @@ function finishOrNext() {
     planId: activePlan()?.id || workout.planName,
     planName: workout.planName,
     planNameSnapshot: workout.planName,
+    dayId: workout.dayId || "",
     dayName: workout.dayName,
     dayNameSnapshot: workout.dayName,
     startedAt: workout.startedAt,
@@ -7937,6 +8408,344 @@ function renderSessionDetail(id) {
   `;
 }
 
+function defaultCustomPlanBuilderDraft() {
+  const now = new Date().toISOString();
+  return {
+    id: `custom_plan_builder_${Date.now()}`,
+    planName: "Eigener Plan",
+    goal: "Hypertrophie / Wiedereinstieg",
+    splitType: "custom",
+    maxDurationMinutes: 60,
+    constraints: {
+      lumbarFriendly: true,
+      maxExercisesPerDay: 6
+    },
+    days: [{
+      id: "custom_day_1",
+      name: "Tag 1",
+      focus: "",
+      maxDurationMinutes: 60,
+      exercises: []
+    }],
+    createdAt: now,
+    updatedAt: now
+  };
+}
+
+function currentCustomPlanBuilderDraft() {
+  const draft = storage.customPlanBuilderDraft;
+  if (draft?.days?.length) return draft;
+  return defaultCustomPlanBuilderDraft();
+}
+
+function saveCustomPlanBuilderDraft(draft) {
+  storage.customPlanBuilderDraft = {
+    ...draft,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function openCustomPlanBuilder() {
+  const draft = currentCustomPlanBuilderDraft();
+  saveCustomPlanBuilderDraft(draft);
+  state.customPlanBuilderOpen = true;
+  state.customPlanBuilderStep = state.customPlanBuilderStep || "basics";
+  state.customPlanBuilderSelectedDayId = state.customPlanBuilderSelectedDayId || draft.days[0]?.id || "";
+  state.tab = "plans";
+  render();
+}
+
+function customPlanBuilderSteps() {
+  return ["basics", "constraints", "days", "exercises", "preview"];
+}
+
+function customPlanBuilderStepLabel(step) {
+  return {
+    basics: "Plan",
+    constraints: "Vorgaben",
+    days: "Tage",
+    exercises: "Übungen",
+    preview: "Vorschau"
+  }[step] || step;
+}
+
+function selectedBuilderDay(draft) {
+  return draft.days.find((day) => day.id === state.customPlanBuilderSelectedDayId) || draft.days[0] || null;
+}
+
+function updateCustomPlanBuilderField(field, value) {
+  const draft = currentCustomPlanBuilderDraft();
+  if (field === "maxDurationMinutes") draft[field] = Math.max(20, parseInteger(value) || 60);
+  else draft[field] = value;
+  saveCustomPlanBuilderDraft(draft);
+}
+
+function updateCustomPlanBuilderConstraint(field, value) {
+  const draft = currentCustomPlanBuilderDraft();
+  draft.constraints = { ...(draft.constraints || {}) };
+  if (field === "lumbarFriendly") draft.constraints[field] = Boolean(value);
+  else draft.constraints[field] = Math.max(1, parseInteger(value) || 1);
+  saveCustomPlanBuilderDraft(draft);
+}
+
+function addCustomPlanBuilderDay() {
+  const draft = currentCustomPlanBuilderDraft();
+  const nextNumber = draft.days.length + 1;
+  const day = {
+    id: `custom_day_${Date.now()}`,
+    name: `Tag ${nextNumber}`,
+    focus: "",
+    maxDurationMinutes: Number(draft.maxDurationMinutes) || 60,
+    exercises: []
+  };
+  draft.days = [...draft.days, day];
+  state.customPlanBuilderSelectedDayId = day.id;
+  saveCustomPlanBuilderDraft(draft);
+  render();
+}
+
+function removeCustomPlanBuilderDay(dayId) {
+  const draft = currentCustomPlanBuilderDraft();
+  if (draft.days.length <= 1) return alert("Mindestens ein Trainingstag bleibt notwendig.");
+  draft.days = draft.days.filter((day) => day.id !== dayId);
+  state.customPlanBuilderSelectedDayId = draft.days[0]?.id || "";
+  saveCustomPlanBuilderDraft(draft);
+  render();
+}
+
+function updateCustomPlanBuilderDay(dayId, field, value) {
+  const draft = currentCustomPlanBuilderDraft();
+  draft.days = draft.days.map((day) => {
+    if (day.id !== dayId) return day;
+    return { ...day, [field]: field === "maxDurationMinutes" ? Math.max(20, parseInteger(value) || 60) : value };
+  });
+  saveCustomPlanBuilderDraft(draft);
+}
+
+function addExerciseToCustomPlanBuilder(exerciseId) {
+  const draft = currentCustomPlanBuilderDraft();
+  const day = selectedBuilderDay(draft);
+  const exercise = exerciseById(exerciseId);
+  if (!day || !exercise) return;
+  const maxExercises = Math.max(1, Number(draft.constraints?.maxExercisesPerDay) || 6);
+  if (day.exercises.length >= maxExercises) {
+    alert(`Maximal ${maxExercises} Übungen für diesen Tag.`);
+    return;
+  }
+  const entry = {
+    exerciseId,
+    sets: setPolicyDefaultForExercise(exercise, day.exercises.length, day.name, day.exercises.length < 2 ? "required" : "important"),
+    reps: exercise.defaultRepRange || "8-12",
+    restSeconds: exercise.defaultRestSeconds || 90,
+    priority: day.exercises.length < 2 ? "required" : "important",
+    sortOrder: day.exercises.length + 1
+  };
+  draft.days = draft.days.map((item) => item.id === day.id ? { ...item, exercises: [...item.exercises, entry] } : item);
+  saveCustomPlanBuilderDraft(draft);
+  render();
+}
+
+function removeExerciseFromCustomPlanBuilder(dayId, index) {
+  const draft = currentCustomPlanBuilderDraft();
+  draft.days = draft.days.map((day) => {
+    if (day.id !== dayId) return day;
+    const exercises = day.exercises.filter((_, itemIndex) => itemIndex !== Number(index)).map((entry, itemIndex) => ({ ...entry, sortOrder: itemIndex + 1 }));
+    return { ...day, exercises };
+  });
+  saveCustomPlanBuilderDraft(draft);
+  render();
+}
+
+function updateCustomPlanBuilderExercise(dayId, index, field, value) {
+  const draft = currentCustomPlanBuilderDraft();
+  draft.days = draft.days.map((day) => {
+    if (day.id !== dayId) return day;
+    const exercises = day.exercises.map((entry, itemIndex) => {
+      if (itemIndex !== Number(index)) return entry;
+      const numeric = ["sets", "restSeconds"].includes(field);
+      return { ...entry, [field]: numeric ? Math.max(field === "sets" ? 1 : 0, parseInteger(value) || (field === "sets" ? 1 : 90)) : value };
+    });
+    return { ...day, exercises };
+  });
+  saveCustomPlanBuilderDraft(draft);
+}
+
+function customPlanBuilderWarnings(draft) {
+  const warnings = [];
+  if (!draft.planName?.trim()) warnings.push("Planname fehlt.");
+  draft.days.forEach((day) => {
+    if (!day.exercises.length) warnings.push(`${day.name}: keine Übungen.`);
+    invalidPlannedExercises(day).forEach((entry) => warnings.push(`${day.name}: ${entry.exerciseId} fehlt in der Datenbank.`));
+  });
+  return warnings;
+}
+
+function planFromCustomBuilderDraft(draft) {
+  const now = Date.now();
+  return {
+    version: 1,
+    type: "training_plan",
+    id: `plan_custom_${now}`,
+    planName: draft.planName.trim() || `Eigener Plan ${new Date().toLocaleDateString("de-DE")}`,
+    description: "Manuell im D-Coach Plan Builder erstellt.",
+    goal: draft.goal || "Hypertrophie / Wiedereinstieg",
+    splitType: draft.splitType || "custom",
+    maxDurationMinutes: Number(draft.maxDurationMinutes) || 60,
+    createdBy: "user",
+    createdAt: new Date().toISOString(),
+    days: draft.days.map((day, dayIndex) => ({
+      id: day.id || `custom_day_${dayIndex + 1}`,
+      name: day.name || `Tag ${dayIndex + 1}`,
+      focus: day.focus || "",
+      maxDurationMinutes: Number(day.maxDurationMinutes) || Number(draft.maxDurationMinutes) || 60,
+      exercises: day.exercises.map((entry, index) => ({
+        ...normalizedPlannedExercise(entry, index),
+        sortOrder: index + 1
+      }))
+    }))
+  };
+}
+
+function saveCustomBuilderPlan({ activate = false } = {}) {
+  const draft = currentCustomPlanBuilderDraft();
+  const warnings = customPlanBuilderWarnings(draft);
+  if (warnings.length) {
+    alert(`Plan noch nicht speicherbar:\n${warnings.slice(0, 4).join("\n")}`);
+    return;
+  }
+  const plan = planFromCustomBuilderDraft(draft);
+  storage.customPlans = [...storage.customPlans.filter((item) => item.planName !== plan.planName), plan];
+  if (activate) storage.activePlanName = plan.planName;
+  state.customPlanBuilderOpen = false;
+  alert(activate ? "Eigener Plan gespeichert und aktiviert." : "Eigener Plan gespeichert.");
+  render();
+}
+
+function renderCustomPlanBuilder() {
+  if (!state.customPlanBuilderOpen) return "";
+  const draft = currentCustomPlanBuilderDraft();
+  const steps = customPlanBuilderSteps();
+  const step = steps.includes(state.customPlanBuilderStep) ? state.customPlanBuilderStep : "basics";
+  const selectedDay = selectedBuilderDay(draft);
+  const search = state.customPlanBuilderExerciseSearch.trim().toLowerCase();
+  const candidates = allExercises()
+    .filter((exercise) => !exercise.isArchived)
+    .filter((exercise) => !(draft.constraints?.lumbarFriendly && exercise.lumbarDiscSuitability === "avoidInitially"))
+    .filter((exercise) => {
+      const haystack = `${exercise.displayName} ${(exercise.tags || []).join(" ")} ${exercise.primaryMuscleGroups.join(" ")} ${exercise.secondaryMuscleGroups.join(" ")}`.toLowerCase();
+      return !search || haystack.includes(search);
+    })
+    .sort((a, b) => a.displayName.localeCompare(b.displayName, "de"))
+    .slice(0, 18);
+  const warnings = customPlanBuilderWarnings(draft);
+  return `
+    <article class="card stack custom-plan-builder" data-custom-plan-builder>
+      <div class="row">
+        <div class="grow">
+          <p class="muted">Plan Builder v6.18</p>
+          <h2>${htmlesc(customPlanBuilderStepLabel(step))}</h2>
+        </div>
+        <button class="secondary compact-button" data-close-custom-plan-builder>Schließen</button>
+      </div>
+      <div class="chip-row">
+        ${steps.map((item) => `<button class="chip ${item === step ? "active" : ""}" data-builder-step="${item}">${htmlesc(customPlanBuilderStepLabel(item))}</button>`).join("")}
+      </div>
+      ${step === "basics" ? `
+        <div class="stack">
+          <label class="field"><span>Planname</span><input class="input" value="${htmlesc(draft.planName)}" data-builder-field="planName"></label>
+          <label class="field"><span>Ziel</span><input class="input" value="${htmlesc(draft.goal)}" data-builder-field="goal"></label>
+          <label class="field"><span>Split</span><input class="input" value="${htmlesc(draft.splitType)}" data-builder-field="splitType"></label>
+          <label class="field"><span>Max. Minuten</span><input class="input" inputmode="numeric" value="${htmlesc(draft.maxDurationMinutes)}" data-builder-field="maxDurationMinutes"></label>
+        </div>
+      ` : ""}
+      ${step === "constraints" ? `
+        <div class="stack">
+          <label class="range-field"><span>LWS-freundlich filtern</span><input type="checkbox" ${draft.constraints?.lumbarFriendly ? "checked" : ""} data-builder-constraint="lumbarFriendly"></label>
+          <label class="field"><span>Max. Übungen pro Tag</span><input class="input" inputmode="numeric" value="${htmlesc(draft.constraints?.maxExercisesPerDay || 6)}" data-builder-constraint="maxExercisesPerDay"></label>
+        </div>
+      ` : ""}
+      ${step === "days" ? `
+        <div class="stack">
+          ${draft.days.map((day) => `
+            <article class="card stack compact-card">
+              <div class="row">
+                <strong class="grow">${htmlesc(day.name)}</strong>
+                <button class="danger compact-button" data-builder-remove-day="${htmlesc(day.id)}">Löschen</button>
+              </div>
+              <input class="input" value="${htmlesc(day.name)}" data-builder-day-field="name" data-builder-day-id="${htmlesc(day.id)}">
+              <input class="input" placeholder="Fokus, z.B. Pull" value="${htmlesc(day.focus || "")}" data-builder-day-field="focus" data-builder-day-id="${htmlesc(day.id)}">
+              <input class="input" inputmode="numeric" value="${htmlesc(day.maxDurationMinutes || draft.maxDurationMinutes)}" data-builder-day-field="maxDurationMinutes" data-builder-day-id="${htmlesc(day.id)}">
+            </article>
+          `).join("")}
+          <button class="secondary" data-builder-add-day>Trainingstag hinzufügen</button>
+        </div>
+      ` : ""}
+      ${step === "exercises" ? `
+        <div class="stack">
+          <div class="chip-row">
+            ${draft.days.map((day) => `<button class="chip ${selectedDay?.id === day.id ? "active" : ""}" data-builder-select-day="${htmlesc(day.id)}">${htmlesc(day.name)}</button>`).join("")}
+          </div>
+          ${selectedDay ? `
+            <h3>${htmlesc(selectedDay.name)}</h3>
+            ${selectedDay.exercises.length ? selectedDay.exercises.map((entry, index) => {
+              const exercise = exerciseById(entry.exerciseId);
+              return `
+                <article class="card stack compact-card">
+                  <div class="row">
+                    <strong class="grow">${htmlesc(exercise?.displayName || entry.exerciseId)}</strong>
+                    <button class="danger compact-button" data-builder-remove-exercise="${index}" data-builder-day-id="${htmlesc(selectedDay.id)}">Entfernen</button>
+                  </div>
+                  <div class="mini-grid">
+                    <input class="input" inputmode="numeric" value="${htmlesc(entry.sets)}" data-builder-exercise-field="sets" data-builder-exercise-index="${index}" data-builder-day-id="${htmlesc(selectedDay.id)}">
+                    <input class="input" value="${htmlesc(entry.reps)}" data-builder-exercise-field="reps" data-builder-exercise-index="${index}" data-builder-day-id="${htmlesc(selectedDay.id)}">
+                    <input class="input" inputmode="numeric" value="${htmlesc(entry.restSeconds)}" data-builder-exercise-field="restSeconds" data-builder-exercise-index="${index}" data-builder-day-id="${htmlesc(selectedDay.id)}">
+                  </div>
+                </article>
+              `;
+            }).join("") : `<p class="muted">Noch keine Übungen in diesem Tag.</p>`}
+            <input class="input" placeholder="Übung suchen" value="${htmlesc(state.customPlanBuilderExerciseSearch)}" data-builder-search>
+            <div class="training-day-list">
+              ${candidates.map((exercise) => `
+                <button class="list-button" data-builder-add-exercise="${htmlesc(exercise.id)}">
+                  <article class="card row compact-training-day">
+                    <div class="grow">
+                      <h3>${htmlesc(exercise.displayName)}</h3>
+                      <p class="muted">${htmlesc(exerciseListMuscleText(exercise))}</p>
+                    </div>
+                    ${lwsBadge(exercise.lumbarDiscSuitability)}
+                  </article>
+                </button>
+              `).join("")}
+            </div>
+          ` : `<p class="muted">Lege zuerst einen Trainingstag an.</p>`}
+        </div>
+      ` : ""}
+      ${step === "preview" ? `
+        <div class="stack">
+          ${warnings.length ? `<article class="warning compact-warning"><strong>Nicht speicherbar</strong><ul class="small-list">${warnings.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul></article>` : `<p class="green">Plan ist speicherbar.</p>`}
+          ${draft.days.map((day) => `
+            <article class="card stack compact-card">
+              <div class="row">
+                <h3 class="grow">${htmlesc(day.name)}</h3>
+                <span class="badge blue">${trainingDaySetCount(day)} Sätze</span>
+              </div>
+              ${renderPlannedExerciseList(day.exercises)}
+            </article>
+          `).join("")}
+          <div class="button-row">
+            <button class="primary" data-builder-save-plan data-builder-activate="true" ${warnings.length ? "disabled" : ""}>Speichern und aktivieren</button>
+            <button class="secondary" data-builder-save-plan ${warnings.length ? "disabled" : ""}>Nur speichern</button>
+          </div>
+        </div>
+      ` : ""}
+      <div class="button-row">
+        <button class="secondary" data-builder-save-draft>Entwurf speichern</button>
+        <button class="secondary" data-builder-discard>Entwurf verwerfen</button>
+      </div>
+    </article>
+  `;
+}
+
 function renderPlans() {
   const plans = availablePlans();
   const deletedCount = storage.deletedPlanNames.length;
@@ -7956,7 +8765,8 @@ function renderPlans() {
         </div>
         <div class="button-row">
           <button class="primary" ${active ? "data-start-training-flow" : "data-tab=\"training\""}>${active ? "Training starten" : "Plan ansehen"}</button>
-          <button class="secondary" data-generate-plan>Plan erstellen</button>
+          <button class="secondary" data-open-custom-plan-builder>Eigenen Plan erstellen</button>
+          <button class="secondary" data-generate-plan>Coach-Plan erstellen</button>
         </div>
         <details class="disclosure-card stack">
           <summary>
@@ -7970,6 +8780,7 @@ function renderPlans() {
       ${renderRecoveryFatigueCard("plans")}
       ${renderPlanOptimizerCard("plans")}
       ${renderLongTermProgressCard("plans")}
+      ${renderCustomPlanBuilder()}
       <article class="card stack">
         <h3>Plan teilen / importieren</h3>
         <p class="muted">${payload.length > qrLimit ? appText("qr.tooLarge", "Dieser Plan ist zu groß für QR. Bitte JSON-Export verwenden.") : "Kompakter Plan-Code für QR/Text-Import."}</p>
@@ -8826,6 +9637,7 @@ function createBackup() {
     scannedEquipmentMappings: storage.scannedEquipmentMappings,
     customPlans: storage.customPlans,
     customExercises: storage.customExercises,
+    customPlanBuilderDraft: storage.customPlanBuilderDraft,
     personalProfile: storage.personalProfile,
     coachFeedback: storage.coachFeedback,
     coachPlanProposals: storage.coachPlanProposals,
@@ -8937,6 +9749,7 @@ function importBackupFile(file) {
       storage.scannedEquipmentMappings = mergeScannedEquipmentMappings(storage.scannedEquipmentMappings, Array.isArray(backup.scannedEquipmentMappings) ? backup.scannedEquipmentMappings : []);
       storage.customPlans = mergeById(storage.customPlans, Array.isArray(backup.customPlans) ? backup.customPlans : []);
       storage.customExercises = mergeById(storage.customExercises, Array.isArray(backup.customExercises) ? backup.customExercises : []);
+      if (!storage.customPlanBuilderDraft && backup.customPlanBuilderDraft && typeof backup.customPlanBuilderDraft === "object") storage.customPlanBuilderDraft = backup.customPlanBuilderDraft;
       storage.coachFeedback = mergeById(storage.coachFeedback, Array.isArray(backup.coachFeedback) ? backup.coachFeedback : []);
       storage.coachPlanProposals = mergeById(storage.coachPlanProposals, Array.isArray(backup.coachPlanProposals) ? backup.coachPlanProposals : []);
       if (!storage.coachPlanUndo && backup.coachPlanUndo && typeof backup.coachPlanUndo === "object") storage.coachPlanUndo = backup.coachPlanUndo;
@@ -9103,6 +9916,26 @@ function bindEvents() {
     button.addEventListener("click", () => startDay(button.dataset.startDay));
   });
 
+  document.querySelectorAll("[data-start-day-id]").forEach((button) => {
+    button.addEventListener("click", () => startDay(button.dataset.startDayId));
+  });
+
+  document.querySelectorAll("[data-select-training-day]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.manualTrainingDayId = button.dataset.selectTrainingDay;
+      state.trainingDayError = null;
+      render();
+    });
+  });
+
+  document.querySelector("[data-confirm-workout-review]")?.addEventListener("click", confirmPreWorkoutReview);
+  document.querySelector("[data-cancel-workout-review]")?.addEventListener("click", cancelPreWorkoutReview);
+  document.querySelector("[data-clear-training-day-error]")?.addEventListener("click", () => {
+    state.trainingDayError = null;
+    render();
+  });
+  document.querySelector("[data-export-training-day-diagnostics]")?.addEventListener("click", exportTrainingDayDiagnostics);
+
   document.querySelectorAll("[data-start-smart-day]").forEach((button) => {
     button.addEventListener("click", () => startSmartDay(button.dataset.startSmartDay));
   });
@@ -9195,6 +10028,9 @@ function bindEvents() {
   });
 
   document.querySelector("[data-prev-exercise]")?.addEventListener("click", goToPreviousExercise);
+  document.querySelectorAll("[data-jump-workout-exercise]").forEach((button) => {
+    button.addEventListener("click", () => jumpToWorkoutExercise(button.dataset.jumpWorkoutExercise));
+  });
   document.querySelector("[data-next-exercise]")?.addEventListener("click", (event) => {
     event.currentTarget.disabled = true;
     finishOrNext();
@@ -9294,6 +10130,67 @@ function bindEvents() {
     } catch (error) {
       alert(error.message || "Plan konnte nicht importiert werden.");
     }
+  });
+
+  document.querySelector("[data-open-custom-plan-builder]")?.addEventListener("click", openCustomPlanBuilder);
+  document.querySelector("[data-close-custom-plan-builder]")?.addEventListener("click", () => {
+    state.customPlanBuilderOpen = false;
+    render();
+  });
+  document.querySelectorAll("[data-builder-step]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.customPlanBuilderStep = button.dataset.builderStep;
+      render();
+    });
+  });
+  document.querySelectorAll("[data-builder-field]").forEach((input) => {
+    input.addEventListener("input", () => updateCustomPlanBuilderField(input.dataset.builderField, input.value));
+  });
+  document.querySelectorAll("[data-builder-constraint]").forEach((input) => {
+    input.addEventListener("input", () => updateCustomPlanBuilderConstraint(input.dataset.builderConstraint, input.type === "checkbox" ? input.checked : input.value));
+    input.addEventListener("change", () => updateCustomPlanBuilderConstraint(input.dataset.builderConstraint, input.type === "checkbox" ? input.checked : input.value));
+  });
+  document.querySelector("[data-builder-add-day]")?.addEventListener("click", addCustomPlanBuilderDay);
+  document.querySelectorAll("[data-builder-remove-day]").forEach((button) => {
+    button.addEventListener("click", () => removeCustomPlanBuilderDay(button.dataset.builderRemoveDay));
+  });
+  document.querySelectorAll("[data-builder-day-field]").forEach((input) => {
+    input.addEventListener("input", () => updateCustomPlanBuilderDay(input.dataset.builderDayId, input.dataset.builderDayField, input.value));
+  });
+  document.querySelectorAll("[data-builder-select-day]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.customPlanBuilderSelectedDayId = button.dataset.builderSelectDay;
+      render();
+    });
+  });
+  document.querySelector("[data-builder-search]")?.addEventListener("input", (event) => {
+    state.customPlanBuilderExerciseSearch = event.target.value;
+    render();
+  });
+  document.querySelectorAll("[data-builder-add-exercise]").forEach((button) => {
+    button.addEventListener("click", () => addExerciseToCustomPlanBuilder(button.dataset.builderAddExercise));
+  });
+  document.querySelectorAll("[data-builder-remove-exercise]").forEach((button) => {
+    button.addEventListener("click", () => removeExerciseFromCustomPlanBuilder(button.dataset.builderDayId, button.dataset.builderRemoveExercise));
+  });
+  document.querySelectorAll("[data-builder-exercise-field]").forEach((input) => {
+    input.addEventListener("input", () => updateCustomPlanBuilderExercise(input.dataset.builderDayId, input.dataset.builderExerciseIndex, input.dataset.builderExerciseField, input.value));
+  });
+  document.querySelector("[data-builder-save-draft]")?.addEventListener("click", () => {
+    saveCustomPlanBuilderDraft(currentCustomPlanBuilderDraft());
+    alert("Planentwurf gespeichert.");
+  });
+  document.querySelectorAll("[data-builder-save-plan]").forEach((button) => {
+    button.addEventListener("click", () => saveCustomBuilderPlan({ activate: button.dataset.builderActivate === "true" }));
+  });
+  document.querySelector("[data-builder-discard]")?.addEventListener("click", () => {
+    if (!confirm("Planentwurf verwerfen?")) return;
+    storage.customPlanBuilderDraft = null;
+    state.customPlanBuilderOpen = false;
+    state.customPlanBuilderStep = "basics";
+    state.customPlanBuilderSelectedDayId = "";
+    state.customPlanBuilderExerciseSearch = "";
+    render();
   });
 
   document.querySelector("[data-generate-plan]")?.addEventListener("click", () => {
