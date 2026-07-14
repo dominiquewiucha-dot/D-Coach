@@ -1,0 +1,16 @@
+{
+  "version": "6.16.0",
+  "appVersion": "pwa-v67",
+  "backupFormat": "6.16.0",
+  "storageSchema": "6.7.0",
+  "cache": "dcoach-pwa-v67",
+  "newKeys": [
+    "dcoach.coachRecommendationHistory",
+    "dcoach.recommendationOutcomes",
+    "dcoach.coachContextFeedback",
+    "dcoach.coachConflictLog",
+    "dcoach.coachCalibrationState"
+  ],
+  "migrationType": "additive",
+  "privateFreeTextIncluded": false
+}

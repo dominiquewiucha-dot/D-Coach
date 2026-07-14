@@ -1,0 +1,18 @@
+{
+  "version": "6.16.0",
+  "results": ["positive", "neutral", "negative", "inconclusive"],
+  "evaluation": "Triggered after training finish for due pending or accepted recommendations.",
+  "inconclusiveReasons": [
+    "exercise changed",
+    "session incomplete",
+    "missing data",
+    "context differs too much"
+  ],
+  "learningLimits": {
+    "minimumEvaluableOutcomes": 3,
+    "maxAdjustmentPerOutcome": 0.03,
+    "contextMultiplierMin": 0.8,
+    "contextMultiplierMax": 1.2,
+    "singleOutcomeDominancePrevented": true
+  }
+}

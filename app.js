@@ -202,8 +202,8 @@
   route: null
 };
 
-const APP_VERSION = "pwa-v66";
-const BACKUP_FORMAT_VERSION = "6.15.1";
+const APP_VERSION = "pwa-v67";
+const BACKUP_FORMAT_VERSION = "6.16.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
@@ -221,6 +221,11 @@ const STORAGE_KEYS = [
   { key: "dcoach.coachFeedback", label: "Coach-Feedback", type: "array" },
   { key: "dcoach.coachPlanProposals", label: "Coach-Vorschlaege", type: "array" },
   { key: "dcoach.coachPlanUndo", label: "Coach-Undo", type: "object" },
+  { key: "dcoach.coachRecommendationHistory", label: "Coach-Empfehlungshistorie", type: "array" },
+  { key: "dcoach.recommendationOutcomes", label: "Coach-Outcome-Auswertung", type: "array" },
+  { key: "dcoach.coachContextFeedback", label: "Kontextbezogenes Coach-Feedback", type: "array" },
+  { key: "dcoach.coachConflictLog", label: "Coach-Konfliktlog", type: "array" },
+  { key: "dcoach.coachCalibrationState", label: "Coach-Kalibrierung", type: "object" },
   { key: "dcoach.dailyCheckins", label: "Daily Check-ins", type: "array" },
   { key: "dcoach.dailyCheckinDraft", label: "Daily Check-in Draft", type: "object" },
   { key: "dcoach.lastErrors", label: "Fehlerlog", type: "array" },
@@ -323,6 +328,40 @@ const storage = {
   set coachPlanUndo(value) {
     if (value) writeJson("dcoach.coachPlanUndo", value);
     else localStorage.removeItem("dcoach.coachPlanUndo");
+  },
+  get coachRecommendationHistory() {
+    return readJson("dcoach.coachRecommendationHistory", []);
+  },
+  set coachRecommendationHistory(value) {
+    const items = Array.isArray(value) ? value : [];
+    const open = items.filter((item) => ["pending", "accepted"].includes(item?.status));
+    const closed = items.filter((item) => !["pending", "accepted"].includes(item?.status)).slice(-120);
+    writeJson("dcoach.coachRecommendationHistory", [...closed, ...open].slice(-180));
+  },
+  get recommendationOutcomes() {
+    return readJson("dcoach.recommendationOutcomes", []);
+  },
+  set recommendationOutcomes(value) {
+    writeJson("dcoach.recommendationOutcomes", Array.isArray(value) ? value.slice(-180) : []);
+  },
+  get coachContextFeedback() {
+    return readJson("dcoach.coachContextFeedback", []);
+  },
+  set coachContextFeedback(value) {
+    writeJson("dcoach.coachContextFeedback", Array.isArray(value) ? value.slice(-220) : []);
+  },
+  get coachConflictLog() {
+    return readJson("dcoach.coachConflictLog", []);
+  },
+  set coachConflictLog(value) {
+    writeJson("dcoach.coachConflictLog", Array.isArray(value) ? value.slice(-120) : []);
+  },
+  get coachCalibrationState() {
+    return readJson("dcoach.coachCalibrationState", null);
+  },
+  set coachCalibrationState(value) {
+    if (value) writeJson("dcoach.coachCalibrationState", value);
+    else localStorage.removeItem("dcoach.coachCalibrationState");
   },
   get dailyCheckins() {
     return readJson("dcoach.dailyCheckins", []);
@@ -4700,6 +4739,445 @@ function coachLearningWeight(ruleId) {
   }, 0);
 }
 
+const COACH_QUALITY_FLAGS_V616 = [
+  "missing_reps",
+  "missing_weight",
+  "incomplete_set",
+  "skipped_exercise",
+  "outlier",
+  "exercise_mapping_missing",
+  "exercise_mapping_changed",
+  "plan_changed",
+  "long_training_gap",
+  "insufficient_comparable_sessions",
+  "missing_readiness",
+  "conflicting_units",
+  "stale_data",
+  "manual_correction_pending"
+];
+
+const COACH_CALIBRATION_CONFIG_V616 = {
+  version: "6.16.0",
+  qualityWeights: {
+    completeness: 0.30,
+    evidenceVolume: 0.20,
+    recency: 0.15,
+    mapping: 0.10,
+    planStability: 0.10,
+    readiness: 0.10,
+    outlierCleanliness: 0.05
+  },
+  confidenceWeights: {
+    evidenceQuality: 0.30,
+    outcomeHistory: 0.25,
+    performanceConsistency: 0.15,
+    ruleStability: 0.10,
+    contextSimilarity: 0.10,
+    conflictFreedom: 0.10
+  },
+  evidenceCaps: [
+    { sessions: 0, maxConfidence: 25 },
+    { sessions: 1, maxConfidence: 45 },
+    { sessions: 2, maxConfidence: 60 },
+    { sessionsMin: 3, sessionsMax: 5, maxConfidence: 75 },
+    { sessionsMin: 6, sessionsMax: 11, maxConfidence: 88 },
+    { sessionsMin: 12, maxConfidence: 95 }
+  ],
+  learning: {
+    minimumOutcomes: 3,
+    maxAdjustmentPerOutcome: 0.03,
+    contextMultiplierMin: 0.80,
+    contextMultiplierMax: 1.20
+  },
+  conflictPriority: [
+    "safety_pain",
+    "data_quality",
+    "recovery_fatigue",
+    "time_limit",
+    "plan_order",
+    "progression",
+    "muscle_balance",
+    "preferences",
+    "variation"
+  ]
+};
+
+function clampPercent(value) {
+  return Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
+}
+
+function average(values, fallback = 0) {
+  const clean = values.map(Number).filter(Number.isFinite);
+  return clean.length ? clean.reduce((sum, value) => sum + value, 0) / clean.length : fallback;
+}
+
+function coachConfidenceLabelV616(percent) {
+  if (percent <= 39) return "niedrig";
+  if (percent <= 64) return "mittel";
+  if (percent <= 84) return "hoch";
+  return "sehr hoch";
+}
+
+function comparableSessionsForContext(context = {}) {
+  const sessions = storage.sessions || [];
+  if (!context.exerciseId && !context.planDayId && !context.planId) return sessions.slice(-12);
+  return sessions.filter((session) => {
+    const sameDay = context.planDayId ? String(session.dayName || "") === String(context.planDayId) : true;
+    const samePlan = context.planId ? String(session.planId || session.planName || "") === String(context.planId) : true;
+    const hasExercise = context.exerciseId
+      ? (session.completedExercises || []).some((exercise) => exercise.exerciseId === context.exerciseId)
+      : true;
+    return sameDay && samePlan && hasExercise;
+  }).slice(-12);
+}
+
+function setHasMissingReps(set) {
+  const reps = Number(set.actualReps ?? set.reps);
+  return !Number.isFinite(reps) || reps <= 0;
+}
+
+function setHasMissingWeight(set) {
+  const weight = Number(set.actualWeightKg ?? set.weightKg);
+  return !Number.isFinite(weight) || weight < 0;
+}
+
+function completedEvidenceSets(sessions) {
+  return sessions.flatMap((session) => (session.completedExercises || []).flatMap((exercise) => (exercise.sets || []).map((set) => ({
+    ...set,
+    exerciseId: exercise.exerciseId,
+    sessionId: session.id,
+    sessionStartedAt: session.startedAt
+  }))));
+}
+
+function coachDataQualityForContext(context = {}) {
+  const flags = new Set();
+  const comparable = comparableSessionsForContext(context);
+  const allSets = completedEvidenceSets(comparable);
+  const completeSets = allSets.filter((set) => set.completed === true && !setHasMissingReps(set) && !setHasMissingWeight(set));
+  const incompleteSets = allSets.filter((set) => set.completed !== true || setHasMissingReps(set) || setHasMissingWeight(set));
+  if (incompleteSets.some((set) => setHasMissingReps(set))) flags.add("missing_reps");
+  if (incompleteSets.some((set) => setHasMissingWeight(set))) flags.add("missing_weight");
+  if (incompleteSets.length) flags.add("incomplete_set");
+  if (!context.exerciseId && activePlan()?.days?.length && !comparable.length) flags.add("insufficient_comparable_sessions");
+  if (context.exerciseId && !muscleMappingForExercise(context.exerciseId)) flags.add("exercise_mapping_missing");
+  if (comparable.length < 3) flags.add("insufficient_comparable_sessions");
+  const latest = comparable.map((session) => new Date(session.startedAt || session.completedAt || 0).getTime()).filter(Number.isFinite).sort((a, b) => b - a)[0] || 0;
+  const daysSinceLatest = latest ? (Date.now() - latest) / 86400000 : Infinity;
+  if (daysSinceLatest > 21) flags.add("stale_data");
+  if (daysSinceLatest > 14) flags.add("long_training_gap");
+  const readinessEntries = storage.dailyCheckins.filter((entry) => entry.status === "completed" || entry.status === "skipped");
+  if (!readinessEntries.length) flags.add("missing_readiness");
+  const volumes = comparable.map(sessionVolume).filter((value) => value > 0);
+  const avgVolume = average(volumes, 0);
+  const outliers = avgVolume ? volumes.filter((value) => value > avgVolume * 1.8 || value < avgVolume * 0.35).length : 0;
+  if (outliers) flags.add("outlier");
+  const completeness = allSets.length ? clampPercent((completeSets.length / allSets.length) * 100) : 0;
+  const evidenceVolume = clampPercent((comparable.length / 12) * 100);
+  const recencyScore = !latest ? 0 : clampPercent(100 - Math.min(100, daysSinceLatest * 4));
+  const mappingQuality = context.exerciseId ? (muscleMappingForExercise(context.exerciseId) ? 100 : 0) : 90;
+  const planStabilityScore = storage.sessions.slice(-6).some((session) => session.planName && session.planName !== storage.sessions.slice(-1)[0]?.planName) ? 64 : 100;
+  if (planStabilityScore < 80) flags.add("plan_changed");
+  const readinessAvailability = clampPercent((readinessEntries.length / Math.max(1, storage.sessions.length || 1)) * 100);
+  const outlierCleanliness = clampPercent(100 - (outliers / Math.max(1, volumes.length)) * 100);
+  const score = clampPercent(
+    completeness * COACH_CALIBRATION_CONFIG_V616.qualityWeights.completeness +
+    evidenceVolume * COACH_CALIBRATION_CONFIG_V616.qualityWeights.evidenceVolume +
+    recencyScore * COACH_CALIBRATION_CONFIG_V616.qualityWeights.recency +
+    mappingQuality * COACH_CALIBRATION_CONFIG_V616.qualityWeights.mapping +
+    planStabilityScore * COACH_CALIBRATION_CONFIG_V616.qualityWeights.planStability +
+    readinessAvailability * COACH_CALIBRATION_CONFIG_V616.qualityWeights.readiness +
+    outlierCleanliness * COACH_CALIBRATION_CONFIG_V616.qualityWeights.outlierCleanliness
+  );
+  const reasons = [
+    `${completeSets.length}/${allSets.length || 0} Saetze vollstaendig verwertbar.`,
+    `${comparable.length} vergleichbare Einheiten.`,
+    readinessEntries.length ? "Readiness-Daten vorhanden." : "Aktuelle Readiness-Daten fehlen."
+  ];
+  return {
+    score,
+    flags: [...flags].filter((flag) => COACH_QUALITY_FLAGS_V616.includes(flag)),
+    comparableSessionCount: comparable.length,
+    completeSetRatio: allSets.length ? Number((completeSets.length / allSets.length).toFixed(2)) : 0,
+    mappingQuality,
+    recencyScore,
+    planStabilityScore,
+    readinessAvailability,
+    outlierRatio: volumes.length ? Number((outliers / volumes.length).toFixed(2)) : 0,
+    reasons
+  };
+}
+
+function evidenceConfidenceCap(comparableSessionCount) {
+  const caps = COACH_CALIBRATION_CONFIG_V616.evidenceCaps;
+  const rule = caps.find((item) => Number.isFinite(item.sessions) && item.sessions === comparableSessionCount)
+    || caps.find((item) => comparableSessionCount >= (item.sessionsMin || 0) && comparableSessionCount <= (item.sessionsMax || Infinity));
+  return rule?.maxConfidence || 95;
+}
+
+function contextKeyForRecommendation(recommendation, context = {}) {
+  return [
+    recommendation?.ruleId || recommendation?.recommendationType || "coach",
+    context.exerciseId || recommendation?.exerciseId || "no_exercise",
+    context.muscleId || recommendation?.muscleId || "no_muscle",
+    context.planDayId || context.dayName || "no_day",
+    context.planId || activePlan()?.id || activePlan()?.planName || "no_plan",
+    context.recoveryClass || "recovery_unknown",
+    context.timeBudgetClass || "time_60"
+  ].join("|");
+}
+
+function outcomesForContextKey(contextKey) {
+  const historyIds = new Set(storage.coachRecommendationHistory.filter((item) => item.contextKey === contextKey).map((item) => item.id));
+  return storage.recommendationOutcomes.filter((outcome) => historyIds.has(outcome.recommendationId));
+}
+
+function coachCalibrationMultiplier(contextKey) {
+  const stateValue = storage.coachCalibrationState || {};
+  const multiplier = Number(stateValue.contextMultipliers?.[contextKey]);
+  return Number.isFinite(multiplier) ? Math.max(0.8, Math.min(1.2, multiplier)) : 1;
+}
+
+function performanceConsistencyScore(sessions) {
+  const volumes = sessions.map(sessionVolume).filter((value) => value > 0);
+  if (volumes.length < 2) return 45;
+  const changes = volumes.slice(1).map((value, index) => Math.abs(value - volumes[index]) / Math.max(1, volumes[index]));
+  return clampPercent(100 - average(changes, 0) * 100);
+}
+
+function coachConfidenceForRecommendation(recommendation, context = {}) {
+  const quality = coachDataQualityForContext(context);
+  const contextKey = contextKeyForRecommendation(recommendation, context);
+  const outcomes = outcomesForContextKey(contextKey).filter((item) => item.result !== "inconclusive");
+  const comparable = comparableSessionsForContext(context);
+  const unresolvedConflicts = (context.conflicts || []).filter((item) => item.unresolved);
+  const consistency = performanceConsistencyScore(comparable);
+  const outcomeScore = clampPercent((outcomes.filter((item) => item.result === "positive").length * 100 + outcomes.filter((item) => item.result === "neutral").length * 60) / Math.max(1, outcomes.length));
+  const ruleStability = clampPercent(85 * coachCalibrationMultiplier(contextKey));
+  const contextSimilarity = context.planChanged ? 45 : 80;
+  const conflictFreedom = unresolvedConflicts.length ? 20 : 100;
+  let raw = clampPercent(
+    quality.score * COACH_CALIBRATION_CONFIG_V616.confidenceWeights.evidenceQuality +
+    outcomeScore * COACH_CALIBRATION_CONFIG_V616.confidenceWeights.outcomeHistory +
+    consistency * COACH_CALIBRATION_CONFIG_V616.confidenceWeights.performanceConsistency +
+    ruleStability * COACH_CALIBRATION_CONFIG_V616.confidenceWeights.ruleStability +
+    contextSimilarity * COACH_CALIBRATION_CONFIG_V616.confidenceWeights.contextSimilarity +
+    conflictFreedom * COACH_CALIBRATION_CONFIG_V616.confidenceWeights.conflictFreedom
+  );
+  const limits = [];
+  const evidenceCap = evidenceConfidenceCap(quality.comparableSessionCount);
+  if (raw > evidenceCap) limits.push(`Evidenz-Cap: erst ${quality.comparableSessionCount} vergleichbare Einheiten.`);
+  raw = Math.min(raw, evidenceCap);
+  if (quality.flags.some((flag) => ["missing_reps", "missing_weight", "incomplete_set", "conflicting_units", "exercise_mapping_missing"].includes(flag))) {
+    raw = Math.min(raw, 39);
+    limits.push("Critical Quality Flag begrenzt Confidence.");
+  }
+  if (quality.flags.includes("missing_readiness") && String(recommendation?.ruleId || "").includes("recovery")) {
+    raw = Math.min(raw, 59);
+    limits.push("Recovery-Empfehlung ohne aktuelle Readiness begrenzt.");
+  }
+  if (quality.flags.includes("plan_changed")) {
+    raw = Math.min(raw, 64);
+    limits.push("Kuerzlicher Planwechsel begrenzt Confidence.");
+  }
+  if (quality.flags.includes("outlier") && quality.comparableSessionCount <= 1) {
+    raw = Math.min(raw, 45);
+    limits.push("Einzelne Ausreisserleistung begrenzt Confidence.");
+  }
+  if (unresolvedConflicts.length) {
+    raw = Math.min(raw, 39);
+    limits.push("Ungeloester Sicherheits- oder Prioritaetskonflikt.");
+  }
+  return {
+    percent: Math.min(95, clampPercent(raw)),
+    label: coachConfidenceLabelV616(raw),
+    limits,
+    dataQuality: quality,
+    contextKey
+  };
+}
+
+function coachHardGatesForProposal(proposal, quality = null) {
+  const gates = [];
+  const changeExerciseIds = (proposal?.proposedChanges || []).map((change) => change.exerciseId).filter(Boolean);
+  changeExerciseIds.forEach((exerciseId) => {
+    if (!exerciseById(exerciseId)) gates.push("Zieluebung existiert nicht mehr.");
+    if (!muscleMappingForExercise(exerciseId)) gates.push("Muskelmapping fehlt.");
+  });
+  if (!proposal?.currentPlanSnapshot || planFingerprint(activePlan()) !== proposal.currentPlanFingerprint) gates.push("Plan-Snapshot ist veraltet.");
+  const q = quality || coachDataQualityForContext({ exerciseId: changeExerciseIds[0] });
+  if (q.flags.includes("conflicting_units")) gates.push("Einheit oder Gewichtseinheit widerspruechlich.");
+  if (q.flags.includes("incomplete_set") && q.completeSetRatio === 0) gates.push("Empfehlung basiert nur auf unvollstaendigen Saetzen.");
+  if ((proposal?.riskNotes || []).some((item) => String(item).toLowerCase().includes("schmerz")) && q.flags.includes("missing_readiness")) gates.push("Sicherheits-/Schmerzkonflikt nicht aufgeloest.");
+  return [...new Set(gates)];
+}
+
+function upsertCoachRecommendationRecord(recommendation, context = {}) {
+  const calibration = coachConfidenceForRecommendation(recommendation, context);
+  const existing = storage.coachRecommendationHistory.find((item) => item.id === recommendation.id);
+  const now = new Date().toISOString();
+  const record = {
+    id: recommendation.id,
+    createdAt: existing?.createdAt || now,
+    updatedAt: now,
+    recommendationType: recommendation.ruleId || recommendation.scope || "coach",
+    contextKey: calibration.contextKey,
+    exerciseId: context.exerciseId || recommendation.exerciseId,
+    exerciseNameSnapshot: context.exerciseNameSnapshot || recommendation.exerciseNameSnapshot,
+    muscleId: context.muscleId || recommendation.muscleId,
+    planId: context.planId || activePlan()?.id || activePlan()?.planName,
+    planDayId: context.planDayId || context.dayName,
+    recommendationPayload: {
+      title: recommendation.title,
+      summary: recommendation.summary,
+      action: recommendation.action
+    },
+    baselineMetrics: {
+      sessions: storage.sessions.length,
+      weekSessions: sessionsSince(7).length,
+      dataQualityScore: calibration.dataQuality.score
+    },
+    dataQualityScore: calibration.dataQuality.score,
+    dataQualityFlags: calibration.dataQuality.flags,
+    confidenceAtCreation: calibration.percent,
+    status: existing?.status || "pending",
+    acceptedAt: existing?.acceptedAt,
+    rejectedAt: existing?.rejectedAt,
+    evaluationDueAfter: existing?.evaluationDueAfter || new Date(Date.now() + 86400000).toISOString(),
+    sourceRuleIds: [recommendation.ruleId].filter(Boolean)
+  };
+  storage.coachRecommendationHistory = [...storage.coachRecommendationHistory.filter((item) => item.id !== record.id), record];
+  return record;
+}
+
+function resolveCoachConflicts(candidates, context = {}) {
+  const priorityIndex = new Map(COACH_CALIBRATION_CONFIG_V616.conflictPriority.map((item, index) => [item, index]));
+  const ranked = [...candidates].sort((a, b) => (priorityIndex.get(a.priorityClass) ?? 99) - (priorityIndex.get(b.priorityClass) ?? 99) || (b.confidencePercent || 0) - (a.confidencePercent || 0));
+  const winner = ranked[0] || null;
+  const suppressed = ranked.slice(1);
+  const resolution = {
+    id: `conflict_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    createdAt: new Date().toISOString(),
+    candidateRecommendationIds: candidates.map((item) => item.id).filter(Boolean),
+    winnerId: winner?.id,
+    suppressedIds: suppressed.map((item) => item.id).filter(Boolean),
+    priorityReason: winner?.priorityClass || "none",
+    userExplanation: suppressed.length
+      ? [`${winner?.title || "Empfehlung"} hat Vorrang vor ${suppressed.map((item) => item.title).join(", ")}.`]
+      : ["Kein Konflikt zwischen Empfehlungen."],
+    unresolved: Boolean(context.unresolvedSafetyConflict)
+  };
+  storage.coachConflictLog = [...storage.coachConflictLog, resolution];
+  return resolution;
+}
+
+function estimateSessionDurationMinutesForPlan(day) {
+  const exercises = day?.exercises || [];
+  const setCount = exercises.reduce((sum, item) => sum + (Number(item.sets) || 0), 0);
+  return 10 + setCount * 3 + exercises.length * 2;
+}
+
+function coachTimeBudgetConflict(day, extraSetCount = 0) {
+  const limit = Number(currentUserSettings().maxWorkoutMinutes) || 60;
+  const estimate = estimateSessionDurationMinutesForPlan(day) + extraSetCount * 3;
+  return {
+    limit,
+    estimate,
+    conflict: estimate > limit,
+    explanation: estimate > limit
+      ? `Kein Zusatzvolumen: geschaetzte Gesamtdauer ${estimate} Minuten bei ${limit}-Minuten-Limit.`
+      : `Zeitbudget passt: geschaetzte ${estimate} von ${limit} Minuten.`
+  };
+}
+
+function evaluateRecommendationOutcome(record, session = lastSession()) {
+  if (!record || !session) return null;
+  const exerciseChanged = record.exerciseId && !(session.completedExercises || []).some((exercise) => exercise.exerciseId === record.exerciseId);
+  const incomplete = (session.completedExercises || []).some((exercise) => (exercise.sets || []).some((set) => set.completed !== true || setHasMissingReps(set)));
+  const beforeVolume = Number(record.baselineMetrics?.lastVolumeKg) || null;
+  const afterVolume = sessionVolume(session) || null;
+  let result = "neutral";
+  const reasons = [];
+  if (exerciseChanged || incomplete) {
+    result = "inconclusive";
+    if (exerciseChanged) reasons.push("Uebung wurde gewechselt.");
+    if (incomplete) reasons.push("Session enthaelt unvollstaendige Saetze.");
+  } else if (afterVolume && beforeVolume && afterVolume > beforeVolume * 1.03) {
+    result = "positive";
+    reasons.push("Leistung oder Volumen nach Empfehlung verbessert.");
+  } else if (afterVolume && beforeVolume && afterVolume < beforeVolume * 0.85) {
+    result = "negative";
+    reasons.push("Leistung nach Empfehlung deutlich niedriger.");
+  } else {
+    reasons.push("Keine klare positive oder negative Veraenderung.");
+  }
+  const outcome = {
+    recommendationId: record.id,
+    evaluatedAt: new Date().toISOString(),
+    result,
+    metricsBefore: { volumeKg: beforeVolume },
+    metricsAfter: { volumeKg: afterVolume },
+    reasons,
+    painChange: null,
+    completionImpact: incomplete ? -1 : 0,
+    timeBudgetMet: null
+  };
+  storage.recommendationOutcomes = [...storage.recommendationOutcomes, outcome];
+  storage.coachRecommendationHistory = storage.coachRecommendationHistory.map((item) => item.id === record.id ? { ...item, status: "evaluated", updatedAt: outcome.evaluatedAt } : item);
+  updateCoachCalibrationFromOutcome(record.contextKey, outcome);
+  return outcome;
+}
+
+function evaluateDueCoachRecommendations(session) {
+  const due = storage.coachRecommendationHistory.filter((record) => {
+    if (!["accepted", "pending"].includes(record.status)) return false;
+    if (!record.evaluationDueAfter) return true;
+    return new Date(record.evaluationDueAfter).getTime() <= Date.now();
+  }).slice(0, 6);
+  due.forEach((record) => evaluateRecommendationOutcome(record, session));
+}
+
+function updateCoachCalibrationFromOutcome(contextKey, outcome) {
+  if (!contextKey || !outcome || outcome.result === "inconclusive") return;
+  const stateValue = storage.coachCalibrationState || { version: "6.16.0", contextMultipliers: {}, safetyFlags: {}, updatedAt: null };
+  const relevant = outcomesForContextKey(contextKey).filter((item) => item.result !== "inconclusive");
+  if (relevant.length < COACH_CALIBRATION_CONFIG_V616.learning.minimumOutcomes) {
+    storage.coachCalibrationState = { ...stateValue, version: "6.16.0", updatedAt: new Date().toISOString() };
+    return;
+  }
+  const direction = outcome.result === "positive" ? 1 : outcome.result === "negative" ? -1 : 0;
+  const previous = Number(stateValue.contextMultipliers?.[contextKey]) || 1;
+  const next = Math.max(
+    COACH_CALIBRATION_CONFIG_V616.learning.contextMultiplierMin,
+    Math.min(COACH_CALIBRATION_CONFIG_V616.learning.contextMultiplierMax, previous + direction * COACH_CALIBRATION_CONFIG_V616.learning.maxAdjustmentPerOutcome)
+  );
+  storage.coachCalibrationState = {
+    ...stateValue,
+    version: "6.16.0",
+    contextMultipliers: { ...(stateValue.contextMultipliers || {}), [contextKey]: Number(next.toFixed(2)) },
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function coachExplanationForRecommendation(recommendation, context = {}) {
+  const calibration = coachConfidenceForRecommendation(recommendation, context);
+  return {
+    recommendation: recommendation.title || recommendation.action || "Training sauber fortsetzen",
+    why: recommendation.why || [],
+    confidencePercent: calibration.percent,
+    confidenceLabel: calibration.label,
+    confidenceLimits: calibration.limits,
+    dataQualityScore: calibration.dataQuality.score,
+    dataQualityFlags: calibration.dataQuality.flags,
+    evidenceUsed: recommendation.evidence || calibration.dataQuality.reasons,
+    evidenceMissing: calibration.dataQuality.flags.includes("missing_readiness") ? ["Aktuelle Readiness fehlt."] : [],
+    conflicts: (context.conflicts || []).flatMap((item) => item.userExplanation || []),
+    safetyNotes: recommendation.requiresConfirmation ? ["Aenderung erst nach bewusster Pruefung uebernehmen."] : [],
+    predictedEffect: recommendation.action || "",
+    nextEvaluation: "Nach der naechsten vergleichbaren Einheit."
+  };
+}
+
 function smartCoachInputData() {
   const weekSessions = sessionsSince(7);
   const latestSession = lastSession();
@@ -4845,6 +5323,20 @@ function smartCoachRecommendation() {
   }
 
   const winner = candidates.sort((a, b) => b.priority - a.priority || b.confidencePercent - a.confidencePercent)[0];
+  const suppressed = candidates.filter((item) => item !== winner);
+  const conflictResolution = suppressed.length
+    ? {
+      id: `preview_conflict_${winner.ruleId}`,
+      userExplanation: suppressed.map((item) => `${item.title} wird aktuell nachrangig behandelt.`),
+      unresolved: false
+    }
+    : null;
+  const context = {
+    planId: plan?.id || plan?.planName,
+    planDayId: nextDay?.name,
+    conflicts: conflictResolution ? [conflictResolution] : []
+  };
+  const calibration = coachConfidenceForRecommendation(winner, context);
   return {
     id: `smart-coach-${winner.ruleId}`,
     scope: winner.scope,
@@ -4852,7 +5344,11 @@ function smartCoachRecommendation() {
     summary: winner.summary,
     action: winner.action,
     affectedMuscles: winner.affectedMuscles || [],
-    confidencePercent: Math.max(0, Math.min(95, Math.round(winner.confidencePercent || 0))),
+    confidencePercent: Math.min(Math.max(0, Math.min(95, Math.round(winner.confidencePercent || 0))), calibration.percent),
+    confidenceLabel: calibration.label,
+    confidenceLimits: calibration.limits,
+    dataQuality: calibration.dataQuality,
+    contextKey: calibration.contextKey,
     why: winner.why || [],
     evidence: winner.evidence || [],
     alternatives: winner.alternatives || [],
@@ -4924,6 +5420,10 @@ function coachRecommendationSummaryV54() {
     recommendation: smart.title,
     mainReason: smart.summary,
     confidence: smart.confidencePercent,
+    confidenceLabel: smart.confidenceLabel || coachConfidenceLabelV616(smart.confidencePercent),
+    confidenceLimits: smart.confidenceLimits || [],
+    dataQuality: smart.dataQuality || coachDataQualityForContext({}),
+    contextKey: smart.contextKey || contextKeyForRecommendation(smart, {}),
     affected: smart.affectedMuscles.length
       ? smart.affectedMuscles.map((name) => coverageByName.get(name) || { name, percent: 0 })
       : affected,
@@ -4985,7 +5485,7 @@ function buildCoachPlanProposal() {
   const current = weak?.percent ?? null;
   const target = Math.max(70, current || 70);
   const predicted = current === null ? null : Math.min(100, Math.max(target, current + 18));
-  return {
+  const baseProposal = {
     id: `proposal_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     createdAt: new Date().toISOString(),
     scope: "exercise",
@@ -5013,11 +5513,52 @@ function buildCoachPlanProposal() {
     requiresConfirmation: true,
     status: "pending"
   };
+  const quality = coachDataQualityForContext({ exerciseId: change?.exerciseId, muscleId: weak?.muscleId, planDayId: change?.dayName, planId: plan?.id || plan?.planName });
+  const calibration = coachConfidenceForRecommendation({
+    id: baseProposal.id,
+    ruleId: "coach_plan_proposal_review",
+    title: baseProposal.title,
+    summary: baseProposal.summary,
+    action: baseProposal.summary,
+    confidencePercent: summary.confidence
+  }, { exerciseId: change?.exerciseId, muscleId: weak?.muscleId, planDayId: change?.dayName, planId: plan?.id || plan?.planName });
+  const hardGates = coachHardGatesForProposal(baseProposal, quality);
+  return {
+    ...baseProposal,
+    dataQualityScore: quality.score,
+    dataQualityFlags: quality.flags,
+    confidencePercent: Math.min(summary.confidence, calibration.percent),
+    confidenceLabel: calibration.label,
+    confidenceLimits: calibration.limits,
+    hardGates,
+    contextKey: calibration.contextKey,
+    outcomeEvaluationDueAfter: new Date(Date.now() + 86400000).toISOString()
+  };
 }
 
 function openCoachProposalReview() {
   const proposal = buildCoachPlanProposal();
+  const conflict = resolveCoachConflicts([
+    { id: proposal.id, title: proposal.title, priorityClass: proposal.hardGates?.length ? "data_quality" : "progression", confidencePercent: proposal.confidencePercent },
+    { id: "time_budget_guard", title: "Zeitbudget schuetzen", priorityClass: coachTimeBudgetConflict(activePlan()?.days?.find((day) => day.name === proposal.proposedChanges?.[0]?.dayName), 1).conflict ? "time_limit" : "preferences", confidencePercent: 70 }
+  ], { unresolvedSafetyConflict: proposal.hardGates?.some((item) => item.includes("Schmerz")) });
+  proposal.conflictResolutionId = conflict.id;
   storage.coachPlanProposals = [...storage.coachPlanProposals, proposal];
+  upsertCoachRecommendationRecord({
+    id: proposal.id,
+    ruleId: "coach_plan_proposal_review",
+    scope: "exercise",
+    title: proposal.title,
+    summary: proposal.summary,
+    action: proposal.summary,
+    confidencePercent: proposal.confidencePercent
+  }, {
+    exerciseId: proposal.proposedChanges?.[0]?.exerciseId,
+    exerciseNameSnapshot: proposal.proposedChanges?.[0]?.exerciseNameSnapshot,
+    muscleId: proposal.affectedMuscles?.[0]?.muscleId,
+    planDayId: proposal.proposedChanges?.[0]?.dayName,
+    planId: activePlan()?.id || activePlan()?.planName
+  });
   state.activeCoachProposalId = proposal.id;
   state.showProposalAlternative = false;
   render();
@@ -5028,7 +5569,7 @@ function activeCoachProposal() {
 }
 
 function proposalCanApply(proposal) {
-  return Boolean(proposal?.currentPlanSnapshot && proposal?.proposedChanges?.length && proposal.proposedChanges.every((change) => change.type && change.exerciseId));
+  return Boolean(proposal?.currentPlanSnapshot && proposal?.proposedChanges?.length && proposal.proposedChanges.every((change) => change.type && change.exerciseId) && !(proposal.hardGates || []).length);
 }
 
 function applyCoachPlanProposal() {
@@ -5063,6 +5604,7 @@ function applyCoachPlanProposal() {
   storage.activePlanName = nextPlan.planName;
   storage.coachPlanUndo = previous;
   storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === proposal.id ? { ...item, status: "accepted", appliedAt: new Date().toISOString() } : item);
+  storage.coachRecommendationHistory = storage.coachRecommendationHistory.map((item) => item.id === proposal.id ? { ...item, status: "accepted", acceptedAt: new Date().toISOString(), updatedAt: new Date().toISOString() } : item);
   render();
 }
 
@@ -5070,11 +5612,22 @@ function rejectCoachPlanProposal() {
   const proposal = activeCoachProposal();
   if (!proposal) return;
   storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === proposal.id ? { ...item, status: "rejected", rejectedAt: new Date().toISOString() } : item);
+  storage.coachRecommendationHistory = storage.coachRecommendationHistory.map((item) => item.id === proposal.id ? { ...item, status: "rejected", rejectedAt: new Date().toISOString(), updatedAt: new Date().toISOString() } : item);
   storage.coachFeedback = [...storage.coachFeedback, {
     id: `coach_feedback_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     recommendationId: proposal.id,
     ruleId: "coach_plan_proposal_review",
     feedbackType: "notHelpful",
+    timestamp: new Date().toISOString()
+  }];
+  storage.coachContextFeedback = [...storage.coachContextFeedback, {
+    id: `coach_context_feedback_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    recommendationId: proposal.id,
+    contextKey: proposal.contextKey,
+    feedbackType: "notHelpful",
+    category: "Empfehlung unklar",
+    exerciseId: proposal.proposedChanges?.[0]?.exerciseId || null,
+    muscleId: proposal.affectedMuscles?.[0]?.muscleId || null,
     timestamp: new Date().toISOString()
   }];
   state.activeCoachProposalId = "";
@@ -5094,6 +5647,7 @@ function undoCoachPlanProposal() {
   storage.customPlans = undo.customPlans || [];
   storage.activePlanName = undo.activePlanName || undo.planSnapshot?.planName || "";
   storage.coachPlanProposals = storage.coachPlanProposals.map((item) => item.id === undo.proposalId ? { ...item, status: "reverted", revertedAt: new Date().toISOString() } : item);
+  storage.coachRecommendationHistory = storage.coachRecommendationHistory.map((item) => item.id === undo.proposalId ? { ...item, status: "reverted", updatedAt: new Date().toISOString() } : item);
   storage.coachPlanUndo = null;
   state.activeCoachProposalId = "";
   ensureActivePlan();
@@ -5105,7 +5659,8 @@ function renderCoachProposalReview() {
   if (!proposal) return "";
   const canApply = proposalCanApply(proposal) && proposal.status === "pending";
   const undo = storage.coachPlanUndo?.proposalId === proposal.id;
-  const confidence = proposal.prediction?.confidencePercent ?? 0;
+  const confidence = proposal.confidencePercent ?? proposal.prediction?.confidencePercent ?? 0;
+  const conflict = storage.coachConflictLog.find((item) => item.id === proposal.conflictResolutionId);
   return `
     <div class="proposal-backdrop" role="dialog" aria-modal="true" aria-label="Coach Vorschlag pruefen">
       <section class="proposal-sheet stack">
@@ -5143,16 +5698,30 @@ function renderCoachProposalReview() {
         <article class="proposal-block">
           <div class="row">
             <h3 class="grow">Confidence</h3>
-            <span class="badge blue">${confidence}% ${htmlesc(confidenceBand(confidence))}</span>
+            <span class="badge blue">${confidence}% ${htmlesc(proposal.confidenceLabel || confidenceBand(confidence))}</span>
           </div>
           <div class="confidence-bar"><span style="width:${confidence}%"></span></div>
+          ${(proposal.confidenceLimits || []).length ? `<ul class="small-list">${proposal.confidenceLimits.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
+        </article>
+        <article class="proposal-block">
+          <div class="row">
+            <h3 class="grow">Datenqualitaet</h3>
+            <span class="badge ${proposal.dataQualityScore >= 70 ? "green" : proposal.dataQualityScore >= 40 ? "amber" : "red"}">${proposal.dataQualityScore ?? 0}/100</span>
+          </div>
+          ${(proposal.dataQualityFlags || []).length ? `<p class="quiet">Flags: ${proposal.dataQualityFlags.map(htmlesc).join(", ")}</p>` : `<p class="quiet">Keine kritischen Quality Flags.</p>`}
+          ${(proposal.hardGates || []).length ? `<ul class="small-list">${proposal.hardGates.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
+        </article>
+        ${conflict ? `<article class="proposal-block"><h3>Konfliktresolver</h3><ul class="small-list">${conflict.userExplanation.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul></article>` : ""}
+        <article class="proposal-block">
+          <h3>Naechste Auswertung</h3>
+          <p class="muted">Outcome wird nach der naechsten vergleichbaren Einheit bewertet. Unvollstaendige oder stark abweichende Einheiten werden inconclusive.</p>
         </article>
         <article class="proposal-block">
           <h3>Sicherheit</h3>
           <ul class="small-list">${(proposal.riskNotes || []).map((item) => `<li>${htmlesc(item)}</li>`).join("") || "<li>Keine zusaetzlichen Hinweise.</li>"}</ul>
         </article>
         ${state.showProposalAlternative ? `<article class="proposal-block"><h3>Alternative</h3>${(proposal.alternatives || []).map((item) => `<p class="muted"><strong>${htmlesc(item.title || "Alternative")}</strong><br>${htmlesc(item.summary || item)}</p>`).join("") || `<p class="muted">Keine Alternative hinterlegt.</p>`}</article>` : ""}
-        ${!canApply && proposal.status === "pending" ? `<p class="warning compact-warning">Uebernehmen ist deaktiviert, weil der Vorschlag unvollstaendig ist oder der Plan nicht mehr passt.</p>` : ""}
+        ${!canApply && proposal.status === "pending" ? `<p class="warning compact-warning">Uebernehmen ist deaktiviert, weil Hard Gates offen sind, der Vorschlag unvollstaendig ist oder der Plan nicht mehr passt.</p>` : ""}
         <div class="proposal-actions">
           <button class="primary" data-apply-coach-proposal ${canApply ? "" : "disabled"}>Aenderung uebernehmen</button>
           <button class="secondary" data-show-proposal-alternative>Alternative anzeigen</button>
@@ -5196,7 +5765,7 @@ function renderCoachDashboardV54() {
             <p class="muted">Smart Coach Â· offline</p>
             <h2>${htmlesc(summary.recommendation)}</h2>
           </div>
-          <span class="badge ${summary.confidence >= 75 ? "green" : "amber"}">${summary.confidence}%</span>
+          <span class="badge ${summary.confidence >= 75 ? "green" : "amber"}">${summary.confidence}% ${htmlesc(summary.confidenceLabel)}</span>
         </div>
         <p class="muted">${htmlesc(summary.mainReason)}</p>
         <div class="coach-action-row">
@@ -5206,7 +5775,9 @@ function renderCoachDashboardV54() {
         <details>
           <summary>${htmlesc(coachDashboardText("why", "Warum?"))}</summary>
           <ul class="small-list">${summary.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
+          ${summary.confidenceLimits.length ? `<h4>Begrenzt durch</h4><ul class="small-list">${summary.confidenceLimits.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
         </details>
+        <p class="quiet">Datenqualitaet: ${summary.dataQuality.score}/100${summary.dataQuality.flags.length ? ` - ${summary.dataQuality.flags.map(htmlesc).join(", ")}` : ""}</p>
         <p class="quiet">${htmlesc(coachDashboardText("notAutomatic", "Aenderungen werden erst nach deiner Bestaetigung uebernommen."))}</p>
         ${currentUserSettings().debugMode ? `<p class="quiet">Regel: ${htmlesc(summary.smart.ruleId)}</p>` : ""}
         ${renderCoachFeedbackControls(summary.smart.id, summary.smart.ruleId)}
@@ -6149,6 +6720,101 @@ function renderDashboard() {
   `;
 }
 
+function renderCoachCalibrationCard() {
+  const smart = smartCoachRecommendationSafe();
+  const explanation = coachExplanationForRecommendation(smart, { planId: activePlan()?.id || activePlan()?.planName, planDayId: nextPlanDayAfterLastSession(activePlan())?.name });
+  return `
+    <article class="card stack">
+      <div class="row">
+        <h3 class="grow">Coach-Kalibrierung</h3>
+        <span class="badge ${explanation.confidencePercent >= 65 ? "green" : explanation.confidencePercent >= 40 ? "amber" : "red"}">${explanation.confidencePercent}% ${htmlesc(explanation.confidenceLabel)}</span>
+      </div>
+      <p class="muted">${htmlesc(explanation.recommendation)}</p>
+      <div class="confidence-bar"><span style="width:${explanation.confidencePercent}%"></span></div>
+      <div class="mini-grid">
+        <div><span>Datenqualitaet</span><strong>${explanation.dataQualityScore}/100</strong></div>
+        <div><span>History</span><strong>${storage.coachRecommendationHistory.length}</strong></div>
+        <div><span>Outcomes</span><strong>${storage.recommendationOutcomes.length}</strong></div>
+      </div>
+      ${explanation.confidenceLimits.length ? `<h4>Begrenzt durch</h4><ul class="small-list">${explanation.confidenceLimits.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
+      ${explanation.dataQualityFlags.length ? `<p class="quiet">Quality Flags: ${explanation.dataQualityFlags.map(htmlesc).join(", ")}</p>` : `<p class="quiet">Keine kritischen Quality Flags.</p>`}
+    </article>
+  `;
+}
+
+function renderCoachRecommendationHistoryCard() {
+  const history = [...storage.coachRecommendationHistory].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
+  return `
+    <article class="card stack">
+      <div class="row">
+        <h3 class="grow">Empfehlungshistorie</h3>
+        <span class="badge blue">${storage.coachRecommendationHistory.length}</span>
+      </div>
+      ${history.length ? history.map((item) => {
+        const outcome = storage.recommendationOutcomes.find((entry) => entry.recommendationId === item.id);
+        return `
+          <div class="history-row">
+            <div>
+              <strong>${htmlesc(item.recommendationPayload?.title || item.recommendationType)}</strong>
+              <p class="muted">${dateText(item.createdAt)} - ${htmlesc(item.status)}${outcome ? ` - ${htmlesc(outcome.result)}` : ""}</p>
+              <p class="quiet">Naechste Bewertung: ${item.evaluationDueAfter ? dateText(item.evaluationDueAfter) : "-"}</p>
+            </div>
+            <span class="badge ${item.confidenceAtCreation >= 65 ? "green" : item.confidenceAtCreation >= 40 ? "amber" : "red"}">${item.confidenceAtCreation}%</span>
+          </div>
+        `;
+      }).join("") : `<p class="muted">Noch keine gepruefte Empfehlung gespeichert.</p>`}
+    </article>
+  `;
+}
+
+function renderCoachOutcomeLearningCard() {
+  const outcomes = [...storage.recommendationOutcomes].sort((a, b) => new Date(b.evaluatedAt) - new Date(a.evaluatedAt)).slice(0, 5);
+  const calibration = storage.coachCalibrationState || { contextMultipliers: {} };
+  const multipliers = Object.entries(calibration.contextMultipliers || {}).slice(0, 4);
+  return `
+    <article class="card stack">
+      <div class="row">
+        <h3 class="grow">Outcome Learning</h3>
+        <span class="badge blue">max +/-0,03</span>
+      </div>
+      <p class="muted">Lernen wirkt erst ab 3 auswertbaren Outcomes je Kontext. Multiplikatoren bleiben zwischen 0,80 und 1,20.</p>
+      ${outcomes.length ? `<ul class="small-list">${outcomes.map((item) => `<li>${dateText(item.evaluatedAt)}: ${htmlesc(item.result)} - ${htmlesc((item.reasons || [])[0] || "bewertet")}</li>`).join("")}</ul>` : `<p class="quiet">Noch keine Outcome-Auswertung.</p>`}
+      ${multipliers.length ? `<h4>Gelernte Kontexte</h4><ul class="small-list">${multipliers.map(([key, value]) => `<li>${htmlesc(key.split("|").slice(0, 3).join(" / "))}: ${value}</li>`).join("")}</ul>` : ""}
+    </article>
+  `;
+}
+
+function renderCoachConflictCard() {
+  const conflicts = [...storage.coachConflictLog].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+  const day = nextPlanDayAfterLastSession(activePlan());
+  const time = coachTimeBudgetConflict(day, 1);
+  return `
+    <article class="card stack">
+      <div class="row">
+        <h3 class="grow">Konflikte & Zeitbudget</h3>
+        <span class="badge ${time.conflict ? "amber" : "green"}">${time.limit} min</span>
+      </div>
+      <p class="muted">${htmlesc(time.explanation)}</p>
+      ${conflicts.length ? `<ul class="small-list">${conflicts.map((item) => `<li>${htmlesc(item.priorityReason)}: ${htmlesc((item.userExplanation || [])[0] || "Konflikt geloest.")}</li>`).join("")}</ul>` : `<p class="quiet">Noch kein persistierter Coach-Konflikt.</p>`}
+      <p class="quiet">Prioritaet: Sicherheit, Datenqualitaet, Recovery, Zeitlimit, Planreihenfolge, Progression, Muskelbalance, Praeferenzen, Variation.</p>
+    </article>
+  `;
+}
+
+function renderCoachContextFeedbackCard() {
+  const feedback = [...storage.coachContextFeedback].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
+  return `
+    <article class="card stack">
+      <div class="row">
+        <h3 class="grow">Kontext-Feedback</h3>
+        <span class="badge blue">${storage.coachContextFeedback.length}</span>
+      </div>
+      <p class="muted">Feedback wirkt nur im passenden Kontext aus Uebung, Muskel, Trainingstag, Empfehlungstyp, Geraet, Recovery und Zeitbudget.</p>
+      ${feedback.length ? `<ul class="small-list">${feedback.map((item) => `<li>${dateText(item.timestamp)}: ${htmlesc(item.feedbackType)} - ${htmlesc(item.contextKey || "Kontext")}</li>`).join("")}</ul>` : `<p class="quiet">Noch kein Kontext-Feedback gespeichert.</p>`}
+    </article>
+  `;
+}
+
 function renderCoach() {
   const session = lastSession();
   const readiness = readinessForJournal(journalEntryForDate(todayIsoDate()) || latestJournalEntry());
@@ -6158,6 +6824,11 @@ function renderCoach() {
       <section class="screen stack">
         <header><h1 class="title">Coach</h1><p class="subtitle">Auswertung nach dem Training.</p></header>
         ${renderCoachDashboardV54()}
+        ${renderCoachCalibrationCard()}
+        ${renderCoachRecommendationHistoryCard()}
+        ${renderCoachOutcomeLearningCard()}
+        ${renderCoachConflictCard()}
+        ${renderCoachContextFeedbackCard()}
         ${renderWeeklyCoachCard()}
         ${renderPlateauCoachCard()}
         ${renderDeloadCoachCard()}
@@ -6183,6 +6854,11 @@ function renderCoach() {
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
       ${renderSessionCoachAfterCard(session)}
+      ${renderCoachCalibrationCard()}
+      ${renderCoachRecommendationHistoryCard()}
+      ${renderCoachOutcomeLearningCard()}
+      ${renderCoachConflictCard()}
+      ${renderCoachContextFeedbackCard()}
       ${renderWeeklyCoachCard()}
       ${renderIntelligenceCoreCard("coach")}
       ${renderRecoveryFatigueCard("coach")}
@@ -6952,6 +7628,7 @@ function finishOrNext() {
     })
   };
   storage.sessions = [...storage.sessions, session];
+  evaluateDueCoachRecommendations(session);
   clearWorkoutDraft();
   state.activeWorkout = null;
   state.showAlternatives = false;
@@ -7802,6 +8479,11 @@ function createBackup() {
     coachFeedback: storage.coachFeedback,
     coachPlanProposals: storage.coachPlanProposals,
     coachPlanUndo: storage.coachPlanUndo,
+    coachRecommendationHistory: storage.coachRecommendationHistory,
+    recommendationOutcomes: storage.recommendationOutcomes,
+    coachContextFeedback: storage.coachContextFeedback,
+    coachConflictLog: storage.coachConflictLog,
+    coachCalibrationState: storage.coachCalibrationState,
     dailyCheckins: storage.dailyCheckins,
     dailyCheckinDraft: storage.dailyCheckinDraft,
     userSettings: currentUserSettings(),
@@ -7895,6 +8577,11 @@ function importBackupFile(file) {
       storage.coachFeedback = mergeById(storage.coachFeedback, Array.isArray(backup.coachFeedback) ? backup.coachFeedback : []);
       storage.coachPlanProposals = mergeById(storage.coachPlanProposals, Array.isArray(backup.coachPlanProposals) ? backup.coachPlanProposals : []);
       if (!storage.coachPlanUndo && backup.coachPlanUndo && typeof backup.coachPlanUndo === "object") storage.coachPlanUndo = backup.coachPlanUndo;
+      storage.coachRecommendationHistory = mergeById(storage.coachRecommendationHistory, Array.isArray(backup.coachRecommendationHistory) ? backup.coachRecommendationHistory : []);
+      storage.recommendationOutcomes = mergeById(storage.recommendationOutcomes, Array.isArray(backup.recommendationOutcomes) ? backup.recommendationOutcomes : []);
+      storage.coachContextFeedback = mergeById(storage.coachContextFeedback, Array.isArray(backup.coachContextFeedback) ? backup.coachContextFeedback : []);
+      storage.coachConflictLog = mergeById(storage.coachConflictLog, Array.isArray(backup.coachConflictLog) ? backup.coachConflictLog : []);
+      if (!storage.coachCalibrationState && backup.coachCalibrationState && typeof backup.coachCalibrationState === "object") storage.coachCalibrationState = backup.coachCalibrationState;
       storage.dailyCheckins = mergeById(storage.dailyCheckins, Array.isArray(backup.dailyCheckins) ? backup.dailyCheckins : []);
       if (!storage.dailyCheckinDraft && backup.dailyCheckinDraft && typeof backup.dailyCheckinDraft === "object") storage.dailyCheckinDraft = backup.dailyCheckinDraft;
       if (!storage.personalProfile && backup.personalProfile && typeof backup.personalProfile === "object") storage.personalProfile = backup.personalProfile;
@@ -7928,7 +8615,8 @@ const FULL_RESET_CONFIRMATION_TEXT = [
   "- Geraete-, Sitz- und Griffdaten",
   "- Life-Fitness-Scanner-Zuordnungen",
   "- eigene Plaene und eigene Uebungen",
-  "- Coach-Feedback und Vorschlagsverlauf",
+  "- Coach-Feedback, Vorschlagsverlauf, Empfehlungshistorie und Outcome-Lernen",
+  "- Coach-Konflikte, Kontextfeedback und Kalibrierungsdaten",
   "- persoenliche Einstellungen, technische Logs und lokale App-Daten",
   "",
   "Diese Aktion kann ohne Backup nicht rueckgaengig gemacht werden.",
@@ -7998,6 +8686,16 @@ function bindEvents() {
         timestamp: new Date().toISOString()
       };
       storage.coachFeedback = [...storage.coachFeedback, entry];
+      const history = storage.coachRecommendationHistory.find((item) => item.id === entry.recommendationId);
+      storage.coachContextFeedback = [...storage.coachContextFeedback, {
+        id: `coach_context_feedback_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        recommendationId: entry.recommendationId,
+        ruleId: entry.ruleId,
+        contextKey: history?.contextKey || `${entry.ruleId}|general`,
+        feedbackType: entry.feedbackType,
+        category: entry.feedbackType,
+        timestamp: entry.timestamp
+      }];
       alert(coachFeedbackText("thanks", "Feedback gespeichert."));
       render();
     });

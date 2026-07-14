@@ -1,0 +1,34 @@
+{
+  "version": "6.16.0",
+  "weights": {
+    "completeness": 0.3,
+    "evidenceVolume": 0.2,
+    "recency": 0.15,
+    "mapping": 0.1,
+    "planStability": 0.1,
+    "readiness": 0.1,
+    "outlierCleanliness": 0.05
+  },
+  "flags": [
+    "missing_reps",
+    "missing_weight",
+    "incomplete_set",
+    "skipped_exercise",
+    "outlier",
+    "exercise_mapping_missing",
+    "exercise_mapping_changed",
+    "plan_changed",
+    "long_training_gap",
+    "insufficient_comparable_sessions",
+    "missing_readiness",
+    "conflicting_units",
+    "stale_data",
+    "manual_correction_pending"
+  ],
+  "criticalCaps": {
+    "criticalQualityFlagMaxConfidence": 39,
+    "missingReadinessRecoveryMaxConfidence": 59,
+    "recentPlanChangeMaxConfidence": 64,
+    "singleOutlierMaxConfidence": 45
+  }
+}
