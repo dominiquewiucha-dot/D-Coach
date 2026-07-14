@@ -24,6 +24,6 @@ assert(app.includes('data-session-coach-stage="duringWorkout"'), "duringWorkout 
 assert(app.includes('data-session-coach-stage="afterWorkout"'), "afterWorkout stage missing");
 assert(app.includes("planOptimizerSummary()"), "v4.2 plan simulation not reused");
 assert(app.includes("Zeit knapp"), "time guard copy missing");
-assert(app.includes("Prognose und tatsaechliche Belastung"), "post-workout comparison missing");
+assert(app.includes("Prognose und tatsächliche Belastung"), "post-workout comparison missing");
 
 console.log("session coach v6.2.0 tests passed");

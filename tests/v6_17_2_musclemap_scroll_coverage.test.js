@@ -9,11 +9,11 @@ const production = fs.readFileSync(path.join(root, "production", "production-mus
 const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v70";'), "app version must be pwa-v70");
+assert(app.includes('const APP_VERSION = "pwa-v71";'), "app version must be pwa-v71");
 assert(app.includes('const BACKUP_FORMAT_VERSION = "6.17.2";'), "backup version must be 6.17.2");
 assert(app.includes('const MUSCLE_MAPPING_VERSION = "muscle-mapping-v3";'), "mapping version missing");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v70";'), "cache must be pwa-v70");
-assert(html.includes("app.js?v=pwa-v70"), "app cache buster must be pwa-v70");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v71";'), "cache must be pwa-v71");
+assert(html.includes("app.js?v=pwa-v71"), "app cache buster must be pwa-v71");
 
 assert(app.includes("function getCanonicalMuscleCoverage"), "canonical coverage API missing");
 assert(app.includes("function canonicalizeMuscleRegionId"), "region normalizer missing");
@@ -25,8 +25,8 @@ assert(app.includes('if (group === "mg_abs" || group === "mg_obliques") return;'
 assert(app.includes("premiumCoverageForSessions(sessions)"), "premium adapter must remain available");
 assert(app.includes("coverageForSessions(sessions)"), "standard adapter must remain available");
 assert(app.includes("canonicalCoverageDiagnosticsForMode"), "diagnostics missing");
-assert(app.includes("DCoach_v6.17.2_MuscleCoverage_Diagnostics.json"), "diagnostics export missing");
-assert(app.includes('import("./production/production-muscle-map.js?v=6.17.2")'), "production map cache buster missing");
+assert(app.includes("DCoach_v6.17.3_MuscleCoverage_Diagnostics.json"), "diagnostics export missing");
+assert(app.includes('import("./production/production-muscle-map.js?v=6.17.3")'), "production map cache buster missing");
 
 assert(css.includes("touch-action: pan-y pinch-zoom;"), "muscle map must allow vertical pan and pinch zoom");
 assert(production.includes("installGestureGuard"), "production gesture guard missing");

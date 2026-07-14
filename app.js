@@ -202,7 +202,7 @@
   route: null
 };
 
-const APP_VERSION = "pwa-v70";
+const APP_VERSION = "pwa-v71";
 const BACKUP_FORMAT_VERSION = "6.17.2";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -211,15 +211,15 @@ const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
   { key: "dcoach.journalEntries", label: "Journal", type: "array" },
-  { key: "dcoach.machineSettings", label: "Geraete", type: "array" },
-  { key: "dcoach.scannedEquipmentMappings", label: "Geraetezuordnungen", type: "array" },
+  { key: "dcoach.machineSettings", label: "Geräte", type: "array" },
+  { key: "dcoach.scannedEquipmentMappings", label: "Gerätezuordnungen", type: "array" },
   { key: "dcoach.activePlanName", label: "Aktiver Plan", type: "string" },
-  { key: "dcoach.archivedPlanNames", label: "Archivierte Plaene", type: "array" },
-  { key: "dcoach.deletedPlanNames", label: "Geloeschte Plaene", type: "array" },
-  { key: "dcoach.customPlans", label: "Eigene Plaene", type: "array" },
-  { key: "dcoach.customExercises", label: "Eigene Uebungen", type: "array" },
+  { key: "dcoach.archivedPlanNames", label: "Archivierte Pläne", type: "array" },
+  { key: "dcoach.deletedPlanNames", label: "Geloeschte Pläne", type: "array" },
+  { key: "dcoach.customPlans", label: "Eigene Pläne", type: "array" },
+  { key: "dcoach.customExercises", label: "Eigene Übungen", type: "array" },
   { key: "dcoach.userSettings", label: "Einstellungen", type: "object" },
-  { key: "dcoach.personalProfile", label: "Persoenliche Daten", type: "object" },
+  { key: "dcoach.personalProfile", label: "Persönliche Daten", type: "object" },
   { key: "dcoach.coachFeedback", label: "Coach-Feedback", type: "array" },
   { key: "dcoach.coachPlanProposals", label: "Coach-Vorschlaege", type: "array" },
   { key: "dcoach.coachPlanUndo", label: "Coach-Undo", type: "object" },
@@ -228,7 +228,7 @@ const STORAGE_KEYS = [
   { key: "dcoach.coachContextFeedback", label: "Kontextbezogenes Coach-Feedback", type: "array" },
   { key: "dcoach.coachConflictLog", label: "Coach-Konfliktlog", type: "array" },
   { key: "dcoach.coachCalibrationState", label: "Coach-Kalibrierung", type: "object" },
-  { key: "dcoach.deviceValidationReports", label: "Geraetepruefungsberichte", type: "array" },
+  { key: "dcoach.deviceValidationReports", label: "Geräteprüfungsberichte", type: "array" },
   { key: "dcoach.dailyCheckins", label: "Daily Check-ins", type: "array" },
   { key: "dcoach.dailyCheckinDraft", label: "Daily Check-in Draft", type: "object" },
   { key: "dcoach.lastErrors", label: "Fehlerlog", type: "array" },
@@ -493,14 +493,14 @@ function indexedDbSupported() {
 }
 
 function indexedDbStatusText() {
-  if (!indexedDbSupported()) return "Nicht unterstuetzt";
+  if (!indexedDbSupported()) return "Nicht unterstützt";
   return storage.indexedDbReady ? "Vorbereitet" : "Nicht vorbereitet";
 }
 
 function openDCoachIndexedDb() {
   return new Promise((resolve, reject) => {
     if (!indexedDbSupported()) {
-      reject(new Error("IndexedDB wird von diesem Browser nicht unterstuetzt."));
+      reject(new Error("IndexedDB wird von diesem Browser nicht unterstützt."));
       return;
     }
     const request = indexedDB.open("DCoachLocal", 1);
@@ -513,7 +513,7 @@ function openDCoachIndexedDb() {
       });
     };
     request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error || new Error("IndexedDB konnte nicht geoeffnet werden."));
+    request.onerror = () => reject(request.error || new Error("IndexedDB konnte nicht geöffnet werden."));
   });
 }
 
@@ -575,7 +575,7 @@ function normalizeExercise(raw, existing = null) {
     secondaryMuscleGroups,
     movementPattern: raw.movementPattern || existing?.movementPattern || "Allgemein",
     equipment: uniqueValues(equipmentName),
-    category: raw.category || existing?.category || "Uebung",
+    category: raw.category || existing?.category || "Übung",
     difficulty: raw.difficulty || existing?.difficulty || "mittel",
     spineLoadLevel: raw.spineLoadLevel || existing?.spineLoadLevel || "medium",
     lumbarDiscSuitability: raw.lumbarDiscSuitability || existing?.lumbarDiscSuitability || "conditionallySuitable",
@@ -689,7 +689,7 @@ function currentPersonalProfile() {
 
 function importSeedProfile() {
   if (!state.personalProfileSeed) throw new Error("Seed-Daten fehlen.");
-  if (storage.personalProfile && !confirm("Bestehende persoenliche Daten ersetzen?")) return;
+  if (storage.personalProfile && !confirm("Bestehende persönliche Daten ersetzen?")) return;
   storage.personalProfile = {
     ...defaultPersonalProfile(),
     ...state.personalProfileSeed,
@@ -734,7 +734,7 @@ function planQrPayload(plan) {
 function parsePlanPayload(text) {
   const payload = JSON.parse(String(text || "").trim());
   if (payload?.type !== "dcoach_plan" || !payload.plan?.name || !Array.isArray(payload.plan.days)) {
-    throw new Error("Kein gueltiger D-Coach-Plan.");
+    throw new Error("Kein gültiger D-Coach-Plan.");
   }
   return normalizePlanPreset({
     id: payload.plan.id || `plan_import_${Date.now()}`,
@@ -773,7 +773,7 @@ function generatePlanCandidate() {
     });
   const groups = [
     ["Push", ["push", "brust", "schulter", "trizeps"]],
-    ["Pull", ["pull", "ruecken", "rÃ¼cken", "bizeps"]],
+    ["Pull", ["pull", "ruecken", "ruecken", "bizeps"]],
     ["Beine + Core", ["bein", "quad", "glute", "hamstring", "core", "bauch"]]
   ];
   const days = groups.map(([name, needles]) => {
@@ -797,7 +797,7 @@ function generatePlanCandidate() {
   return {
     id: `plan_generated_${Date.now()}`,
     planName: `D-Coach Vorschlag ${new Date().toLocaleDateString("de-DE")}`,
-    description: "Regelbasiert aus vorhandenen Uebungen erzeugt. Bitte pruefen.",
+    description: "Regelbasiert aus vorhandenen Übungen erzeugt. Bitte prüfen.",
     goal: "Hypertrophie / Wiedereinstieg",
     maxDurationMinutes: 60,
     days
@@ -1642,7 +1642,7 @@ function customExerciseFromForm(existing = null) {
     secondaryMuscleGroups: [],
     movementPattern: "Custom",
     equipment: [equipment],
-    category: "Eigene Uebung",
+    category: "Eigene Übung",
     difficulty: "mittel",
     spineLoadLevel: lws === "suitable" ? "low" : "medium",
     lumbarDiscSuitability: lws,
@@ -1678,7 +1678,7 @@ function archiveCustomExercise(exerciseId) {
 function deleteCustomExercise(exerciseId) {
   if (exerciseHasHistory(exerciseId)) {
     archiveCustomExercise(exerciseId);
-    alert(appText("exercise.customArchived", "Diese Uebung hat Historie und wurde archiviert statt geloescht."));
+    alert(appText("exercise.customArchived", "Diese Übung hat Historie und wurde archiviert statt gelöscht."));
     return;
   }
   storage.customExercises = storage.customExercises.filter((exercise) => exercise.id !== exerciseId);
@@ -1916,10 +1916,10 @@ function dailyPainRegions() {
     { id: "wrist_left", label: "Handgelenk links", side: "left" },
     { id: "wrist_right", label: "Handgelenk rechts", side: "right" },
     { id: "chest", label: "Brust", side: "center" },
-    { id: "upper_back", label: "oberer Ruecken", side: "center" },
+    { id: "upper_back", label: "oberer Rücken", side: "center" },
     { id: "lws", label: "LWS", side: "center" },
-    { id: "hip_left", label: "Huefte links", side: "left" },
-    { id: "hip_right", label: "Huefte rechts", side: "right" },
+    { id: "hip_left", label: "Hüfte links", side: "left" },
+    { id: "hip_right", label: "Hüfte rechts", side: "right" },
     { id: "knee_left", label: "Knie links", side: "left" },
     { id: "knee_right", label: "Knie rechts", side: "right" },
     { id: "ankle_left", label: "Sprunggelenk links", side: "left" },
@@ -2025,7 +2025,7 @@ function renderDailyCheckinDraftStep(draft) {
       <p class="muted">Du hast deinen Tages-Check-in noch nicht abgeschlossen.</p>
       <button class="primary" data-checkin-go="sleep">Fortsetzen</button>
       <button class="secondary" data-checkin-new>Neu beginnen</button>
-      <button class="secondary" data-checkin-skip>Fuer heute ueberspringen</button>
+      <button class="secondary" data-checkin-skip>Für heute überspringen</button>
     </article>
   `;
 }
@@ -2038,13 +2038,13 @@ function renderDailyCheckinSleepStep(draft) {
         <label>Stunden<input class="input" type="number" min="0" max="14" value="${Math.floor((draft.sleepDurationMinutes || 0) / 60) || ""}" data-checkin-sleep-hours></label>
         <label>Minuten<input class="input" type="number" min="0" max="59" value="${(draft.sleepDurationMinutes || 0) % 60 || ""}" data-checkin-sleep-minutes></label>
       </div>
-      ${renderCheckinRange("sleepQuality", "Schlafqualitaet", draft.sleepQuality)}
+      ${renderCheckinRange("sleepQuality", "Schlafqualität", draft.sleepQuality)}
       ${renderCheckinRange("energy", "Energie", draft.energy)}
       ${renderCheckinRange("stress", "Stress", draft.stress)}
       ${renderCheckinRange("recovery", "Erholung", draft.recovery)}
       <textarea class="input area" placeholder="Schlafnotiz" data-checkin-field="sleepNote">${htmlesc(draft.sleepNote || "")}</textarea>
       <div class="button-row">
-        <button class="secondary" data-checkin-skip>Ueberspringen</button>
+        <button class="secondary" data-checkin-skip>Überspringen</button>
         <button class="primary" data-checkin-go="pain">Weiter</button>
       </div>
     </article>
@@ -2076,10 +2076,10 @@ function renderDailyCheckinPainStep(draft) {
           `;
         }).join("")}
       </div>
-      <textarea class="input area" placeholder="Schmerznotiz fuer heute" data-checkin-field="painNote">${htmlesc(draft.painNote || "")}</textarea>
-      <p class="quiet">D-Coach nutzt diese Angaben nur fuer Trainingshinweise, nicht fuer Diagnosen.</p>
+      <textarea class="input area" placeholder="Schmerznotiz für heute" data-checkin-field="painNote">${htmlesc(draft.painNote || "")}</textarea>
+      <p class="quiet">D-Coach nutzt diese Angaben nur für Trainingshinweise, nicht für Diagnosen.</p>
       <div class="button-row">
-        <button class="secondary" data-checkin-go="sleep">Zurueck</button>
+        <button class="secondary" data-checkin-go="sleep">Zurück</button>
         <button class="primary" data-checkin-go="weight">Weiter</button>
       </div>
     </article>
@@ -2094,14 +2094,14 @@ function renderDailyCheckinWeightStep(draft) {
     <article class="stack">
       <h2>Heutiges Gewicht</h2>
       <p class="muted">Letzter Wert: ${latest ? kg(latest.weightKg) : "-"}</p>
-      <p class="quiet">Veraenderung: ${delta === null ? "-" : `${delta >= 0 ? "+" : ""}${kg(delta)}`}</p>
+      <p class="quiet">Veränderung: ${delta === null ? "-" : `${delta >= 0 ? "+" : ""}${kg(delta)}`}</p>
       <input class="input" inputmode="decimal" placeholder="kg" value="${htmlesc(current)}" data-checkin-field="weightKg">
       <textarea class="input area" placeholder="Tagesnotiz optional" data-checkin-field="generalNote">${htmlesc(draft.generalNote || "")}</textarea>
       <div class="button-row">
-        <button class="secondary" data-checkin-go="pain">Zurueck</button>
+        <button class="secondary" data-checkin-go="pain">Zurück</button>
         <button class="primary" data-checkin-go="summary">Speichern und weiter</button>
       </div>
-      <button class="secondary" data-checkin-go="summary" data-checkin-skip-weight>Gewicht heute ueberspringen</button>
+      <button class="secondary" data-checkin-go="summary" data-checkin-skip-weight>Gewicht heute überspringen</button>
     </article>
   `;
 }
@@ -2113,14 +2113,14 @@ function renderDailyCheckinSummaryStep(draft) {
       <h2>Tages-Check-in gespeichert</h2>
       <div class="storage-table">
         <div><span>Schlaf</span><strong>${draft.sleepDurationMinutes ? `${Math.floor(draft.sleepDurationMinutes / 60)} h ${draft.sleepDurationMinutes % 60} min` : "-"}</strong></div>
-        <div><span>Schlafqualitaet</span><strong>${draft.sleepQuality || "-"}/10</strong></div>
+        <div><span>Schlafqualität</span><strong>${draft.sleepQuality || "-"}/10</strong></div>
         <div><span>Energie</span><strong>${draft.energy || "-"}/10</strong></div>
         <div><span>Erholung</span><strong>${draft.recovery || "-"}/10</strong></div>
         <div><span>Schmerz</span><strong>${htmlesc(pain || "-")}</strong></div>
         <div><span>Gewicht</span><strong>${draft.weightKg ? kg(draft.weightKg) : "-"}</strong></div>
       </div>
       <button class="primary" data-checkin-complete>Zur App</button>
-      <button class="secondary" data-checkin-go="weight">Zurueck</button>
+      <button class="secondary" data-checkin-go="weight">Zurück</button>
     </article>
   `;
 }
@@ -2136,7 +2136,7 @@ function readinessForJournal(entry) {
   const soreness = Number(entry?.soreness || (checkin?.painPresent ? normalizeTenToFive(painIntensity) : 1));
   const base = (sleep + energy + mood) / 3;
   const score = Math.max(1, Math.min(5, base - Math.max(0, stress - 3) * 0.45 - Math.max(0, soreness - 3) * 0.35));
-  const source = checkin ? " Check-in: Schlaf, Energie, Stress, Erholung und Schmerzen wurden beruecksichtigt." : "";
+  const source = checkin ? " Check-in: Schlaf, Energie, Stress, Erholung und Schmerzen wurden berücksichtigt." : "";
   if (score >= 3.7) return { color: "green", label: "Gut", score, hint: `Heute normal trainieren.${source}` };
   if (score >= 2.6) return { color: "amber", label: "Moderat", score, hint: `Heute moderat starten.${source}` };
   return { color: "red", label: "Leicht", score, hint: `Heute leichter trainieren und Regeneration beachten.${source}` };
@@ -2169,17 +2169,17 @@ function progressionForEntry(entry, previous) {
   const topTarget = upperRepTarget(entry.reps);
   const allTop = topTarget && currentPerf.sets.length && currentPerf.sets.every((set) => Number(set.actualReps || 0) >= topTarget);
   const critical = exerciseIsCritical(exerciseById(entry.exerciseId));
-  if (!currentPerf.sets.length) return { color: "amber", text: texts.noHistory || "Noch keine abgeschlossenen Saetze." };
+  if (!currentPerf.sets.length) return { color: "amber", text: texts.noHistory || "Noch keine abgeschlossenen Sätze." };
   if (critical && allTop) return { color: "amber", text: texts.lwsCaution || "Stark, aber LWS-vorsichtig: erst Technik stabil halten, dann klein steigern." };
-  if (allTop) return { color: "green", text: texts.increaseSuggested || "Alle Saetze stark. Naechstes Mal leicht erhoehen." };
-  if (previousPerf && currentPerf.volume > previousPerf.volume) return { color: "green", text: texts.sameWeightMoreReps || "Staerker als letztes Mal." };
-  if (previousPerf && currentPerf.volume < previousPerf.volume * 0.85) return { color: "amber", text: texts.performanceDrop || "Heute schwaecher. Regeneration pruefen." };
+  if (allTop) return { color: "green", text: texts.increaseSuggested || "Alle Sätze stark. Nächstes Mal leicht erhöhen." };
+  if (previousPerf && currentPerf.volume > previousPerf.volume) return { color: "green", text: texts.sameWeightMoreReps || "Stärker als letztes Mal." };
+  if (previousPerf && currentPerf.volume < previousPerf.volume * 0.85) return { color: "amber", text: texts.performanceDrop || "Heute schwächer. Regeneration prüfen." };
   return { color: "blue", text: texts.holdWeight || "Gewicht halten und Wiederholungen sammeln." };
 }
 
 function progressionForCompletedExercise(exercise, previous, sessionId) {
   const texts = coachingTexts();
-  if (!previous) return { color: "blue", text: texts.noHistory || "Neue Uebung in deiner Historie." };
+  if (!previous) return { color: "blue", text: texts.noHistory || "Neue Übung in deiner Historie." };
   const currentVolume = totalVolume(exercise);
   const previousVolume = totalVolume(previous.exercise);
   const bestBefore = bestWeightBeforeExercise(exercise.exerciseId, sessionId);
@@ -2188,10 +2188,10 @@ function progressionForCompletedExercise(exercise, previous, sessionId) {
     .filter((value) => Number.isFinite(value))
     .reduce((max, value) => Math.max(max, value), 0);
   if (currentBest > 0 && (!bestBefore || currentBest > bestBefore)) {
-    return { color: "green", text: "Neues Bestgewicht. Naechstes Training kontrolliert bestaetigen." };
+    return { color: "green", text: "Neues Bestgewicht. Nächstes Training kontrolliert bestätigen." };
   }
   if (currentVolume > previousVolume) return { color: "green", text: texts.sameWeightMoreReps || "Mehr Volumen als letztes Mal." };
-  if (currentVolume < previousVolume * 0.85) return { color: "amber", text: texts.performanceDrop || "Schwaecher als zuletzt. Regeneration pruefen." };
+  if (currentVolume < previousVolume * 0.85) return { color: "amber", text: texts.performanceDrop || "Schwächer als zuletzt. Regeneration prüfen." };
   return { color: "blue", text: texts.holdWeight || "Gewicht halten und Wiederholungen sammeln." };
 }
 
@@ -2254,7 +2254,7 @@ function scannerCandidateExercises() {
 function applyScannedEquipmentCode(rawCode) {
   const normalizedCode = normalizeScannedEquipmentCode(rawCode);
   if (!normalizedCode) {
-    state.equipmentScanner = { ...state.equipmentScanner, rawCode: rawCode || "", normalizedCode: "", status: "invalid", error: "Kein gueltiger Code erkannt." };
+    state.equipmentScanner = { ...state.equipmentScanner, rawCode: rawCode || "", normalizedCode: "", status: "invalid", error: "Kein gültiger Code erkannt." };
     return;
   }
   const known = scannedEquipmentMappingForCode(rawCode);
@@ -2301,7 +2301,7 @@ function saveScannedEquipmentMapping() {
   const scanner = state.equipmentScanner;
   const exercise = exerciseById(scanner.selectedExerciseId);
   if (!scanner.normalizedCode) throw new Error("Bitte zuerst einen Code scannen oder eingeben.");
-  if (!exercise) throw new Error("Bitte eine Uebung auswaehlen.");
+  if (!exercise) throw new Error("Bitte eine Übung auswählen.");
   const existing = scannedEquipmentMappingForCode(scanner.rawCode);
   const now = new Date().toISOString();
   const equipmentText = `${exercise.displayName} ${exercise.category} ${(exercise.equipment || []).join(" ")}`.toLowerCase();
@@ -2343,12 +2343,12 @@ async function startEquipmentScannerCamera() {
   state.equipmentScanner = { ...state.equipmentScanner, active: true, status: "camera", error: "" };
   render();
   if (!("mediaDevices" in navigator) || !navigator.mediaDevices.getUserMedia) {
-    state.equipmentScanner = { ...state.equipmentScanner, status: "manual", error: "Kamera ist nicht verfuegbar. Bitte Code manuell eingeben." };
+    state.equipmentScanner = { ...state.equipmentScanner, status: "manual", error: "Kamera ist nicht verfügbar. Bitte Code manuell eingeben." };
     render();
     return;
   }
   if (!("BarcodeDetector" in window)) {
-    state.equipmentScanner = { ...state.equipmentScanner, status: "manual", error: "BarcodeDetector ist hier nicht verfuegbar. Bitte Code manuell eingeben." };
+    state.equipmentScanner = { ...state.equipmentScanner, status: "manual", error: "BarcodeDetector ist hier nicht verfügbar. Bitte Code manuell eingeben." };
     render();
     return;
   }
@@ -2378,7 +2378,7 @@ async function startEquipmentScannerCamera() {
     };
     window.dcoachEquipmentScannerLoop = window.requestAnimationFrame(scan);
   } catch (error) {
-    state.equipmentScanner = { ...state.equipmentScanner, status: "manual", error: "Kamerazugriff nicht moeglich. Bitte Code manuell eingeben." };
+    state.equipmentScanner = { ...state.equipmentScanner, status: "manual", error: "Kamerazugriff nicht möglich. Bitte Code manuell eingeben." };
     logAppError(error.message || "Kamera verweigert", "equipment-scanner");
     render();
   }
@@ -2697,7 +2697,7 @@ function canonicalCoverageDiagnosticsForMode(mode = state.coverageMode || "week"
   const sessions = sessionsForCoverageMode(mode);
   const coverage = getCanonicalMuscleCoverage({ sessions, context: mode });
   return {
-    version: "6.17.2",
+    version: "6.17.3",
     mappingVersion: MUSCLE_MAPPING_VERSION,
     context: mode,
     sessionIds: sessions.map((session) => session.id),
@@ -2723,7 +2723,7 @@ function canonicalCoverageDiagnosticsForMode(mode = state.coverageMode || "week"
 
 function coverageCoachHints(items) {
   return items.filter((item) => item.isTarget).map((item) => {
-    if (item.percent > 120) return `${item.name}: Diese Muskelgruppe wurde diese Woche bereits ueberdurchschnittlich belastet.`;
+    if (item.percent > 120) return `${item.name}: Diese Muskelgruppe wurde diese Woche bereits überdurchschnittlich belastet.`;
     if (item.percent === 0) return `${item.name}: Noch nicht trainiert.`;
     if (item.percent < 70 && sessionsSince(7).length >= 2) return `${item.name}: Diese Muskelgruppe wurde diese Woche wenig trainiert.`;
     return null;
@@ -2745,7 +2745,7 @@ function coverageCoachTextFor(percent) {
     low: "Diese Muskelgruppe ist diese Woche noch deutlich unter dem Ziel.",
     moderate: "Diese Muskelgruppe wurde bereits teilweise belastet.",
     target: "Diese Muskelgruppe liegt im Zielbereich.",
-    over_target: "Diese Muskelgruppe wurde diese Woche bereits deutlich ueber dem Ziel belastet."
+    over_target: "Diese Muskelgruppe wurde diese Woche bereits deutlich über dem Ziel belastet."
   }[status];
 }
 
@@ -3033,8 +3033,8 @@ function personalRecordsForExercise(completedExercise, session) {
   const bestVolumeBefore = before.reduce((max, item) => Math.max(max, totalVolume(item)), 0);
   const currentVolume = totalVolume(completedExercise);
   const records = [];
-  if (currentBestWeight > 0 && currentBestWeight > bestWeightBefore) records.push("Hoechstes Gewicht");
-  if (currentVolume > 0 && currentVolume > bestVolumeBefore) records.push("Hoechstes Uebungsvolumen");
+  if (currentBestWeight > 0 && currentBestWeight > bestWeightBefore) records.push("Höchstes Gewicht");
+  if (currentVolume > 0 && currentVolume > bestVolumeBefore) records.push("Höchstes Übungsvolumen");
   (completedExercise.sets || []).forEach((set) => {
     const weight = Number(set.actualWeightKg) || 0;
     const reps = Number(set.actualReps) || 0;
@@ -3078,11 +3078,11 @@ function coachDecisionForExercise(completedExercise, session) {
     - (lwsConflict || painNote ? 8 : 0)
   ));
   const evidence = [];
-  if (previous) evidence.push(`${delta.volumeDelta >= 0 ? "+" : ""}${Math.round(delta.volumeDelta)}% Volumen gegenueber letzter Einheit`);
+  if (previous) evidence.push(`${delta.volumeDelta >= 0 ? "+" : ""}${Math.round(delta.volumeDelta)}% Volumen gegenüber letzter Einheit`);
   else evidence.push("Noch keine Vergleichsdaten vorhanden.");
   if (delta.repDelta !== null) evidence.push(`${delta.repDelta >= 0 ? "+" : ""}${delta.repDelta} Wiederholungen`);
   if (delta.loadDelta !== null && Math.abs(delta.loadDelta) >= 1) evidence.push(`${delta.loadDelta >= 0 ? "+" : ""}${Math.round(delta.loadDelta)}% Last`);
-  if (lwsConflict) evidence.push("LWS-Daten sprechen gegen diese Uebung.");
+  if (lwsConflict) evidence.push("LWS-Daten sprechen gegen diese Übung.");
 
   return {
     decisionId,
@@ -3100,10 +3100,10 @@ function coachDecisionForExercise(completedExercise, session) {
 function smartNoteForInsight(insight) {
   const templates = state.smartNotesRules?.templates || [];
   const findTemplate = (id, fallback) => templates.find((item) => item.id === id)?.text || fallback;
-  if (insight.decisionId === "choose_lws_alternative") return findTemplate("lws_caution", "LWS-Hinweis beruecksichtigt. Saubere Technik hatte Prioritaet.");
-  if (insight.performance.classification === "strong_progress") return findTemplate("strong_progress", "Starker Fortschritt. Naechstes Mal kleine Steigerung pruefen.");
-  if (insight.performance.classification === "small_progress") return findTemplate("small_progress", "Leichte Leistungssteigerung gegenueber der letzten vergleichbaren Einheit.");
-  if (insight.performance.classification === "drop") return findTemplate("performance_drop", "Heute etwas schwaecher. Regeneration pruefen und nichts erzwingen.");
+  if (insight.decisionId === "choose_lws_alternative") return findTemplate("lws_caution", "LWS-Hinweis berücksichtigt. Saubere Technik hatte Priorität.");
+  if (insight.performance.classification === "strong_progress") return findTemplate("strong_progress", "Starker Fortschritt. Nächstes Mal kleine Steigerung prüfen.");
+  if (insight.performance.classification === "small_progress") return findTemplate("small_progress", "Leichte Leistungssteigerung gegenüber der letzten vergleichbaren Einheit.");
+  if (insight.performance.classification === "drop") return findTemplate("performance_drop", "Heute etwas schwächer. Regeneration prüfen und nichts erzwingen.");
   return findTemplate("stable_good", "Solide Einheit. Gewicht halten und sauber weiter steigern.");
 }
 
@@ -3206,7 +3206,7 @@ function adaptiveProgressionForExercise(completedExercise, session, baseInsight 
   const why = [
     historyDepth ? `${historyDepth} vergleichbare Einheiten vorhanden` : "Noch wenig Vergleichsdaten vorhanden",
     topTargetReached(completedExercise) ? "Zielwiederholungen erreicht" : "Zielwiederholungen noch nicht voll erreicht",
-    dropOff > 25 ? "Leistungsabfall innerhalb der Saetze ist hoch" : "Satzleistung wirkt kontrollierbar"
+    dropOff > 25 ? "Leistungsabfall innerhalb der Sätze ist hoch" : "Satzleistung wirkt kontrollierbar"
   ];
   if (lwsConflict) why.push("LWS-Daten verhindern aggressive Progression");
   if (readiness.color === "red") why.push("Readiness spricht gegen Steigerung");
@@ -3254,7 +3254,7 @@ function machineStatusForExercise(exercise) {
     displayName: match.machine.displayName,
     verified: match.machine.verified || "unknown",
     isGeneric: match.machine.manufacturer === "generic",
-    note: match.machine.verified === "unknown" ? machineText("notVerified", "Noch nicht bestaetigt") : machineText("verifiedByUser", "Vom Nutzer bestaetigt")
+    note: match.machine.verified === "unknown" ? machineText("notVerified", "Noch nicht bestätigt") : machineText("verifiedByUser", "Vom Nutzer bestätigt")
   };
 }
 
@@ -3267,7 +3267,7 @@ function occupiedAlternativesForExercise(exercise) {
 function dayTypeFromName(value) {
   const text = String(value || "").toLowerCase();
   if (text.includes("push") || text.includes("brust") || text.includes("schulter") || text.includes("trizeps")) return "Push";
-  if (text.includes("pull") || text.includes("ruecken") || text.includes("rÃ¼cken") || text.includes("bizeps")) return "Pull";
+  if (text.includes("pull") || text.includes("ruecken") || text.includes("ruecken") || text.includes("bizeps")) return "Pull";
   if (text.includes("leg") || text.includes("bein") || text.includes("unter")) return "Legs";
   return "FullBody";
 }
@@ -3321,7 +3321,7 @@ function buildSmartWorkout(dayTypeOrName) {
   const exercises = template.exerciseSlots.map((slot, index) => {
     const exercise = smartWorkoutCandidateForSlot(slot, usedIds, profile);
     if (!exercise) {
-      warnings.push(`Keine passende Uebung fuer ${slot.slot} gefunden.`);
+      warnings.push(`Keine passende Übung für ${slot.slot} gefunden.`);
       return null;
     }
     usedIds.add(exercise.id);
@@ -3344,8 +3344,8 @@ function buildSmartWorkout(dayTypeOrName) {
     estimatedDurationMinutes = exercises.reduce((sum, item) => sum + item.estimatedMinutes, 0);
   }
   if (profile.lumbarDiscHistory) reasons.push(smartBuilderText("adapted_lws", "LWS-freundliche Varianten wurden bevorzugt."));
-  if (skippedOptionalExercises.length) reasons.push(smartBuilderText("optional_removed", "Optionale Uebungen wurden entfernt, damit die Einheit in der Zeit bleibt."));
-  if (!storage.sessions.length) reasons.push(smartBuilderText("not_enough_data", "Noch nicht genug persoenliche Daten. Standardregeln werden genutzt."));
+  if (skippedOptionalExercises.length) reasons.push(smartBuilderText("optional_removed", "Optionale Übungen wurden entfernt, damit die Einheit in der Zeit bleibt."));
+  if (!storage.sessions.length) reasons.push(smartBuilderText("not_enough_data", "Noch nicht genug persönliche Daten. Standardregeln werden genutzt."));
   reasons.push(smartBuilderText("generated", "Training wurde aus deinem Plan und deinen Vorgaben erstellt."));
   return {
     workoutId: `smart-${dayType}-${Date.now()}`,
@@ -3479,7 +3479,7 @@ function coachMemoryItems() {
     }
   }
   const weeks = new Set(sessions.map((session) => trainingWeekKey(session.startedAt)));
-  if (weeks.size >= 8) items.push("Du trainierst seit mehreren Wochen konstant - gute Basis fuer planbare Progression.");
+  if (weeks.size >= 8) items.push("Du trainierst seit mehreren Wochen konstant - gute Basis für planbare Progression.");
   return items.slice(0, 3);
 }
 
@@ -3491,14 +3491,14 @@ function upperRepTarget(text) {
 function progressionHint(exercise, plannedReps, previousSets) {
   const texts = coachingTexts();
   if (exerciseIsCritical(exercise)) {
-    return texts.lwsCaution || "Nur schmerzfrei ausfÃ¼hren oder Alternative wÃ¤hlen.";
+    return texts.lwsCaution || "Nur schmerzfrei ausführen oder Alternative wählen.";
   }
   const target = upperRepTarget(plannedReps);
   if (!target || !previousSets?.length) {
     return texts.noHistory || "Sauber arbeiten und moderat starten.";
   }
   const allReached = previousSets.every((set) => Number(set.actualReps || 0) >= target);
-  return allReached ? (texts.increaseSuggested || "Letztes Mal Ziel erreicht. Beim nÃ¤chsten Mal leicht steigern.") : (texts.holdWeight || "Gewicht beibehalten und Technik priorisieren.");
+  return allReached ? (texts.increaseSuggested || "Letztes Mal Ziel erreicht. Beim nächsten Mal leicht steigern.") : (texts.holdWeight || "Gewicht beibehalten und Technik priorisieren.");
 }
 
 function lwsBadge(value) {
@@ -3633,10 +3633,10 @@ function alternativeExplanation(sourceExercise, alternativeExercise) {
   const source = ratingForExercise(sourceExercise);
   const alternative = ratingForExercise(alternativeExercise);
   const textFor = (id, fallback) => state.alternativeExplanationRules?.rules?.find((item) => item.id === id)?.text || fallback;
-  if (alternative.lumbarFriendliness > source.lumbarFriendliness + 2) return textFor("lws_better_alternative", "Diese Alternative ist LWS-freundlicher und trainiert eine aehnliche Muskelgruppe.");
-  if (alternative.stimulusScore >= source.stimulusScore - 1 && alternative.fatigueCost < source.fatigueCost) return textFor("same_stimulus_less_fatigue", "Aehnlicher Muskelreiz bei geringerer Ermuedung.");
+  if (alternative.lumbarFriendliness > source.lumbarFriendliness + 2) return textFor("lws_better_alternative", "Diese Alternative ist LWS-freundlicher und trainiert eine ähnliche Muskelgruppe.");
+  if (alternative.stimulusScore >= source.stimulusScore - 1 && alternative.fatigueCost < source.fatigueCost) return textFor("same_stimulus_less_fatigue", "Ähnlicher Muskelreiz bei geringerer Ermüdung.");
   if (alternative.timeEfficiency > source.timeEfficiency + 1) return textFor("better_time_efficiency", "Diese Alternative ist zeiteffizienter.");
-  if (alternative.reentrySuitability > source.reentrySuitability + 2) return textFor("better_reentry", "Diese Uebung passt besser zum moderaten Wiedereinstieg.");
+  if (alternative.reentrySuitability > source.reentrySuitability + 2) return textFor("better_reentry", "Diese Übung passt besser zum moderaten Wiedereinstieg.");
   return "";
 }
 
@@ -3803,7 +3803,7 @@ function exerciseKindText(exercise) {
   if (exerciseKind(exercise) === "Isolation") {
     return "Belastet vor allem den Zielmuskel. Hilfsmuskeln spielen nur eine kleine Rolle.";
   }
-  return "Trainiert den Zielmuskel und nutzt Hilfsmuskeln fuer Stabilitaet und Kraftuebertragung.";
+  return "Trainiert den Zielmuskel und nutzt Hilfsmuskeln für Stabilität und Kraftübertragung.";
 }
 
 function muscleRoleCards(exercise) {
@@ -3813,17 +3813,17 @@ function muscleRoleCards(exercise) {
       <article class="muscle-role">
         <span class="role-label">Zielmuskel</span>
         <div class="muscle-chip-row">${renderMuscleItems(roles.primary, "Nicht hinterlegt")}</div>
-        <p class="muted">Hauptarbeit der Uebung.</p>
+        <p class="muted">Hauptarbeit der Übung.</p>
       </article>
       <article class="muscle-role">
         <span class="role-label">Hilfsmuskel</span>
         <div class="muscle-chip-row">${renderMuscleItems(roles.secondary, "Keine wesentlichen Hilfsmuskeln")}</div>
-        <p class="muted">Unterstuetzt Bewegung oder Stabilitaet.</p>
+        <p class="muted">Unterstützt Bewegung oder Stabilität.</p>
       </article>
       <article class="muscle-role">
         <span class="role-label">Stabilisatoren</span>
         <div class="muscle-chip-row">${renderMuscleItems(roles.stabilizers, "Nicht gesondert hinterlegt")}</div>
-        <p class="muted">Halten Position und Koerperspannung.</p>
+        <p class="muted">Halten Position und Körperspannung.</p>
       </article>
     </div>
   `;
@@ -3852,7 +3852,7 @@ function renderMuscleMap(exercise) {
       <div class="body-map-grid">
         ${views.map((view) => `
           <div class="body-map">
-            ${state.muscleAssets?.baseMaps?.[view] ? `<img src="${htmlesc(state.muscleAssets.baseMaps[view])}" alt="${view === "front" ? "Vorderseite" : "Rueckseite"}">` : ""}
+            ${state.muscleAssets?.baseMaps?.[view] ? `<img src="${htmlesc(state.muscleAssets.baseMaps[view])}" alt="${view === "front" ? "Vorderseite" : "Rückseite"}">` : ""}
             ${sources.filter((item) => item.view === view).map((item) => `<img class="${item.role}" src="${htmlesc(item.asset)}" alt="">`).join("")}
           </div>
         `).join("")}
@@ -3872,13 +3872,13 @@ function exerciseKnowledge(exercise) {
   const primary = muscleItemsText(roles.primary, "Zielmuskel nicht hinterlegt");
   const secondary = muscleItemsText(roles.secondary, "");
   const stabilizers = muscleItemsText(roles.stabilizers, "");
-  const equipment = extended?.equipmentId ? equipmentNameById(extended.equipmentId) : exercise.equipment.join(", ") || "Geraet nicht hinterlegt";
+  const equipment = extended?.equipmentId ? equipmentNameById(extended.equipmentId) : exercise.equipment.join(", ") || "Gerät nicht hinterlegt";
   const notes = [
     `${exerciseKind(exercise)}: ${exerciseKindText(exercise)}`,
-    `Primaer: ${primary}.`,
+    `Primär: ${primary}.`,
     secondary ? `Sekundaer: ${secondary}.` : "Sekundaer: keine wesentlichen Hilfsmuskeln hinterlegt.",
     stabilizers ? `Stabilisatoren: ${stabilizers}.` : "Stabilisatoren: nicht gesondert hinterlegt.",
-    `Geraet: ${equipment}.`
+    `Gerät: ${equipment}.`
   ];
   if (extended?.spineLoadLevel) notes.push(`LWS-Last: ${spineLoadText(extended.spineLoadLevel)}.`);
   return notes;
@@ -3937,7 +3937,7 @@ function renderMuscleMapJsPrototypeScreen() {
         <div class="grow">
           <p class="eyebrow">v6.8 Debug</p>
           <h1 class="title">MuscleMapJS Prototyp</h1>
-          <p class="subtitle">Isolierter Vergleich mit lokal gebundener Male MuscleMapJS-Karte. Die produktive Muscle Map bleibt unveraendert.</p>
+          <p class="subtitle">Isolierter Vergleich mit lokal gebundener Male MuscleMapJS-Karte. Die produktive Muscle Map bleibt unverändert.</p>
         </div>
         <span class="badge blue">MIT lokal</span>
       </div>
@@ -3964,7 +3964,7 @@ function renderMuscleMapJsPrototypeScreen() {
       </div>
       <article class="card prototype-compare">
         <h3>Vergleich zur aktuellen Karte</h3>
-        <p class="muted">Diese Seite ist nur Debug/Proof-of-Concept. Kein produktives Mapping, keine Trainingsdaten und keine Storage-Schluessel werden veraendert.</p>
+        <p class="muted">Diese Seite ist nur Debug/Proof-of-Concept. Kein produktives Mapping, keine Trainingsdaten und keine Storage-Schlüssel werden verändert.</p>
       </article>
     </section>
   `;
@@ -3972,11 +3972,11 @@ function renderMuscleMapJsPrototypeScreen() {
 
 function renderTabs() {
   const tabs = [
-    ["dashboard", "Dashboard", "âŒ‚"],
-    ["training", "Training", "â†»"],
+    ["dashboard", "Dashboard", "⌂"],
+    ["training", "Training", "↻"],
     ["coach", "Coach", "D"],
-    ["plans", "PlÃ¤ne", "â–¥"],
-    ["settings", "Tracking", "â™™"]
+    ["plans", "Pläne", "▥"],
+    ["settings", "Tracking", "♙"]
   ];
   return `<nav class="tabs">${tabs.map(([id, label, icon]) => `<button class="tab ${state.tab === id && !state.activeWorkout && !state.selectedExerciseId && !state.selectedSessionId ? "active" : ""}" data-tab="${id}"><span class="tab-icon">${icon}</span><span>${label}</span></button>`).join("")}</nav>`;
 }
@@ -4054,7 +4054,7 @@ function renderCoverageCard() {
       ${mode === "trend" ? renderCoverageTrend() : `
         ${renderCoverageBodyView(items)}
         <div class="coverage-list">
-          ${visibleItems.length ? visibleItems.map(renderCoverageRow).join("") : `<p class="muted">Noch keine Trainingsdaten fuer diese Ansicht.</p>`}
+          ${visibleItems.length ? visibleItems.map(renderCoverageRow).join("") : `<p class="muted">Noch keine Trainingsdaten für diese Ansicht.</p>`}
         </div>
         ${state.selectedMuscleId ? renderCoverageDetail(state.selectedMuscleId) : ""}
         ${hints.length && mode === "week" ? `<ul class="small-list">${hints.map((hint) => `<li>${htmlesc(hint)}</li>`).join("")}</ul>` : ""}
@@ -4098,9 +4098,9 @@ function renderMuscleMapScreen() {
       </article>
       ${mode === "trend" ? renderCoverageTrend() : ""}
       <div class="coverage-list muscle-map-list" aria-label="Muskelgruppen">
-        ${visibleItems.length ? visibleItems.map(renderCoverageRow).join("") : `<p class="muted">Keine Muskelregionen fuer diese Ansicht.</p>`}
+        ${visibleItems.length ? visibleItems.map(renderCoverageRow).join("") : `<p class="muted">Keine Muskelregionen für diese Ansicht.</p>`}
       </div>
-      ${selected ? renderCoverageDetail(selected) : `<article class="card"><p class="muted">Waehle einen Muskel fuer Details.</p></article>`}
+      ${selected ? renderCoverageDetail(selected) : `<article class="card"><p class="muted">Wähle einen Muskel für Details.</p></article>`}
     </section>
   `;
 }
@@ -4143,7 +4143,7 @@ function premiumTrendCoverageItems() {
 
 function productionMuscleMapPayload(view, mode, items, visibleItems) {
   return {
-    version: "6.17.2",
+    version: "6.17.3",
     view,
     mode,
     modeLabel: mode === "trend" ? "Trend" : mode === "today" ? "Heute" : mode === "month" ? "Monat" : "Diese Woche",
@@ -4208,7 +4208,7 @@ function renderCoverageBodyView(items) {
           }).join("")}
         </div>
       </div>
-      <p class="quiet">${htmlesc(texts.tapHint || "Tippe auf einen Muskel fuer Details.")}</p>
+      <p class="quiet">${htmlesc(texts.tapHint || "Tippe auf einen Muskel für Details.")}</p>
     </div>
   `;
 }
@@ -4218,7 +4218,7 @@ function renderInteractiveMuscleSvg(view, items) {
   if (premiumRegions.length) return renderPremiumMuscleSvg(view, items, premiumRegions);
   const regions = state.muscleMapRegions?.regions?.filter((item) => item.view === view) || [];
   if (!regions.length) {
-    return `<img src="./assets/muscle_maps/muscle_map_${view}_v3.0.0.svg" alt="${view === "front" ? "Vorderseite" : "Rueckseite"}">`;
+    return `<img src="./assets/muscle_maps/muscle_map_${view}_v3.0.0.svg" alt="${view === "front" ? "Vorderseite" : "Rückseite"}">`;
   }
   const selected = state.selectedMuscleId;
   const regionMarkup = regions.map((region, index) => {
@@ -4231,7 +4231,7 @@ function renderInteractiveMuscleSvg(view, items) {
   }).join("");
   return `
     <div class="interactive-muscle-map ${view}">
-      <img src="./assets/muscle_maps/muscle_map_${view}_v3.0.0.svg" alt="${view === "front" ? "Vorderseite" : "Rueckseite"}">
+      <img src="./assets/muscle_maps/muscle_map_${view}_v3.0.0.svg" alt="${view === "front" ? "Vorderseite" : "Rückseite"}">
       ${regionMarkup}
     </div>
   `;
@@ -4249,7 +4249,7 @@ function renderPremiumMuscleSvg(view, items, regions) {
   }).join("");
   return `
     <div class="interactive-muscle-map premium inline ${view}">
-      <svg class="premium-body-svg" viewBox="0 0 220 520" role="img" aria-label="${view === "front" ? "Athletische Muskelkarte Vorderseite" : "Athletische Muskelkarte Rueckseite"}">
+      <svg class="premium-body-svg" viewBox="0 0 220 520" role="img" aria-label="${view === "front" ? "Athletische Muskelkarte Vorderseite" : "Athletische Muskelkarte Rückseite"}">
         ${renderPremiumBodyBase(view)}
         <g class="premium-svg-regions">
           ${regionMarkup}
@@ -4325,10 +4325,10 @@ function premiumMusclePathDefinitions(view) {
     { id: "triceps_right", muscleId: "mg_triceps_long", side: "rechts", label: "Trizeps", d: "M179 158 C167 155 160 169 162 203 C163 226 170 239 180 243 C187 221 187 178 179 158 Z" },
     { id: "forearm_extensors_left", muscleId: "mg_forearm_extensors", side: "links", label: "Unterarmstrecker", d: "M39 244 C50 240 56 250 54 274 C52 294 46 304 35 306 C29 284 31 257 39 244 Z" },
     { id: "forearm_extensors_right", muscleId: "mg_forearm_extensors", side: "rechts", label: "Unterarmstrecker", d: "M181 244 C170 240 164 250 166 274 C168 294 174 304 185 306 C191 284 189 257 181 244 Z" },
-    { id: "erectors_upper_left", muscleId: "mg_erectors_upper", side: "links", label: "Rueckenstrecker oben", d: "M97 191 C106 208 107 244 103 270 C94 258 92 216 97 191 Z" },
-    { id: "erectors_upper_right", muscleId: "mg_erectors_upper", side: "rechts", label: "Rueckenstrecker oben", d: "M123 191 C114 208 113 244 117 270 C126 258 128 216 123 191 Z" },
-    { id: "erectors_lower_left", muscleId: "mg_erectors_lower", side: "links", label: "Rueckenstrecker unten", d: "M101 268 C107 283 106 305 99 326 C89 312 91 286 101 268 Z" },
-    { id: "erectors_lower_right", muscleId: "mg_erectors_lower", side: "rechts", label: "Rueckenstrecker unten", d: "M119 268 C113 283 114 305 121 326 C131 312 129 286 119 268 Z" },
+    { id: "erectors_upper_left", muscleId: "mg_erectors_upper", side: "links", label: "Rückenstrecker oben", d: "M97 191 C106 208 107 244 103 270 C94 258 92 216 97 191 Z" },
+    { id: "erectors_upper_right", muscleId: "mg_erectors_upper", side: "rechts", label: "Rückenstrecker oben", d: "M123 191 C114 208 113 244 117 270 C126 258 128 216 123 191 Z" },
+    { id: "erectors_lower_left", muscleId: "mg_erectors_lower", side: "links", label: "Rückenstrecker unten", d: "M101 268 C107 283 106 305 99 326 C89 312 91 286 101 268 Z" },
+    { id: "erectors_lower_right", muscleId: "mg_erectors_lower", side: "rechts", label: "Rückenstrecker unten", d: "M119 268 C113 283 114 305 121 326 C131 312 129 286 119 268 Z" },
     { id: "gluteus_maximus_left", muscleId: "mg_glutes_maximus", side: "links", label: "Gluteus maximus", d: "M73 305 C91 292 107 301 108 323 C104 348 82 358 65 340 C63 325 66 313 73 305 Z" },
     { id: "gluteus_maximus_right", muscleId: "mg_glutes_maximus", side: "rechts", label: "Gluteus maximus", d: "M147 305 C129 292 113 301 112 323 C116 348 138 358 155 340 C157 325 154 313 147 305 Z" },
     { id: "gluteus_medius_left", muscleId: "mg_glutes_medius", side: "links", label: "Gluteus medius", d: "M65 285 C78 279 94 287 101 304 C84 300 72 304 63 316 C60 304 60 293 65 285 Z" },
@@ -4496,7 +4496,7 @@ function renderCoverageDetail(muscleId) {
           ${detail.history.map((week) => `<div class="trend-item"><span style="height:${Math.max(14, Math.min(120, week.percent))}px; background:${coverageColorFor(week.percent)}"></span><small>${htmlesc(week.label)}</small></div>`).join("")}
         </div>
       </div>
-      ${contributors.length ? `<p class="quiet">${htmlesc(muscleDetailText("contributors", "Beteiligte Uebungen"))}: ${contributors.length}</p>` : `<p class="quiet">Noch keine Uebung fuer diese Muskelgruppe in der aktuellen Woche.</p>`}
+      ${contributors.length ? `<p class="quiet">${htmlesc(muscleDetailText("contributors", "Beteiligte Übungen"))}: ${contributors.length}</p>` : `<p class="quiet">Noch keine Übung für diese Muskelgruppe in der aktuellen Woche.</p>`}
     </div>
   `;
 }
@@ -4531,7 +4531,7 @@ function renderPerformanceCoachCard(session) {
             <span class="badge ${progression.decisionType === "change_exercise" || insight.performance.classification === "drop" ? "amber" : insight.records.length ? "green" : "blue"}">${htmlesc(insight.records[0] || progression.label)}</span>
           </div>
           <p class="muted">${htmlesc(smartNote)}</p>
-          <p class="quiet">${htmlesc(progression.coachText)}${progression.nextWeightKg ? ` Naechstes Ziel: ${kg(progression.nextWeightKg)}.` : ""} Â· ${progression.confidencePercent}% ${htmlesc(progression.confidenceLabel)}</p>
+          <p class="quiet">${htmlesc(progression.coachText)}${progression.nextWeightKg ? ` Nächstes Ziel: ${kg(progression.nextWeightKg)}.` : ""} · ${progression.confidencePercent}% ${htmlesc(progression.confidenceLabel)}</p>
           <details>
             <summary>Warum?</summary>
             <ul class="small-list">
@@ -4564,7 +4564,7 @@ function workoutTimelineEvents(session) {
     events.push({
       type: "exercise_start",
       title: exercise.exerciseNameSnapshot,
-      text: `${completedSets}/${exercise.plannedSets || exercise.sets?.length || 0} Saetze abgeschlossen - ${Math.round(totalVolume(exercise))} kg`,
+      text: `${completedSets}/${exercise.plannedSets || exercise.sets?.length || 0} Sätze abgeschlossen - ${Math.round(totalVolume(exercise))} kg`,
       tone: "blue"
     });
     (insight?.insight.records || []).forEach((record) => {
@@ -4595,7 +4595,7 @@ function workoutTimelineEvents(session) {
   events.push({
     type: "workout_end",
     title: timelineText("workoutFinished", "Training beendet"),
-    text: `${sessionDurationMinutes(session)} Minuten - ${sessionSetCount(session)} Saetze - ${Math.round(sessionVolume(session))} kg Volumen`,
+    text: `${sessionDurationMinutes(session)} Minuten - ${sessionSetCount(session)} Sätze - ${Math.round(sessionVolume(session))} kg Volumen`,
     tone: "green"
   });
   return events;
@@ -4609,7 +4609,7 @@ function renderWorkoutTimelineCard(session) {
         <h3 class="grow">${htmlesc(timelineText("title", "Workout Timeline"))}</h3>
         <span class="badge blue">${events.length} Events</span>
       </div>
-      <p class="muted">${sessionSetCount(session)} Saetze, ${session.completedExercises.length} Uebungen, ${Math.round(sessionVolume(session))} kg Gesamtvolumen.</p>
+      <p class="muted">${sessionSetCount(session)} Sätze, ${session.completedExercises.length} Übungen, ${Math.round(sessionVolume(session))} kg Gesamtvolumen.</p>
       <div class="workout-timeline-list">
         ${events.map((event) => `
           <div class="timeline-event ${htmlesc(event.tone)}">
@@ -4710,7 +4710,7 @@ function achievementItems() {
     { id: "ten_workouts", title: "10 Workouts", active: count >= 10, text: `${count}/10 gespeicherte Einheiten.` },
     { id: "hundred_workouts", title: "100 Workouts", active: count >= 100, text: `${count}/100 gespeicherte Einheiten.` },
     { id: "new_pr", title: achievementText("newRecord", "Neue Bestleistung"), active: records.length > 0, text: records[0] || "Noch kein neuer PR in der letzten Einheit." },
-    { id: "bodyweight_milestone", title: "Koerpergewicht", active: Boolean(bestWeight), text: bestWeight ? `Niedrigster gespeicherter Wert: ${kg(bestWeight.weightKg)}.` : "Noch kein Gewicht gespeichert." }
+    { id: "bodyweight_milestone", title: "Körpergewicht", active: Boolean(bestWeight), text: bestWeight ? `Niedrigster gespeicherter Wert: ${kg(bestWeight.weightKg)}.` : "Noch kein Gewicht gespeichert." }
   ];
 }
 
@@ -4756,10 +4756,10 @@ function renderCoachDashboardPremium() {
     record
   }))).slice(0, 3);
   const recommendationTitle = mainInsight ? mainInsight.progression.label : "Erstes Training sauber erfassen";
-  const recommendationText = mainInsight ? mainInsight.smartNote : "Starte die naechste Einheit und speichere alle Arbeitssaetze. Danach kann D-Coach belastbare Empfehlungen geben.";
+  const recommendationText = mainInsight ? mainInsight.smartNote : "Starte die nächste Einheit und speichere alle Arbeitssaetze. Danach kann D-Coach belastbare Empfehlungen geben.";
   const whyItems = mainInsight ? [...mainInsight.progression.why, ...mainInsight.insight.evidence].slice(0, 5) : [
-    "Ohne gespeicherte Trainings gibt es noch keine persoenliche Leistungsbasis.",
-    "Sobald Saetze vorhanden sind, werden Muskelabdeckung, Progression und PRs ausgewertet."
+    "Ohne gespeicherte Trainings gibt es noch keine persönliche Leistungsbasis.",
+    "Sobald Sätze vorhanden sind, werden Muskelabdeckung, Progression und PRs ausgewertet."
   ];
   return `
     <section class="coach-dashboard-premium stack" aria-label="Coach Dashboard">
@@ -4767,12 +4767,12 @@ function renderCoachDashboardPremium() {
         <div class="row">
           <div class="grow">
             <p class="muted">Heute</p>
-            <h2>${plan ? htmlesc(nextDay) : "Plan auswaehlen"}</h2>
+            <h2>${plan ? htmlesc(nextDay) : "Plan auswählen"}</h2>
           </div>
           <span class="badge blue">v3.2</span>
         </div>
         <p class="muted">${plan ? `Aktiver Plan: ${htmlesc(plan.planName)}` : "Ohne aktiven Plan bleibt die Empfehlung allgemein."}</p>
-        <button class="primary" ${plan ? "data-start-training-flow" : "data-tab=\"plans\""}>${plan ? "Training starten" : "Zu den Plaenen"}</button>
+        <button class="primary" ${plan ? "data-start-training-flow" : "data-tab=\"plans\""}>${plan ? "Training starten" : "Zu den Plänen"}</button>
       </article>
 
       <div class="premium-card-grid">
@@ -4811,7 +4811,7 @@ function renderCoachDashboardPremium() {
         </article>
 
         <article class="card stack">
-          <h3>Naechste Aktionen</h3>
+          <h3>Nächste Aktionen</h3>
           <div class="next-action-list">
             <button class="secondary" data-start-training-flow>Training starten</button>
             <button class="secondary" data-tab="journal">Readiness eintragen</button>
@@ -4825,7 +4825,7 @@ function renderCoachDashboardPremium() {
 
 function renderDashboardMiniMuscleMap(items) {
   const visible = items.slice(0, 6);
-  if (!visible.length) return `<p class="muted">Die Mini-Map fuellt sich nach deinem ersten gespeicherten Training.</p>`;
+  if (!visible.length) return `<p class="muted">Die Mini-Map füllt sich nach deinem ersten gespeicherten Training.</p>`;
   return `
     <div class="mini-muscle-map">
       ${visible.map((item) => `
@@ -5021,7 +5021,7 @@ function coachDataQualityForContext(context = {}) {
     outlierCleanliness * COACH_CALIBRATION_CONFIG_V616.qualityWeights.outlierCleanliness
   );
   const reasons = [
-    `${completeSets.length}/${allSets.length || 0} Saetze vollstaendig verwertbar.`,
+    `${completeSets.length}/${allSets.length || 0} Sätze vollständig verwertbar.`,
     `${comparable.length} vergleichbare Einheiten.`,
     readinessEntries.length ? "Readiness-Daten vorhanden." : "Aktuelle Readiness-Daten fehlen."
   ];
@@ -5117,7 +5117,7 @@ function coachConfidenceForRecommendation(recommendation, context = {}) {
   }
   if (unresolvedConflicts.length) {
     raw = Math.min(raw, 39);
-    limits.push("Ungeloester Sicherheits- oder Prioritaetskonflikt.");
+    limits.push("Ungelöster Sicherheits- oder Prioritätskonflikt.");
   }
   return {
     percent: Math.min(95, clampPercent(raw)),
@@ -5138,8 +5138,8 @@ function coachHardGatesForProposal(proposal, quality = null) {
   if (!proposal?.currentPlanSnapshot || planFingerprint(activePlan()) !== proposal.currentPlanFingerprint) gates.push("Plan-Snapshot ist veraltet.");
   const q = quality || coachDataQualityForContext({ exerciseId: changeExerciseIds[0] });
   if (q.flags.includes("conflicting_units")) gates.push("Einheit oder Gewichtseinheit widerspruechlich.");
-  if (q.flags.includes("incomplete_set") && q.completeSetRatio === 0) gates.push("Empfehlung basiert nur auf unvollstaendigen Saetzen.");
-  if ((proposal?.riskNotes || []).some((item) => String(item).toLowerCase().includes("schmerz")) && q.flags.includes("missing_readiness")) gates.push("Sicherheits-/Schmerzkonflikt nicht aufgeloest.");
+  if (q.flags.includes("incomplete_set") && q.completeSetRatio === 0) gates.push("Empfehlung basiert nur auf unvollständigen Sätzen.");
+  if ((proposal?.riskNotes || []).some((item) => String(item).toLowerCase().includes("schmerz")) && q.flags.includes("missing_readiness")) gates.push("Sicherheits-/Schmerzkonflikt nicht aufgelöst.");
   return [...new Set(gates)];
 }
 
@@ -5333,9 +5333,9 @@ function evaluateRecommendationOutcome(record, session = lastSession()) {
   const reasons = [];
   if (exerciseChanged || incomplete || comparison.score < 75 || coachRecommendationApplicationState(record) === "partially_applied") {
     result = "inconclusive";
-    if (exerciseChanged) reasons.push("Uebung wurde gewechselt.");
-    if (incomplete) reasons.push("Session enthaelt unvollstaendige Saetze.");
-    if (comparison.score < 75) reasons.push("Kontext ist nur eingeschraenkt vergleichbar.");
+    if (exerciseChanged) reasons.push("Übung wurde gewechselt.");
+    if (incomplete) reasons.push("Session enthält unvollständige Sätze.");
+    if (comparison.score < 75) reasons.push("Kontext ist nur eingeschränkt vergleichbar.");
   } else if (afterVolume && beforeVolume && afterVolume > beforeVolume * 1.03) {
     result = "positive";
     reasons.push("Leistung oder Volumen nach Empfehlung verbessert.");
@@ -5343,7 +5343,7 @@ function evaluateRecommendationOutcome(record, session = lastSession()) {
     result = "negative";
     reasons.push("Leistung nach Empfehlung deutlich niedriger.");
   } else {
-    reasons.push("Keine klare positive oder negative Veraenderung.");
+    reasons.push("Keine klare positive oder negative Veränderung.");
   }
   const evaluationKey = recommendationOutcomeEvaluationKey(record, session);
   const outcome = {
@@ -5414,9 +5414,9 @@ function coachExplanationForRecommendation(recommendation, context = {}) {
     evidenceUsed: recommendation.evidence || calibration.dataQuality.reasons,
     evidenceMissing: calibration.dataQuality.flags.includes("missing_readiness") ? ["Aktuelle Readiness fehlt."] : [],
     conflicts: (context.conflicts || []).flatMap((item) => item.userExplanation || []),
-    safetyNotes: recommendation.requiresConfirmation ? ["Aenderung erst nach bewusster Pruefung uebernehmen."] : [],
+    safetyNotes: recommendation.requiresConfirmation ? ["Änderung erst nach bewusster Prüfung übernehmen."] : [],
     predictedEffect: recommendation.action || "",
-    nextEvaluation: "Nach der naechsten vergleichbaren Einheit."
+    nextEvaluation: "Nach der nächsten vergleichbaren Einheit."
   };
 }
 
@@ -5458,13 +5458,13 @@ function smartCoachRecommendation() {
       id: "smart-coach-learning",
       scope: "daily",
       title: smartCoachText("learning", "D-Coach lernt dein Training kennen."),
-      summary: smartCoachText("notEnoughData", "Noch nicht genug Daten fuer eine belastbare Empfehlung."),
+      summary: smartCoachText("notEnoughData", "Noch nicht genug Daten für eine belastbare Empfehlung."),
       action: nextDay ? `${nextDay.name} starten und sauber speichern.` : "Erstes Training speichern.",
       affectedMuscles: [],
       confidencePercent: 35,
       why: ["Noch keine gespeicherte Trainingshistorie vorhanden."],
       evidence: [`Operation: ${state.smartCoachSchema?.operation || "offline_rule_based"}.`],
-      alternatives: ["Training starten", "Plan auswaehlen"],
+      alternatives: ["Training starten", "Plan auswählen"],
       requiresConfirmation: false,
       ruleId: "preference_fifth",
       priority: smartCoachPriority("preference_fifth")
@@ -5482,18 +5482,18 @@ function smartCoachRecommendation() {
   if (input.recoveryFatigue.deloadCandidate || criticalPlanned.length) {
     add("safety_first", {
       scope: "daily",
-      title: input.recoveryFatigue.deloadCandidate ? "Heute konservativ trainieren" : "LWS-sichere Variante pruefen",
+      title: input.recoveryFatigue.deloadCandidate ? "Heute konservativ trainieren" : "LWS-sichere Variante prüfen",
       summary: input.recoveryFatigue.deloadCandidate
-        ? "Mehrere Ermuedungssignale sprechen fuer reduzierte Belastung."
-        : `${criticalPlanned[0]?.displayName || "Eine geplante Uebung"} kann die LWS staerker belasten.`,
-      action: input.recoveryFatigue.deloadCandidate ? "Volumen oder Intensitaet reduzieren." : "Alternative mit niedrigerem LWS-Risiko waehlen.",
+        ? "Mehrere Ermüdungssignale sprechen für reduzierte Belastung."
+        : `${criticalPlanned[0]?.displayName || "Eine geplante Übung"} kann die LWS stärker belasten.`,
+      action: input.recoveryFatigue.deloadCandidate ? "Volumen oder Intensität reduzieren." : "Alternative mit niedrigerem LWS-Risiko wählen.",
       affectedMuscles: weak.map((item) => item.name),
       confidencePercent: Math.max(72, input.recoveryFatigue.deloadCandidate ? 84 : 76),
       why: [
         input.recoveryFatigue.statusText,
         ...criticalPlanned.map((exercise) => `${exercise.displayName}: ${exercise.lumbarDiscSuitability}`)
       ],
-      evidence: [`Systemische Ermuedung ${input.recoveryFatigue.systemicFatiguePercent}%.`, `Gelenkflags: ${input.recoveryFatigue.jointFlags.length}.`],
+      evidence: [`Systemische Ermüdung ${input.recoveryFatigue.systemicFatiguePercent}%.`, `Gelenkflags: ${input.recoveryFatigue.jointFlags.length}.`],
       alternatives: ["Maschinengefuehrte Variante", "Weniger Volumen", "Saubere Technik priorisieren"],
       requiresConfirmation: true
     });
@@ -5502,7 +5502,7 @@ function smartCoachRecommendation() {
   if (!plan) {
     add("plan_adherence_second", {
       scope: "daily",
-      title: "Plan auswaehlen",
+      title: "Plan auswählen",
       summary: "Ohne aktiven Plan bleibt der Coach allgemein.",
       action: "Aktiven Plan setzen.",
       affectedMuscles: [],
@@ -5520,12 +5520,12 @@ function smartCoachRecommendation() {
       scope: "weekly",
       title: weak[0] ? `${weak[0].name} priorisieren` : `${over[0].name} entlasten`,
       summary: `${main.name} liegt aktuell bei ${main.percent}% Wochenabdeckung.`,
-      action: weak[0] ? `${weak[0].name} in der naechsten Einheit gezielt einplanen.` : `${over[0].name} diese Woche nicht weiter erhoehen.`,
+      action: weak[0] ? `${weak[0].name} in der nächsten Einheit gezielt einplanen.` : `${over[0].name} diese Woche nicht weiter erhöhen.`,
       affectedMuscles: [...weak, ...over].slice(0, 4).map((item) => item.name),
       confidencePercent: Math.min(91, 65 + sessions.length * 2),
       why: [...weak.map((item) => `${item.name}: nur ${item.percent}%.`), ...over.map((item) => `${item.name}: ${item.percent}%.`)],
       evidence: [`Wochentrainings: ${sessionsSince(7).length}.`, `Plan-Simulation: ${input.planSimulation.simulatedSessions} Einheiten.`],
-      alternatives: ["Naechsten Trainingstag anpassen", "Uebungsalternative waehlen"],
+      alternatives: ["Nächsten Trainingstag anpassen", "Übungsalternative wählen"],
       requiresConfirmation: true
     });
   }
@@ -5550,13 +5550,13 @@ function smartCoachRecommendation() {
     add("preference_fifth", {
       scope: "daily",
       title: sessions.length < 12 ? smartCoachText("learning", "D-Coach lernt dein Training kennen.") : "Training sauber fortsetzen",
-      summary: sessions.length < 12 ? smartCoachText("notEnoughData", "Noch nicht genug Daten fuer eine belastbare Empfehlung.") : "Die aktuelle Datenlage zeigt keinen dringenden Eingriff.",
-      action: nextDay ? `${nextDay.name} wie geplant starten.` : "Naechste Einheit speichern.",
+      summary: sessions.length < 12 ? smartCoachText("notEnoughData", "Noch nicht genug Daten für eine belastbare Empfehlung.") : "Die aktuelle Datenlage zeigt keinen dringenden Eingriff.",
+      action: nextDay ? `${nextDay.name} wie geplant starten.` : "Nächste Einheit speichern.",
       affectedMuscles: [],
       confidencePercent: sessions.length < 12 ? Math.min(68, 35 + sessions.length * 3) : 74,
       why: [
-        `${sessions.length}/12 Trainings fuer stabile Smart-Coach-Empfehlungen.`,
-        "Keine Regel mit hoeherer Prioritaet verlangt aktuell eine Aenderung."
+        `${sessions.length}/12 Trainings für stabile Smart-Coach-Empfehlungen.`,
+        "Keine Regel mit höherer Priorität verlangt aktuell eine Änderung."
       ],
       evidence: [`Operation: ${state.smartCoachSchema?.operation || "offline_rule_based"}.`],
       alternatives: ["Weiter Daten sammeln", "Training manuell starten"],
@@ -5615,13 +5615,13 @@ function smartCoachRecommendationSafe() {
       id: "smart-coach-fallback",
       scope: "daily",
       title: "Coach pausiert",
-      summary: "Eine Berechnung war unvollstaendig. Training bleibt manuell nutzbar.",
-      action: "Naechste Einheit normal starten und Daten sauber speichern.",
+      summary: "Eine Berechnung war unvollständig. Training bleibt manuell nutzbar.",
+      action: "Nächste Einheit normal starten und Daten sauber speichern.",
       affectedMuscles: [],
       confidencePercent: 0,
       why: ["Fallback-Regel: calculation error."],
       evidence: ["Lokal geloggt, keine externen Daten."],
-      alternatives: ["Training starten", "Coach spaeter erneut pruefen"],
+      alternatives: ["Training starten", "Coach später erneut prüfen"],
       requiresConfirmation: false,
       ruleId: "fallback_calculation_error",
       priority: 0
@@ -5732,7 +5732,7 @@ function buildCoachPlanProposal() {
     createdAt: new Date().toISOString(),
     scope: "exercise",
     title: weak ? `${weak.name} priorisieren` : summary.recommendation,
-    summary: change ? `${change.exerciseNameSnapshot}: ${change.before} auf ${change.after} Saetze` : "Es liegt noch kein vollstaendiger Planvorschlag vor.",
+    summary: change ? `${change.exerciseNameSnapshot}: ${change.before} auf ${change.after} Sätze` : "Es liegt noch kein vollständiger Planvorschlag vor.",
     affectedMuscles: weak ? [{
       muscleId: weak.muscleId,
       label: weak.name,
@@ -5750,8 +5750,8 @@ function buildCoachPlanProposal() {
     } : null,
     why: summary.why.length ? summary.why : ["Die Empfehlung basiert auf Wochenabdeckung, Readiness und Planstruktur."],
     evidence: summary.smart?.evidence || [],
-    alternatives: change ? [{ title: "Alternative", summary: `${change.exerciseNameSnapshot} unveraendert lassen und die naechste Einheit auswerten.` }] : [],
-    riskNotes: ["Nur uebernehmen, wenn Technik und LWS aktuell stabil sind.", "Bei Schmerz oder schlechter Readiness nicht erhoehen."],
+    alternatives: change ? [{ title: "Alternative", summary: `${change.exerciseNameSnapshot} unverändert lassen und die nächste Einheit auswerten.` }] : [],
+    riskNotes: ["Nur übernehmen, wenn Technik und LWS aktuell stabil sind.", "Bei Schmerz oder schlechter Readiness nicht erhöhen."],
     requiresConfirmation: true,
     status: "pending"
   };
@@ -5782,7 +5782,7 @@ function openCoachProposalReview() {
   const proposal = buildCoachPlanProposal();
   const conflict = resolveCoachConflicts([
     { id: proposal.id, title: proposal.title, priorityClass: proposal.hardGates?.length ? "data_quality" : "progression", confidencePercent: proposal.confidencePercent },
-    { id: "time_budget_guard", title: "Zeitbudget schuetzen", priorityClass: coachTimeBudgetConflict(activePlan()?.days?.find((day) => day.name === proposal.proposedChanges?.[0]?.dayName), 1).conflict ? "time_limit" : "preferences", confidencePercent: 70 }
+    { id: "time_budget_guard", title: "Zeitbudget schützen", priorityClass: coachTimeBudgetConflict(activePlan()?.days?.find((day) => day.name === proposal.proposedChanges?.[0]?.dayName), 1).conflict ? "time_limit" : "preferences", confidencePercent: 70 }
   ], { unresolvedSafetyConflict: proposal.hardGates?.some((item) => item.includes("Schmerz")) });
   proposal.conflictResolutionId = conflict.id;
   storage.coachPlanProposals = [...storage.coachPlanProposals, proposal];
@@ -5816,10 +5816,10 @@ function proposalCanApply(proposal) {
 
 function applyCoachPlanProposal() {
   const proposal = activeCoachProposal();
-  if (!proposalCanApply(proposal)) return alert("Dieser Vorschlag ist unvollstaendig und kann nicht uebernommen werden.");
+  if (!proposalCanApply(proposal)) return alert("Dieser Vorschlag ist unvollständig und kann nicht übernommen werden.");
   const currentPlan = activePlan();
   if (planFingerprint(currentPlan) !== proposal.currentPlanFingerprint) {
-    alert("Der Plan wurde inzwischen geaendert. Bitte Vorschlag neu berechnen.");
+    alert("Der Plan wurde inzwischen geändert. Bitte Vorschlag neu berechnen.");
     return;
   }
   const previous = {
@@ -5906,7 +5906,7 @@ function renderCoachProposalReview() {
   const confidence = proposal.confidencePercent ?? proposal.prediction?.confidencePercent ?? 0;
   const conflict = storage.coachConflictLog.find((item) => item.id === proposal.conflictResolutionId);
   return `
-    <div class="proposal-backdrop" role="dialog" aria-modal="true" aria-label="Coach Vorschlag pruefen">
+    <div class="proposal-backdrop" role="dialog" aria-modal="true" aria-label="Coach Vorschlag prüfen">
       <section class="proposal-sheet stack">
         <div class="row">
           <div class="grow">
@@ -5929,10 +5929,10 @@ function renderCoachProposalReview() {
           <h3>Vorher / Nachher</h3>
           ${proposal.proposedChanges.length ? proposal.proposedChanges.map((change) => `
             <div class="compare-row">
-              <div><span>Vorher</span><strong>${htmlesc(change.exerciseNameSnapshot || change.exerciseId)} - ${change.before ?? "-"} Saetze</strong></div>
-              <div><span>Nachher</span><strong>${htmlesc(change.exerciseNameSnapshot || change.exerciseId)} - ${change.after ?? "-"} Saetze</strong></div>
+              <div><span>Vorher</span><strong>${htmlesc(change.exerciseNameSnapshot || change.exerciseId)} - ${change.before ?? "-"} Sätze</strong></div>
+              <div><span>Nachher</span><strong>${htmlesc(change.exerciseNameSnapshot || change.exerciseId)} - ${change.after ?? "-"} Sätze</strong></div>
             </div>
-          `).join("") : `<p class="muted">Keine konkrete Planaenderung vorhanden.</p>`}
+          `).join("") : `<p class="muted">Keine konkrete Planänderung vorhanden.</p>`}
         </article>
         <article class="proposal-block">
           <h3>Warum?</h3>
@@ -5949,7 +5949,7 @@ function renderCoachProposalReview() {
         </article>
         <article class="proposal-block">
           <div class="row">
-            <h3 class="grow">Datenqualitaet</h3>
+          <h3 class="grow">Datenqualität</h3>
             <span class="badge ${proposal.dataQualityScore >= 70 ? "green" : proposal.dataQualityScore >= 40 ? "amber" : "red"}">${proposal.dataQualityScore ?? 0}/100</span>
           </div>
           ${(proposal.dataQualityFlags || []).length ? `<p class="quiet">Flags: ${proposal.dataQualityFlags.map(htmlesc).join(", ")}</p>` : `<p class="quiet">Keine kritischen Quality Flags.</p>`}
@@ -5957,17 +5957,17 @@ function renderCoachProposalReview() {
         </article>
         ${conflict ? `<article class="proposal-block"><h3>Konfliktresolver</h3><ul class="small-list">${conflict.userExplanation.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul></article>` : ""}
         <article class="proposal-block">
-          <h3>Naechste Auswertung</h3>
-          <p class="muted">Outcome wird nach der naechsten vergleichbaren Einheit bewertet. Unvollstaendige oder stark abweichende Einheiten werden inconclusive.</p>
+          <h3>Nächste Auswertung</h3>
+          <p class="muted">Outcome wird nach der nächsten vergleichbaren Einheit bewertet. Unvollständige oder stark abweichende Einheiten werden inconclusive.</p>
         </article>
         <article class="proposal-block">
           <h3>Sicherheit</h3>
-          <ul class="small-list">${(proposal.riskNotes || []).map((item) => `<li>${htmlesc(item)}</li>`).join("") || "<li>Keine zusaetzlichen Hinweise.</li>"}</ul>
+          <ul class="small-list">${(proposal.riskNotes || []).map((item) => `<li>${htmlesc(item)}</li>`).join("") || "<li>Keine zusätzlichen Hinweise.</li>"}</ul>
         </article>
         ${state.showProposalAlternative ? `<article class="proposal-block"><h3>Alternative</h3>${(proposal.alternatives || []).map((item) => `<p class="muted"><strong>${htmlesc(item.title || "Alternative")}</strong><br>${htmlesc(item.summary || item)}</p>`).join("") || `<p class="muted">Keine Alternative hinterlegt.</p>`}</article>` : ""}
-        ${!canApply && proposal.status === "pending" ? `<p class="warning compact-warning">Uebernehmen ist deaktiviert, weil Hard Gates offen sind, der Vorschlag unvollstaendig ist oder der Plan nicht mehr passt.</p>` : ""}
+        ${!canApply && proposal.status === "pending" ? `<p class="warning compact-warning">Übernehmen ist deaktiviert, weil Hard Gates offen sind, der Vorschlag unvollständig ist oder der Plan nicht mehr passt.</p>` : ""}
         <div class="proposal-actions">
-          <button class="primary" data-apply-coach-proposal ${canApply ? "" : "disabled"}>Aenderung uebernehmen</button>
+          <button class="primary" data-apply-coach-proposal ${canApply ? "" : "disabled"}>Änderung übernehmen</button>
           <button class="secondary" data-show-proposal-alternative>Alternative anzeigen</button>
           <button class="secondary" data-reject-coach-proposal>Ablehnen</button>
           <button class="secondary" data-cancel-coach-proposal>Abbrechen</button>
@@ -6006,35 +6006,35 @@ function renderCoachDashboardV54() {
       <article class="card stack coach-hero-v54">
         <div class="row">
           <div class="grow">
-            <p class="muted">Smart Coach Â· offline</p>
+            <p class="muted">Smart Coach · offline</p>
             <h2>${htmlesc(summary.recommendation)}</h2>
           </div>
           <span class="badge ${summary.confidence >= 75 ? "green" : "amber"}">${summary.confidence}% ${htmlesc(summary.confidenceLabel)}</span>
         </div>
         <p class="muted">${htmlesc(summary.mainReason)}</p>
         <div class="coach-action-row">
-          <button class="primary" ${plan ? "data-start-training-flow" : "data-tab=\"plans\""}>${plan ? "Training starten" : "Plan auswaehlen"}</button>
-          <button class="secondary" data-confirm-plan-adjust>${htmlesc(coachDashboardText("review", "Vorschlag pruefen"))}</button>
+          <button class="primary" ${plan ? "data-start-training-flow" : "data-tab=\"plans\""}>${plan ? "Training starten" : "Plan auswählen"}</button>
+          <button class="secondary" data-confirm-plan-adjust>${htmlesc(coachDashboardText("review", "Vorschlag prüfen"))}</button>
         </div>
         <details>
           <summary>${htmlesc(coachDashboardText("why", "Warum?"))}</summary>
           <ul class="small-list">${summary.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
           ${summary.confidenceLimits.length ? `<h4>Begrenzt durch</h4><ul class="small-list">${summary.confidenceLimits.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
         </details>
-        <p class="quiet">Datenqualitaet: ${summary.dataQuality.score}/100${summary.dataQuality.flags.length ? ` - ${summary.dataQuality.flags.map(htmlesc).join(", ")}` : ""}</p>
-        <p class="quiet">${htmlesc(coachDashboardText("notAutomatic", "Aenderungen werden erst nach deiner Bestaetigung uebernommen."))}</p>
+      <p class="quiet">Datenqualität: ${summary.dataQuality.score}/100${summary.dataQuality.flags.length ? ` - ${summary.dataQuality.flags.map(htmlesc).join(", ")}` : ""}</p>
+        <p class="quiet">${htmlesc(coachDashboardText("notAutomatic", "Änderungen werden erst nach deiner Bestätigung übernommen."))}</p>
         ${currentUserSettings().debugMode ? `<p class="quiet">Regel: ${htmlesc(summary.smart.ruleId)}</p>` : ""}
         ${renderCoachFeedbackControls(summary.smart.id, summary.smart.ruleId)}
       </article>
       <div class="premium-card-grid">
         <article class="card stack">
           <div class="row">
-            <h3 class="grow">Prioritaeten dieser Woche</h3>
+            <h3 class="grow">Prioritäten dieser Woche</h3>
             <button class="chip-button" data-tab="musclemap">Map</button>
           </div>
           ${renderDashboardMiniMuscleMap(([...(chest ? [chest] : []), ...(weak.length ? weak : coverage)]).slice(0, 6))}
           ${chest && chest.percent > 0 ? `<p class="quiet">Brust wurde heute bereits belastet: ${chest.percent}% Wochenabdeckung.</p>` : ""}
-          ${over.length ? `<p class="quiet">Ueber Ziel: ${over.map((item) => `${htmlesc(item.name)} ${item.percent}%`).join(", ")}</p>` : ""}
+          ${over.length ? `<p class="quiet">Über Ziel: ${over.map((item) => `${htmlesc(item.name)} ${item.percent}%`).join(", ")}</p>` : ""}
         </article>
         <article class="card stack">
           <div class="row">
@@ -6054,7 +6054,7 @@ function renderCoachDashboardV54() {
             <span class="badge ${readiness.ready ? "green" : "amber"}">${readiness.ready ? "bereit" : "lernt"}</span>
           </div>
           <div class="confidence-bar"><span style="width:${readiness.percent}%"></span></div>
-          <p class="muted">${readiness.sessions}/${readiness.requiredWorkouts} Trainings Â· ${readiness.weeks}/${readiness.requiredWeeks} Wochen.</p>
+          <p class="muted">${readiness.sessions}/${readiness.requiredWorkouts} Trainings · ${readiness.weeks}/${readiness.requiredWeeks} Wochen.</p>
           <p class="quiet">v6 Smart Coach bleibt offline und regelbasiert. v7 AI Trainer erst nach stabiler Datenbasis.</p>
         </article>
       </div>
@@ -6073,8 +6073,8 @@ function renderTrainingDnaCard() {
           <h3 class="grow">Training-DNA</h3>
           <span class="badge amber">${dna.sessionCount} Einheiten</span>
         </div>
-        <p class="muted">${htmlesc(trainingDnaText("not_enough_data", "Noch nicht genug Daten fuer eine belastbare Auswertung."))}</p>
-        <p class="quiet">Aktuell: ${dna.setCount} aus mindestens 20 verwertbaren Saetzen.</p>
+        <p class="muted">${htmlesc(trainingDnaText("not_enough_data", "Noch nicht genug Daten für eine belastbare Auswertung."))}</p>
+        <p class="quiet">Aktuell: ${dna.setCount} aus mindestens 20 verwertbaren Sätzen.</p>
       </article>
     `;
   }
@@ -6086,11 +6086,11 @@ function renderTrainingDnaCard() {
       </div>
       <div class="dna-grid">
         <div><span>Rep-Bereich</span><strong>${htmlesc(dna.topRepRange || "-")}</strong></div>
-        <div><span>Ã˜ Dauer</span><strong>${dna.averageSessionDurationMinutes || "-"} min</strong></div>
+        <div><span>Ø Dauer</span><strong>${dna.averageSessionDurationMinutes || "-"} min</strong></div>
       </div>
-      ${dna.exerciseAffinity.length ? `<div class="stack"><h4>Hohe Uebungs-Affinitaet</h4>${dna.exerciseAffinity.map((item) => `<p class="quiet">${htmlesc(item.exercise.displayName)} Â· ${item.count} Einheiten</p>`).join("")}</div>` : ""}
-      ${dna.stagnating.length ? `<div class="stack"><h4>Stagnation moeglich</h4>${dna.stagnating.map((item) => `<p class="quiet">${htmlesc(item.exercise.displayName)} Â· ${trainingDnaText("stagnation_detected", "Diese Uebung stagniert seit mehreren vergleichbaren Einheiten.")}</p>`).join("")}</div>` : ""}
-      ${dna.undertrainedMuscles.length ? `<div class="stack"><h4>Unter Ziel</h4>${dna.undertrainedMuscles.map((item) => `<p class="quiet">${htmlesc(item.name)} Â· ${item.percent}%</p>`).join("")}</div>` : ""}
+      ${dna.exerciseAffinity.length ? `<div class="stack"><h4>Hohe Übungs-Affinität</h4>${dna.exerciseAffinity.map((item) => `<p class="quiet">${htmlesc(item.exercise.displayName)} · ${item.count} Einheiten</p>`).join("")}</div>` : ""}
+      ${dna.stagnating.length ? `<div class="stack"><h4>Stagnation möglich</h4>${dna.stagnating.map((item) => `<p class="quiet">${htmlesc(item.exercise.displayName)} · ${trainingDnaText("stagnation_detected", "Diese Übung stagniert seit mehreren vergleichbaren Einheiten.")}</p>`).join("")}</div>` : ""}
+      ${dna.undertrainedMuscles.length ? `<div class="stack"><h4>Unter Ziel</h4>${dna.undertrainedMuscles.map((item) => `<p class="quiet">${htmlesc(item.name)} · ${item.percent}%</p>`).join("")}</div>` : ""}
       ${memory.length ? `<ul class="small-list">${memory.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
       ${events.length ? `<details><summary>Timeline</summary><ul class="small-list">${events.map((event) => `<li>${dateText(event.date)}: ${htmlesc(event.title)} - ${htmlesc(event.description)}</li>`).join("")}</ul></details>` : ""}
     </article>
@@ -6102,7 +6102,7 @@ function renderExerciseRatingCard(exercise) {
   const quality = personalExerciseQualityScore(exercise);
   const rows = [
     ["Muskelreiz", rating.stimulusScore],
-    ["Ermuedungskosten", rating.fatigueCost],
+    ["Ermüdungskosten", rating.fatigueCost],
     ["Zeiteffizienz", rating.timeEfficiency],
     ["Progression", rating.progressionPotential],
     ["LWS-Freundlichkeit", rating.lumbarFriendliness],
@@ -6111,10 +6111,10 @@ function renderExerciseRatingCard(exercise) {
   return `
     <article class="card stack">
       <div class="row">
-        <h3 class="grow">Uebungsbewertung</h3>
+        <h3 class="grow">Übungsbewertung</h3>
         <span class="badge blue">${quality}/10</span>
       </div>
-      ${rating.isFallback ? `<p class="quiet">Fallback-Bewertung, weil fuer diese Uebung noch kein Seed-Rating hinterlegt ist.</p>` : ""}
+      ${rating.isFallback ? `<p class="quiet">Fallback-Bewertung, weil für diese Übung noch kein Seed-Rating hinterlegt ist.</p>` : ""}
       <div class="rating-grid">
         ${rows.map(([label, value]) => `
           <div>
@@ -6137,18 +6137,18 @@ function renderMachineMatchCard(exercise) {
         <h3 class="grow">Studio & Maschine</h3>
         <span class="badge amber">${htmlesc(studio?.name || "Studio")}</span>
       </div>
-      <p class="muted">${htmlesc(machineText("studioUnknown", "Fuer dieses Studio liegt noch kein bestaetigter Geraetekatalog vor."))}</p>
+      <p class="muted">${htmlesc(machineText("studioUnknown", "Für dieses Studio liegt noch kein bestätigter Gerätekatalog vor."))}</p>
       ${match ? `
         <div class="history-row">
           <div>
             <strong>${htmlesc(match.displayName)}</strong>
-            <p class="quiet">${htmlesc(machineText("usingGeneric", "Es werden generische Geraete/Alternativen genutzt."))}</p>
+            <p class="quiet">${htmlesc(machineText("usingGeneric", "Es werden generische Geräte/Alternativen genutzt."))}</p>
           </div>
           <span class="badge blue">${htmlesc(match.note)}</span>
         </div>
-      ` : `<p class="quiet">${htmlesc(machineText("noMatch", "Keine passende Maschine gefunden. Bitte manuell auswaehlen."))}</p>`}
+      ` : `<p class="quiet">${htmlesc(machineText("noMatch", "Keine passende Maschine gefunden. Bitte manuell auswählen."))}</p>`}
       ${alternatives.length ? `
-        <h4>${htmlesc(machineText("markOccupied", "Geraet besetzt"))}</h4>
+        <h4>${htmlesc(machineText("markOccupied", "Gerät besetzt"))}</h4>
         <ul class="small-list">${alternatives.map((item) => `<li>${htmlesc(item.exercise.displayName)} - ${htmlesc(item.explanation || exerciseListMuscleText(item.exercise))}</li>`).join("")}</ul>
       ` : ""}
     </article>
@@ -6168,7 +6168,7 @@ function intelligenceDecision() {
   const coverageHints = coverageCoachHints(coverageForSessions(weekSessions));
   const conflicts = [];
   if (readiness.color === "red") conflicts.push("Recovery vor Last");
-  if (coverageHints.some((hint) => hint.includes("ueberdurchschnittlich"))) conflicts.push("Ueberlastung vor Zusatzvolumen");
+  if (coverageHints.some((hint) => hint.includes("überdurchschnittlich"))) conflicts.push("Überlastung vor Zusatzvolumen");
   if (weekSessions.length >= 4) conflicts.push("Zeit/Erholung vor optionalem Volumen");
   const factors = {
     data_depth: Math.min(25, sessionCount * 5),
@@ -6179,7 +6179,7 @@ function intelligenceDecision() {
   };
   const confidencePercent = Math.max(0, Math.min(100, Object.values(factors).reduce((sum, value) => sum + value, 0)));
   let recommendation = "Trainingsdaten sammeln";
-  let action = "Naechste Einheit sauber speichern.";
+  let action = "Nächste Einheit sauber speichern.";
   const why = [];
   const evidence = [
     `${sessionCount} gespeicherte Trainings`,
@@ -6190,14 +6190,14 @@ function intelligenceDecision() {
     why.push("Ohne gespeicherte Einheiten kann der Coach noch keine belastbare Entscheidung treffen.");
   } else if (readiness.color === "red") {
     recommendation = "Recovery priorisieren";
-    action = "Belastung reduzieren oder Technik/leichte Saetze waehlen.";
+    action = "Belastung reduzieren oder Technik/leichte Sätze wählen.";
     why.push("Die aktuelle Readiness spricht gegen aggressive Progression.");
   } else if (coverageHints.length) {
     recommendation = "Muskelabdeckung ausgleichen";
     action = coverageHints[0];
-    why.push("Die Wochenabdeckung zeigt eine klare Prioritaet.");
+    why.push("Die Wochenabdeckung zeigt eine klare Priorität.");
   } else {
-    recommendation = "Kleine Progression pruefen";
+    recommendation = "Kleine Progression prüfen";
     action = "Bei stabiler Technik vorsichtig steigern.";
     why.push("Leistung, Abdeckung und Readiness liefern keinen harten Konflikt.");
   }
@@ -6233,7 +6233,7 @@ function renderIntelligenceCoreCard(context = "coach") {
           ${decision.conflicts.length ? decision.conflicts.map((item) => `<li>Konflikt: ${htmlesc(item)}</li>`).join("") : `<li>Keine harte Konfliktregel aktiv.</li>`}
         </ul>
       </details>
-      <p class="quiet">${context === "plans" ? "Planungsansicht: Empfehlung dient als Pruefung vor Anpassungen." : "Coachansicht: aus Historie, Readiness und Wochenabdeckung berechnet."}</p>
+      <p class="quiet">${context === "plans" ? "Planungsansicht: Empfehlung dient als Prüfung vor Anpassungen." : "Coachansicht: aus Historie, Readiness und Wochenabdeckung berechnet."}</p>
     </article>
   `;
 }
@@ -6258,13 +6258,13 @@ function recoveryFatigueSummary() {
     const exercise = exerciseById(item.exerciseId);
     return exercise?.spineLoadLevel === "high" || /hinge|deadlift|kreuzheben/i.test(`${exercise?.movementPattern || ""} ${exercise?.displayName || ""}`);
   })) jointFlags.push("LWS");
-  if (recentExercises.filter((item) => /push|druecken|press/i.test(exerciseById(item.exerciseId)?.movementPattern || exerciseById(item.exerciseId)?.displayName || "")).length >= 2) jointFlags.push("Schulter");
+  if (recentExercises.filter((item) => /push|drücken|press/i.test(exerciseById(item.exerciseId)?.movementPattern || exerciseById(item.exerciseId)?.displayName || "")).length >= 2) jointFlags.push("Schulter");
   if (coverage.some((item) => /quad|beine|knee|knie/i.test(`${item.muscleId} ${item.name}`) && item.percent > 120)) jointFlags.push("Knie");
   const deloadCandidate = systemicFatiguePercent >= 75 || muscleFatiguePercent >= 85 || (readiness.color === "red" && weekSessions.length >= 2);
   const status = deloadCandidate ? "deload" : systemicFatiguePercent >= 65 || muscleFatiguePercent >= 75 ? "high" : systemicFatiguePercent >= 45 ? "caution" : "good";
   return {
     status,
-    statusText: recoveryText(status, status === "good" ? "Erholung wirkt ausreichend." : status === "caution" ? "Heute konservativ planen." : status === "high" ? "Belastung hoch." : "Deload pruefen."),
+    statusText: recoveryText(status, status === "good" ? "Erholung wirkt ausreichend." : status === "caution" ? "Heute konservativ planen." : status === "high" ? "Belastung hoch." : "Deload prüfen."),
     systemicFatiguePercent,
     muscleFatiguePercent,
     topMuscle: maxMuscle,
@@ -6273,7 +6273,7 @@ function recoveryFatigueSummary() {
     evidence: [
       `${weekSessions.length} Trainings in 7 Tagen`,
       `${Math.round(weeklyVolume())} kg Wochenvolumen`,
-      `${rirZeroSets} Saetze mit RIR 0`
+      `${rirZeroSets} Sätze mit RIR 0`
     ]
   };
 }
@@ -6292,13 +6292,13 @@ function renderRecoveryFatigueCard(context = "coach") {
         <div class="fatigue-metric"><strong>${summary.muscleFatiguePercent}%</strong><span>Lokal</span></div>
         <div class="fatigue-metric"><strong>${summary.jointFlags.length}</strong><span>Gelenkflags</span></div>
       </div>
-      ${summary.topMuscle ? `<p class="muted">HÃ¶chste lokale Belastung: ${htmlesc(summary.topMuscle.name)} mit ${summary.topMuscle.percent}% Wochenabdeckung.</p>` : `<p class="muted">Noch nicht genug Muskeldaten fuer lokale Ermuedung.</p>`}
+      ${summary.topMuscle ? `<p class="muted">Höchste lokale Belastung: ${htmlesc(summary.topMuscle.name)} mit ${summary.topMuscle.percent}% Wochenabdeckung.</p>` : `<p class="muted">Noch nicht genug Muskeldaten für lokale Ermüdung.</p>`}
       ${summary.jointFlags.length ? `<p class="quiet">Gelenkstress: ${summary.jointFlags.map(htmlesc).join(", ")}</p>` : `<p class="quiet">Keine harte Gelenkstress-Regel aktiv.</p>`}
       <details>
         <summary>Warum?</summary>
         <ul class="small-list">${summary.evidence.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
       </details>
-      <p class="quiet">${context === "plans" ? "Planung: vor Zusatzvolumen pruefen." : "Coach: aus Historie, Readiness, RIR und Wochenlast berechnet."}</p>
+      <p class="quiet">${context === "plans" ? "Planung: vor Zusatzvolumen prüfen." : "Coach: aus Historie, Readiness, RIR und Wochenlast berechnet."}</p>
     </article>
   `;
 }
@@ -6314,11 +6314,11 @@ function planOptimizerSummary() {
   const overTargets = weekCoverage.filter((item) => item.percent > 120).slice(0, 3);
   const recovery = recoveryFatigueSummary();
   const action = weakPoints.length
-    ? `${weakPoints[0].name}: +2 bis +4 Saetze diese Woche pruefen.`
+    ? `${weakPoints[0].name}: +2 bis +4 Sätze diese Woche prüfen.`
     : overTargets.length
       ? `${overTargets[0].name}: Zusatzvolumen reduzieren.`
       : recovery.deloadCandidate
-        ? "Plan konservativ halten, Deload-Option pruefen."
+        ? "Plan konservativ halten, Deload-Option prüfen."
         : "Plan aktuell ohne harte Korrektur weiterfuehren.";
   return {
     planName: plan?.planName || "Kein aktiver Plan",
@@ -6377,7 +6377,7 @@ function weeklyCoachSummary() {
     activeRules.push({
       id: "legs_missing",
       title: "Legs Lite einplanen",
-      action: "Naechster sinnvoller Trainingstag: Legs Lite oder ein kurzer Bein-Fokus.",
+      action: "Nächster sinnvoller Trainingstag: Legs Lite oder ein kurzer Bein-Fokus.",
       why: "Diese Woche sind noch keine Beinmuskeln abgedeckt."
     });
   }
@@ -6385,15 +6385,15 @@ function weeklyCoachSummary() {
     activeRules.push({
       id: "lat_under_upper_back_over",
       title: "Mehr Vertikalzug",
-      action: "Ruecken-Tag pruefen: mehr Lat-Zug/Klimmzug, weniger rudern.",
-      why: "Lat ist unter Ziel, oberer Ruecken ist bereits hoch belastet."
+      action: "Rücken-Tag prüfen: mehr Lat-Zug/Klimmzug, weniger rudern.",
+      why: "Lat ist unter Ziel, oberer Rücken ist bereits hoch belastet."
     });
   }
   if (scores.triceps < 70 && scores.frontDelts > 120) {
     activeRules.push({
       id: "triceps_under_front_delt_over",
       title: "Trizeps statt Schulterdruck",
-      action: "Push-Tag pruefen: mehr Trizeps-Isolation, weniger Schulterdruecken.",
+      action: "Push-Tag prüfen: mehr Trizeps-Isolation, weniger Schulterdrücken.",
       why: "Trizeps ist unter Ziel, vordere Schulter ist bereits hoch belastet."
     });
   }
@@ -6401,14 +6401,14 @@ function weeklyCoachSummary() {
     activeRules.push({
       id: "hamstrings_under_quads_over",
       title: "Mehr Beinbeuger/Hip Hinge",
-      action: "Bein-Tag pruefen: Beinbeuger oder Hueftstreckung ergaenzen.",
+      action: "Bein-Tag prüfen: Beinbeuger oder Hüftstreckung ergänzen.",
       why: "Hamstrings sind unter Ziel, Quads sind bereits hoch belastet."
     });
   }
 
   const recommendedNextDay = activeRules[0]?.id === "legs_missing"
     ? plan?.days?.find((day) => plannedDayHitsMuscleGroup(day, groups.legs))?.name || "Legs Lite"
-    : nextPlanDayAfterLastSession(plan)?.name || "Naechste Einheit";
+    : nextPlanDayAfterLastSession(plan)?.name || "Nächste Einheit";
   const fallbackAction = missingMuscles.length
     ? `${missingMuscles[0].name}: diese Woche noch gezielt abdecken.`
     : overloadedMuscles.length
@@ -6448,10 +6448,10 @@ function renderWeeklyCoachCard() {
       <div class="mini-grid">
         <div class="fatigue-metric"><strong>${summary.missingMuscles.length}</strong><span>Fehlt</span></div>
         <div class="fatigue-metric"><strong>${summary.overloadedMuscles.length}</strong><span>Hoch</span></div>
-        <div class="fatigue-metric"><strong>${htmlesc(summary.recommendedNextDay)}</strong><span>Naechster Tag</span></div>
+        <div class="fatigue-metric"><strong>${htmlesc(summary.recommendedNextDay)}</strong><span>Nächster Tag</span></div>
       </div>
       ${summary.missingMuscles.length ? `<p class="quiet">Unter Ziel: ${summary.missingMuscles.map((item) => `${htmlesc(item.name)} ${item.percent}%`).join(", ")}</p>` : ""}
-      ${summary.overloadedMuscles.length ? `<p class="quiet">Ueber Ziel: ${summary.overloadedMuscles.map((item) => `${htmlesc(item.name)} ${item.percent}%`).join(", ")}</p>` : ""}
+      ${summary.overloadedMuscles.length ? `<p class="quiet">Über Ziel: ${summary.overloadedMuscles.map((item) => `${htmlesc(item.name)} ${item.percent}%`).join(", ")}</p>` : ""}
       <details>
         <summary>Warum?</summary>
         <ul class="small-list">
@@ -6460,7 +6460,7 @@ function renderWeeklyCoachCard() {
           <li>${summary.rulesLoaded ? "v6.1 Regeln geladen." : "v6.1 Regeln nicht geladen."}</li>
         </ul>
       </details>
-      <button class="secondary" data-confirm-plan-adjust>${htmlesc(weeklyCoachText("confirm", "Aenderung pruefen"))}</button>
+      <button class="secondary" data-confirm-plan-adjust>${htmlesc(weeklyCoachText("confirm", "Änderung prüfen"))}</button>
     </article>
   `;
 }
@@ -6506,11 +6506,11 @@ function renderSessionCoachPreWorkoutCard(day) {
   const plannedCoverage = coverageForPlannedEntries(day?.exercises || []);
   const optimizer = planOptimizerSummary();
   const warnings = [
-    ...optimizer.overTargets.slice(0, 1).map((item) => `${item.name}: heute nicht weiter ueberladen.`),
+    ...optimizer.overTargets.slice(0, 1).map((item) => `${item.name}: heute nicht weiter überladen.`),
     ...(day?.exercises || []).filter((planned) => {
       const exercise = exerciseById(planned.exerciseId);
       return exercise && exerciseIsCritical(exercise);
-    }).slice(0, 1).map((planned) => `${exerciseById(planned.exerciseId)?.displayName || "Uebung"}: LWS sauber vorbereiten.`)
+    }).slice(0, 1).map((planned) => `${exerciseById(planned.exerciseId)?.displayName || "Übung"}: LWS sauber vorbereiten.`)
   ];
   return `
     <article class="card stack session-coach-card" data-session-coach-stage="beforeWorkout">
@@ -6519,7 +6519,7 @@ function renderSessionCoachPreWorkoutCard(day) {
         <span class="badge blue">v6.2</span>
       </div>
       <p class="muted">${htmlesc(sessionCoachText("before", "So wirkt sich das Training voraussichtlich aus."))}</p>
-      ${renderSessionCoverageList(plannedCoverage, "Keine Planvorschau verfuegbar.")}
+      ${renderSessionCoverageList(plannedCoverage, "Keine Planvorschau verfügbar.")}
       ${warnings.length ? `<p class="warning compact-warning">${htmlesc(warnings[0])}</p>` : `<p class="quiet">Plan-Simulation: ${htmlesc(optimizer.action)}</p>`}
     </article>
   `;
@@ -6534,9 +6534,9 @@ function sessionCoachDuringSummary(workout, entry, exercise) {
   const projectedRemaining = remainingEntries.reduce((sum, item) => sum + estimateExerciseMinutes(exerciseById(item.exerciseId) || { defaultSets: 2, defaultRestSeconds: 90 }, item.sets?.length || 2), 0);
   const timeLow = elapsedMinutes + projectedRemaining > maxMinutes && optionalRemaining.length > 0;
   const prompts = [];
-  if (timeLow) prompts.push(sessionCoachText("timeLow", "Zeit knapp: optionale Uebung ueberspringen?"));
+  if (timeLow) prompts.push(sessionCoachText("timeLow", "Zeit knapp: optionale Übung überspringen?"));
   if (exerciseIsCritical(exercise)) prompts.push("LWS-Hinweis: Technik vor Last.");
-  prompts.push(sessionCoachText("occupied", "Geraet besetzt? Alternative anzeigen."));
+  prompts.push(sessionCoachText("occupied", "Gerät besetzt? Alternative anzeigen."));
   return { elapsedMinutes, maxMinutes, timeLow, prompts: prompts.slice(0, 3) };
 }
 
@@ -6574,9 +6574,9 @@ function renderSessionCoachAfterCard(session) {
         <span class="badge green">fertig</span>
       </div>
       <p class="muted">${htmlesc(sessionCoachText("after", "Training ausgewertet."))}</p>
-      <h4>${htmlesc(sessionCoachText("predictionCompare", "Prognose und tatsaechliche Belastung"))}</h4>
-      ${rows.length ? `<ul class="small-list">${rows.map((item) => `<li>${htmlesc(item.name)}: ${item.predicted}% geplant / ${item.actual}% erreicht</li>`).join("")}</ul>` : `<p class="quiet">Noch keine Coverage fuer diese Einheit.</p>`}
-      <p class="quiet">Fortschritt: ${improvements.length ? `${improvements.length} Verbesserung(en)` : "keine klare Verbesserung erkannt"}. Naechster Vorschlag: ${htmlesc(nextSuggestion)}.</p>
+      <h4>${htmlesc(sessionCoachText("predictionCompare", "Prognose und tatsächliche Belastung"))}</h4>
+      ${rows.length ? `<ul class="small-list">${rows.map((item) => `<li>${htmlesc(item.name)}: ${item.predicted}% geplant / ${item.actual}% erreicht</li>`).join("")}</ul>` : `<p class="quiet">Noch keine Coverage für diese Einheit.</p>`}
+      <p class="quiet">Fortschritt: ${improvements.length ? `${improvements.length} Verbesserung(en)` : "keine klare Verbesserung erkannt"}. Nächster Vorschlag: ${htmlesc(nextSuggestion)}.</p>
     </article>
   `;
 }
@@ -6600,12 +6600,12 @@ function plateauSummary() {
       plateauStatus: confidencePercent >= 55 ? "detected" : "none",
       plateauType,
       confidencePercent,
-      recommendedAction: plateauType === "load_plateau" ? "Erst Wiederholungen sammeln, dann Microload pruefen." : plateauType === "rep_plateau" ? "Pausenzeit oder Rep-Bereich leicht anpassen." : "Noch kein belastbares Plateau.",
+      recommendedAction: plateauType === "load_plateau" ? "Erst Wiederholungen sammeln, dann Microload prüfen." : plateauType === "rep_plateau" ? "Pausenzeit oder Rep-Bereich leicht anpassen." : "Noch kein belastbares Plateau.",
       why: [
         `${history.length} vergleichbare Einheiten`,
         `Volumenveraenderung ${Math.round(volumeDelta)}%`,
         `Lastveraenderung ${kg(loadDelta)}`
-      ].concat(avgRirNow !== null ? [`Ã˜ RIR ${Math.round(avgRirNow * 10) / 10}`] : [])
+      ].concat(avgRirNow !== null ? [`Ø RIR ${Math.round(avgRirNow * 10) / 10}`] : [])
     };
   }).filter(Boolean).sort((a, b) => b.confidencePercent - a.confidencePercent)[0];
   return candidates || {
@@ -6627,13 +6627,13 @@ function renderPlateauCoachCard() {
         <h3 class="grow">Plateau Coach</h3>
         <span class="badge ${active ? "amber" : "green"}">${active ? `${summary.confidencePercent}%` : "kein Alarm"}</span>
       </div>
-      <p class="muted">${summary.exercise ? htmlesc(summary.exercise.displayName) : "Noch keine Uebung belastbar auffaellig."}</p>
+      <p class="muted">${summary.exercise ? htmlesc(summary.exercise.displayName) : "Noch keine Übung belastbar auffällig."}</p>
       <p class="muted">${htmlesc(summary.recommendedAction)}</p>
       <details>
         <summary>Warum?</summary>
         <ul class="small-list">${summary.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
       </details>
-      ${active ? `<button class="secondary" data-confirm-plan-adjust>Plananpassung pruefen</button>` : ""}
+      ${active ? `<button class="secondary" data-confirm-plan-adjust>Plananpassung prüfen</button>` : ""}
     </article>
   `;
 }
@@ -6644,7 +6644,7 @@ function deloadCoachSummary() {
   const readiness = readinessForJournal(journalEntryForDate(todayIsoDate()) || latestJournalEntry());
   const scores = [];
   if (trend.status === "declining") scores.push(["performance_drop", 30, "Leistungstrend faellt."]);
-  if (recovery.systemicFatiguePercent >= 70 || recovery.muscleFatiguePercent >= 80) scores.push(["high_fatigue", 25, "Ermuedung ist hoch."]);
+  if (recovery.systemicFatiguePercent >= 70 || recovery.muscleFatiguePercent >= 80) scores.push(["high_fatigue", 25, "Ermüdung ist hoch."]);
   if (recovery.jointFlags.length) scores.push(["joint_stress", 25, `Gelenkstress: ${recovery.jointFlags.join(", ")}.`]);
   if (readiness.color === "red") scores.push(["readiness_low", 20, "Readiness niedrig."]);
   const score = Math.min(100, scores.reduce((sum, item) => sum + item[1], 0));
@@ -6659,7 +6659,7 @@ function deloadCoachSummary() {
     volumeReduction: prescription.volumeReductionPercent || (type === "exercise_deload" ? 0 : 20),
     intensityReduction: prescription.intensityReductionPercent || (type === "exercise_deload" ? 0 : 10),
     confidencePercent: score,
-    why: scores.map((item) => item[2]).length ? scores.map((item) => item[2]) : ["Einzelner schlechter Tag reicht nicht fuer Deload."]
+    why: scores.map((item) => item[2]).length ? scores.map((item) => item[2]) : ["Einzelner schlechter Tag reicht nicht für Deload."]
   };
 }
 
@@ -6671,14 +6671,14 @@ function renderDeloadCoachCard() {
         <h3 class="grow">Deload Coach</h3>
         <span class="badge ${summary.deloadNeeded ? "amber" : "green"}">${summary.confidencePercent}%</span>
       </div>
-      <p class="muted">${summary.deloadNeeded ? `Deload pruefen: ${summary.deloadType}.` : "Kein belastbarer Deload-Bedarf."}</p>
+      <p class="muted">${summary.deloadNeeded ? `Deload prüfen: ${summary.deloadType}.` : "Kein belastbarer Deload-Bedarf."}</p>
       <div class="mini-grid">
         <div class="fatigue-metric"><strong>${summary.durationDays}</strong><span>Tage</span></div>
         <div class="fatigue-metric"><strong>${summary.volumeReduction}%</strong><span>Volumen runter</span></div>
-        <div class="fatigue-metric"><strong>${summary.intensityReduction}%</strong><span>Intensitaet runter</span></div>
+        <div class="fatigue-metric"><strong>${summary.intensityReduction}%</strong><span>Intensität runter</span></div>
       </div>
       <ul class="small-list">${summary.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
-      ${summary.deloadNeeded ? `<button class="secondary" data-confirm-plan-adjust>Deload im Plan pruefen</button>` : ""}
+      ${summary.deloadNeeded ? `<button class="secondary" data-confirm-plan-adjust>Deload im Plan prüfen</button>` : ""}
     </article>
   `;
 }
@@ -6693,14 +6693,14 @@ function adaptiveMesocycleSummary() {
   const weeks = new Set(storage.sessions.map((session) => trainingWeekKey(session.startedAt))).size;
   let ruleId = "hold_volume";
   let status = "stabil";
-  let action = "Plan halten und naechste Woche erneut pruefen.";
+  let action = "Plan halten und nächste Woche erneut prüfen.";
   let weeklySetChange = 0;
   let progressionStrategy = "double_progression";
 
   if (deload.confidencePercent >= 80) {
     ruleId = "early_deload";
     status = "deload";
-    action = "Accumulation stoppen und Deload im Plan pruefen.";
+    action = "Accumulation stoppen und Deload im Plan prüfen.";
     weeklySetChange = -4;
     progressionStrategy = "volume_accumulation";
   } else if (recovery.status === "high" || recovery.status === "deload" || deload.deloadNeeded) {
@@ -6712,20 +6712,20 @@ function adaptiveMesocycleSummary() {
   } else if (weakPoints.length && recovery.status === "good") {
     ruleId = weeks >= 3 ? "weak_point_focus" : "increase_volume";
     status = "aufbauen";
-    action = `${weakPoints[0].name}: 1-2 Wochensaetze mehr pruefen.`;
+    action = `${weakPoints[0].name}: 1-2 Wochensaetze mehr prüfen.`;
     weeklySetChange = 2;
     progressionStrategy = "hypertrophy_reentry";
   } else if (plateau.plateauStatus === "detected") {
     ruleId = "weak_point_focus";
     status = "fokus";
-    action = `${plateau.exercise?.displayName || "Plateau-Uebung"} fuer 3-4 Wochen priorisieren.`;
+    action = `${plateau.exercise?.displayName || "Plateau-Übung"} für 3-4 Wochen priorisieren.`;
     weeklySetChange = 1;
   }
 
   return {
     id: `mesocycle-${ruleId}`,
     name: "Adaptive Mesocycle",
-    goal: weakPoints[0]?.name ? `${weakPoints[0].name} stabil auf Ziel bringen` : "Planqualitaet stabil halten",
+    goal: weakPoints[0]?.name ? `${weakPoints[0].name} stabil auf Ziel bringen` : "Planqualität stabil halten",
     plannedWeeks: 4,
     currentWeek: Math.max(1, Math.min(4, weeks || 1)),
     weeklyVolumeTargets: weakPoints.map((item) => ({ muscleId: item.muscleId, name: item.name, setChange: weeklySetChange || 1 })),
@@ -6761,8 +6761,8 @@ function renderAdaptiveMesocycleCard() {
       </div>
       <p class="muted">${htmlesc(summary.action)}</p>
       <ul class="small-list">${summary.why.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
-      <p class="quiet">Strategie: ${htmlesc(summary.progressionStrategy)} Â· Deload: ${htmlesc(summary.deloadStrategy)} Â· Regel: ${htmlesc(summary.ruleId)}</p>
-      ${summary.requiresConfirmation ? `<button class="secondary" data-confirm-plan-adjust>Mesocycle-Anpassung pruefen</button>` : `<p class="quiet">Keine automatische Planaenderung.</p>`}
+      <p class="quiet">Strategie: ${htmlesc(summary.progressionStrategy)} · Deload: ${htmlesc(summary.deloadStrategy)} · Regel: ${htmlesc(summary.ruleId)}</p>
+      ${summary.requiresConfirmation ? `<button class="secondary" data-confirm-plan-adjust>Mesocycle-Anpassung prüfen</button>` : `<p class="quiet">Keine automatische Planänderung.</p>`}
     </article>
   `;
 }
@@ -6854,7 +6854,7 @@ function renderPlanOptimizerCard(context = "plans") {
       </div>
       <p class="muted">${htmlesc(summary.action)}</p>
       ${summary.weakPoints.length ? `<ul class="small-list">${summary.weakPoints.map((item) => `<li>${htmlesc(planOptimizerText("weakPoint", "Schwachpunkt erkannt"))}: ${htmlesc(item.name)} (${item.percent}%)</li>`).join("")}</ul>` : `<p class="quiet">Keine Zielmuskelgruppe klar unter 70% Wochenabdeckung.</p>`}
-      ${summary.overTargets.length ? `<p class="quiet">Ueber Ziel: ${summary.overTargets.map((item) => `${htmlesc(item.name)} ${item.percent}%`).join(", ")}</p>` : ""}
+      ${summary.overTargets.length ? `<p class="quiet">Über Ziel: ${summary.overTargets.map((item) => `${htmlesc(item.name)} ${item.percent}%`).join(", ")}</p>` : ""}
       <p class="quiet">${context === "coach" ? "Coachansicht: als Wochensteuerung, nicht als Satzscreen-Hinweis." : "Planung: Simulation nutzt aktive Planstruktur und aktuelle Wochenabdeckung."}</p>
     </article>
   `;
@@ -6899,7 +6899,7 @@ function renderLongTermProgressCard(context = "coach") {
         <div class="fatigue-metric"><strong>${summary.sessions >= 6 ? `${summary.delta}%` : "-"}</strong><span>Trend</span></div>
       </div>
       ${summary.sessions >= 6 ? `<p class="muted">Prognose bei aktuellem Schnitt: ca. ${summary.forecast} kg Monatsvolumen.</p>` : `<p class="muted">${htmlesc(longTermText("notEnoughData", "Noch nicht genug Langzeitdaten"))}.</p>`}
-      <p class="quiet">${context === "plans" ? "Planung: Trend als Hintergrund fuer Wochenanpassungen." : "Coach: Plateau/Trend aus gespeicherten Einheiten berechnet."}</p>
+      <p class="quiet">${context === "plans" ? "Planung: Trend als Hintergrund für Wochenanpassungen." : "Coach: Plateau/Trend aus gespeicherten Einheiten berechnet."}</p>
     </article>
   `;
 }
@@ -6919,17 +6919,17 @@ function renderDashboard() {
       ${plan ? `<article class="card stack">
         <p class="muted">Aktiver Plan</p>
         <h2>${htmlesc(plan.planName)}</h2>
-        <p class="muted">Naechstes Training: ${htmlesc(nextDay)}</p>
+        <p class="muted">Nächstes Training: ${htmlesc(nextDay)}</p>
         <button class="primary" data-start-training-flow>Training starten</button>
       </article>` : `<article class="card stack">
         <h2>Kein aktiver Plan</h2>
-        <p class="muted">Aktiviere oder stelle einen Plan im Tab Plaene wieder her.</p>
-        <button class="secondary" data-tab="plans">Zu den Plaenen</button>
+        <p class="muted">Aktiviere oder stelle einen Plan im Tab Pläne wieder her.</p>
+        <button class="secondary" data-tab="plans">Zu den Plänen</button>
       </article>`}
       <article class="card stack">
         <div class="row"><h3 class="grow">Readiness</h3><span class="badge ${readiness.color}">${htmlesc(readiness.label)}</span></div>
         <p class="muted">${htmlesc(readiness.hint)}</p>
-        <button class="secondary" data-tab="journal">Journal oeffnen</button>
+        <button class="secondary" data-tab="journal">Journal öffnen</button>
       </article>
       <article class="card stack">
         <div class="row"><h3 class="grow">Wochenstatus</h3><span class="badge blue">${weeklySessions.length} Trainings</span></div>
@@ -6947,13 +6947,13 @@ function renderDashboard() {
         ${metric(String(storage.sessions.length), "Gespeicherte Einheiten")}
       </div>
       <article class="card stack">
-        <h3>Letzte Aktivitaet</h3>
+        <h3>Letzte Aktivität</h3>
         ${latestSessions.length ? latestSessions.map((item) => `
           <button class="list-button" data-session-id="${htmlesc(item.id)}">
             <div class="history-row">
               <div>
                 <strong>${htmlesc(item.dayName)}</strong>
-                <p class="muted">${dateText(item.startedAt)} Â· ${item.completedExercises.length} Uebungen Â· ${sessionSetCount(item)} Saetze</p>
+                <p class="muted">${dateText(item.startedAt)} · ${item.completedExercises.length} Übungen · ${sessionSetCount(item)} Sätze</p>
               </div>
               <span class="badge blue">${Math.round(sessionVolume(item))} kg</span>
             </div>
@@ -6976,7 +6976,7 @@ function renderCoachCalibrationCard() {
       <p class="muted">${htmlesc(explanation.recommendation)}</p>
       <div class="confidence-bar"><span style="width:${explanation.confidencePercent}%"></span></div>
       <div class="mini-grid">
-        <div><span>Datenqualitaet</span><strong>${explanation.dataQualityScore}/100</strong></div>
+        <div><span>Datenqualität</span><strong>${explanation.dataQualityScore}/100</strong></div>
         <div><span>History</span><strong>${storage.coachRecommendationHistory.length}</strong></div>
         <div><span>Outcomes</span><strong>${storage.recommendationOutcomes.length}</strong></div>
       </div>
@@ -7001,12 +7001,12 @@ function renderCoachRecommendationHistoryCard() {
             <div>
               <strong>${htmlesc(item.recommendationPayload?.title || item.recommendationType)}</strong>
               <p class="muted">${dateText(item.createdAt)} - ${htmlesc(item.status)}${outcome ? ` - ${htmlesc(outcome.result)}` : ""}</p>
-              <p class="quiet">Naechste Bewertung: ${item.evaluationDueAfter ? dateText(item.evaluationDueAfter) : "-"}</p>
+              <p class="quiet">Nächste Bewertung: ${item.evaluationDueAfter ? dateText(item.evaluationDueAfter) : "-"}</p>
             </div>
             <span class="badge ${item.confidenceAtCreation >= 65 ? "green" : item.confidenceAtCreation >= 40 ? "amber" : "red"}">${item.confidenceAtCreation}%</span>
           </div>
         `;
-      }).join("") : `<p class="muted">Noch keine gepruefte Empfehlung gespeichert.</p>`}
+      }).join("") : `<p class="muted">Noch keine geprüfte Empfehlung gespeichert.</p>`}
     </article>
   `;
 }
@@ -7039,8 +7039,8 @@ function renderCoachConflictCard() {
         <span class="badge ${time.conflict ? "amber" : "green"}">${time.limit} min</span>
       </div>
       <p class="muted">${htmlesc(time.explanation)}</p>
-      ${conflicts.length ? `<ul class="small-list">${conflicts.map((item) => `<li>${htmlesc(item.priorityReason)}: ${htmlesc((item.userExplanation || [])[0] || "Konflikt geloest.")}</li>`).join("")}</ul>` : `<p class="quiet">Noch kein persistierter Coach-Konflikt.</p>`}
-      <p class="quiet">Prioritaet: Sicherheit, Datenqualitaet, Recovery, Zeitlimit, Planreihenfolge, Progression, Muskelbalance, Praeferenzen, Variation.</p>
+      ${conflicts.length ? `<ul class="small-list">${conflicts.map((item) => `<li>${htmlesc(item.priorityReason)}: ${htmlesc((item.userExplanation || [])[0] || "Konflikt gelöst.")}</li>`).join("")}</ul>` : `<p class="quiet">Noch kein persistierter Coach-Konflikt.</p>`}
+      <p class="quiet">Priorität: Sicherheit, Datenqualität, Recovery, Zeitlimit, Planreihenfolge, Progression, Muskelbalance, Präferenzen, Variation.</p>
     </article>
   `;
 }
@@ -7053,7 +7053,7 @@ function renderCoachContextFeedbackCard() {
         <h3 class="grow">Kontext-Feedback</h3>
         <span class="badge blue">${storage.coachContextFeedback.length}</span>
       </div>
-      <p class="muted">Feedback wirkt nur im passenden Kontext aus Uebung, Muskel, Trainingstag, Empfehlungstyp, Geraet, Recovery und Zeitbudget.</p>
+      <p class="muted">Feedback wirkt nur im passenden Kontext aus Übung, Muskel, Trainingstag, Empfehlungstyp, Gerät, Recovery und Zeitbudget.</p>
       ${feedback.length ? `<ul class="small-list">${feedback.map((item) => `<li>${dateText(item.timestamp)}: ${htmlesc(item.feedbackType)} - ${htmlesc(item.contextKey || "Kontext")}</li>`).join("")}</ul>` : `<p class="quiet">Noch kein Kontext-Feedback gespeichert.</p>`}
     </article>
   `;
@@ -7090,11 +7090,11 @@ function renderCoach() {
   const coverageHints = coverageCoachHints(coverageForSessions(sessionsSince(7)));
   return `
     <section class="screen stack coach-screen">
-      <header><h1 class="title">Coach</h1><p class="subtitle">${htmlesc(session.dayName)} Â· ${dateText(session.startedAt)}</p></header>
+      <header><h1 class="title">Coach</h1><p class="subtitle">${htmlesc(session.dayName)} · ${dateText(session.startedAt)}</p></header>
       <div class="grid">
         ${metric(String(sessionDurationMinutes(session)), "Minuten")}
-        ${metric(String(session.completedExercises.length), "Uebungen")}
-        ${metric(String(sessionSetCount(session)), "Saetze")}
+        ${metric(String(session.completedExercises.length), "Übungen")}
+        ${metric(String(sessionSetCount(session)), "Sätze")}
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
       ${renderSessionCoachAfterCard(session)}
@@ -7133,14 +7133,14 @@ function renderCoach() {
             </div>
             <span class="badge ${item.isRecord ? "green" : "blue"}">${item.isRecord ? "Rekord" : "Plus"}</span>
           </div>
-        `).join("") : `<p class="muted">Keine Verbesserung gegenueber der letzten gespeicherten Ausfuehrung erkannt.</p>`}
+        `).join("") : `<p class="muted">Keine Verbesserung gegenüber der letzten gespeicherten Ausführung erkannt.</p>`}
       </article>
       <article class="card stack">
         <h3>Gewichtstrend</h3>
         ${renderWeightTrend(weightEntries)}
       </article>
       <article class="card stack">
-        <h3>Letzte Uebungen</h3>
+        <h3>Letzte Übungen</h3>
         ${session.completedExercises.sort((a, b) => a.sortOrder - b.sortOrder).map((exercise) => {
           const previous = previousExerciseBefore(exercise.exerciseId, session.id);
           const recommendation = progressionForCompletedExercise(exercise, previous, session.id);
@@ -7182,7 +7182,7 @@ function renderTraining() {
           <article class="card row">
             <div class="grow">
               <h2>${htmlesc(day.name)}</h2>
-              <p class="muted">${day.exercises.length} Ãœbungen Â· ${day.maxDurationMinutes} Minuten</p>
+              <p class="muted">${day.exercises.length} Übungen · ${day.maxDurationMinutes} Minuten</p>
               <p class="quiet">${lastDayDate(day.name) || "Noch nicht trainiert"}</p>
               ${renderWarmupHint(day)}
             </div>
@@ -7191,9 +7191,9 @@ function renderTraining() {
         </button>
         ${renderSmartWorkoutPreview(day.name)}
       `).join("") : `<article class="card stack">
-        <h2>Kein Training verfÃ¼gbar</h2>
+        <h2>Kein Training verfügbar</h2>
         <p class="muted">Aktiviere zuerst einen Plan.</p>
-        <button class="secondary" data-tab="plans">Plan auswÃ¤hlen</button>
+        <button class="secondary" data-tab="plans">Plan auswählen</button>
       </article>`}
     </section>
   `;
@@ -7205,11 +7205,11 @@ function renderSmartWorkoutPreview(dayName) {
   return `
     <article class="card stack builder-preview">
       <div class="row">
-        <h3 class="grow">Smart Builder Â· ${htmlesc(proposal.dayType)}</h3>
+        <h3 class="grow">Smart Builder · ${htmlesc(proposal.dayType)}</h3>
         <span class="badge blue">ca. ${proposal.estimatedDurationMinutes} min</span>
       </div>
       <ol class="builder-list">
-        ${proposal.exercises.map((item) => `<li><strong>${htmlesc(item.exercise.displayName)}</strong><span>${item.sets} Saetze Â· ${htmlesc(item.reps)}</span></li>`).join("")}
+        ${proposal.exercises.map((item) => `<li><strong>${htmlesc(item.exercise.displayName)}</strong><span>${item.sets} Sätze · ${htmlesc(item.reps)}</span></li>`).join("")}
       </ol>
       ${proposal.builderReasons.length ? `<ul class="small-list">${proposal.builderReasons.slice(0, 2).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
       ${proposal.warnings.length ? `<p class="quiet">${htmlesc(proposal.warnings[0])}</p>` : ""}
@@ -7237,9 +7237,9 @@ function renderTrainingV53() {
         <article class="card stack training-hero">
           <div class="row">
             <div class="grow">
-              <p class="muted">Naechste Einheit</p>
+              <p class="muted">Nächste Einheit</p>
               <h2>${htmlesc(primaryDay.name)}</h2>
-              <p class="muted">${primaryDay.exercises.length} Uebungen Â· ${primaryDay.maxDurationMinutes} Minuten Â· ${lastDayDate(primaryDay.name) || "noch nicht trainiert"}</p>
+              <p class="muted">${primaryDay.exercises.length} Übungen · ${primaryDay.maxDurationMinutes} Minuten · ${lastDayDate(primaryDay.name) || "noch nicht trainiert"}</p>
             </div>
             <span class="badge blue">Start</span>
           </div>
@@ -7257,9 +7257,9 @@ function renderTrainingV53() {
           </details>
         ` : ""}
       ` : `<article class="card stack">
-        <h2>Kein Training verfuegbar</h2>
+        <h2>Kein Training verfügbar</h2>
         <p class="muted">Aktiviere zuerst einen Plan.</p>
-        <button class="secondary" data-tab="plans">Plan auswaehlen</button>
+        <button class="secondary" data-tab="plans">Plan auswählen</button>
       </article>`}
     </section>
   `;
@@ -7271,7 +7271,7 @@ function renderTrainingDayCompactV53(day) {
       <article class="card row compact-training-day">
         <div class="grow">
           <h3>${htmlesc(day.name)}</h3>
-          <p class="muted">${day.exercises.length} Uebungen Â· ${day.maxDurationMinutes} min</p>
+          <p class="muted">${day.exercises.length} Übungen · ${day.maxDurationMinutes} min</p>
         </div>
         <span class="badge blue">Start</span>
       </article>
@@ -7286,16 +7286,16 @@ function renderSmartWorkoutPreviewV53(dayName) {
   return `
     <article class="card stack builder-preview compact-builder">
       <div class="row">
-        <h3 class="grow">Smart Builder Â· ${htmlesc(proposal.dayType)}</h3>
+        <h3 class="grow">Smart Builder · ${htmlesc(proposal.dayType)}</h3>
         <span class="badge blue">ca. ${proposal.estimatedDurationMinutes} min</span>
       </div>
-      <p class="muted">${proposal.exercises.length} Uebungen Â· Fokus: ${htmlesc(focus.join(", ") || "Ganzkoerper")}</p>
+      <p class="muted">${proposal.exercises.length} Übungen · Fokus: ${htmlesc(focus.join(", ") || "Ganzkörper")}</p>
       ${proposal.builderReasons.length ? `<ul class="small-list">${proposal.builderReasons.slice(0, 2).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : ""}
       ${proposal.warnings.length ? `<p class="quiet">${htmlesc(proposal.warnings[0])}</p>` : ""}
       <details class="compact-plan-preview">
         <summary>Planvorschau</summary>
         <ol class="builder-list">
-          ${proposal.exercises.map((item) => `<li><strong>${htmlesc(item.exercise.displayName)}</strong><span>${item.sets} Saetze Â· ${htmlesc(item.reps)}</span></li>`).join("")}
+          ${proposal.exercises.map((item) => `<li><strong>${htmlesc(item.exercise.displayName)}</strong><span>${item.sets} Sätze · ${htmlesc(item.reps)}</span></li>`).join("")}
         </ol>
       </details>
       <button class="secondary" data-start-smart-day="${htmlesc(dayName)}">Smart-Training starten</button>
@@ -7369,7 +7369,7 @@ function renderPrimaryCoachRecommendationCard() {
       <p class="quiet">${htmlesc(summary.mainReason)}</p>
       <div class="button-row">
         <button class="secondary" data-tab="coach">Details im Coach</button>
-        <button class="secondary" data-confirm-plan-adjust>${htmlesc(coachDashboardText("review", "Vorschlag pruefen"))}</button>
+        <button class="secondary" data-confirm-plan-adjust>${htmlesc(coachDashboardText("review", "Vorschlag prüfen"))}</button>
       </div>
     </article>
   `;
@@ -7382,16 +7382,16 @@ function latestWarmupEquipmentMapping() {
 }
 
 function askWarmupBeforeWorkout() {
-  if (!confirm("Moechtest du dich vorher aufwaermen?")) return null;
+  if (!confirm("Möchtest du dich vorher aufwärmen?")) return null;
   const last = lastWarmupDefaults();
   const scanned = latestWarmupEquipmentMapping();
-  const equipment = prompt("Warm-up Geraet: Laufband / Fahrrad / Crosstrainer / Rudergeraet / Stepper / Sonstiges", scanned?.machineLabel || last?.equipment || "Fahrrad");
+  const equipment = prompt("Warm-up Gerät: Laufband / Fahrrad / Crosstrainer / Rudergeraet / Stepper / Sonstiges", scanned?.machineLabel || last?.equipment || "Fahrrad");
   if (equipment === null) return null;
   const minutesText = prompt("Warm-up Dauer in Minuten", last?.durationMinutes ? String(last.durationMinutes) : "8");
   if (minutesText === null) return null;
   const durationMinutes = Math.max(0, parseInteger(minutesText) || 0);
   if (!durationMinutes) return null;
-  const intensity = prompt("Intensitaet optional: leicht / mittel / hoch", last?.intensity || "leicht") || "";
+  const intensity = prompt("Intensität optional: leicht / mittel / hoch", last?.intensity || "leicht") || "";
   const note = prompt("Warm-up Notiz optional", "") || "";
   return {
     id: crypto.randomUUID ? crypto.randomUUID() : `warmup_${Date.now()}`,
@@ -7509,7 +7509,7 @@ function startDay(dayName) {
 function startSmartDay(dayName) {
   const proposal = buildSmartWorkout(dayName);
   if (!proposal.exercises.length) {
-    alert("Keine passende Uebung gefunden. Bitte manuell auswaehlen.");
+    alert("Keine passende Übung gefunden. Bitte manuell auswählen.");
     return;
   }
   const plan = activePlan();
@@ -7543,21 +7543,21 @@ function renderWorkout() {
     <section class="screen stack">
       <header>
         <h1 class="title">${htmlesc(workout.dayName)}</h1>
-        <p class="subtitle">Ãœbung ${workout.index + 1} von ${workout.entries.length}</p>
+        <p class="subtitle">Übung ${workout.index + 1} von ${workout.entries.length}</p>
       </header>
       <div class="progress"><span style="width:${progress}%"></span></div>
       ${renderWorkoutWarmupSummary(workout)}
       ${renderSessionCoachDuringCard(workout, entry, exercise)}
       <article class="card stack">
         <h2>${htmlesc(exercise.displayName)}</h2>
-        <p class="muted">${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].slice(0, 3).join(" Â· "))}</p>
+        <p class="muted">${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].slice(0, 3).join(" · "))}</p>
         <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} <span class="badge blue">${htmlesc(entry.reps)} Wdh.</span> <span class="badge">${entry.restSeconds} s Pause</span></div>
-        ${machineSetting ? `<p class="quiet">Setup: Sitz ${htmlesc(machineSetting.seatPosition || "-")} Â· Griff ${htmlesc(machineSetting.handlePosition || "-")} Â· Ruecken ${htmlesc(machineSetting.backrestPosition || "-")}</p>` : ""}
+        ${machineSetting ? `<p class="quiet">Setup: Sitz ${htmlesc(machineSetting.seatPosition || "-")} · Griff ${htmlesc(machineSetting.handlePosition || "-")} · Rücken ${htmlesc(machineSetting.backrestPosition || "-")}</p>` : ""}
         ${scannedMapping ? `<p class="quiet">Life Fitness: ${htmlesc(scannedMapping.machineLabel || scannedMapping.machineSerial || "Zuordnung gespeichert")} - Sitz ${htmlesc(entry.seatPosition || "-")} - Griff ${htmlesc(entry.gripPosition || "-")}</p>` : ""}
         ${exerciseIsCritical(exercise) ? `<p class="warning compact-warning">${lwsWarning(exercise)}</p>` : ""}
         <div class="button-grid">
           <button class="secondary" data-workout-exercise-detail="${htmlesc(exercise.id)}">Details ansehen</button>
-          <button class="secondary" data-workout-equipment-scan>Geraet scannen</button>
+          <button class="secondary" data-workout-equipment-scan>Gerät scannen</button>
         </div>
       </article>
       ${state.equipmentScanner.active ? renderWorkoutScannerPanel() : ""}
@@ -7568,17 +7568,17 @@ function renderWorkout() {
         ` : `<p class="muted">Noch keine vorherige Leistung vorhanden. Starte moderat.</p>`}
       </article>
       <article class="card stack">
-        <div class="row"><h3 class="grow">SÃ¤tze</h3><span class="quiet">kg Â· Wdh. Â· RIR</span></div>
+        <div class="row"><h3 class="grow">Sätze</h3><span class="quiet">kg · Wdh. · RIR</span></div>
         ${entry.sets.map((set, index) => renderSetRow(set, index)).join("")}
       </article>
       ${renderExerciseSetupFields(entry)}
-      <p class="quiet">Dieses Training wird automatisch auf diesem GerÃ¤t gesichert.</p>
+      <p class="quiet">Dieses Training wird automatisch auf diesem Gerät gesichert.</p>
       ${state.restTimer.remaining > 0 || state.restTimer.running ? renderRestTimer() : ""}
       ${state.showAlternatives ? renderAlternativePicker(alternatives) : ""}
       <div class="actions">
-        <button class="secondary" data-toggle-alternatives>${state.showAlternatives ? "Alternativen ausblenden" : machineText("device_occupied", "Geraet besetzt? Alternative anzeigen.")}</button>
-        ${workout.index > 0 ? `<button class="secondary" data-prev-exercise>Vorherige Uebung</button>` : ""}
-        <button class="primary" data-next-exercise>${workout.index < workout.entries.length - 1 ? "NÃ¤chste Ãœbung" : "Training speichern"}</button>
+        <button class="secondary" data-toggle-alternatives>${state.showAlternatives ? "Alternativen ausblenden" : machineText("device_occupied", "Gerät besetzt? Alternative anzeigen.")}</button>
+        ${workout.index > 0 ? `<button class="secondary" data-prev-exercise>Vorherige Übung</button>` : ""}
+        <button class="primary" data-next-exercise>${workout.index < workout.entries.length - 1 ? "Nächste Übung" : "Training speichern"}</button>
         <button class="secondary" data-cancel-workout>Training abbrechen</button>
       </div>
     </section>
@@ -7590,7 +7590,7 @@ function renderWorkoutWarmupSummary(workout) {
   if (!warmups.length) return "";
   return `
     <article class="card stack compact-card">
-      <h3>0. Aufwaermen</h3>
+      <h3>0. Aufwärmen</h3>
       ${warmups.map((item) => `<p class="muted">${htmlesc(item.equipment)} - ${Number(item.durationMinutes) || 0} Minuten${item.intensity ? ` - ${htmlesc(item.intensity)}` : ""}</p>`).join("")}
     </article>
   `;
@@ -7600,7 +7600,7 @@ function renderWorkoutScannerPanel() {
   return `
     <article class="card stack equipment-scanner-card">
       <div class="row">
-        <h3 class="grow">Geraet scannen</h3>
+        <h3 class="grow">Gerät scannen</h3>
         <span class="badge blue">Training</span>
       </div>
       <p class="muted">Der aktuelle Satz wird nicht automatisch abgeschlossen.</p>
@@ -7611,12 +7611,12 @@ function renderWorkoutScannerPanel() {
       ` : ""}
       ${state.equipmentScanner.error ? `<p class="quiet">${htmlesc(state.equipmentScanner.error)}</p>` : ""}
       <div class="button-grid">
-        <button class="primary" data-start-equipment-scan>Kamera oeffnen</button>
+        <button class="primary" data-start-equipment-scan>Kamera öffnen</button>
         <button class="secondary" data-stop-equipment-scan>Scanner schliessen</button>
       </div>
       <div class="row">
         <input class="input grow" placeholder="Code oder URL manuell eingeben" value="${htmlesc(state.equipmentScanner.rawCode)}" data-manual-equipment-code>
-        <button class="secondary compact-button" data-apply-manual-equipment-code>Pruefen</button>
+        <button class="secondary compact-button" data-apply-manual-equipment-code>Prüfen</button>
       </div>
       ${renderEquipmentScannerResult()}
     </article>
@@ -7632,10 +7632,10 @@ function renderExerciseSetupFields(entry) {
         <label>Griff<input class="input" value="${htmlesc(entry.gripPosition || "")}" placeholder="neutral, proniert, oberer Griff" data-entry-field="gripPosition"></label>
         <label>Griffbreite<input class="input" value="${htmlesc(entry.gripWidth || "")}" placeholder="eng, mittel, breit" data-entry-field="gripWidth"></label>
         <label>Aufsatz<input class="input" value="${htmlesc(entry.attachment || "")}" placeholder="Seil, V-Griff, Stange" data-entry-field="attachment"></label>
-        <label>Geraet<input class="input" value="${htmlesc(entry.machineLabel || "")}" placeholder="z.B. Brustpresse Fenster" data-entry-field="machineLabel"></label>
-        <label>Geraetenummer<input class="input" value="${htmlesc(entry.machineSerial || "")}" placeholder="z.B. 12" data-entry-field="machineSerial"></label>
+        <label>Gerät<input class="input" value="${htmlesc(entry.machineLabel || "")}" placeholder="z.B. Brustpresse Fenster" data-entry-field="machineLabel"></label>
+        <label>Gerätenummer<input class="input" value="${htmlesc(entry.machineSerial || "")}" placeholder="z.B. 12" data-entry-field="machineSerial"></label>
       </div>
-      <textarea class="input area" placeholder="Notiz zu Uebung oder Training ..." data-entry-field="exerciseNote">${htmlesc(entry.exerciseNote || "")}</textarea>
+      <textarea class="input area" placeholder="Notiz zu Übung oder Training ..." data-entry-field="exerciseNote">${htmlesc(entry.exerciseNote || "")}</textarea>
       <textarea class="input area" placeholder="Notiz zum Training ..." data-workout-field="sessionNote">${htmlesc(state.activeWorkout?.sessionNote || "")}</textarea>
     </article>
   `;
@@ -7687,7 +7687,7 @@ function renderSetRow(set, index) {
       <input inputmode="decimal" placeholder="kg" value="${htmlesc(set.weightText)}" data-set="${index}" data-field="weightText">
       <input inputmode="numeric" placeholder="Wdh." value="${htmlesc(set.repsText)}" data-set="${index}" data-field="repsText">
       <input inputmode="numeric" placeholder="RIR" value="${htmlesc(set.rirText)}" data-set="${index}" data-field="rirText">
-      <button class="check ${set.completed ? "done" : ""}" data-check-set="${index}">${set.completed ? "âœ“" : ""}</button>
+      <button class="check ${set.completed ? "done" : ""}" data-check-set="${index}">${set.completed ? "✓" : ""}</button>
     </div>
   `;
 }
@@ -7697,8 +7697,8 @@ function exerciseIsCritical(exercise) {
 }
 
 function lwsWarning(exercise) {
-  let text = "Diese Ãœbung kann die LendenwirbelsÃ¤ule stÃ¤rker belasten. Wenn du Schmerzen hast, wÃ¤hle eine Alternative.";
-  if (exercise.lumbarDiscSuitability === "avoidInitially") text += " FÃ¼r den Wiedereinstieg zunÃ¤chst besser vermeiden.";
+  let text = "Diese Übung kann die Lendenwirbelsäule stärker belasten. Wenn du Schmerzen hast, wähle eine Alternative.";
+  if (exercise.lumbarDiscSuitability === "avoidInitially") text += " Für den Wiedereinstieg zunächst besser vermeiden.";
   return htmlesc(text);
 }
 
@@ -7743,7 +7743,7 @@ function handleIncompleteSetsBeforeLeaving(entry) {
     first.rirText ? `RIR ${first.rirText}` : ""
   ].filter(Boolean).join(", ");
   const choice = window.prompt(
-    `Satz noch nicht abgeschlossen\n\n${filled || "Es wurden bereits Werte eingetragen."}\n\n1 = Satz fertig eintragen\n2 = Als unvollstaendig speichern\n3 = Eingaben verwerfen\n4 = Abbrechen`,
+    `Satz noch nicht abgeschlossen\n\n${filled || "Es wurden bereits Werte eingetragen."}\n\n1 = Satz fertig eintragen\n2 = Als unvollständig speichern\n3 = Eingaben verwerfen\n4 = Abbrechen`,
     "4"
   );
   if (choice === "1") {
@@ -7824,7 +7824,7 @@ function finishOrNext() {
   if (incomplete.length) {
     const first = incomplete[0];
     const exercise = exerciseById(first.entry.exerciseId);
-    const proceed = confirm(`Training abschliessen?\n\n${incomplete.length} Satz ist noch unvollstaendig:\n${exercise?.displayName || first.entry.exerciseId} - Satz ${first.set.setNumber}\n\nOK = unvollstaendig abschliessen\nAbbrechen = Satz bearbeiten`);
+    const proceed = confirm(`Training abschliessen?\n\n${incomplete.length} Satz ist noch unvollständig:\n${exercise?.displayName || first.entry.exerciseId} - Satz ${first.set.setNumber}\n\nOK = unvollständig abschliessen\nAbbrechen = Satz bearbeiten`);
     if (!proceed) {
       workout.index = first.entryIndex;
       persistWorkoutDraft();
@@ -7887,7 +7887,7 @@ function renderSessionDetail(id) {
   if (!session) {
     return `
       <section class="screen stack">
-        <button class="secondary" data-back-dashboard>ZurÃ¼ck</button>
+        <button class="secondary" data-back-dashboard>Zurück</button>
         <article class="card"><p class="muted">Training nicht gefunden.</p></article>
       </section>
     `;
@@ -7895,15 +7895,15 @@ function renderSessionDetail(id) {
   const improvements = sessionImprovements(session);
   return `
     <section class="screen stack">
-      <button class="secondary" data-back-dashboard>ZurÃ¼ck</button>
+      <button class="secondary" data-back-dashboard>Zurück</button>
       <header>
         <h1 class="title">Auswertung</h1>
-        <p class="subtitle">${htmlesc(session.dayName)} Â· ${dateText(session.startedAt)}</p>
+        <p class="subtitle">${htmlesc(session.dayName)} · ${dateText(session.startedAt)}</p>
       </header>
       <div class="grid">
         ${metric(String(sessionDurationMinutes(session)), "Minuten")}
-        ${metric(String(session.completedExercises.length), "Ãœbungen")}
-        ${metric(String(sessionSetCount(session)), "SÃ¤tze")}
+        ${metric(String(session.completedExercises.length), "Übungen")}
+        ${metric(String(sessionSetCount(session)), "Sätze")}
         ${metric(`${Math.round(sessionVolume(session))} kg`, "Volumen")}
       </div>
       ${renderWorkoutTimelineCard(session)}
@@ -7920,19 +7920,19 @@ function renderSessionDetail(id) {
             </div>
             <span class="badge ${item.isRecord ? "green" : "blue"}">${item.isRecord ? "Rekord" : "Plus"}</span>
           </div>
-        `).join("") : `<p class="muted">Keine Verbesserung gegenÃ¼ber der letzten gespeicherten AusfÃ¼hrung erkannt.</p>`}
+        `).join("") : `<p class="muted">Keine Verbesserung gegenüber der letzten gespeicherten Ausführung erkannt.</p>`}
       </article>
       ${session.completedExercises.sort((a, b) => a.sortOrder - b.sortOrder).map((exercise) => `
         <article class="card stack">
           <h3>${htmlesc(exercise.exerciseNameSnapshot)}</h3>
           <ul class="small-list">
-            ${exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}${set.rir !== null && set.rir !== undefined ? ` Â· RIR ${set.rir}` : ""}</li>`).join("")}
+            ${exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}${set.rir !== null && set.rir !== undefined ? ` · RIR ${set.rir}` : ""}</li>`).join("")}
           </ul>
           <p class="green">Volumen: ${Math.round(totalVolume(exercise))} kg</p>
-          ${previousExerciseBefore(exercise.exerciseId, session.id) ? `<p class="muted">Vorher: ${Math.round(totalVolume(previousExerciseBefore(exercise.exerciseId, session.id).exercise))} kg</p>` : `<p class="muted">Erste gespeicherte AusfÃ¼hrung.</p>`}
+          ${previousExerciseBefore(exercise.exerciseId, session.id) ? `<p class="muted">Vorher: ${Math.round(totalVolume(previousExerciseBefore(exercise.exerciseId, session.id).exercise))} kg</p>` : `<p class="muted">Erste gespeicherte Ausführung.</p>`}
         </article>
       `).join("")}
-      <button class="danger" data-delete-session="${htmlesc(session.id)}">Training lÃ¶schen</button>
+      <button class="danger" data-delete-session="${htmlesc(session.id)}">Training löschen</button>
     </section>
   `;
 }
@@ -7945,7 +7945,7 @@ function renderPlans() {
   const qrLimit = state.qrSchema?.maxRecommendedCharacters || 2500;
   return `
     <section class="screen stack">
-      <header><h1 class="title">PlÃ¤ne</h1><p class="subtitle">Aktiver Plan und Bibliothek.</p></header>
+      <header><h1 class="title">Pläne</h1><p class="subtitle">Aktiver Plan und Bibliothek.</p></header>
       <article class="card stack">
         <div class="row">
           <div class="grow">
@@ -7963,7 +7963,7 @@ function renderPlans() {
             <span>Plan verwalten</span>
             <span class="badge blue">${plans.length}</span>
           </summary>
-          <p class="muted">Duplizieren, Archivieren, LÃ¶schen, Import, Export, Plan-Code, QR und Wiederherstellen bleiben darunter erhalten.</p>
+          <p class="muted">Duplizieren, Archivieren, Löschen, Import, Export, Plan-Code, QR und Wiederherstellen bleiben darunter erhalten.</p>
         </details>
       </article>
       ${renderIntelligenceCoreCard("plans")}
@@ -7972,25 +7972,25 @@ function renderPlans() {
       ${renderLongTermProgressCard("plans")}
       <article class="card stack">
         <h3>Plan teilen / importieren</h3>
-        <p class="muted">${payload.length > qrLimit ? appText("qr.tooLarge", "Dieser Plan ist zu gross fuer QR. Bitte JSON-Export verwenden.") : "Kompakter Plan-Code fuer QR/Text-Import."}</p>
+        <p class="muted">${payload.length > qrLimit ? appText("qr.tooLarge", "Dieser Plan ist zu groß für QR. Bitte JSON-Export verwenden.") : "Kompakter Plan-Code für QR/Text-Import."}</p>
         <textarea class="input area mono" readonly data-plan-payload>${htmlesc(payload)}</textarea>
         <div class="button-row">
           <button class="secondary" data-copy-plan-payload>Code kopieren</button>
           <button class="secondary" data-download-plan-json>JSON speichern</button>
         </div>
-        <textarea class="input area mono" placeholder="D-Coach Plan-Code einfuegen" data-plan-import>${htmlesc(state.planImportText)}</textarea>
+        <textarea class="input area mono" placeholder="D-Coach Plan-Code einfügen" data-plan-import>${htmlesc(state.planImportText)}</textarea>
         <button class="primary" data-import-plan-code>Plan importieren</button>
       </article>
       <article class="card stack">
         <h3>Plan-Generator</h3>
-        <p class="muted">Erstellt einen Vorschlag aus vorhandenen Uebungen. Bitte danach pruefen.</p>
+        <p class="muted">Erstellt einen Vorschlag aus vorhandenen Übungen. Bitte danach prüfen.</p>
         <button class="secondary" data-generate-plan>${htmlesc(appText("plan.generated", "Planvorschlag erstellen"))}</button>
       </article>
       ${plans.length ? plans.map((plan) => `
         <article class="card stack">
           <h2>${htmlesc(plan.planName)}</h2>
           <p class="muted">${htmlesc(plan.description)}</p>
-          <p>${plan.days.length} Tage Â· ${Math.max(...plan.days.map((day) => day.maxDurationMinutes))} Minuten</p>
+          <p>${plan.days.length} Tage · ${Math.max(...plan.days.map((day) => day.maxDurationMinutes))} Minuten</p>
           <span class="badge ${planStatus(plan) === "Aktiv" ? "green" : isPlanArchived(plan.planName) ? "amber" : ""}">${planStatus(plan)}</span>
           <div class="button-row">
             ${!isPlanArchived(plan.planName) ? `<button class="secondary" data-activate-plan="${htmlesc(plan.planName)}">Aktivieren</button>` : ""}
@@ -7999,16 +7999,16 @@ function renderPlans() {
               : `<button class="secondary" data-archive-plan="${htmlesc(plan.planName)}">Archivieren</button>`}
           </div>
           <button class="secondary" data-duplicate-plan="${htmlesc(plan.planName)}">Plan duplizieren</button>
-          <button class="danger" data-delete-plan="${htmlesc(plan.planName)}">Plan lÃ¶schen</button>
+          <button class="danger" data-delete-plan="${htmlesc(plan.planName)}">Plan löschen</button>
         </article>
       `).join("") : `<article class="card stack">
-        <h2>Keine PlÃ¤ne</h2>
-        <p class="muted">Alle PlÃ¤ne wurden gelÃ¶scht. Trainingshistorie bleibt erhalten.</p>
+        <h2>Keine Pläne</h2>
+        <p class="muted">Alle Pläne wurden gelöscht. Trainingshistorie bleibt erhalten.</p>
       </article>`}
       ${deletedCount ? `<article class="card stack">
-        <h3>GelÃ¶schte PlÃ¤ne</h3>
-        <p class="muted">${deletedCount} Plan/PlÃ¤ne ausgeblendet.</p>
-        <button class="secondary" data-restore-plans>GelÃ¶schte PlÃ¤ne wiederherstellen</button>
+        <h3>Gelöschte Pläne</h3>
+        <p class="muted">${deletedCount} Plan/Pläne ausgeblendet.</p>
+        <button class="secondary" data-restore-plans>Gelöschte Pläne wiederherstellen</button>
       </article>` : ""}
     </section>
   `;
@@ -8019,7 +8019,7 @@ function renderExercises() {
   const filters = [
     ["all", "Alle"],
     ["Brust", "Brust"],
-    ["RÃ¼cken", "RÃ¼cken"],
+    ["Rücken", "Rücken"],
     ["Beine", "Beine"],
     ["Schulter", "Schulter"],
     ["Core", "Core"],
@@ -8035,15 +8035,15 @@ function renderExercises() {
   }).sort((a, b) => a.displayName.localeCompare(b.displayName, "de"));
   return `
     <section class="screen stack">
-      <header><h1 class="title">Ãœbungen</h1><p class="subtitle">${exercises.length} EintrÃ¤ge</p></header>
+      <header><h1 class="title">Übungen</h1><p class="subtitle">${exercises.length} Einträge</p></header>
       <div class="search stack">
-        <input class="input" placeholder="Ãœbung suchen" value="${htmlesc(state.exerciseSearch)}" data-search-exercise>
+        <input class="input" placeholder="Übung suchen" value="${htmlesc(state.exerciseSearch)}" data-search-exercise>
         <div class="chip-row">
           ${filters.map(([id, label]) => `<button class="chip ${state.exerciseFilter === id ? "active" : ""}" data-exercise-filter="${htmlesc(id)}">${htmlesc(label)}</button>`).join("")}
         </div>
       </div>
       <article class="card stack">
-        <h3>Eigene Uebung</h3>
+        <h3>Eigene Übung</h3>
         <input class="input" placeholder="Name" data-custom-exercise-name>
         <div class="mini-grid">
           <input class="input" placeholder="Equipment" data-custom-exercise-equipment>
@@ -8056,14 +8056,14 @@ function renderExercises() {
           <option value="avoidInitially">Anfangs vermeiden</option>
         </select>
         <textarea class="input area" placeholder="Techniknotiz" data-custom-exercise-note></textarea>
-        <button class="secondary" data-save-custom-exercise>Eigene Uebung speichern</button>
+        <button class="secondary" data-save-custom-exercise>Eigene Übung speichern</button>
       </article>
       ${exercises.map((exercise) => `
         <button class="list-button" data-exercise-id="${htmlesc(exercise.id)}">
           <article class="card stack">
             <h3>${htmlesc(exercise.displayName)}</h3>
             <p class="quiet">${htmlesc(exerciseListMuscleText(exercise))}</p>
-            <p class="muted">${htmlesc(exercise.primaryMuscleGroups.join(", "))} Â· ${htmlesc(exercise.equipment.join(", "))}</p>
+            <p class="muted">${htmlesc(exercise.primaryMuscleGroups.join(", "))} · ${htmlesc(exercise.equipment.join(", "))}</p>
             <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} ${bestWeightForExercise(exercise.id) ? `<span class="badge blue">Best: ${kg(bestWeightForExercise(exercise.id))}</span>` : ""}</div>
           </article>
         </button>
@@ -8126,15 +8126,15 @@ function renderExerciseDetailPremium(exercise, last, history, alternatives) {
 
       <article class="card stack">
         <div class="row">
-          <h3 class="grow">${htmlesc(exerciseDetailText("nextSuggestion", "Naechster Vorschlag"))}</h3>
+          <h3 class="grow">${htmlesc(exerciseDetailText("nextSuggestion", "Nächster Vorschlag"))}</h3>
           <span class="badge ${insight?.progression.decisionType === "increase" ? "green" : "blue"}">${htmlesc(insight?.progression.label || "Fallback")}</span>
         </div>
         <p class="muted">${htmlesc(insight?.progression.coachText || exerciseDetailText("notEnoughData", "Noch nicht genug Daten."))}</p>
-        ${insight?.progression.nextWeightKg ? `<p class="green">Naechstes Ziel: ${kg(insight.progression.nextWeightKg)}</p>` : ""}
+        ${insight?.progression.nextWeightKg ? `<p class="green">Nächstes Ziel: ${kg(insight.progression.nextWeightKg)}</p>` : ""}
         <details>
           <summary>${htmlesc(exerciseDetailText("why", "Warum?"))}</summary>
           <ul class="small-list">
-            ${(insight ? [...insight.progression.why, ...insight.insight.evidence, ...insight.insight.whyBullets] : ["Es gibt noch keine ausreichende Historie fuer eine belastbare Progression."]).map((item) => `<li>${htmlesc(item)}</li>`).join("")}
+            ${(insight ? [...insight.progression.why, ...insight.insight.evidence, ...insight.insight.whyBullets] : ["Es gibt noch keine ausreichende Historie für eine belastbare Progression."]).map((item) => `<li>${htmlesc(item)}</li>`).join("")}
           </ul>
         </details>
       </article>
@@ -8150,7 +8150,7 @@ function renderExerciseDetailPremium(exercise, last, history, alternatives) {
         </article>
         <article class="card stack">
           <h3>${htmlesc(exerciseDetailText("muscleImpact", "Muskelbeitrag"))}</h3>
-          <p class="muted">Primaer: ${htmlesc(muscleItemsText(roles.primary, "nicht hinterlegt"))}</p>
+          <p class="muted">Primär: ${htmlesc(muscleItemsText(roles.primary, "nicht hinterlegt"))}</p>
           <p class="quiet">Hilfsbelastung: ${htmlesc(muscleItemsText([...roles.secondary, ...roles.stabilizers], "nicht hinterlegt"))}</p>
         </article>
       </div>
@@ -8187,7 +8187,7 @@ function renderExerciseDetail(id) {
   const machineSetting = latestMachineSetting(id) || {};
   return `
     <section class="screen stack">
-      <button class="secondary" data-back-exercises>ZurÃ¼ck</button>
+      <button class="secondary" data-back-exercises>Zurück</button>
       <header><h1 class="title">${htmlesc(exercise.displayName)}</h1><p class="subtitle">${htmlesc(exercise.movementPattern)}</p></header>
       <article class="card stack">
         <div class="row">
@@ -8196,22 +8196,22 @@ function renderExerciseDetail(id) {
         </div>
         ${muscleRoleCards(exercise)}
         <p class="muted">${htmlesc(exerciseKindText(exercise))}</p>
-        ${exercise.isCustom ? `<button class="danger" data-delete-custom-exercise="${htmlesc(exercise.id)}">Eigene Uebung entfernen</button>` : ""}
+        ${exercise.isCustom ? `<button class="danger" data-delete-custom-exercise="${htmlesc(exercise.id)}">Eigene Übung entfernen</button>` : ""}
       </article>
       ${renderExerciseDetailPremium(exercise, last, history, alternatives)}
       ${renderMuscleMap(exercise)}
       <article class="card stack">
-        <p>${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].join(" Â· "))}</p>
-        <p class="muted">${htmlesc(exercise.equipment.join(" Â· "))}</p>
+        <p>${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].join(" · "))}</p>
+        <p class="muted">${htmlesc(exercise.equipment.join(" · "))}</p>
         ${lwsBadge(exercise.lumbarDiscSuitability)}
       </article>
       <article class="card stack">
-        <h3>GerÃ¤teeinstellung</h3>
+        <h3>Geräteeinstellung</h3>
         <input class="input" placeholder="Maschinenname / Studio" value="${htmlesc(machineSetting.machineName || "")}" data-machine-field="machineName" data-machine-exercise="${htmlesc(id)}">
         <div class="mini-grid">
           <input class="input" placeholder="Sitz" value="${htmlesc(machineSetting.seatPosition || "")}" data-machine-field="seatPosition" data-machine-exercise="${htmlesc(id)}">
           <input class="input" placeholder="Griff" value="${htmlesc(machineSetting.handlePosition || "")}" data-machine-field="handlePosition" data-machine-exercise="${htmlesc(id)}">
-          <input class="input" placeholder="Ruecken" value="${htmlesc(machineSetting.backrestPosition || "")}" data-machine-field="backrestPosition" data-machine-exercise="${htmlesc(id)}">
+          <input class="input" placeholder="Rücken" value="${htmlesc(machineSetting.backrestPosition || "")}" data-machine-field="backrestPosition" data-machine-exercise="${htmlesc(id)}">
         </div>
         <textarea class="input area" placeholder="Notiz" data-machine-field="note" data-machine-exercise="${htmlesc(id)}">${htmlesc(machineSetting.note || "")}</textarea>
         <button class="secondary" data-save-machine-setting="${htmlesc(id)}">Einstellung speichern</button>
@@ -8227,8 +8227,8 @@ function renderExerciseDetail(id) {
         <ul class="small-list">${exerciseKnowledge(exercise).map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>
       </article>
       ${renderExerciseRatingCard(exercise)}
-      <article class="card stack"><h3>AusfÃ¼hrung</h3><p class="muted">${htmlesc(exercise.techniqueNotes || "Keine Technikhinweise hinterlegt.")}</p></article>
-      <article class="card stack"><h3>HÃ¤ufige Fehler</h3>${exercise.commonMistakes?.length ? `<ul class="small-list">${exercise.commonMistakes.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : `<p class="muted">Keine Fehlerhinweise hinterlegt.</p>`}</article>
+      <article class="card stack"><h3>Ausführung</h3><p class="muted">${htmlesc(exercise.techniqueNotes || "Keine Technikhinweise hinterlegt.")}</p></article>
+      <article class="card stack"><h3>Häufige Fehler</h3>${exercise.commonMistakes?.length ? `<ul class="small-list">${exercise.commonMistakes.map((item) => `<li>${htmlesc(item)}</li>`).join("")}</ul>` : `<p class="muted">Keine Fehlerhinweise hinterlegt.</p>`}</article>
       <article class="card stack"><h3>Letzte Leistung</h3>${last ? `<p class="muted">Letztes Mal am ${dateText(last.session.endedAt || last.session.startedAt)}</p><ul class="small-list">${last.exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}</li>`).join("")}</ul>` : `<p class="muted">Noch keine vorherige Leistung vorhanden.</p>`}</article>
       <article class="card stack">
         <h3>Verlauf</h3>
@@ -8236,7 +8236,7 @@ function renderExerciseDetail(id) {
           <div class="history-row">
             <div>
               <strong>${dateText(item.session.startedAt)}</strong>
-              <p class="muted">${item.exercise.sets.map((set) => `${kg(set.actualWeightKg)} x ${set.actualReps || "-"}`).join(" Â· ")}</p>
+              <p class="muted">${item.exercise.sets.map((set) => `${kg(set.actualWeightKg)} x ${set.actualReps || "-"}`).join(" · ")}</p>
             </div>
             <span class="badge blue">${Math.round(totalVolume(item.exercise))} kg</span>
           </div>
@@ -8266,7 +8266,7 @@ function renderExerciseDetail(id) {
 
 function renderWeightTrend(entries) {
   const points = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date)).slice(-14);
-  if (points.length < 2) return `<p class="muted">Mindestens zwei Eintraege fuer Trendanzeige noetig.</p>`;
+  if (points.length < 2) return `<p class="muted">Mindestens zwei Einträge für Trendanzeige nötig.</p>`;
   const values = points.map((entry) => Number(entry.weightKg)).filter(Number.isFinite);
   const min = Math.min(...values);
   const max = Math.max(...values);
@@ -8290,7 +8290,7 @@ function renderWeight() {
         ${metric(kg(entries[0]?.weightKg), "Aktuell")}
         ${metric(kg(averageWeight(7)), "7-Tage-Schnitt")}
         ${metric(kg(averageWeight(30)), "30-Tage-Schnitt")}
-        ${metric(String(entries.length), "EintrÃ¤ge")}
+        ${metric(String(entries.length), "Einträge")}
       </div>
       <article class="card stack">
         <h3>Trend</h3>
@@ -8306,7 +8306,7 @@ function renderWeight() {
           <div class="grow"><h3>${kg(entry.weightKg)}</h3><p class="muted">${dateText(entry.date)}</p></div>
           <div class="compact-actions">
             <button class="secondary" data-edit-weight="${htmlesc(entry.id)}">Bearbeiten</button>
-            <button class="danger" data-delete-weight="${htmlesc(entry.id)}">LÃ¶schen</button>
+            <button class="danger" data-delete-weight="${htmlesc(entry.id)}">Löschen</button>
           </div>
         </article>
       `).join("") : `<article class="card"><p class="muted">Noch kein Gewicht eingetragen.</p></article>`}
@@ -8349,11 +8349,11 @@ function renderJournal() {
         ${renderRatingInput("soreness", "Muskelkater", entry.soreness || 3)}
         ${renderRatingInput("mood", "Stimmung", entry.mood || 3)}
         <textarea class="input area" placeholder="Schmerznotiz" data-journal-text="painNote">${htmlesc(entry.painNote || "")}</textarea>
-        <textarea class="input area" placeholder="Ernaehrung / Notiz" data-journal-text="nutritionNote">${htmlesc(entry.nutritionNote || "")}</textarea>
+        <textarea class="input area" placeholder="Ernährung / Notiz" data-journal-text="nutritionNote">${htmlesc(entry.nutritionNote || "")}</textarea>
         <button class="primary" data-save-journal>Journal speichern</button>
       </article>
       <article class="card stack">
-        <h3>Letzte Eintraege</h3>
+        <h3>Letzte Einträge</h3>
         ${history.length ? history.map((item) => {
           const itemReadiness = readinessForJournal(item);
           return `<div class="history-row"><div><strong>${dateText(item.date)}</strong><p class="muted">${htmlesc(itemReadiness.hint)}</p></div><span class="badge ${itemReadiness.color}">${htmlesc(itemReadiness.label)}</span></div>`;
@@ -8369,7 +8369,7 @@ function renderProfileShortcuts() {
     { tab: "journal", icon: "book", title: "Journal", text: "Schlaf, Energie, Stress und Tages-Check-ins" },
     { tab: "history", icon: "history", title: "Trainingshistorie", text: "Gespeicherte Einheiten und Volumen" },
     { tab: "musclemap", icon: "trending", title: "Fortschritt", text: "Wochenabdeckung und Entwicklung" },
-    { tab: "weight", icon: "ruler", title: "Koerperwerte", text: "Gewicht und Messwerte im Verlauf" },
+    { tab: "weight", icon: "ruler", title: "Körperwerte", text: "Gewicht und Messwerte im Verlauf" },
     { tab: "machines", icon: "machine", title: "Ger\u00e4te", text: "Sitz, Griff, Scanner und Maschinen-Setup" },
     { tab: "musclemap", icon: "body", title: "Muskelmapping", text: "Muskelkarte und Wochenabdeckung" },
     { tab: "exercises", icon: "dumbbell", title: "\u00dcbungen", text: "\u00dcbungsdatenbank und Details" },
@@ -8397,14 +8397,14 @@ function renderScannerExercisePicker() {
   const candidates = scannerCandidateExercises();
   return `
     <div class="stack">
-      <input class="input" placeholder="Uebung suchen" value="${htmlesc(state.equipmentScanner.search)}" data-scanner-search>
+      <input class="input" placeholder="Übung suchen" value="${htmlesc(state.equipmentScanner.search)}" data-scanner-search>
       <div class="scanner-exercise-list">
         ${candidates.map((exercise) => `
           <button class="scanner-exercise-option ${state.equipmentScanner.selectedExerciseId === exercise.id ? "active" : ""}" data-scanner-exercise="${htmlesc(exercise.id)}">
             <strong>${htmlesc(exercise.displayName)}</strong>
             <span>${htmlesc(exerciseListMuscleText(exercise))}</span>
           </button>
-        `).join("") || `<p class="muted">Keine passende Uebung gefunden.</p>`}
+        `).join("") || `<p class="muted">Keine passende Übung gefunden.</p>`}
       </div>
     </div>
   `;
@@ -8421,14 +8421,14 @@ function renderEquipmentScannerResult() {
           <h3 class="grow">Life Fitness erkannt</h3>
           <span class="badge green">bekannt</span>
         </div>
-        <p class="muted">${htmlesc(mapping.machineLabel || "Gespeichertes Geraet")}</p>
+        <p class="muted">${htmlesc(mapping.machineLabel || "Gespeichertes Gerät")}</p>
         <div class="storage-table">
-          <div><span>Uebung</span><strong>${htmlesc(exercise?.displayName || mapping.exerciseNameSnapshot || mapping.exerciseId)}</strong></div>
+          <div><span>Übung</span><strong>${htmlesc(exercise?.displayName || mapping.exerciseNameSnapshot || mapping.exerciseId)}</strong></div>
           <div><span>Sitz</span><strong>${htmlesc(mapping.seatPosition || "-")}</strong></div>
           <div><span>Griff</span><strong>${htmlesc(mapping.gripPosition || "-")}</strong></div>
           <div><span>Code</span><strong>${htmlesc(mapping.normalizedCode)}</strong></div>
         </div>
-        <button class="primary" data-open-scanned-exercise="${htmlesc(mapping.exerciseId)}">Uebung oeffnen</button>
+        <button class="primary" data-open-scanned-exercise="${htmlesc(mapping.exerciseId)}">Übung öffnen</button>
         <button class="secondary" data-edit-scanned-mapping>Zuordnung bearbeiten</button>
       </article>
     `;
@@ -8438,7 +8438,7 @@ function renderEquipmentScannerResult() {
     return `
       <article class="scanner-result stack">
         <div class="row">
-          <h3 class="grow">${existing ? "Life-Fitness-Zuordnung bearbeiten" : "Unbekanntes Life-Fitness-Geraet"}</h3>
+          <h3 class="grow">${existing ? "Life-Fitness-Zuordnung bearbeiten" : "Unbekanntes Life-Fitness-Gerät"}</h3>
           <span class="badge amber">${existing ? "edit" : "neu"}</span>
         </div>
         <p class="quiet">Gescannt: ${htmlesc(scanner.rawCode)}</p>
@@ -8446,8 +8446,8 @@ function renderEquipmentScannerResult() {
         ${renderScannerExercisePicker()}
         <div class="scanner-field-grid">
           <input class="input" placeholder="Studio" value="${htmlesc(existing?.studioName || "")}" data-scanner-field="studioName">
-          <input class="input" placeholder="Geraetename" value="${htmlesc(existing?.machineLabel || "")}" data-scanner-field="machineLabel">
-          <input class="input" placeholder="Geraetenummer" value="${htmlesc(existing?.machineSerial || "")}" data-scanner-field="machineSerial">
+          <input class="input" placeholder="Gerätename" value="${htmlesc(existing?.machineLabel || "")}" data-scanner-field="machineLabel">
+          <input class="input" placeholder="Gerätenummer" value="${htmlesc(existing?.machineSerial || "")}" data-scanner-field="machineSerial">
           <input class="input" placeholder="Sitzposition" value="${htmlesc(existing?.seatPosition || "")}" data-scanner-field="seatPosition">
           <input class="input" placeholder="Griffposition" value="${htmlesc(existing?.gripPosition || "")}" data-scanner-field="gripPosition">
           <input class="input" placeholder="Griffbreite" value="${htmlesc(existing?.gripWidth || "")}" data-scanner-field="gripWidth">
@@ -8481,12 +8481,12 @@ function renderEquipmentScannerCard() {
       ` : ""}
       ${scanner.error ? `<p class="quiet">${htmlesc(scanner.error)}</p>` : ""}
       <div class="button-grid">
-        <button class="primary" data-start-equipment-scan>Kamera oeffnen</button>
+        <button class="primary" data-start-equipment-scan>Kamera öffnen</button>
         <button class="secondary" data-stop-equipment-scan>Scanner stoppen</button>
       </div>
       <div class="row">
         <input class="input grow" placeholder="Code oder URL manuell eingeben" value="${htmlesc(scanner.rawCode)}" data-manual-equipment-code>
-        <button class="secondary compact-button" data-apply-manual-equipment-code>Pruefen</button>
+        <button class="secondary compact-button" data-apply-manual-equipment-code>Prüfen</button>
       </div>
       ${renderEquipmentScannerResult()}
     </article>
@@ -8498,7 +8498,7 @@ function renderScannedEquipmentMappingsCard() {
   return `
     <article class="card stack">
       <div class="row">
-        <h3 class="grow">Geraetezuordnungen</h3>
+        <h3 class="grow">Gerätezuordnungen</h3>
         <span class="badge blue">${mappings.length}</span>
       </div>
       ${mappings.length ? mappings.map((mapping) => {
@@ -8514,11 +8514,11 @@ function renderScannedEquipmentMappingsCard() {
             </button>
             <div class="compact-actions">
               <button class="secondary" data-load-scanned-mapping="${htmlesc(mapping.id)}">Bearbeiten</button>
-              <button class="danger" data-delete-scanned-mapping="${htmlesc(mapping.id)}">Loeschen</button>
+              <button class="danger" data-delete-scanned-mapping="${htmlesc(mapping.id)}">Löschen</button>
             </div>
           </div>
         `;
-      }).join("") : `<p class="muted">Noch keine gescannten Geraete gespeichert.</p>`}
+      }).join("") : `<p class="muted">Noch keine gescannten Geräte gespeichert.</p>`}
     </article>
   `;
 }
@@ -8571,7 +8571,7 @@ function renderTrainingHistory() {
   const sessions = [...storage.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
   return `
     <section class="screen stack">
-      <button class="secondary" data-tab="settings">Zurueck zu Tracking</button>
+      <button class="secondary" data-tab="settings">Zurück zu Tracking</button>
       <header><h1 class="title">Trainingshistorie</h1><p class="subtitle">${sessions.length} gespeicherte Einheiten.</p></header>
       <div class="grid">
         ${metric(String(sessions.length), "Einheiten")}
@@ -8583,7 +8583,7 @@ function renderTrainingHistory() {
             <div class="row">
               <div class="grow">
                 <h3>${htmlesc(session.dayName)}</h3>
-                <p class="muted">${dateTimeText(session.startedAt)} Â· ${session.completedExercises.length} Uebungen Â· ${sessionSetCount(session)} Saetze</p>
+                <p class="muted">${dateTimeText(session.startedAt)} · ${session.completedExercises.length} Übungen · ${sessionSetCount(session)} Sätze</p>
               </div>
               <span class="badge blue">${Math.round(sessionVolume(session))} kg</span>
             </div>
@@ -8622,9 +8622,9 @@ function renderSettings() {
       <article class="card stack">
         <div class="row">
           <h3 class="grow">Backup</h3>
-          <span class="badge ${needsBackup ? "amber" : "green"}">${needsBackup ? "Faellig" : "Ok"}</span>
+          <span class="badge ${needsBackup ? "amber" : "green"}">${needsBackup ? "Fällig" : "Ok"}</span>
         </div>
-        <p class="muted">Exportiere regelmÃ¤ÃŸig deine Trainingsdaten. GitHub speichert deine Fortschritte nicht.</p>
+        <p class="muted">Exportiere regelmäßig deine Trainingsdaten. GitHub speichert deine Fortschritte nicht.</p>
         <p class="quiet">Letztes Backup: ${dateTimeText(lastBackupAt)}</p>
         <button class="primary" data-export-backup>Backup exportieren</button>
         <label class="secondary file-label">
@@ -8648,16 +8648,16 @@ function renderSettings() {
         <button class="secondary" data-prepare-indexeddb>IndexedDB vorbereiten</button>
       </article>
       <article class="card stack">
-        <h3>ZurÃ¼cksetzen</h3>
-        <p class="muted">LÃ¶scht nur die lokalen Trainings- und Gewichtsdaten auf diesem GerÃ¤t.</p>
-        <button class="danger" data-reset-app>App-Daten zurÃ¼cksetzen</button>
+        <h3>Zurücksetzen</h3>
+        <p class="muted">Löscht nur die lokalen Trainings- und Gewichtsdaten auf diesem Gerät.</p>
+        <button class="danger" data-reset-app>App-Daten zurücksetzen</button>
       </article>
       <article class="card stack">
         <div class="row">
-          <h3 class="grow">Persoenliche Schicht</h3>
+          <h3 class="grow">Persönliche Schicht</h3>
           <span class="badge ${storage.personalProfile ? "green" : "amber"}">${storage.personalProfile ? "Aktiv" : "Leer"}</span>
         </div>
-        <p class="muted">${storage.personalProfile ? htmlesc(currentPersonalProfile().displayName || "Persoenliche Daten aktiv") : "Optionale persoenliche Daten importieren. Bestehende Trainingsdaten bleiben erhalten."}</p>
+        <p class="muted">${storage.personalProfile ? htmlesc(currentPersonalProfile().displayName || "Persönliche Daten aktiv") : "Optionale persönliche Daten importieren. Bestehende Trainingsdaten bleiben erhalten."}</p>
         <button class="secondary" data-import-seed-profile>Dominique-Daten importieren</button>
       </article>
       <article class="card stack">
@@ -8687,8 +8687,8 @@ function renderDebugPanel(manifest) {
     <div class="stack">
       <div class="storage-table">
         <div><span>Storage</span><strong>${manifest.totalBytes}</strong></div>
-        <div><span>Uebungen</span><strong>${allExercises().length}</strong></div>
-        <div><span>Eigene Uebungen</span><strong>${storage.customExercises.length}</strong></div>
+        <div><span>Übungen</span><strong>${allExercises().length}</strong></div>
+        <div><span>Eigene Übungen</span><strong>${storage.customExercises.length}</strong></div>
         <div><span>Datenbanken</span><strong>${databases.length}</strong></div>
         <div><span>Fehler</span><strong>${storage.lastErrors.length}</strong></div>
       </div>
@@ -8710,7 +8710,7 @@ function deviceValidationTestCases() {
     ["keyboard_daily_checkin", "Tastatur Daily Check-in"],
     ["keyboard_workout_inputs", "Tastatur Workout Eingaben"],
     ["keyboard_coach_feedback", "Tastatur Coach Feedback"],
-    ["training_skip_checkin_once", "Check-in ueberspringen startet einmal"],
+    ["training_skip_checkin_once", "Check-in überspringen startet einmal"],
     ["training_complete_checkin_once", "Check-in abschliessen startet einmal"],
     ["training_draft_resume", "Draft-Wiederaufnahme"],
     ["scanner_first_middle_last", "Scanner erster mittlerer letzter Eintrag"],
@@ -8762,14 +8762,14 @@ function renderDeviceValidationPanel() {
   return `
     <article class="card stack" data-device-validation-panel>
       <div class="row">
-        <h3 class="grow">Geraetepruefung v6.17</h3>
+        <h3 class="grow">Geräteprüfung v6.17</h3>
         <span class="badge amber">manuell</span>
       </div>
-      <p class="muted">Diese Debug-Checkliste veraendert keine Trainingsdaten. Echte iPhone/PWA-Tests muessen manuell bewertet werden.</p>
+      <p class="muted">Diese Debug-Checkliste verändert keine Trainingsdaten. Echte iPhone/PWA-Tests müssen manuell bewertet werden.</p>
       <div class="storage-table">
         ${deviceValidationTestCases().slice(0, 6).map(([id, label]) => `<div><span>${htmlesc(label)}</span><strong>not_tested</strong></div>`).join("")}
       </div>
-      <button class="secondary" data-export-device-validation>Pruefbericht exportieren</button>
+      <button class="secondary" data-export-device-validation>Prüfbericht exportieren</button>
       <p class="quiet">Letzter Bericht: ${latest ? dateTimeText(latest.createdAt) : "Noch keiner"}</p>
     </article>
   `;
@@ -8781,7 +8781,7 @@ function exportMuscleCoverageDiagnostics() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "DCoach_v6.17.2_MuscleCoverage_Diagnostics.json";
+  link.download = "DCoach_v6.17.3_MuscleCoverage_Diagnostics.json";
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -8873,11 +8873,11 @@ async function installPwa() {
 }
 
 function validateBackup(backup) {
-  if (!backup || typeof backup !== "object") return "Backup-Datei ist ungÃ¼ltig.";
+  if (!backup || typeof backup !== "object") return "Backup-Datei ist ungültig.";
   if (backup.app !== "D-Coach") return "Diese Datei ist kein D-Coach-Backup.";
-  if (backup.schemaVersion !== 1) return "Diese Backup-Version wird nicht unterstÃ¼tzt.";
-  if (!Array.isArray(backup.sessions)) return "Backup enthÃ¤lt keine gÃ¼ltigen Trainingsdaten.";
-  if (!Array.isArray(backup.weights)) return "Backup enthÃ¤lt keine gÃ¼ltigen Gewichtsdaten.";
+  if (backup.schemaVersion !== 1) return "Diese Backup-Version wird nicht unterstützt.";
+  if (!Array.isArray(backup.sessions)) return "Backup enthält keine gültigen Trainingsdaten.";
+  if (!Array.isArray(backup.weights)) return "Backup enthält keine gültigen Gewichtsdaten.";
   return null;
 }
 
@@ -8887,12 +8887,12 @@ function mergeBackupActiveWorkoutDraft(backupDraft) {
   const backupValid = isValidActiveWorkoutDraft(backupDraft);
   if (localValid) {
     return backupValid
-      ? "Dein aktuell geoeffnetes Training wurde geschuetzt und beibehalten. Ein Trainingsentwurf aus dem Backup wurde nicht uebernommen."
-      : "Dein aktuell geoeffnetes Training wurde geschuetzt und beibehalten.";
+      ? "Dein aktuell geöffnetes Training wurde geschützt und beibehalten. Ein Trainingsentwurf aus dem Backup wurde nicht übernommen."
+      : "Dein aktuell geöffnetes Training wurde geschützt und beibehalten.";
   }
   if (backupValid) {
     storage.activeWorkoutDraft = backupDraft;
-    return "Trainingsentwurf aus dem Backup wurde uebernommen.";
+    return "Trainingsentwurf aus dem Backup wurde übernommen.";
   }
   return "";
 }
@@ -8922,10 +8922,10 @@ function importBackupFile(file) {
         "Backup importieren?",
         "",
         `Trainings: ${backup.sessions.length}`,
-        `GewichtseintrÃ¤ge: ${backup.weights.length}`,
+        `Gewichtseinträge: ${backup.weights.length}`,
         `Journal: ${Array.isArray(backup.journalEntries) ? backup.journalEntries.length : 0}`,
-        `Geraeteeinstellungen: ${Array.isArray(backup.machineSettings) ? backup.machineSettings.length : 0}`,
-        `Geraetezuordnungen: ${Array.isArray(backup.scannedEquipmentMappings) ? backup.scannedEquipmentMappings.length : 0}`,
+        `Geräteeinstellungen: ${Array.isArray(backup.machineSettings) ? backup.machineSettings.length : 0}`,
+        `Gerätezuordnungen: ${Array.isArray(backup.scannedEquipmentMappings) ? backup.scannedEquipmentMappings.length : 0}`,
         "",
         "Die lokalen Daten werden zusammengefuehrt. Duplikate werden vermieden."
       ].join("\n");
@@ -8969,26 +8969,26 @@ function importBackupFile(file) {
 }
 
 const FULL_RESET_CONFIRMATION_TEXT = [
-  "Alle lokalen D-Coach-Daten loeschen?",
+  "Alle lokalen D-Coach-Daten löschen?",
   "",
-  "Dabei werden dauerhaft geloescht:",
+  "Dabei werden dauerhaft gelöscht:",
   "",
   "- Trainings und offene Trainingsentwuerfe",
   "- Gewicht und Journal",
   "- Tages-Check-ins, Schlaf- und Schmerzangaben",
-  "- Geraete-, Sitz- und Griffdaten",
+  "- Geräte-, Sitz- und Griffdaten",
   "- Life-Fitness-Scanner-Zuordnungen",
-  "- eigene Plaene und eigene Uebungen",
+  "- eigene Pläne und eigene Übungen",
   "- Coach-Feedback, Vorschlagsverlauf, Empfehlungshistorie und Outcome-Lernen",
   "- Coach-Konflikte, Kontextfeedback und Kalibrierungsdaten",
-  "- Geraetepruefungsberichte",
-  "- persoenliche Einstellungen, technische Logs und lokale App-Daten",
+  "- Geräteprüfungsberichte",
+  "- persönliche Einstellungen, technische Logs und lokale App-Daten",
   "",
   "Diese Aktion kann ohne Backup nicht rueckgaengig gemacht werden.",
   "",
-  "Tippe BACKUP fuer Backup erstellen.",
-  "Tippe LOESCHEN fuer endgueltig loeschen.",
-  "Lasse ABBRECHEN stehen, um nichts zu loeschen."
+  "Tippe BACKUP für Backup erstellen.",
+  "Tippe LÖSCHEN für endgültig löschen.",
+  "Lasse ABBRECHEN stehen, um nichts zu löschen."
 ].join("\n");
 
 function resetAllLocalAppData() {
@@ -9018,11 +9018,11 @@ function handleFullAppReset() {
   const normalized = String(choice || "ABBRECHEN").trim().toUpperCase();
   if (normalized === "BACKUP") {
     exportBackup();
-    alert("Backup wurde erstellt. Es wurden keine Daten geloescht. Starte den Reset erneut, wenn du danach wirklich loeschen willst.");
+    alert("Backup wurde erstellt. Es wurden keine Daten gelöscht. Starte den Reset erneut, wenn du danach wirklich löschen willst.");
     return;
   }
-  if (normalized !== "LOESCHEN") return;
-  if (!confirm("Wirklich alle lokalen D-Coach-Daten endgueltig loeschen?")) return;
+  if (normalized !== "LÖSCHEN") return;
+  if (!confirm("Wirklich alle lokalen D-Coach-Daten endgültig löschen?")) return;
   resetAllLocalAppData();
   render();
 }
@@ -9299,12 +9299,12 @@ function bindEvents() {
   document.querySelector("[data-generate-plan]")?.addEventListener("click", () => {
     const plan = generatePlanCandidate();
     if (!plan.days.length) {
-      alert("Kein Planvorschlag moeglich. Es fehlen passende Uebungen.");
+      alert("Kein Planvorschlag möglich. Es fehlen passende Übungen.");
       return;
     }
     storage.customPlans = [...storage.customPlans, plan];
     storage.activePlanName = plan.planName;
-    alert(appText("plan.generated", "Planvorschlag erstellt. Bitte pruefen und aktivieren."));
+    alert(appText("plan.generated", "Planvorschlag erstellt. Bitte prüfen und aktivieren."));
     render();
   });
 
@@ -9318,7 +9318,7 @@ function bindEvents() {
   document.querySelectorAll("[data-delete-plan]").forEach((button) => {
     button.addEventListener("click", () => {
       const planName = button.dataset.deletePlan;
-      if (!confirm("Trainingsplan wirklich lÃ¶schen? Deine gespeicherten Trainingseinheiten bleiben erhalten.")) return;
+      if (!confirm("Trainingsplan wirklich löschen? Deine gespeicherten Trainingseinheiten bleiben erhalten.")) return;
       storage.deletedPlanNames = [...new Set([...storage.deletedPlanNames, planName])];
       storage.archivedPlanNames = storage.archivedPlanNames.filter((name) => name !== planName);
       if (storage.activePlanName === planName) ensureActivePlan();
@@ -9340,17 +9340,17 @@ function bindEvents() {
   document.querySelector("[data-save-custom-exercise]")?.addEventListener("click", () => {
     try {
       saveCustomExercise();
-      alert("Eigene Uebung gespeichert.");
+      alert("Eigene Übung gespeichert.");
       render();
     } catch (error) {
-      alert(error.message || "Uebung konnte nicht gespeichert werden.");
+      alert(error.message || "Übung konnte nicht gespeichert werden.");
     }
   });
 
   document.querySelectorAll("[data-delete-custom-exercise]").forEach((button) => {
     button.addEventListener("click", (event) => {
       event.stopPropagation();
-      if (!confirm("Eigene Uebung entfernen? Historie bleibt erhalten.")) return;
+      if (!confirm("Eigene Übung entfernen? Historie bleibt erhalten.")) return;
       deleteCustomExercise(button.dataset.deleteCustomExercise);
       render();
     });
@@ -9389,7 +9389,7 @@ function bindEvents() {
   });
 
   document.querySelector("[data-delete-session]")?.addEventListener("click", (event) => {
-    if (!confirm("Training wirklich lÃ¶schen?")) return;
+    if (!confirm("Training wirklich löschen?")) return;
     storage.sessions = storage.sessions.filter((session) => session.id !== event.currentTarget.dataset.deleteSession);
     state.selectedSessionId = null;
     navigateTo("dashboard", { resetSelection: false });
@@ -9399,7 +9399,7 @@ function bindEvents() {
     const input = document.querySelector("[data-weight-input]");
     const value = parseNumber(input.value);
     if (!value || value <= 0) {
-      alert("Bitte gÃ¼ltiges Gewicht eingeben.");
+      alert("Bitte gültiges Gewicht eingeben.");
       return;
     }
     const today = new Date();
@@ -9425,7 +9425,7 @@ function bindEvents() {
       if (value === null) return;
       const parsed = parseNumber(value);
       if (!parsed || parsed <= 0) {
-        alert("Bitte gÃ¼ltiges Gewicht eingeben.");
+        alert("Bitte gültiges Gewicht eingeben.");
         return;
       }
       storage.weights = storage.weights.map((item) => item.id === entry.id ? { ...item, weightKg: parsed } : item);
@@ -9514,7 +9514,7 @@ function bindEvents() {
   document.querySelector("[data-save-scanned-mapping]")?.addEventListener("click", () => {
     try {
       saveScannedEquipmentMapping();
-      alert("Geraetezuordnung gespeichert.");
+      alert("Gerätezuordnung gespeichert.");
       render();
     } catch (error) {
       alert(error.message || "Zuordnung konnte nicht gespeichert werden.");
@@ -9530,7 +9530,7 @@ function bindEvents() {
     button.addEventListener("click", () => {
       const exerciseId = button.dataset.openScannedExercise;
       if (!exerciseById(exerciseId)) {
-        alert("Diese Uebung ist nicht mehr in der Uebungsdatenbank vorhanden.");
+        alert("Diese Übung ist nicht mehr in der Übungsdatenbank vorhanden.");
         return;
       }
       persistWorkoutDraft();
@@ -9560,7 +9560,7 @@ function bindEvents() {
 
   document.querySelectorAll("[data-delete-scanned-mapping]").forEach((button) => {
     button.addEventListener("click", () => {
-      if (!confirm("Geraetezuordnung wirklich loeschen?")) return;
+      if (!confirm("Gerätezuordnung wirklich löschen?")) return;
       storage.scannedEquipmentMappings = storage.scannedEquipmentMappings.filter((item) => item.id !== button.dataset.deleteScannedMapping);
       render();
     });
@@ -9593,7 +9593,7 @@ function bindEvents() {
       importSeedProfile();
       render();
     } catch (error) {
-      alert(error.message || "Persoenliche Daten konnten nicht importiert werden.");
+      alert(error.message || "Persönliche Daten konnten nicht importiert werden.");
     }
   });
 
@@ -9615,7 +9615,7 @@ function bindEvents() {
   });
 
   document.querySelector("[data-load-test-data]")?.addEventListener("click", () => {
-    if (!confirm("Testdaten hinzufuegen? Bestehende Daten bleiben erhalten.")) return;
+    if (!confirm("Testdaten hinzufügen? Bestehende Daten bleiben erhalten.")) return;
     loadDebugTestData();
     render();
   });
@@ -9679,7 +9679,7 @@ function mountMuscleMapJsPrototype() {
 function mountProductionMuscleMap() {
   const container = document.querySelector("[data-production-muscle-map]");
   if (!container || !window.dcoachProductionMuscleMapPayload) return;
-  import("./production/production-muscle-map.js?v=6.17.2")
+  import("./production/production-muscle-map.js?v=6.17.3")
     .then((module) => module.mountProductionMuscleMap(container, window.dcoachProductionMuscleMapPayload))
     .catch((error) => {
       logAppError(error?.message || error, "production-muscle-map");

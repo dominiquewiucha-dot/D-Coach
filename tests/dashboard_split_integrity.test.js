@@ -12,7 +12,7 @@ assert(app.includes("function planDayMatchScore"), "next day must fall back to e
 assert(app.includes("explicitDayTypeFromName"), "smart day names must resolve to plan day type");
 assert(app.includes("plan.days[(index + 1) % plan.days.length]"), "next day must follow last completed day");
 assert(!app.includes("const nextDay = plan?.days?.[0]?.name || \"-\";"), "dashboard must not hard-code first plan day");
-assert(app.includes("Prioritaeten dieser Woche"), "dashboard status label must clarify priority meaning");
+assert(app.includes("Prioritäten dieser Woche"), "dashboard status label must clarify priority meaning");
 assert(app.includes("Brust wurde heute bereits belastet"), "dashboard must explain trained chest coverage");
 assert(app.includes("currentUserSettings().debugMode ? `<p"), "internal dashboard rule id must be debug-only");
 assert(app.includes("currentUserSettings().debugMode ? `<li>Regel"), "weekly coach rule id must be debug-only");

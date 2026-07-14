@@ -7,11 +7,11 @@ const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
 const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v70";'), "app version must be pwa-v70");
+assert(app.includes('const APP_VERSION = "pwa-v71";'), "app version must be pwa-v71");
 assert(app.includes('const BACKUP_FORMAT_VERSION = "6.17.2";'), "backup version must be 6.17.2");
 assert(app.includes('const OUTCOME_EVALUATOR_VERSION = "v6.17.0";'), "outcome evaluator version missing");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v70";'), "cache version must be pwa-v70");
-assert(html.includes("app.js?v=pwa-v70"), "app cache buster must be pwa-v70");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v71";'), "cache version must be pwa-v71");
+assert(html.includes("app.js?v=pwa-v71"), "app cache buster must be pwa-v71");
 
 assert(app.includes("function coachRecommendationApplicationState"), "application state helper missing");
 assert(app.includes("function recommendationOutcomeEligible"), "outcome eligibility helper missing");
@@ -47,9 +47,9 @@ assert(app.includes("dcoach.deviceValidationReports"), "device validation storag
 assert(app.includes("function createDeviceValidationReport"), "device validation report creator missing");
 assert(app.includes("DCoach_v6.17_DeviceValidation_Report.json"), "device validation export filename missing");
 assert(app.includes("data-export-device-validation"), "device validation export button missing");
-assert(app.includes("Geraetepruefung v6.17"), "device validation UI missing");
+assert(app.includes("Geräteprüfung v6.17"), "device validation UI missing");
 assert(app.includes("not_tested"), "manual tests must default to not_tested");
-assert(app.includes("Geraetepruefungsberichte"), "reset disclosure must include device validation reports");
+assert(app.includes("Geräteprüfungsberichte"), "reset disclosure must include device validation reports");
 
 assert(app.includes("todayCheckin?.status === \"completed\" || todayCheckin?.status === \"skipped\""), "v6.15.1 skipped guard regressed");
 assert(app.includes("maxAdjustmentPerOutcome: 0.03"), "v6.16 slow learning regressed");
