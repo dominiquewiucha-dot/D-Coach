@@ -1,4 +1,4 @@
-﻿const state = {
+const state = {
   seed: null,
   muscles: null,
   exerciseMuscleMap: null,
@@ -210,7 +210,7 @@
   route: null
 };
 
-const APP_VERSION = "pwa-v72";
+const APP_VERSION = "pwa-v73";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -1976,6 +1976,27 @@ function parseNumber(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function parseWeightKg(value) {
+  const parsed = parseNumber(value);
+  return parsed && parsed > 0 ? parsed : null;
+}
+
+function normalizedWeightEntry(entry) {
+  const weightKg = parseWeightKg(entry?.weightKg ?? entry?.weight ?? entry?.valueKg);
+  return weightKg ? { ...entry, weightKg } : null;
+}
+
+function weightEntriesSorted() {
+  return storage.weights
+    .map(normalizedWeightEntry)
+    .filter(Boolean)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
+function latestWeightEntry() {
+  return weightEntriesSorted()[0] || null;
+}
+
 function parseInteger(value) {
   const parsed = Number.parseInt(String(value ?? ""), 10);
   return Number.isFinite(parsed) ? parsed : null;
@@ -2016,7 +2037,10 @@ function averageWeight(days) {
   const start = new Date();
   start.setHours(0, 0, 0, 0);
   start.setDate(start.getDate() - days + 1);
-  const values = storage.weights.filter((entry) => new Date(entry.date) >= start).map((entry) => Number(entry.weightKg));
+  const values = storage.weights
+    .filter((entry) => new Date(entry.date) >= start)
+    .map((entry) => parseWeightKg(entry.weightKg ?? entry.weight ?? entry.valueKg))
+    .filter(Boolean);
   if (!values.length) return null;
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
@@ -2100,6 +2124,10 @@ function updateDailyCheckinDraftFromDom() {
   const draft = ensureDailyCheckinDraft();
   document.querySelectorAll("[data-checkin-field]").forEach((input) => {
     const key = input.dataset.checkinField;
+    if (key === "weightKg") {
+      draft[key] = parseWeightKg(input.value) || input.value.trim();
+      return;
+    }
     draft[key] = input.type === "number" || input.type === "range" ? Number(input.value) : input.value.trim();
   });
   draft.painPresent = document.querySelector("[data-checkin-pain-present='true']")?.checked || false;
@@ -2168,7 +2196,7 @@ function completeDailyCheckin() {
   storage.dailyCheckins = [...storage.dailyCheckins.filter((entry) => entry.localDate !== completed.localDate), completed];
   storage.dailyCheckinDraft = null;
   upsertJournalFromDailyCheckin(completed);
-  if (Number(completed.weightKg) > 0) upsertWeightFromDailyCheckin(completed);
+  if (parseWeightKg(completed.weightKg)) upsertWeightFromDailyCheckin(completed);
   state.dailyCheckinActive = false;
   if (resumeAction === "start_training") {
     startTrainingFlow();
@@ -2206,10 +2234,12 @@ function normalizeTenToFive(value) {
 function upsertWeightFromDailyCheckin(entry) {
   const dateKey = entry.localDate;
   const existing = storage.weights.find((item) => String(item.date || "").slice(0, 10) === dateKey);
+  const weightKg = parseWeightKg(entry.weightKg);
+  if (!weightKg) return;
   const next = {
     id: existing?.id || (crypto.randomUUID ? crypto.randomUUID() : `weight_${Date.now()}`),
     date: new Date(`${dateKey}T08:00:00`).toISOString(),
-    weightKg: Number(entry.weightKg),
+    weightKg,
     source: "morning_flow"
   };
   storage.weights = [...storage.weights.filter((item) => String(item.date || "").slice(0, 10) !== dateKey), next];
@@ -2271,7 +2301,8 @@ function renderDailyCheckinSleepStep(draft) {
 }
 
 function renderCheckinRange(key, label, value = 5) {
-  return `<label class="range-field"><span>${label}: ${Number(value) || 0}/10</span><input type="range" min="1" max="10" value="${htmlesc(value || 5)}" data-checkin-field="${key}"></label>`;
+  const current = Math.max(1, Math.min(10, Number(value) || 5));
+  return `<label class="range-field"><span data-range-value-label="${htmlesc(key)}">${label}: ${current}/10</span><input type="range" min="1" max="10" value="${htmlesc(current)}" data-checkin-field="${key}" data-range-label="${htmlesc(label)}"></label>`;
 }
 
 function renderDailyCheckinPainStep(draft) {
@@ -2306,15 +2337,15 @@ function renderDailyCheckinPainStep(draft) {
 }
 
 function renderDailyCheckinWeightStep(draft) {
-  const latest = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-  const current = Number(draft.weightKg) || "";
-  const delta = latest && current ? Number(current) - Number(latest.weightKg) : null;
+  const latest = latestWeightEntry();
+  const current = parseWeightKg(draft.weightKg);
+  const delta = latest && current ? current - latest.weightKg : null;
   return `
     <article class="stack">
       <h2>Heutiges Gewicht</h2>
       <p class="muted">Letzter Wert: ${latest ? kg(latest.weightKg) : "-"}</p>
       <p class="quiet">Veränderung: ${delta === null ? "-" : `${delta >= 0 ? "+" : ""}${kg(delta)}`}</p>
-      <input class="input" inputmode="decimal" placeholder="kg" value="${htmlesc(current)}" data-checkin-field="weightKg">
+      <input class="input" inputmode="decimal" placeholder="kg" value="${htmlesc(current ? String(current).replace(".", ",") : "")}" data-checkin-field="weightKg">
       <textarea class="input area" placeholder="Tagesnotiz optional" data-checkin-field="generalNote">${htmlesc(draft.generalNote || "")}</textarea>
       <div class="button-row">
         <button class="secondary" data-checkin-go="pain">Zurück</button>
@@ -2327,6 +2358,7 @@ function renderDailyCheckinWeightStep(draft) {
 
 function renderDailyCheckinSummaryStep(draft) {
   const pain = draft.painPresent ? (draft.painEntries || []).map((item) => `${item.regionLabelSnapshot} ${item.intensity}/10`).join(", ") : "Nein";
+  const weightKg = parseWeightKg(draft.weightKg);
   return `
     <article class="stack">
       <h2>Tages-Check-in gespeichert</h2>
@@ -2336,7 +2368,7 @@ function renderDailyCheckinSummaryStep(draft) {
         <div><span>Energie</span><strong>${draft.energy || "-"}/10</strong></div>
         <div><span>Erholung</span><strong>${draft.recovery || "-"}/10</strong></div>
         <div><span>Schmerz</span><strong>${htmlesc(pain || "-")}</strong></div>
-        <div><span>Gewicht</span><strong>${draft.weightKg ? kg(draft.weightKg) : "-"}</strong></div>
+        <div><span>Gewicht</span><strong>${weightKg ? kg(weightKg) : "-"}</strong></div>
       </div>
       <button class="primary" data-checkin-complete>Zur App</button>
       <button class="secondary" data-checkin-go="weight">Zurück</button>
@@ -7159,7 +7191,7 @@ function renderLongTermProgressCard(context = "coach") {
 
 function renderDashboard() {
   const plan = activePlan();
-  const latestWeight = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  const latestWeight = latestWeightEntry();
   const session = lastSession();
   const nextDay = nextPlanDayAfterLastSession(plan)?.name || "-";
   const latestSessions = [...storage.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).slice(0, 3);
@@ -8570,6 +8602,14 @@ function updateCustomPlanBuilderExercise(dayId, index, field, value) {
   saveCustomPlanBuilderDraft(draft);
 }
 
+function updateRangeValueLabel(input) {
+  if (input?.type !== "range") return;
+  const label = input.dataset.rangeLabel;
+  const output = input.closest("label")?.querySelector("[data-range-value-label]");
+  if (!label || !output) return;
+  output.textContent = `${label}: ${input.value}/${input.max || 10}`;
+}
+
 function customPlanBuilderWarnings(draft) {
   const warnings = [];
   if (!draft.planName?.trim()) warnings.push("Planname fehlt.");
@@ -9093,7 +9133,7 @@ function renderWeightTrend(entries) {
 }
 
 function renderWeight() {
-  const entries = [...storage.weights].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const entries = weightEntriesSorted();
   return `
     <section class="screen stack">
       <header><h1 class="title">Gewicht</h1><p class="subtitle">Trend statt Tagesrauschen.</p></header>
@@ -9126,10 +9166,11 @@ function renderWeight() {
 }
 
 function renderRatingInput(id, label, value = 3) {
+  const current = Math.max(1, Math.min(5, Number(value) || 3));
   return `
     <label class="range-field">
-      <span>${label}</span>
-      <input type="range" min="1" max="5" value="${htmlesc(value)}" data-journal-field="${id}">
+      <span data-range-value-label="${htmlesc(id)}">${label}: ${current}/5</span>
+      <input type="range" min="1" max="5" value="${htmlesc(current)}" data-journal-field="${id}" data-range-label="${htmlesc(label)}">
     </label>
   `;
 }
@@ -10299,10 +10340,9 @@ function bindEvents() {
       alert("Bitte gültiges Gewicht eingeben.");
       return;
     }
-    const today = new Date();
-    const todayKey = today.toISOString().slice(0, 10);
+    const todayKey = localIsoDate();
     const entries = storage.weights.filter((entry) => String(entry.date).slice(0, 10) !== todayKey);
-    entries.push({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), date: today.toISOString(), weightKg: value });
+    entries.push({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), date: new Date(`${todayKey}T08:00:00`).toISOString(), weightKg: value });
     storage.weights = entries;
     render();
   });
@@ -10354,6 +10394,10 @@ function bindEvents() {
     });
     storage.journalEntries = [...storage.journalEntries.filter((item) => item.date !== today), entry];
     render();
+  });
+
+  document.querySelectorAll("[data-journal-field]").forEach((input) => {
+    input.addEventListener("input", () => updateRangeValueLabel(input));
   });
 
   document.querySelector("[data-save-machine-setting]")?.addEventListener("click", (event) => {
@@ -10530,9 +10574,11 @@ function bindDailyCheckinEvents() {
   if (!state.dailyCheckinActive) return;
   document.querySelectorAll("[data-checkin-field], [data-checkin-sleep-hours], [data-checkin-sleep-minutes], [data-pain-region], [data-pain-intensity], [data-pain-type], [data-pain-note-region], [data-checkin-pain-present]").forEach((input) => {
     input.addEventListener("input", () => {
+      updateRangeValueLabel(input);
       updateDailyCheckinDraftFromDom();
     });
     input.addEventListener("change", () => {
+      updateRangeValueLabel(input);
       updateDailyCheckinDraftFromDom();
       if (input.dataset.checkinPainPresent) render();
     });

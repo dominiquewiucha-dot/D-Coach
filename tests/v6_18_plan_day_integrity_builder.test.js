@@ -7,11 +7,11 @@ const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
 const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v72";'), "app version must be pwa-v72");
+assert(app.includes('const APP_VERSION = "pwa-v73";'), "app version must be pwa-v73");
 assert(app.includes('const BACKUP_FORMAT_VERSION = "6.18.0";'), "backup format must be 6.18.0");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v72";'), "service worker cache must be pwa-v72");
-assert(html.includes("app.js?v=pwa-v72"), "app cache buster must be pwa-v72");
-assert(html.includes("styles.css?v=pwa-v72"), "style cache buster must be pwa-v72");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v73";'), "service worker cache must be pwa-v73");
+assert(html.includes("app.js?v=pwa-v73"), "app cache buster must be pwa-v73");
+assert(html.includes("styles.css?v=pwa-v73"), "style cache buster must be pwa-v73");
 
 [
   "function resolveTrainingDay(",
