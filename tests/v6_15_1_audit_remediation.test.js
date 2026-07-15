@@ -29,10 +29,10 @@ assert(app.includes("persistWorkoutDraft();\n      stopEquipmentScannerCamera();
 assert(app.includes("Diese Übung ist nicht mehr in der Übungsdatenbank vorhanden."), "missing scanner exercise warning missing");
 
 assert(!/function renderDashboard\(\)[\s\S]*?\$\{renderCoachDashboardV54\(\)\}[\s\S]*?function renderCoach\(\)/.test(app), "dashboard must not contain old coach dashboard block");
-assert(app.includes('const APP_VERSION = "pwa-v79";'), "app version must be pwa-v79");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v79";'), "service worker cache must be pwa-v79");
-assert(html.includes("app.js?v=pwa-v79"), "index app cache buster must be pwa-v79");
-assert(html.includes("styles.css?v=pwa-v79"), "index style cache buster must be pwa-v79");
+assert(app.includes('const APP_VERSION = "pwa-v80";'), "app version must be pwa-v80");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v80";'), "service worker cache must be pwa-v80");
+assert(html.includes("app.js?v=pwa-v80"), "index app cache buster must be pwa-v80");
+assert(html.includes("styles.css?v=pwa-v80"), "index style cache buster must be pwa-v80");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

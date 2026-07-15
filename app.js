@@ -211,8 +211,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v79";
-const APP_CACHE_VERSION = "dcoach-pwa-v79";
+const APP_VERSION = "pwa-v80";
+const APP_CACHE_VERSION = "dcoach-pwa-v80";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -2232,11 +2232,6 @@ function addLocalDays(date = new Date(), days = 0) {
   const next = new Date(date);
   next.setDate(next.getDate() + days);
   return next;
-}
-
-function localDateTimeIso(localDate, time = "18:00") {
-  const [hours = "18", minutes = "00"] = String(time || "18:00").split(":");
-  return new Date(`${localDate}T${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}:00`).toISOString();
 }
 
 function dateTimeText(value) {
@@ -8122,7 +8117,7 @@ function renderPreWorkoutReview(review) {
             <p class="muted">Vor dem Start</p>
             <h2>${htmlesc(review.dayName)}</h2>
             <p class="muted">${review.exercises.length} Übungen · ${trainingDaySetCount(review)} Sätze · ca. ${estimatedPlanDayMinutes(review)} Minuten</p>
-            <p class="quiet">Quelle: ${trainingDayReasonText(review.reason)} - Datum: ${htmlesc(review.sessionLocalDate || localIsoDate())}</p>
+            <p class="quiet">Quelle: ${trainingDayReasonText(review.reason)}</p>
           </div>
           <span class="badge ${invalid.length ? "amber" : "green"}">${invalid.length ? "prüfen" : "startklar"}</span>
         </div>
@@ -8321,30 +8316,7 @@ function buildTrainingDayError(resolved, invalid) {
   };
 }
 
-function askTrainingSessionLocalDate() {
-  const today = localIsoDate();
-  const yesterday = localIsoDate(addLocalDays(new Date(), -1));
-  const choice = prompt("Trainingsdatum:\n1 = Heute\n2 = Gestern\n3 = Datum wählen", "1");
-  if (choice === null) return null;
-  let selected = today;
-  if (choice.trim() === "2") selected = yesterday;
-  if (choice.trim() === "3") {
-    const custom = prompt("Trainingsdatum im Format YYYY-MM-DD", today);
-    if (custom === null) return null;
-    selected = custom.trim();
-  }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(selected)) {
-    alert("Bitte ein gültiges Datum im Format YYYY-MM-DD eingeben.");
-    return null;
-  }
-  if (selected > today) {
-    alert("Trainingsdatum in der Zukunft ist nicht erlaubt.");
-    return null;
-  }
-  return selected;
-}
-
-function buildTrainingStartIntent(resolved, sessionLocalDate, source = "manual_day_selection") {
+function buildTrainingStartIntent(resolved, source = "manual_day_selection") {
   return {
     id: `training_intent_${Date.now()}`,
     planId: resolved.planId,
@@ -8353,7 +8325,6 @@ function buildTrainingStartIntent(resolved, sessionLocalDate, source = "manual_d
     dayName: resolved.dayName,
     exerciseIds: resolved.exercises.map((entry) => entry.exerciseId),
     source,
-    sessionLocalDate,
     createdAt: new Date().toISOString()
   };
 }
@@ -8388,8 +8359,6 @@ function buildPreWorkoutReview(resolved, warmup = null, intent = null) {
     maxDurationMinutes: resolved.maxDurationMinutes,
     exercises: resolved.exercises.map((entry) => ({ ...entry, sourceDayId: resolved.dayId })),
     warmups: warmup ? [warmup] : [],
-    sessionLocalDate: intent?.sessionLocalDate || localIsoDate(),
-    entryMode: intent?.sessionLocalDate && intent.sessionLocalDate !== localIsoDate() ? "historical_entry" : "live",
     createdAt: new Date().toISOString()
   };
 }
@@ -8417,10 +8386,7 @@ function startWorkoutFromReview(review) {
     dayId: review.dayId,
     dayName: review.dayName,
     trainingStartIntentId: review.trainingStartIntentId || "",
-    sessionLocalDate: review.sessionLocalDate || localIsoDate(),
-    entryMode: review.entryMode || "live",
-    startedAt: review.entryMode === "historical_entry" ? localDateTimeIso(review.sessionLocalDate, "18:00") : new Date().toISOString(),
-    liveStartedAt: new Date().toISOString(),
+    startedAt: new Date().toISOString(),
     warmups: review.warmups || [],
     sessionNote: "",
     index: 0,
@@ -8466,15 +8432,8 @@ function openPreWorkoutReview(dayIdOrName = "", options = {}) {
     render();
     return;
   }
-  const sessionLocalDate = askTrainingSessionLocalDate();
-  if (!sessionLocalDate) {
-    state.pendingWorkoutReview = null;
-    state.tab = "training";
-    render();
-    return;
-  }
-  const source = options.source || (sessionLocalDate !== localIsoDate() ? "historical_entry" : (dayIdOrName ? "manual_day_selection" : "automatic_next_day"));
-  const intent = buildTrainingStartIntent(resolved, sessionLocalDate, source);
+  const source = options.source || (dayIdOrName ? "manual_day_selection" : "automatic_next_day");
+  const intent = buildTrainingStartIntent(resolved, source);
   state.trainingStartIntent = intent;
   const warmup = askWarmupBeforeWorkout();
   state.manualTrainingDayId = resolved.dayId;
@@ -8904,14 +8863,6 @@ function rememberExerciseSetup(entry) {
   storage.machineSettings = [...storage.machineSettings.filter((item) => item.id !== setting.id), setting];
 }
 
-function workoutCompletedAt(workout) {
-  if (workout?.entryMode !== "historical_entry") return new Date().toISOString();
-  const started = new Date(workout.startedAt).getTime();
-  const liveStarted = new Date(workout.liveStartedAt || new Date()).getTime();
-  const elapsedMinutes = Number.isFinite(liveStarted) ? Math.max(10, Math.min(240, Math.round((Date.now() - liveStarted) / 60000))) : 60;
-  return new Date(started + elapsedMinutes * 60000).toISOString();
-}
-
 function finishOrNext() {
   const workout = state.activeWorkout;
   const entry = workout.entries[workout.index];
@@ -8938,7 +8889,7 @@ function finishOrNext() {
       return;
     }
   }
-  const completedAt = workoutCompletedAt(workout);
+  const completedAt = new Date().toISOString();
   const session = {
     id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
     planId: activePlan()?.id || workout.planName,
@@ -8950,10 +8901,8 @@ function finishOrNext() {
     startedAt: workout.startedAt,
     endedAt: completedAt,
     completedAt,
-    sessionLocalDate: workout.sessionLocalDate || localIsoDate(new Date(workout.startedAt)),
-    entryMode: workout.entryMode || "live",
     trainingStartIntentId: workout.trainingStartIntentId || "",
-    readinessSnapshot: journalEntryForDate(workout.sessionLocalDate || localIsoDate()) || null,
+    readinessSnapshot: journalEntryForDate(todayIsoDate()) || null,
     warmups: Array.isArray(workout.warmups) ? workout.warmups : [],
     sessionNote: workout.sessionNote || "",
     completedExercises: workout.entries.map((entry) => {

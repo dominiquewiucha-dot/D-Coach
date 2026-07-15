@@ -5,11 +5,11 @@ const css = fs.readFileSync("styles.css", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
 const sw = fs.readFileSync("sw.js", "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v79";'), "app version must be pwa-v79");
-assert(app.includes('const APP_CACHE_VERSION = "dcoach-pwa-v79";'), "app cache version must be dcoach-pwa-v79");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v79";'), "service worker cache must be pwa-v79");
-assert(html.includes("app.js?v=pwa-v79"), "app cache buster must be pwa-v79");
-assert(html.includes("styles.css?v=pwa-v79"), "style cache buster must be pwa-v79");
+assert(app.includes('const APP_VERSION = "pwa-v80";'), "app version must be pwa-v80");
+assert(app.includes('const APP_CACHE_VERSION = "dcoach-pwa-v80";'), "app cache version must be dcoach-pwa-v80");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v80";'), "service worker cache must be pwa-v80");
+assert(html.includes("app.js?v=pwa-v80"), "app cache buster must be pwa-v80");
+assert(html.includes("styles.css?v=pwa-v80"), "style cache buster must be pwa-v80");
 
 assert(app.includes('<main id="app-content" class="app-content">'), "app content missing");
 assert(app.includes('<nav id="bottom-nav" class="bottom-nav tabs"'), "bottom nav must be outside screen content");
