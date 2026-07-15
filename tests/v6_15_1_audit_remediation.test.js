@@ -20,7 +20,7 @@ assert(!app.includes('confirm("Alle Trainings- und Gewichtsdaten'), "old mislead
 assert(app.includes('resumeAction: "start_training"'), "training resume action missing");
 assert(app.includes('todayCheckin?.status === "completed" || todayCheckin?.status === "skipped"'), "skipped check-in must allow training");
 assert(app.includes("function consumeDailyCheckinResumeAction"), "resume action consumer missing");
-assert(app.includes("startTrainingFlow();\n    return;"), "check-in completion/skip must continue training flow");
+assert(app.includes("startTrainingFlow(resumeAction.trainingDayId, { skipReview: resumeAction.skipReview });"), "check-in completion/skip must continue selected training flow");
 assert(app.includes("{ ...existing, resumeAction: null, status: \"draft\""), "manual check-in edit must clear resume action");
 
 assert(app.includes('document.querySelectorAll("[data-open-scanned-exercise]")'), "all scanner open buttons must be bound");
@@ -29,10 +29,10 @@ assert(app.includes("persistWorkoutDraft();\n      stopEquipmentScannerCamera();
 assert(app.includes("Diese Übung ist nicht mehr in der Übungsdatenbank vorhanden."), "missing scanner exercise warning missing");
 
 assert(!/function renderDashboard\(\)[\s\S]*?\$\{renderCoachDashboardV54\(\)\}[\s\S]*?function renderCoach\(\)/.test(app), "dashboard must not contain old coach dashboard block");
-assert(app.includes('const APP_VERSION = "pwa-v74";'), "app version must be pwa-v74");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v75";'), "service worker cache must be pwa-v75");
-assert(html.includes("app.js?v=pwa-v74"), "index app cache buster must be pwa-v74");
-assert(html.includes("styles.css?v=pwa-v74"), "index style cache buster must be pwa-v74");
+assert(app.includes('const APP_VERSION = "pwa-v76";'), "app version must be pwa-v76");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v76";'), "service worker cache must be pwa-v76");
+assert(html.includes("app.js?v=pwa-v76"), "index app cache buster must be pwa-v76");
+assert(html.includes("styles.css?v=pwa-v76"), "index style cache buster must be pwa-v76");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

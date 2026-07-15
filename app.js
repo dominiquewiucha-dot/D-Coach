@@ -210,7 +210,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v74";
+const APP_VERSION = "pwa-v76";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -2277,7 +2277,7 @@ function createDailyCheckinDraft(source = "morning_flow") {
   };
 }
 
-function createTrainingResumeCheckinDraft(existing = null) {
+function createTrainingResumeCheckinDraft(existing = null, trainingDayId = "", skipReview = true) {
   const base = existing && typeof existing === "object" ? { ...existing } : createDailyCheckinDraft("training");
   return {
     ...base,
@@ -2285,16 +2285,29 @@ function createTrainingResumeCheckinDraft(existing = null) {
     status: "draft",
     source: base.source || "training",
     resumeAction: "start_training",
+    resumeTrainingDayId: trainingDayId || base.resumeTrainingDayId || "",
+    resumeSkipReview: skipReview,
     updatedAt: new Date().toISOString()
   };
 }
 
 function consumeDailyCheckinResumeAction(entry = null) {
-  const action = entry?.resumeAction || storage.dailyCheckinDraft?.resumeAction || "";
+  const source = entry || storage.dailyCheckinDraft || {};
+  const result = {
+    action: source.resumeAction || "",
+    trainingDayId: source.resumeTrainingDayId || "",
+    skipReview: source.resumeSkipReview !== false
+  };
   if (storage.dailyCheckinDraft?.resumeAction) {
-    storage.dailyCheckinDraft = { ...storage.dailyCheckinDraft, resumeAction: null, updatedAt: new Date().toISOString() };
+    storage.dailyCheckinDraft = {
+      ...storage.dailyCheckinDraft,
+      resumeAction: null,
+      resumeTrainingDayId: "",
+      resumeSkipReview: true,
+      updatedAt: new Date().toISOString()
+    };
   }
-  return action;
+  return result;
 }
 
 function ensureDailyCheckinDraft() {
@@ -2376,8 +2389,8 @@ function skipDailyCheckin() {
   storage.dailyCheckins = [...storage.dailyCheckins.filter((entry) => entry.localDate !== skipped.localDate), skipped];
   storage.dailyCheckinDraft = null;
   state.dailyCheckinActive = false;
-  if (resumeAction === "start_training") {
-    startTrainingFlow();
+  if (resumeAction.action === "start_training") {
+    startTrainingFlow(resumeAction.trainingDayId, { skipReview: resumeAction.skipReview });
     return;
   }
   render();
@@ -2392,8 +2405,8 @@ function completeDailyCheckin() {
   upsertJournalFromDailyCheckin(completed);
   if (parseWeightKg(completed.weightKg)) upsertWeightFromDailyCheckin(completed);
   state.dailyCheckinActive = false;
-  if (resumeAction === "start_training") {
-    startTrainingFlow();
+  if (resumeAction.action === "start_training") {
+    startTrainingFlow(resumeAction.trainingDayId, { skipReview: resumeAction.skipReview });
     return;
   }
   state.tab = "dashboard";
@@ -7390,7 +7403,8 @@ function renderDashboard() {
   const plan = activePlan();
   const latestWeight = latestWeightEntry();
   const session = lastSession();
-  const nextDay = nextPlanDayAfterLastSession(plan)?.name || "-";
+  const dashboardTraining = resolveTrainingDay({ plan, activeWorkoutDraft: null });
+  const nextDay = dashboardTraining?.dayName || nextPlanDayAfterLastSession(plan)?.name || "-";
   const latestSessions = [...storage.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).slice(0, 3);
   const readiness = readinessForJournal(journalEntryForDate(localIsoDate()) || latestJournalEntry());
   const weeklySessions = sessionsSince(7);
@@ -7402,7 +7416,7 @@ function renderDashboard() {
         <p class="muted">Aktiver Plan</p>
         <h2>${htmlesc(plan.planName)}</h2>
         <p class="muted">Nächstes Training: ${htmlesc(nextDay)}</p>
-        <button class="primary" data-start-training-flow>Training starten</button>
+        <button class="primary" data-start-training-flow="${htmlesc(dashboardTraining?.dayId || "")}">Training starten</button>
       </article>` : `<article class="card stack">
         <h2>Kein aktiver Plan</h2>
         <p class="muted">Aktiviere oder stelle einen Plan im Tab Pläne wieder her.</p>
@@ -8030,7 +8044,60 @@ function buildTrainingDayError(resolved, invalid) {
   };
 }
 
-function openPreWorkoutReview(dayIdOrName = "") {
+function buildPreWorkoutReview(resolved, warmup = null) {
+  return {
+    id: `workout_review_${Date.now()}`,
+    planId: resolved.planId,
+    planName: resolved.planName,
+    dayId: resolved.dayId,
+    dayName: resolved.dayName,
+    dayIndex: resolved.dayIndex,
+    reason: resolved.reason,
+    maxDurationMinutes: resolved.maxDurationMinutes,
+    exercises: resolved.exercises.map((entry) => ({ ...entry, sourceDayId: resolved.dayId })),
+    warmups: warmup ? [warmup] : [],
+    createdAt: new Date().toISOString()
+  };
+}
+
+function startWorkoutFromReview(review) {
+  const invalid = invalidPlannedExercises(review);
+  if (invalid.length) {
+    state.trainingDayError = buildTrainingDayError(review, invalid);
+    state.pendingWorkoutReview = null;
+    state.tab = "training";
+    return false;
+  }
+  state.showAlternatives = false;
+  state.restTimer.remaining = 0;
+  state.restTimer.running = false;
+  const nextWorkout = {
+    planId: review.planId,
+    planName: review.planName,
+    dayId: review.dayId,
+    dayName: review.dayName,
+    startedAt: new Date().toISOString(),
+    warmups: review.warmups || [],
+    sessionNote: "",
+    index: 0,
+    overviewOpen: false,
+    entries: review.exercises.map(workoutEntryFromPlanned)
+  };
+  const integrity = workoutDraftIntegrity(nextWorkout, activePlan());
+  if (!integrity.valid) {
+    state.trainingDayError = buildWorkoutDraftIntegrityError(nextWorkout, integrity, "blocked");
+    state.pendingWorkoutReview = null;
+    state.tab = "training";
+    return false;
+  }
+  state.activeWorkout = nextWorkout;
+  state.pendingWorkoutReview = null;
+  state.trainingDayError = null;
+  persistWorkoutDraft();
+  return true;
+}
+
+function openPreWorkoutReview(dayIdOrName = "", options = {}) {
   const plan = activePlan();
   if (!plan) {
     navigateTo("plans");
@@ -8056,21 +8123,15 @@ function openPreWorkoutReview(dayIdOrName = "") {
     return;
   }
   const warmup = askWarmupBeforeWorkout();
-  state.pendingWorkoutReview = {
-    id: `workout_review_${Date.now()}`,
-    planId: resolved.planId,
-    planName: resolved.planName,
-    dayId: resolved.dayId,
-    dayName: resolved.dayName,
-    dayIndex: resolved.dayIndex,
-    reason: resolved.reason,
-    maxDurationMinutes: resolved.maxDurationMinutes,
-    exercises: resolved.exercises.map((entry) => ({ ...entry, sourceDayId: resolved.dayId })),
-    warmups: warmup ? [warmup] : [],
-    createdAt: new Date().toISOString()
-  };
-  state.trainingDayError = null;
   state.manualTrainingDayId = resolved.dayId;
+  const review = buildPreWorkoutReview(resolved, warmup);
+  if (options.skipReview) {
+    startWorkoutFromReview(review);
+    render();
+    return;
+  }
+  state.pendingWorkoutReview = review;
+  state.trainingDayError = null;
   state.tab = "training";
   render();
 }
@@ -8078,39 +8139,7 @@ function openPreWorkoutReview(dayIdOrName = "") {
 function confirmPreWorkoutReview() {
   const review = state.pendingWorkoutReview;
   if (!review) return;
-  const invalid = invalidPlannedExercises(review);
-  if (invalid.length) {
-    state.trainingDayError = buildTrainingDayError(review, invalid);
-    state.pendingWorkoutReview = null;
-    render();
-    return;
-  }
-  state.showAlternatives = false;
-  state.restTimer.remaining = 0;
-  state.restTimer.running = false;
-  const nextWorkout = {
-    planId: review.planId,
-    planName: review.planName,
-    dayId: review.dayId,
-    dayName: review.dayName,
-    startedAt: new Date().toISOString(),
-    warmups: review.warmups || [],
-    sessionNote: "",
-    index: 0,
-    overviewOpen: false,
-    entries: review.exercises.map(workoutEntryFromPlanned)
-  };
-  const integrity = workoutDraftIntegrity(nextWorkout, activePlan());
-  if (!integrity.valid) {
-    state.trainingDayError = buildWorkoutDraftIntegrityError(nextWorkout, integrity, "blocked");
-    state.pendingWorkoutReview = null;
-    state.tab = "training";
-    render();
-    return;
-  }
-  state.activeWorkout = nextWorkout;
-  state.pendingWorkoutReview = null;
-  persistWorkoutDraft();
+  startWorkoutFromReview(review);
   render();
 }
 
@@ -8119,12 +8148,13 @@ function cancelPreWorkoutReview() {
   render();
 }
 
-function startTrainingFlow() {
+function startTrainingFlow(dayIdOrName = "", options = {}) {
+  const skipReview = options.skipReview !== false;
   const todayCheckin = dailyCheckinForDate(localIsoDate());
   const checkinDone = todayCheckin?.status === "completed" || todayCheckin?.status === "skipped";
   if (!checkinDone) {
     const existingDraft = storage.dailyCheckinDraft?.localDate === localIsoDate() ? storage.dailyCheckinDraft : null;
-    storage.dailyCheckinDraft = createTrainingResumeCheckinDraft(existingDraft);
+    storage.dailyCheckinDraft = createTrainingResumeCheckinDraft(existingDraft, dayIdOrName, skipReview);
     state.dailyCheckinActive = true;
     state.dailyCheckinStep = existingDraft ? "draft" : "sleep";
     render();
@@ -8148,13 +8178,18 @@ function startTrainingFlow() {
     return;
   }
 
-  const resolved = resolveTrainingDay({ plan, activeWorkoutDraft: null });
+  const selectedDay = dayIdOrName ? findPlanDayByStableId(plan, dayIdOrName) : null;
+  const resolved = resolveTrainingDay({
+    plan,
+    activeWorkoutDraft: null,
+    manuallySelectedDayId: selectedDay?.id || dayIdOrName || ""
+  });
   if (!resolved) {
     navigateTo("plans");
     return;
   }
 
-  startDay(resolved.dayId);
+  startDay(resolved.dayId, { skipReview });
 }
 
 function renderCooldownCard() {
@@ -8168,8 +8203,8 @@ function renderCooldownCard() {
   `;
 }
 
-function startDay(dayName) {
-  openPreWorkoutReview(dayName);
+function startDay(dayName, options = {}) {
+  openPreWorkoutReview(dayName, options);
 }
 
 function startSmartDay(dayName) {
@@ -10156,7 +10191,7 @@ function bindEvents() {
   });
 
   document.querySelectorAll("[data-start-training-flow]").forEach((button) => {
-    button.addEventListener("click", startTrainingFlow);
+    button.addEventListener("click", () => startTrainingFlow(button.dataset.startTrainingFlow || "", { skipReview: true }));
   });
 
   document.querySelectorAll("[data-start-day]").forEach((button) => {

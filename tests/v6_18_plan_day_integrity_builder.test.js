@@ -7,11 +7,11 @@ const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
 const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v74";'), "app version must be pwa-v74");
+assert(app.includes('const APP_VERSION = "pwa-v76";'), "app version must be pwa-v76");
 assert(app.includes('const BACKUP_FORMAT_VERSION = "6.18.0";'), "backup format must be 6.18.0");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v75";'), "service worker cache must be pwa-v75");
-assert(html.includes("app.js?v=pwa-v74"), "app cache buster must be pwa-v74");
-assert(html.includes("styles.css?v=pwa-v74"), "style cache buster must be pwa-v74");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v76";'), "service worker cache must be pwa-v76");
+assert(html.includes("app.js?v=pwa-v76"), "app cache buster must be pwa-v76");
+assert(html.includes("styles.css?v=pwa-v76"), "style cache buster must be pwa-v76");
 
 [
   "function resolveTrainingDay(",
@@ -24,8 +24,8 @@ assert(html.includes("styles.css?v=pwa-v74"), "style cache buster must be pwa-v7
 ].forEach((needle) => assert(app.includes(needle), `${needle} missing`));
 
 assert(!app.includes("const primaryDay = plan?.days?.[0] || null;"), "training screen must not use first plan day directly");
-assert(app.includes("startDay(resolved.dayId);"), "training flow must start the resolved day id");
-assert(app.includes("openPreWorkoutReview(dayName);"), "startDay must open review instead of blindly starting");
+assert(app.includes("startDay(resolved.dayId, { skipReview });"), "training flow must start the resolved day id");
+assert(app.includes("openPreWorkoutReview(dayName, options);"), "startDay must route through the review/start options");
 assert(app.includes("data-start-day-id"), "stable day start id action missing");
 assert(app.includes("data-confirm-workout-review"), "pre-workout confirmation missing");
 assert(app.includes("data-jump-workout-exercise"), "in-workout overview jump missing");
