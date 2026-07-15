@@ -7,11 +7,11 @@ const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
 const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v78";'), "app version must be pwa-v78");
+assert(app.includes('const APP_VERSION = "pwa-v79";'), "app version must be pwa-v79");
 assert(app.includes('const BACKUP_FORMAT_VERSION = "6.18.0";'), "backup format must be 6.18.0");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v78";'), "service worker cache must be pwa-v78");
-assert(html.includes("app.js?v=pwa-v78"), "app cache buster must be pwa-v78");
-assert(html.includes("styles.css?v=pwa-v78"), "style cache buster must be pwa-v78");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v79";'), "service worker cache must be pwa-v79");
+assert(html.includes("app.js?v=pwa-v79"), "app cache buster must be pwa-v79");
+assert(html.includes("styles.css?v=pwa-v79"), "style cache buster must be pwa-v79");
 
 [
   "function resolveTrainingDay(",
@@ -24,7 +24,7 @@ assert(html.includes("styles.css?v=pwa-v78"), "style cache buster must be pwa-v7
 ].forEach((needle) => assert(app.includes(needle), `${needle} missing`));
 
 assert(!app.includes("const primaryDay = plan?.days?.[0] || null;"), "training screen must not use first plan day directly");
-assert(app.includes("startDay(resolved.dayId, { skipReview });"), "training flow must start the resolved day id");
+assert(app.includes('startDay(resolved.dayId, { skipReview, source: options.source || "automatic_next_day" });'), "training flow must start the resolved day id");
 assert(app.includes("openPreWorkoutReview(dayName, options);"), "startDay must route through the review/start options");
 assert(app.includes("data-start-day-id"), "stable day start id action missing");
 assert(app.includes("data-confirm-workout-review"), "pre-workout confirmation missing");

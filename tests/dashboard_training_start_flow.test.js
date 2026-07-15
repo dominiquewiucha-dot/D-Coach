@@ -9,7 +9,7 @@ assert(app.includes('button.addEventListener("click", () => startTrainingFlow(bu
 assert(app.includes("function createTrainingResumeCheckinDraft(existing = null, trainingDayId = \"\", skipReview = true)"), "check-in resume draft must preserve selected day id");
 assert(app.includes("resumeTrainingDayId: trainingDayId || base.resumeTrainingDayId || \"\""), "resume draft must store selected training day id");
 assert(app.includes("startTrainingFlow(resumeAction.trainingDayId, { skipReview: resumeAction.skipReview });"), "check-in completion must resume the selected training day");
-assert(app.includes("startDay(resolved.dayId, { skipReview });"), "training flow must start the resolved day with review option");
+assert(app.includes('startDay(resolved.dayId, { skipReview, source: options.source || "automatic_next_day" });'), "training flow must start the resolved day with review option");
 assert(app.includes("if (options.skipReview) {"), "pre-workout flow must support direct start without second confirmation");
 assert(app.includes("startWorkoutFromReview(review);"), "direct start must use the same integrity checks as review confirmation");
 

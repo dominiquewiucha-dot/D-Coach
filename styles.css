@@ -28,6 +28,7 @@
   --space-5: 20px;
   --space-6: 24px;
   --bottom-nav-height: 82px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
   --nav-icon-size: 23px;
   --nav-center-size: 54px;
 }
@@ -85,7 +86,7 @@ select:focus-visible {
 .app-content {
   min-height: 100dvh;
   touch-action: pan-y pinch-zoom;
-  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 24px);
+  padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 24px);
 }
 
 .screen {
@@ -505,7 +506,8 @@ select:focus-visible {
   display: flex;
   gap: 4px;
   min-height: var(--bottom-nav-height);
-  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  padding: 8px 10px calc(8px + var(--safe-bottom));
+  top: auto;
   transform: none;
   translate: none;
   background: rgba(8, 17, 31, .96);

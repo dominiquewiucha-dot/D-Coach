@@ -192,6 +192,7 @@ const state = {
   activeCoachProposalId: "",
   showProposalAlternative: false,
   manualTrainingDayId: "",
+  trainingStartIntent: null,
   pendingWorkoutReview: null,
   trainingDayError: null,
   workoutOverviewOpen: false,
@@ -210,8 +211,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v78";
-const APP_CACHE_VERSION = "dcoach-pwa-v78";
+const APP_VERSION = "pwa-v79";
+const APP_CACHE_VERSION = "dcoach-pwa-v79";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -391,6 +392,12 @@ const storage = {
   },
   set deviceValidationReports(value) {
     writeJson("dcoach.deviceValidationReports", Array.isArray(value) ? value.slice(-20) : []);
+  },
+  get deviceValidationStatus() {
+    return readJson("dcoach.deviceValidationStatus", {});
+  },
+  set deviceValidationStatus(value) {
+    writeJson("dcoach.deviceValidationStatus", value && typeof value === "object" ? value : {});
   },
   get muscleCoverageDeviceValidationStatus() {
     return readJson("dcoach.muscleCoverageDeviceValidationStatus", {});
@@ -2219,6 +2226,17 @@ function localIsoDate(date = new Date()) {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+function addLocalDays(date = new Date(), days = 0) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function localDateTimeIso(localDate, time = "18:00") {
+  const [hours = "18", minutes = "00"] = String(time || "18:00").split(":");
+  return new Date(`${localDate}T${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}:00`).toISOString();
 }
 
 function dateTimeText(value) {
@@ -8104,7 +8122,7 @@ function renderPreWorkoutReview(review) {
             <p class="muted">Vor dem Start</p>
             <h2>${htmlesc(review.dayName)}</h2>
             <p class="muted">${review.exercises.length} Übungen · ${trainingDaySetCount(review)} Sätze · ca. ${estimatedPlanDayMinutes(review)} Minuten</p>
-            <p class="quiet">Quelle: ${trainingDayReasonText(review.reason)}</p>
+            <p class="quiet">Quelle: ${trainingDayReasonText(review.reason)} - Datum: ${htmlesc(review.sessionLocalDate || localIsoDate())}</p>
           </div>
           <span class="badge ${invalid.length ? "amber" : "green"}">${invalid.length ? "prüfen" : "startklar"}</span>
         </div>
@@ -8303,9 +8321,64 @@ function buildTrainingDayError(resolved, invalid) {
   };
 }
 
-function buildPreWorkoutReview(resolved, warmup = null) {
+function askTrainingSessionLocalDate() {
+  const today = localIsoDate();
+  const yesterday = localIsoDate(addLocalDays(new Date(), -1));
+  const choice = prompt("Trainingsdatum:\n1 = Heute\n2 = Gestern\n3 = Datum wählen", "1");
+  if (choice === null) return null;
+  let selected = today;
+  if (choice.trim() === "2") selected = yesterday;
+  if (choice.trim() === "3") {
+    const custom = prompt("Trainingsdatum im Format YYYY-MM-DD", today);
+    if (custom === null) return null;
+    selected = custom.trim();
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(selected)) {
+    alert("Bitte ein gültiges Datum im Format YYYY-MM-DD eingeben.");
+    return null;
+  }
+  if (selected > today) {
+    alert("Trainingsdatum in der Zukunft ist nicht erlaubt.");
+    return null;
+  }
+  return selected;
+}
+
+function buildTrainingStartIntent(resolved, sessionLocalDate, source = "manual_day_selection") {
+  return {
+    id: `training_intent_${Date.now()}`,
+    planId: resolved.planId,
+    planName: resolved.planName,
+    dayId: resolved.dayId,
+    dayName: resolved.dayName,
+    exerciseIds: resolved.exercises.map((entry) => entry.exerciseId),
+    source,
+    sessionLocalDate,
+    createdAt: new Date().toISOString()
+  };
+}
+
+function reviewMatchesTrainingStartIntent(review, intent = state.trainingStartIntent) {
+  if (!review || !intent) return false;
+  const reviewExerciseIds = (review.exercises || []).map((entry) => entry.exerciseId);
+  return review.trainingStartIntentId === intent.id &&
+    review.planId === intent.planId &&
+    review.dayId === intent.dayId &&
+    review.dayName === intent.dayName &&
+    JSON.stringify(reviewExerciseIds) === JSON.stringify(intent.exerciseIds);
+}
+
+function buildTrainingStartIntentMismatchError() {
+  return {
+    message: "Der gewählte Trainingstag hat sich während des Startvorgangs verändert. Das Training wurde aus Sicherheitsgründen nicht gestartet.",
+    details: ["Prüfe den gewählten Tag erneut oder brich den Startvorgang ab."]
+  };
+}
+
+function buildPreWorkoutReview(resolved, warmup = null, intent = null) {
   return {
     id: `workout_review_${Date.now()}`,
+    trainingStartIntentId: intent?.id || "",
     planId: resolved.planId,
     planName: resolved.planName,
     dayId: resolved.dayId,
@@ -8315,11 +8388,19 @@ function buildPreWorkoutReview(resolved, warmup = null) {
     maxDurationMinutes: resolved.maxDurationMinutes,
     exercises: resolved.exercises.map((entry) => ({ ...entry, sourceDayId: resolved.dayId })),
     warmups: warmup ? [warmup] : [],
+    sessionLocalDate: intent?.sessionLocalDate || localIsoDate(),
+    entryMode: intent?.sessionLocalDate && intent.sessionLocalDate !== localIsoDate() ? "historical_entry" : "live",
     createdAt: new Date().toISOString()
   };
 }
 
 function startWorkoutFromReview(review) {
+  if (!reviewMatchesTrainingStartIntent(review)) {
+    state.trainingDayError = buildTrainingStartIntentMismatchError();
+    state.pendingWorkoutReview = null;
+    state.tab = "training";
+    return false;
+  }
   const invalid = invalidPlannedExercises(review);
   if (invalid.length) {
     state.trainingDayError = buildTrainingDayError(review, invalid);
@@ -8335,7 +8416,11 @@ function startWorkoutFromReview(review) {
     planName: review.planName,
     dayId: review.dayId,
     dayName: review.dayName,
-    startedAt: new Date().toISOString(),
+    trainingStartIntentId: review.trainingStartIntentId || "",
+    sessionLocalDate: review.sessionLocalDate || localIsoDate(),
+    entryMode: review.entryMode || "live",
+    startedAt: review.entryMode === "historical_entry" ? localDateTimeIso(review.sessionLocalDate, "18:00") : new Date().toISOString(),
+    liveStartedAt: new Date().toISOString(),
     warmups: review.warmups || [],
     sessionNote: "",
     index: 0,
@@ -8381,9 +8466,19 @@ function openPreWorkoutReview(dayIdOrName = "", options = {}) {
     render();
     return;
   }
+  const sessionLocalDate = askTrainingSessionLocalDate();
+  if (!sessionLocalDate) {
+    state.pendingWorkoutReview = null;
+    state.tab = "training";
+    render();
+    return;
+  }
+  const source = options.source || (sessionLocalDate !== localIsoDate() ? "historical_entry" : (dayIdOrName ? "manual_day_selection" : "automatic_next_day"));
+  const intent = buildTrainingStartIntent(resolved, sessionLocalDate, source);
+  state.trainingStartIntent = intent;
   const warmup = askWarmupBeforeWorkout();
   state.manualTrainingDayId = resolved.dayId;
-  const review = buildPreWorkoutReview(resolved, warmup);
+  const review = buildPreWorkoutReview(resolved, warmup, intent);
   if (options.skipReview) {
     startWorkoutFromReview(review);
     render();
@@ -8404,6 +8499,7 @@ function confirmPreWorkoutReview() {
 
 function cancelPreWorkoutReview() {
   state.pendingWorkoutReview = null;
+  state.trainingStartIntent = null;
   render();
 }
 
@@ -8448,7 +8544,7 @@ function startTrainingFlow(dayIdOrName = "", options = {}) {
     return;
   }
 
-  startDay(resolved.dayId, { skipReview });
+  startDay(resolved.dayId, { skipReview, source: options.source || "automatic_next_day" });
 }
 
 function renderCooldownCard() {
@@ -8808,6 +8904,14 @@ function rememberExerciseSetup(entry) {
   storage.machineSettings = [...storage.machineSettings.filter((item) => item.id !== setting.id), setting];
 }
 
+function workoutCompletedAt(workout) {
+  if (workout?.entryMode !== "historical_entry") return new Date().toISOString();
+  const started = new Date(workout.startedAt).getTime();
+  const liveStarted = new Date(workout.liveStartedAt || new Date()).getTime();
+  const elapsedMinutes = Number.isFinite(liveStarted) ? Math.max(10, Math.min(240, Math.round((Date.now() - liveStarted) / 60000))) : 60;
+  return new Date(started + elapsedMinutes * 60000).toISOString();
+}
+
 function finishOrNext() {
   const workout = state.activeWorkout;
   const entry = workout.entries[workout.index];
@@ -8834,6 +8938,7 @@ function finishOrNext() {
       return;
     }
   }
+  const completedAt = workoutCompletedAt(workout);
   const session = {
     id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
     planId: activePlan()?.id || workout.planName,
@@ -8843,9 +8948,12 @@ function finishOrNext() {
     dayName: workout.dayName,
     dayNameSnapshot: workout.dayName,
     startedAt: workout.startedAt,
-    endedAt: new Date().toISOString(),
-    completedAt: new Date().toISOString(),
-    readinessSnapshot: journalEntryForDate(todayIsoDate()) || null,
+    endedAt: completedAt,
+    completedAt,
+    sessionLocalDate: workout.sessionLocalDate || localIsoDate(new Date(workout.startedAt)),
+    entryMode: workout.entryMode || "live",
+    trainingStartIntentId: workout.trainingStartIntentId || "",
+    readinessSnapshot: journalEntryForDate(workout.sessionLocalDate || localIsoDate()) || null,
     warmups: Array.isArray(workout.warmups) ? workout.warmups : [],
     sessionNote: workout.sessionNote || "",
     completedExercises: workout.entries.map((entry) => {
@@ -8877,6 +8985,7 @@ function finishOrNext() {
   storage.sessions = [...storage.sessions, session];
   evaluateDueCoachRecommendations(session);
   clearWorkoutDraft();
+  state.trainingStartIntent = null;
   state.activeWorkout = null;
   state.showAlternatives = false;
   state.restTimer.remaining = 0;
@@ -10059,6 +10168,10 @@ function deviceValidationTestCases() {
     ["nav_bottom_fixed", "Bottom Navigation bleibt fixiert"],
     ["nav_safe_area", "Safe Area korrekt"],
     ["nav_dashboard_coach_tracking", "Dashboard Coach Tracking"],
+    ["nav_keyboard_open_close", "Navigation nach Tastatur öffnen/schließen"],
+    ["nav_musclemap_scroll", "Navigation bei Muscle-Map-Scroll"],
+    ["nav_workout_scroll", "Navigation bei Workout-Scroll"],
+    ["nav_background_resume", "Navigation nach Hintergrund/Vordergrund"],
     ["musclemap_scroll_top", "Muscle Map startet oben"],
     ["keyboard_daily_checkin", "Tastatur Daily Check-in"],
     ["keyboard_workout_inputs", "Tastatur Workout Eingaben"],
@@ -10077,12 +10190,67 @@ function deviceValidationTestCases() {
   ];
 }
 
+function nearestBottomNavAncestor(predicate) {
+  let node = document.getElementById("bottom-nav")?.parentElement || null;
+  while (node && node !== document.documentElement) {
+    if (predicate(node)) return node.id || node.className || node.tagName;
+    node = node.parentElement;
+  }
+  return "";
+}
+
+function captureBottomNavigationDiagnostics() {
+  const nav = document.getElementById("bottom-nav");
+  const rect = nav?.getBoundingClientRect();
+  const style = nav ? getComputedStyle(nav) : null;
+  const viewport = window.visualViewport || null;
+  return {
+    viewport: {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      devicePixelRatio: window.devicePixelRatio || 1
+    },
+    visualViewport: viewport ? {
+      width: Math.round(viewport.width),
+      height: Math.round(viewport.height),
+      offsetTop: Math.round(viewport.offsetTop),
+      offsetLeft: Math.round(viewport.offsetLeft),
+      scale: viewport.scale
+    } : null,
+    navRect: rect ? {
+      top: Math.round(rect.top),
+      bottom: Math.round(rect.bottom),
+      left: Math.round(rect.left),
+      right: Math.round(rect.right),
+      height: Math.round(rect.height)
+    } : null,
+    computedStyle: style ? {
+      position: style.position,
+      top: style.top,
+      bottom: style.bottom,
+      transform: style.transform,
+      translate: style.translate,
+      zIndex: style.zIndex,
+      paddingBottom: style.paddingBottom
+    } : null,
+    scrollAncestor: nearestBottomNavAncestor((node) => /(auto|scroll)/.test(getComputedStyle(node).overflowY)),
+    transformedAncestor: nearestBottomNavAncestor((node) => {
+      const current = getComputedStyle(node);
+      return current.transform !== "none" || current.filter !== "none" || current.perspective !== "none" || current.willChange.includes("transform") || current.contain.includes("paint");
+    }),
+    duplicateNavCount: document.querySelectorAll("#bottom-nav").length
+  };
+}
+
 function createDeviceValidationReport() {
   const displayMode = isStandaloneApp() ? "standalone" : "browser";
+  const status = storage.deviceValidationStatus;
+  const bottomNavigation = captureBottomNavigationDiagnostics();
   return {
     id: `device_validation_${Date.now()}`,
-    version: "6.17.0",
+    version: "6.19.0",
     appVersion: APP_VERSION,
+    cacheVersion: APP_CACHE_VERSION,
     platform: navigator.platform || "unknown",
     displayMode,
     viewport: {
@@ -10090,7 +10258,14 @@ function createDeviceValidationReport() {
       height: window.innerHeight,
       devicePixelRatio: window.devicePixelRatio || 1
     },
-    tests: deviceValidationTestCases().map(([id]) => ({ id, status: "not_tested" })),
+    bottomNavigation,
+    tests: deviceValidationTestCases().map(([id, label]) => ({
+      id,
+      label,
+      status: status[id] || "not_tested",
+      expected: "Bottom Navigation bleibt am unteren Viewport, nutzt Safe Area und hat keine transformierten oder scrollbaren Vorfahren.",
+      actual: id.startsWith("nav_") ? bottomNavigation : null
+    })),
     createdAt: new Date().toISOString()
   };
 }
@@ -10112,15 +10287,34 @@ function exportDeviceValidationReport() {
 
 function renderDeviceValidationPanel() {
   const latest = storage.deviceValidationReports.slice(-1)[0];
+  const currentStatus = storage.deviceValidationStatus;
+  const currentDiagnostics = captureBottomNavigationDiagnostics();
   return `
     <article class="card stack" data-device-validation-panel>
       <div class="row">
-        <h3 class="grow">Geräteprüfung v6.17</h3>
+        <h3 class="grow">Geräteprüfung v6.19</h3>
         <span class="badge amber">manuell</span>
       </div>
       <p class="muted">Diese Debug-Checkliste verändert keine Trainingsdaten. Echte iPhone/PWA-Tests müssen manuell bewertet werden.</p>
       <div class="storage-table">
-        ${deviceValidationTestCases().slice(0, 6).map(([id, label]) => `<div><span>${htmlesc(label)}</span><strong>not_tested</strong></div>`).join("")}
+        <div><span>Position</span><strong>${htmlesc(currentDiagnostics.computedStyle?.position || "-")}</strong></div>
+        <div><span>Transform-Vorfahre</span><strong>${htmlesc(currentDiagnostics.transformedAncestor || "keiner")}</strong></div>
+        <div><span>Scroll-Vorfahre</span><strong>${htmlesc(currentDiagnostics.scrollAncestor || "keiner")}</strong></div>
+        <div><span>Nav-Anzahl</span><strong>${currentDiagnostics.duplicateNavCount}</strong></div>
+      </div>
+      <div class="stack">
+        ${deviceValidationTestCases().map(([id, label]) => `
+          <div class="card compact-card stack">
+            <div class="row"><strong class="grow">${htmlesc(label)}</strong><span class="badge">${htmlesc(currentStatus[id] || "not_tested")}</span></div>
+            <p class="quiet">Erwartet: Unterleiste bleibt unten, Safe Area frei, keine Duplikate.</p>
+            <p class="quiet">Tatsächlich: bottom ${htmlesc(currentDiagnostics.computedStyle?.bottom || "-")} - nav.bottom ${currentDiagnostics.navRect?.bottom ?? "-"}</p>
+            <div class="button-row">
+              <button class="secondary compact-button" data-device-validation-status="${htmlesc(id)}" data-status="passed">Bestanden</button>
+              <button class="secondary compact-button" data-device-validation-status="${htmlesc(id)}" data-status="failed">Fehlgeschlagen</button>
+              <button class="secondary compact-button" data-device-validation-status="${htmlesc(id)}" data-status="blocked">Blockiert</button>
+            </div>
+          </div>
+        `).join("")}
       </div>
       <button class="secondary" data-export-device-validation>Prüfbericht exportieren</button>
       <p class="quiet">Letzter Bericht: ${latest ? dateTimeText(latest.createdAt) : "Noch keiner"}</p>
@@ -11209,6 +11403,15 @@ function bindEvents() {
   });
 
   document.querySelector("[data-export-device-validation]")?.addEventListener("click", exportDeviceValidationReport);
+  document.querySelectorAll("[data-device-validation-status]").forEach((button) => {
+    button.addEventListener("click", () => {
+      storage.deviceValidationStatus = {
+        ...storage.deviceValidationStatus,
+        [button.dataset.deviceValidationStatus]: button.dataset.status || "blocked"
+      };
+      render();
+    });
+  });
   document.querySelector("[data-export-muscle-coverage-device-validation]")?.addEventListener("click", exportMuscleCoverageDeviceValidationReport);
   document.querySelectorAll("[data-muscle-coverage-manual]").forEach((button) => {
     button.addEventListener("click", () => {

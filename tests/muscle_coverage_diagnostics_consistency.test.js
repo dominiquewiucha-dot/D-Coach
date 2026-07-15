@@ -5,10 +5,10 @@ const app = fs.readFileSync("app.js", "utf8");
 const sw = fs.readFileSync("sw.js", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v78";'), "app version must be pwa-v78");
-assert(app.includes('const APP_CACHE_VERSION = "dcoach-pwa-v78";'), "app cache version must be dcoach-pwa-v78");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v78";'), "service worker cache must be pwa-v78");
-assert(html.includes("app.js?v=pwa-v78"), "index app cache buster must be pwa-v78");
+assert(app.includes('const APP_VERSION = "pwa-v79";'), "app version must be pwa-v79");
+assert(app.includes('const APP_CACHE_VERSION = "dcoach-pwa-v79";'), "app cache version must be dcoach-pwa-v79");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v79";'), "service worker cache must be pwa-v79");
+assert(html.includes("app.js?v=pwa-v79"), "index app cache buster must be pwa-v79");
 
 [
   'const MUSCLE_COVERAGE_CALCULATION_VERSION = "muscle-coverage-v6.19.0";',
