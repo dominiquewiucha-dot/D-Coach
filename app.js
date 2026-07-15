@@ -210,7 +210,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v77";
+const APP_VERSION = "pwa-v78";
+const APP_CACHE_VERSION = "dcoach-pwa-v78";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -390,6 +391,12 @@ const storage = {
   },
   set deviceValidationReports(value) {
     writeJson("dcoach.deviceValidationReports", Array.isArray(value) ? value.slice(-20) : []);
+  },
+  get muscleCoverageDeviceValidationStatus() {
+    return readJson("dcoach.muscleCoverageDeviceValidationStatus", {});
+  },
+  set muscleCoverageDeviceValidationStatus(value) {
+    writeJson("dcoach.muscleCoverageDeviceValidationStatus", value && typeof value === "object" ? value : {});
   },
   get dailyCheckins() {
     return readJson("dcoach.dailyCheckins", []);
@@ -10040,6 +10047,7 @@ function renderDebugPanel(manifest) {
       <button class="secondary" data-load-test-data>Testdaten laden</button>
       <button class="secondary" data-clear-cache>Cache leeren</button>
       ${renderDeviceValidationPanel()}
+      ${renderMuscleCoverageTestCenter()}
       ${renderMuscleCoverageDiagnosticsPanel()}
       <ul class="small-list">${storage.lastErrors.slice(-5).map((item) => `<li>${dateTimeText(item.at)}: ${htmlesc(item.message)}</li>`).join("") || "<li>Keine Fehler protokolliert.</li>"}</ul>
     </div>
@@ -10116,6 +10124,143 @@ function renderDeviceValidationPanel() {
       </div>
       <button class="secondary" data-export-device-validation>Prüfbericht exportieren</button>
       <p class="quiet">Letzter Bericht: ${latest ? dateTimeText(latest.createdAt) : "Noch keiner"}</p>
+    </article>
+  `;
+}
+
+function muscleCoverageDeviceManualTests() {
+  return [
+    ["cyan_selection_visual", "Cyan ist nur Auswahlzustand"],
+    ["restart_same_value", "Nach App-Neustart derselbe Wert"]
+  ];
+}
+
+function muscleCoverageSurfaceValues(mode = state.coverageMode || "week") {
+  const comparison = allSurfacesCoverageComparison(mode);
+  const dashboardCoverage = coverageForSessions(sessionsForCoverageMode(mode));
+  const dashboardTriceps = coverageItemByMuscle(dashboardCoverage, "mg_triceps");
+  return [
+    ...comparison.surfaces,
+    {
+      surface: "Dashboard",
+      muscle: dashboardTriceps.name || "Trizeps",
+      percent: dashboardTriceps.percent || 0,
+      colorBand: dashboardTriceps.colorBand || getCoverageColorBand(dashboardTriceps.percent || 0),
+      status: "uses_canonical_coverageForSessions"
+    }
+  ];
+}
+
+function muscleCoverageDeviceValidationReport() {
+  const mode = state.coverageMode || "week";
+  const diagnostics = canonicalCoverageExportForMode(mode);
+  const triceps = tricepsCoverageDiagnostic(mode);
+  const surfaces = muscleCoverageSurfaceValues(mode);
+  const percentValues = surfaces.map((item) => item.percent).filter(Number.isFinite);
+  const colorValues = surfaces.map((item) => item.colorBand).filter(Boolean);
+  const firstPercent = percentValues[0] ?? 0;
+  const firstColor = colorValues[0] || "";
+  const autoTests = [
+    ["versions_visible", "App-, Mapping-, Coverage- und Cache-Version anzeigen", Boolean(APP_VERSION && MUSCLE_MAPPING_VERSION && MUSCLE_COVERAGE_CALCULATION_VERSION && APP_CACHE_VERSION)],
+    ["period_visible", "Zeitraum mit Start und Ende anzeigen", Boolean(diagnostics.period?.start && diagnostics.period?.end)],
+    ["session_ids_visible", "verwendete Session-IDs anzeigen", Array.isArray(diagnostics.sessionDiagnostics.sessionIds)],
+    ["duplicate_sessions_detected", "doppelte Sessions erkennen", Array.isArray(diagnostics.sessionDiagnostics.duplicateSessionIds)],
+    ["drafts_incomplete_detected", "Drafts und unvollständige Sessions erkennen", Array.isArray(diagnostics.sessionDiagnostics.draftIdsIncluded) && Array.isArray(diagnostics.sessionDiagnostics.incompleteSessionsIncluded)],
+    ["triceps_contributions_visible", "für Trizeps jeden Beitrag pro Übung und Muskelrolle anzeigen", Array.isArray(triceps.contributions)],
+    ["raw_reference_formula_visible", "Rohwert, Referenzwert, Formel und Endwert anzeigen", Boolean(triceps.formula && Number.isFinite(triceps.rawLoad) && Number.isFinite(triceps.referenceLoad) && Number.isFinite(triceps.displayPercent))],
+    ["same_percent_all_surfaces", "gleiche Prozentwerte auf Muscle Map, Tracking, Session Coach und Dashboard prüfen", percentValues.length >= 4 && percentValues.every((value) => Math.abs(value - firstPercent) <= 1)],
+    ["same_color_all_surfaces", "gleiche Farbkategorie auf allen Oberflächen prüfen", colorValues.length >= 4 && colorValues.every((value) => value === firstColor)]
+  ].map(([id, label, passed]) => ({ id, label, status: passed ? "passed" : "failed" }));
+  const manualStatus = storage.muscleCoverageDeviceValidationStatus;
+  return {
+    id: `muscle_coverage_device_validation_${Date.now()}`,
+    appVersion: APP_VERSION,
+    cacheVersion: APP_CACHE_VERSION,
+    mappingVersion: MUSCLE_MAPPING_VERSION,
+    calculationVersion: MUSCLE_COVERAGE_CALCULATION_VERSION,
+    mode,
+    period: diagnostics.period,
+    sessionDiagnostics: diagnostics.sessionDiagnostics,
+    sessions: diagnostics.sessions,
+    triceps,
+    surfaces,
+    autoTests,
+    manualTests: muscleCoverageDeviceManualTests().map(([id, label]) => ({ id, label, status: manualStatus[id] || "not_tested" })),
+    privacy: {
+      excludesBodyWeight: true,
+      excludesJournalText: true,
+      excludesPrivateTrainingNotes: true
+    },
+    createdAt: new Date().toISOString()
+  };
+}
+
+function exportMuscleCoverageDeviceValidationReport() {
+  const report = muscleCoverageDeviceValidationReport();
+  const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "DCoach_MuscleCoverage_DeviceValidation_Report.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function renderMuscleCoverageTestCenter() {
+  const report = muscleCoverageDeviceValidationReport();
+  const statusClass = (status) => status === "passed" || status === "Bestanden" ? "green" : status === "failed" || status === "Fehlgeschlagen" ? "red" : "amber";
+  return `
+    <article class="card stack" data-muscle-coverage-testcenter>
+      <div class="row">
+        <h3 class="grow">Muskelabdeckung prüfen</h3>
+        <span class="badge blue">${htmlesc(report.calculationVersion)}</span>
+      </div>
+      <p class="muted">Dieses Testcenter liest nur Diagnosedaten und verändert keine Trainingsdaten.</p>
+      <div class="storage-table">
+        <div><span>App</span><strong>${htmlesc(report.appVersion)}</strong></div>
+        <div><span>Cache</span><strong>${htmlesc(report.cacheVersion)}</strong></div>
+        <div><span>Mapping</span><strong>${htmlesc(report.mappingVersion)}</strong></div>
+        <div><span>Zeitraum</span><strong>${htmlesc(report.mode)}</strong></div>
+      </div>
+      <p class="quiet">Start: ${htmlesc(report.period.start)} | Ende: ${htmlesc(report.period.end)}</p>
+      <p class="quiet">Session-IDs: ${report.sessionDiagnostics.sessionIds.length ? report.sessionDiagnostics.sessionIds.map(htmlesc).join(", ") : "keine"}</p>
+      <p class="quiet">Doppelte Sessions: ${report.sessionDiagnostics.duplicateSessionIds.length ? report.sessionDiagnostics.duplicateSessionIds.map(htmlesc).join(", ") : "keine"} | Drafts: ${report.sessionDiagnostics.draftIdsIncluded.length ? report.sessionDiagnostics.draftIdsIncluded.map(htmlesc).join(", ") : "keine"} | Unvollständig: ${report.sessionDiagnostics.incompleteSessionsIncluded.length ? report.sessionDiagnostics.incompleteSessionsIncluded.map(htmlesc).join(", ") : "keine"}</p>
+      <div class="storage-table">
+        <div><span>Trizeps Rohwert</span><strong>${report.triceps.rawLoad}</strong></div>
+        <div><span>Referenz</span><strong>${report.triceps.referenceLoad}</strong></div>
+        <div><span>Endwert</span><strong>${report.triceps.displayPercent}%</strong></div>
+      </div>
+      <p class="quiet">Formel: ${htmlesc(report.triceps.formula)}</p>
+      <details class="disclosure-card stack">
+        <summary><span>Trizeps Beiträge</span><span class="badge">${report.triceps.contributions.length}</span></summary>
+        <div class="storage-table">
+          ${report.triceps.contributions.length ? report.triceps.contributions.map((item) => `<div><span>${htmlesc(item.exerciseName)} · ${htmlesc(item.role)}</span><strong>${item.contribution}</strong></div>`).join("") : `<div><span>Keine Beiträge</span><strong>0</strong></div>`}
+        </div>
+      </details>
+      <details class="disclosure-card stack">
+        <summary><span>Oberflächenvergleich</span><span class="badge">${report.surfaces.length}</span></summary>
+        <div class="storage-table">
+          ${report.surfaces.map((item) => `<div><span>${htmlesc(item.surface)}</span><strong>${item.percent}% · ${htmlesc(item.colorBand)}</strong></div>`).join("")}
+        </div>
+      </details>
+      <div class="storage-table">
+        ${report.autoTests.map((test) => `<div><span>${htmlesc(test.label)}</span><strong class="badge ${statusClass(test.status)}">${htmlesc(test.status)}</strong></div>`).join("")}
+      </div>
+      <div class="stack">
+        ${report.manualTests.map((test) => `
+          <div class="card compact-card stack">
+            <div class="row"><strong class="grow">${htmlesc(test.label)}</strong><span class="badge ${statusClass(test.status)}">${htmlesc(test.status)}</span></div>
+            <div class="button-row">
+              <button class="secondary compact-button" data-muscle-coverage-manual="${htmlesc(test.id)}" data-status="passed">Bestanden</button>
+              <button class="secondary compact-button" data-muscle-coverage-manual="${htmlesc(test.id)}" data-status="failed">Fehlgeschlagen</button>
+              <button class="secondary compact-button" data-muscle-coverage-manual="${htmlesc(test.id)}" data-status="blocked">Blockiert</button>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+      <button class="secondary" data-export-muscle-coverage-device-validation>DCoach_MuscleCoverage_DeviceValidation_Report.json exportieren</button>
     </article>
   `;
 }
@@ -11064,6 +11209,16 @@ function bindEvents() {
   });
 
   document.querySelector("[data-export-device-validation]")?.addEventListener("click", exportDeviceValidationReport);
+  document.querySelector("[data-export-muscle-coverage-device-validation]")?.addEventListener("click", exportMuscleCoverageDeviceValidationReport);
+  document.querySelectorAll("[data-muscle-coverage-manual]").forEach((button) => {
+    button.addEventListener("click", () => {
+      storage.muscleCoverageDeviceValidationStatus = {
+        ...storage.muscleCoverageDeviceValidationStatus,
+        [button.dataset.muscleCoverageManual]: button.dataset.status || "blocked"
+      };
+      render();
+    });
+  });
   document.querySelector("[data-export-muscle-coverage-diagnostics]")?.addEventListener("click", exportMuscleCoverageDiagnostics);
 }
 

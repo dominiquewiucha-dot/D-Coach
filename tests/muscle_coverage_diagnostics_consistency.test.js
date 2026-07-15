@@ -2,6 +2,13 @@ const assert = require("assert");
 const fs = require("fs");
 
 const app = fs.readFileSync("app.js", "utf8");
+const sw = fs.readFileSync("sw.js", "utf8");
+const html = fs.readFileSync("index.html", "utf8");
+
+assert(app.includes('const APP_VERSION = "pwa-v78";'), "app version must be pwa-v78");
+assert(app.includes('const APP_CACHE_VERSION = "dcoach-pwa-v78";'), "app cache version must be dcoach-pwa-v78");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v78";'), "service worker cache must be pwa-v78");
+assert(html.includes("app.js?v=pwa-v78"), "index app cache buster must be pwa-v78");
 
 [
   'const MUSCLE_COVERAGE_CALCULATION_VERSION = "muscle-coverage-v6.19.0";',
@@ -13,7 +20,20 @@ const app = fs.readFileSync("app.js", "utf8");
   "function canonicalCoverageExportForMode(",
   "function tricepsCoverageDiagnostic(",
   "function allSurfacesCoverageComparison(",
-  "DCoach_MuscleCoverage_Diagnostics.json"
+  "DCoach_MuscleCoverage_Diagnostics.json",
+  "function muscleCoverageDeviceValidationReport()",
+  "function renderMuscleCoverageTestCenter()",
+  "DCoach_MuscleCoverage_DeviceValidation_Report.json",
+  "data-export-muscle-coverage-device-validation",
+  "data-muscle-coverage-manual",
+  "Cyan ist nur Auswahlzustand",
+  "Nach App-Neustart derselbe Wert",
+  "same_percent_all_surfaces",
+  "same_color_all_surfaces",
+  "excludesBodyWeight: true",
+  "excludesJournalText: true",
+  "excludesPrivateTrainingNotes: true",
+  "storage.muscleCoverageDeviceValidationStatus"
 ].forEach((needle) => assert(app.includes(needle), `${needle} missing`));
 
 [

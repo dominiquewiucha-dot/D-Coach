@@ -7,10 +7,10 @@ const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
 const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v77";'), "app version must be pwa-v77");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v77";'), "service worker cache must be pwa-v77");
-assert(html.includes("app.js?v=pwa-v77"), "index app cache buster must be pwa-v77");
-assert(html.includes("styles.css?v=pwa-v77"), "index style cache buster must be pwa-v77");
+assert(app.includes('const APP_VERSION = "pwa-v78";'), "app version must be pwa-v78");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v78";'), "service worker cache must be pwa-v78");
+assert(html.includes("app.js?v=pwa-v78"), "index app cache buster must be pwa-v78");
+assert(html.includes("styles.css?v=pwa-v78"), "index style cache buster must be pwa-v78");
 
 [
   "function workoutDraftIntegrity(",
