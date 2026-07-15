@@ -211,8 +211,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v80";
-const APP_CACHE_VERSION = "dcoach-pwa-v80";
+const APP_VERSION = "pwa-v81";
+const APP_CACHE_VERSION = "dcoach-pwa-v81";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -8346,8 +8346,8 @@ function buildTrainingStartIntentMismatchError() {
   };
 }
 
-function buildPreWorkoutReview(resolved, warmup = null, intent = null) {
-  return {
+function createLockedTrainingStartArtifacts({ resolved, warmup = null, intent = null, createdAt = new Date().toISOString() }) {
+  const review = {
     id: `workout_review_${Date.now()}`,
     trainingStartIntentId: intent?.id || "",
     planId: resolved.planId,
@@ -8359,8 +8359,35 @@ function buildPreWorkoutReview(resolved, warmup = null, intent = null) {
     maxDurationMinutes: resolved.maxDurationMinutes,
     exercises: resolved.exercises.map((entry) => ({ ...entry, sourceDayId: resolved.dayId })),
     warmups: warmup ? [warmup] : [],
-    createdAt: new Date().toISOString()
+    createdAt
   };
+  return {
+    review,
+    draftCore: {
+      planId: review.planId,
+      planName: review.planName,
+      dayId: review.dayId,
+      dayName: review.dayName,
+      trainingStartIntentId: review.trainingStartIntentId,
+      warmups: review.warmups,
+      exerciseIds: review.exercises.map((entry) => entry.exerciseId)
+    }
+  };
+}
+
+function createLockedWorkoutDraftCore(review) {
+  return {
+    planId: review.planId,
+    planName: review.planName,
+    dayId: review.dayId,
+    dayName: review.dayName,
+    trainingStartIntentId: review.trainingStartIntentId || "",
+    warmups: review.warmups || []
+  };
+}
+
+function buildPreWorkoutReview(resolved, warmup = null, intent = null) {
+  return createLockedTrainingStartArtifacts({ resolved, warmup, intent }).review;
 }
 
 function startWorkoutFromReview(review) {
@@ -8380,14 +8407,10 @@ function startWorkoutFromReview(review) {
   state.showAlternatives = false;
   state.restTimer.remaining = 0;
   state.restTimer.running = false;
+  const draftCore = createLockedWorkoutDraftCore(review);
   const nextWorkout = {
-    planId: review.planId,
-    planName: review.planName,
-    dayId: review.dayId,
-    dayName: review.dayName,
-    trainingStartIntentId: review.trainingStartIntentId || "",
+    ...draftCore,
     startedAt: new Date().toISOString(),
-    warmups: review.warmups || [],
     sessionNote: "",
     index: 0,
     overviewOpen: false,
