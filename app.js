@@ -210,7 +210,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v73";
+const APP_VERSION = "pwa-v74";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -492,6 +492,7 @@ function appendMigrationLog(entry) {
 
 function runStorageMigrations() {
   const currentVersion = storage.storageVersion;
+  repairLegacyPullPlanMixups();
   if (currentVersion === STORAGE_SCHEMA_VERSION) return;
   appendMigrationLog({
     id: `storage-${currentVersion || "unknown"}-to-${STORAGE_SCHEMA_VERSION}`,
@@ -785,6 +786,87 @@ const PULL_LWS_TEMPLATE_V618 = [
   { exerciseId: "ex_face_pull", sets: 2, reps: "12-20", restSeconds: 60, priority: "optional" },
   { exerciseId: "ex_cable_biceps_curl", sets: 3, reps: "10-15", restSeconds: 60, priority: "required" }
 ];
+
+function exerciseTrainingTypeForIntegrity(exercise) {
+  const text = [
+    exercise?.id,
+    exercise?.displayName,
+    exercise?.englishName,
+    exercise?.category,
+    exercise?.movementPattern,
+    ...(exercise?.tags || []),
+    ...(exercise?.primaryMuscleGroups || []),
+    ...(exercise?.secondaryMuscleGroups || [])
+  ].join(" ").toLowerCase();
+  if (/bank|bench|press|drueck|drück|push|brust|chest|schulter|shoulder|trizeps|triceps/.test(text)) return "Push";
+  if (/pull|zug|lat|rudern|row|ruecken|rücken|back|bizeps|biceps|curl|face pull|reverse/.test(text)) return "Pull";
+  if (/bein|leg|quad|glute|hamstring|wade|calf|adduktor|adductor/.test(text)) return "Legs";
+  return "";
+}
+
+function planDayTypeStats(day) {
+  return (day?.exercises || []).reduce((stats, entry) => {
+    const type = exerciseTrainingTypeForIntegrity(exerciseById(entry.exerciseId));
+    if (type) stats[type] = (stats[type] || 0) + 1;
+    stats.total += 1;
+    return stats;
+  }, { Push: 0, Pull: 0, Legs: 0, total: 0 });
+}
+
+function isLegacyPullPlanMixup(day) {
+  if (explicitDayTypeFromName(day?.name) !== "Pull") return false;
+  const stats = planDayTypeStats(day);
+  return stats.total >= 3 && stats.Push >= Math.max(2, Math.ceil(stats.total * 0.5)) && stats.Pull <= 1;
+}
+
+function repairPlanPullDayMixup(plan) {
+  if (!plan?.days?.length) return { plan, changed: false };
+  let changed = false;
+  const days = plan.days.map((day) => {
+    if (!isLegacyPullPlanMixup(day)) return day;
+    changed = true;
+    const replacement = generatedPullDayV618();
+    return {
+      ...day,
+      name: day.name || replacement.name,
+      maxDurationMinutes: day.maxDurationMinutes || replacement.maxDurationMinutes,
+      exercises: replacement.exercises.map((entry) => ({ ...entry })),
+      integrityRepair: {
+        repairedAt: new Date().toISOString(),
+        reason: "legacy_pull_day_contained_push_exercises"
+      }
+    };
+  });
+  return { plan: changed ? { ...plan, days } : plan, changed };
+}
+
+function repairLegacyPullPlanMixups() {
+  let changedSeed = false;
+  const repairedSeed = (state.seed?.trainingPlans || []).map((plan) => {
+    const repaired = repairPlanPullDayMixup(plan);
+    if (repaired.changed) changedSeed = true;
+    return repaired.plan;
+  });
+  if (changedSeed) state.seed.trainingPlans = repairedSeed;
+
+  let changedCustom = false;
+  const repairedCustom = storage.customPlans.map((plan) => {
+    const repaired = repairPlanPullDayMixup(plan);
+    if (repaired.changed) changedCustom = true;
+    return repaired.plan;
+  });
+  if (changedCustom) {
+    storage.customPlans = repairedCustom;
+    appendMigrationLog({
+      id: "v6-18-2-pull-plan-mixup-repair",
+      from: storage.storageVersion || "unknown",
+      to: storage.storageVersion || STORAGE_SCHEMA_VERSION,
+      at: new Date().toISOString(),
+      action: "repair-pull-day-exercise-mixup",
+      destructive: false
+    });
+  }
+}
 
 function setPolicyDefaultForExercise(exercise, index = 0, dayName = "", priority = "") {
   if (priority === "optional") return 2;
@@ -1475,6 +1557,7 @@ function restoreWorkoutDraft() {
   const draft = storage.activeWorkoutDraft;
   if (!isValidActiveWorkoutDraft(draft)) return;
   state.activeWorkout = draft;
+  ensureActiveWorkoutIntegrity();
   state.tab = "training";
 }
 
@@ -1705,6 +1788,117 @@ function workEntriesAsPlannedExercises(entries = []) {
     priority: entry.priority,
     sortOrder: entry.sortOrder || index + 1
   }, index));
+}
+
+function workoutDraftExerciseIds(workout) {
+  return (workout?.entries || []).map((entry) => entry.exerciseId).filter(Boolean);
+}
+
+function workoutHasRecordedSetData(workout) {
+  return (workout?.entries || []).some((entry) =>
+    (entry.sets || []).some((set) => set.completed === true || setHasAnyInput(set))
+  );
+}
+
+function workoutDayExerciseMatchCount(day, workout) {
+  const plannedIds = new Set((day?.exercises || []).map((entry) => entry.exerciseId).filter(Boolean));
+  if (!plannedIds.size) return 0;
+  return workoutDraftExerciseIds(workout).reduce((count, exerciseId) => count + (plannedIds.has(exerciseId) ? 1 : 0), 0);
+}
+
+function workoutDraftIntegrity(workout, plan = activePlan()) {
+  if (!isValidActiveWorkoutDraft(workout)) return { valid: false, action: "invalid" };
+  const days = normalizedPlanDays(plan);
+  if (!days.length) return { valid: true, action: "no_plan" };
+  const namedDay = days.find((day) => day.id === workout.dayId || day.name === workout.dayName) || null;
+  const exerciseIds = workoutDraftExerciseIds(workout);
+  const namedScore = namedDay ? workoutDayExerciseMatchCount(namedDay, workout) : 0;
+  const scored = days
+    .map((day) => ({ day, score: workoutDayExerciseMatchCount(day, workout) }))
+    .sort((a, b) => b.score - a.score);
+  const best = scored[0] || null;
+  const second = scored[1] || null;
+  if (namedDay && namedScore === exerciseIds.length) return { valid: true, action: "ok", day: namedDay };
+  if (
+    best?.score > 0 &&
+    best.score > namedScore &&
+    best.score > (second?.score || 0) &&
+    best.score >= Math.ceil(exerciseIds.length * 0.6)
+  ) {
+    return {
+      valid: false,
+      action: "wrong_day_label",
+      expectedDay: namedDay,
+      actualDay: best.day,
+      score: best.score,
+      exerciseCount: exerciseIds.length
+    };
+  }
+  return {
+    valid: false,
+    action: "day_exercise_mismatch",
+    expectedDay: namedDay,
+    score: namedScore,
+    exerciseCount: exerciseIds.length
+  };
+}
+
+function repairWorkoutDraftDayLabel(workout, integrity) {
+  if (integrity.action !== "wrong_day_label" || !integrity.actualDay) return null;
+  return {
+    ...workout,
+    dayId: integrity.actualDay.id,
+    dayName: integrity.actualDay.name,
+    semanticRepair: {
+      repairedAt: new Date().toISOString(),
+      reason: "workout_entries_matched_another_plan_day",
+      previousDayId: workout.dayId || "",
+      previousDayName: workout.dayName || "",
+      matchedExerciseCount: integrity.score,
+      exerciseCount: integrity.exerciseCount
+    },
+    entries: (workout.entries || []).map((entry) => ({ ...entry, sourceDayId: integrity.actualDay.id }))
+  };
+}
+
+function buildWorkoutDraftIntegrityError(workout, integrity, mode = "blocked") {
+  const actualName = integrity.actualDay?.name || "anderer Plantag";
+  const expectedName = integrity.expectedDay?.name || workout?.dayName || "gewählter Plantag";
+  if (mode === "repaired") {
+    return {
+      message: "Training-Draft passte nicht zum Plantag und wurde korrigiert.",
+      details: [`${expectedName} enthielt Übungen aus ${actualName}. Der Titel wurde auf ${actualName} gesetzt.`]
+    };
+  }
+  return {
+    message: "Training-Draft passt nicht zum Plantag.",
+    details: [
+      `${expectedName} enthielt Übungen aus ${actualName}.`,
+      "Der lokale Entwurf wurde gestoppt. Starte die Einheit bitte neu über die Vorabprüfung."
+    ]
+  };
+}
+
+function ensureActiveWorkoutIntegrity() {
+  const workout = state.activeWorkout;
+  if (!workout) return true;
+  const integrity = workoutDraftIntegrity(workout);
+  if (integrity.valid) return true;
+
+  const repaired = repairWorkoutDraftDayLabel(workout, integrity);
+  if (repaired && workoutHasRecordedSetData(workout)) {
+    state.activeWorkout = repaired;
+    storage.activeWorkoutDraft = repaired;
+    state.trainingDayError = buildWorkoutDraftIntegrityError(workout, integrity, "repaired");
+    return true;
+  }
+
+  clearWorkoutDraft();
+  state.activeWorkout = null;
+  state.pendingWorkoutReview = null;
+  state.trainingDayError = buildWorkoutDraftIntegrityError(workout, integrity, "blocked");
+  state.tab = "training";
+  return false;
 }
 
 function resolveTrainingDay({
@@ -4154,7 +4348,10 @@ function renderRoute() {
   if (!state.seed) return `<section class="screen"><h1 class="title">D-Coach</h1><p class="subtitle">Lade Daten...</p></section>`;
   if (isMuscleMapPrototypeRoute()) return renderMuscleMapJsPrototypeScreen();
   if (state.selectedExerciseId) return renderExerciseDetail(state.selectedExerciseId);
-  if (state.activeWorkout) return renderWorkout();
+  if (state.activeWorkout) {
+    if (!ensureActiveWorkoutIntegrity()) return renderTrainingV53();
+    return renderWorkout();
+  }
   if (state.selectedSessionId) return renderSessionDetail(state.selectedSessionId);
   switch (state.tab) {
     case "training": return renderTrainingV53();
@@ -7891,7 +8088,7 @@ function confirmPreWorkoutReview() {
   state.showAlternatives = false;
   state.restTimer.remaining = 0;
   state.restTimer.running = false;
-  state.activeWorkout = {
+  const nextWorkout = {
     planId: review.planId,
     planName: review.planName,
     dayId: review.dayId,
@@ -7903,6 +8100,15 @@ function confirmPreWorkoutReview() {
     overviewOpen: false,
     entries: review.exercises.map(workoutEntryFromPlanned)
   };
+  const integrity = workoutDraftIntegrity(nextWorkout, activePlan());
+  if (!integrity.valid) {
+    state.trainingDayError = buildWorkoutDraftIntegrityError(nextWorkout, integrity, "blocked");
+    state.pendingWorkoutReview = null;
+    state.tab = "training";
+    render();
+    return;
+  }
+  state.activeWorkout = nextWorkout;
   state.pendingWorkoutReview = null;
   persistWorkoutDraft();
   render();
