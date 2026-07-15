@@ -210,11 +210,14 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v76";
+const APP_VERSION = "pwa-v77";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
 const MUSCLE_MAPPING_VERSION = "muscle-mapping-v3";
+const MUSCLE_COVERAGE_CALCULATION_VERSION = "muscle-coverage-v6.19.0";
+const MUSCLE_GROUP_REFERENCE_LOAD = 8;
+const MUSCLE_REGION_REFERENCE_LOAD = 3;
 const STORAGE_KEYS = [
   { key: "dcoach.sessions", label: "Trainings", type: "array" },
   { key: "dcoach.weights", label: "Gewicht", type: "array" },
@@ -3025,17 +3028,46 @@ function premiumSubregionsForExercise(exercise, mapping) {
 }
 
 function canonicalCoverageContributionTargets(exercise, mapping) {
-  const groupTargets = [];
-  const regionTargets = [];
+  const groupTargets = new Map();
+  const regionTargets = new Map();
+  const duplicateTargets = [];
+  const roleRank = {
+    primary: 3,
+    secondary: 2,
+    stabilizer: 1,
+    primary_region: 3,
+    secondary_region: 2
+  };
+  const addTarget = (map, muscleId, weight, role, source) => {
+    if (!muscleId || !Number.isFinite(weight) || weight <= 0) return;
+    const existing = map.get(muscleId);
+    if (existing) {
+      duplicateTargets.push({
+        muscleId,
+        keptRole: (roleRank[role] || 0) > (roleRank[existing.role] || 0) ? role : existing.role,
+        duplicateRole: (roleRank[role] || 0) > (roleRank[existing.role] || 0) ? existing.role : role,
+        keptWeight: Number(Math.max(existing.weight, weight).toFixed(3)),
+        duplicateWeight: Number(Math.min(existing.weight, weight).toFixed(3)),
+        source
+      });
+      if ((roleRank[role] || 0) > (roleRank[existing.role] || 0)) {
+        map.set(muscleId, { muscleId, weight, role });
+      } else if ((roleRank[role] || 0) === (roleRank[existing.role] || 0) && weight > existing.weight) {
+        map.set(muscleId, { muscleId, weight, role });
+      }
+      return;
+    }
+    map.set(muscleId, { muscleId, weight, role });
+  };
   const addGroup = (muscleId, weight, role) => {
     const id = canonicalizeMuscleGroup(muscleId);
     if (!id || !Number.isFinite(weight) || weight <= 0) return;
-    groupTargets.push({ muscleId: id, weight, role });
+    addTarget(groupTargets, id, weight, role, "group");
   };
   const addRegion = (muscleId, weight, role) => {
     const id = canonicalizeMuscleRegionId(muscleId);
     if (!id || !Number.isFinite(weight) || weight <= 0) return;
-    regionTargets.push({ muscleId: id, weight, role });
+    addTarget(regionTargets, id, weight, role, "region");
   };
   addGroup(mapping?.primaryMuscle, 1, "primary");
   (mapping?.secondaryMuscles || []).forEach((item) => addGroup(item.muscleId, Number(item.intensityWeight) || 0, "secondary"));
@@ -3052,10 +3084,79 @@ function canonicalCoverageContributionTargets(exercise, mapping) {
     const regions = premiumSubregionsForExercise(null, { primaryMuscle: group, secondaryMuscles: [] });
     regions.forEach((muscleId) => addRegion(muscleId, (Number(item.intensityWeight) || 0) / Math.max(1, regions.length), "secondary_region"));
   });
-  return { groupTargets, regionTargets };
+  return {
+    groupTargets: [...groupTargets.values()],
+    regionTargets: [...regionTargets.values()],
+    duplicateTargets
+  };
+}
+
+function coveragePeriodForMode(mode = "week", referenceDate = new Date()) {
+  const end = new Date(referenceDate);
+  end.setHours(23, 59, 59, 999);
+  const start = new Date(referenceDate);
+  start.setHours(0, 0, 0, 0);
+  if (mode === "today") {
+    return { start, end };
+  }
+  if (mode === "month") {
+    start.setDate(start.getDate() - 29);
+    return { start, end };
+  }
+  start.setDate(start.getDate() - 6);
+  return { start, end };
+}
+
+function uniqueCoverageSessions(sessions = []) {
+  const seen = new Set();
+  const duplicateSessionIds = [];
+  const unique = [];
+  sessions.forEach((session, index) => {
+    const id = session?.id || `session_index_${index}`;
+    if (seen.has(id)) {
+      duplicateSessionIds.push(id);
+      return;
+    }
+    seen.add(id);
+    unique.push(session);
+  });
+  return { unique, duplicateSessionIds: [...new Set(duplicateSessionIds)] };
+}
+
+function getCoverageColorBand(percent) {
+  const value = Number(percent) || 0;
+  if (value <= 0) return "neutral";
+  if (value <= 35) return "yellow";
+  if (value <= 70) return "yellow_orange";
+  if (value <= 100) return "orange";
+  if (value <= 130) return "red";
+  return "dark_red";
+}
+
+function coverageMetric({ id, label, level, rawLoad, referenceLoad, sourceExerciseIds = [], sourceSessionIds = [], extra = {} }) {
+  const safeRaw = Number(rawLoad) || 0;
+  const safeReference = Math.max(0.001, Number(referenceLoad) || 0);
+  const percent = Math.round((safeRaw / safeReference) * 100);
+  return {
+    id,
+    muscleId: id,
+    label,
+    level,
+    rawLoad: Number(safeRaw.toFixed(3)),
+    referenceLoad: safeReference,
+    percent,
+    coveragePercent: percent,
+    colorBand: getCoverageColorBand(percent),
+    weightedSetScore: safeRaw,
+    sourceExerciseIds,
+    sourceSessionIds,
+    ...extra
+  };
 }
 
 function getCanonicalMuscleCoverage({ sessions, context = "week", referenceDate = new Date(), planId = null } = {}) {
+  const sessionGate = uniqueCoverageSessions(sessions || []);
+  const coverageSessions = sessionGate.unique;
   const groupPoints = new Map();
   const regionPoints = new Map();
   const diagnostics = [];
@@ -3064,7 +3165,7 @@ function getCanonicalMuscleCoverage({ sessions, context = "week", referenceDate 
     if (!muscleId || !Number.isFinite(value) || value <= 0) return;
     map.set(muscleId, (map.get(muscleId) || 0) + value);
   };
-  sessions.forEach((session) => {
+  coverageSessions.forEach((session) => {
     (session.completedExercises || []).forEach((completedExercise) => {
       const exercise = exerciseById(completedExercise.exerciseId);
       const mapping = muscleMappingForExercise(completedExercise.exerciseId);
@@ -3078,9 +3179,14 @@ function getCanonicalMuscleCoverage({ sessions, context = "week", referenceDate 
       targets.regionTargets.forEach((target) => add(regionPoints, target.muscleId, setPoints * target.weight));
       diagnostics.push({
         sessionId: session.id,
+        sessionDate: session.startedAt || session.completedAt || session.date || "",
+        dayName: session.dayName || session.dayNameSnapshot || "",
         exerciseId: completedExercise.exerciseId,
+        exerciseName: completedExercise.exerciseNameSnapshot || exercise?.displayName || completedExercise.exerciseId,
+        completedSetCount: (completedExercise.sets || []).filter((set) => set.completed === true).length,
         groupTargets: targets.groupTargets,
         regionTargets: targets.regionTargets,
+        duplicateTargets: targets.duplicateTargets,
         rawSetScore: Number(setPoints.toFixed(3))
       });
     });
@@ -3089,38 +3195,61 @@ function getCanonicalMuscleCoverage({ sessions, context = "week", referenceDate 
   targetMuscles.forEach((muscleId) => {
     if (!groupPoints.has(muscleId)) groupPoints.set(muscleId, 0);
   });
-  const groupItems = [...groupPoints.entries()].map(([muscleId, value]) => ({
-    muscleId,
+  const groupItems = [...groupPoints.entries()].map(([muscleId, value]) => coverageMetric({
+    id: muscleId,
     label: muscleName(muscleId),
-    coveragePercent: Math.round((value / 8) * 100),
-    weightedSetScore: value,
+    level: "group",
+    rawLoad: value,
+    referenceLoad: MUSCLE_GROUP_REFERENCE_LOAD,
     sourceExerciseIds: [...new Set(diagnostics.filter((row) => row.groupTargets.some((target) => target.muscleId === muscleId)).map((row) => row.exerciseId))],
     sourceSessionIds: [...new Set(diagnostics.filter((row) => row.groupTargets.some((target) => target.muscleId === muscleId)).map((row) => row.sessionId))]
   }));
   const regionItems = (state.premiumMuscleRegions?.regions || []).map((region) => {
     const value = regionPoints.get(region.muscleId) || 0;
-    return {
-      muscleId: region.muscleId,
+    return coverageMetric({
+      id: region.muscleId,
       label: region.label,
-      coveragePercent: Math.round((value / 3) * 100),
-      weightedSetScore: value,
+      level: "region",
+      rawLoad: value,
+      referenceLoad: MUSCLE_REGION_REFERENCE_LOAD,
       sourceExerciseIds: [...new Set(diagnostics.filter((row) => row.regionTargets.some((target) => target.muscleId === region.muscleId)).map((row) => row.exerciseId))],
       sourceSessionIds: [...new Set(diagnostics.filter((row) => row.regionTargets.some((target) => target.muscleId === region.muscleId)).map((row) => row.sessionId))],
-      group: region.group,
-      view: region.view
-    };
+      extra: { group: region.group, view: region.view }
+    });
   });
+  const period = coveragePeriodForMode(context, referenceDate);
+  const duplicateContributions = diagnostics.flatMap((row) => (row.duplicateTargets || []).map((duplicate) => ({
+    sessionId: row.sessionId,
+    exerciseId: row.exerciseId,
+    exerciseName: row.exerciseName,
+    ...duplicate
+  })));
   return {
     context,
+    calculationVersion: MUSCLE_COVERAGE_CALCULATION_VERSION,
     generatedAt: new Date().toISOString(),
     referenceDate: new Date(referenceDate).toISOString(),
+    period: { start: period.start.toISOString(), end: period.end.toISOString() },
     planId,
     mappingVersion: MUSCLE_MAPPING_VERSION,
+    referenceLoads: {
+      group: MUSCLE_GROUP_REFERENCE_LOAD,
+      region: MUSCLE_REGION_REFERENCE_LOAD,
+      explanation: "100 % entspricht dem hinterlegten Wochenziel gewichteter Sätze: 8 für Muskelgruppen, 3 für Unterregionen. Werte über 100 % bedeuten Über Ziel."
+    },
     muscleGroups: Object.fromEntries(groupItems.map((item) => [item.muscleId, item])),
     premiumRegions: Object.fromEntries(regionItems.map((item) => [item.muscleId, item])),
     diagnostics,
-    warnings,
-    cacheKey: `${context}|${todayIsoDate()}|${sessions.map((session) => session.id).join(",")}|${MUSCLE_MAPPING_VERSION}`
+    duplicateContributions,
+    warnings: [...warnings, ...sessionGate.duplicateSessionIds.map((id) => `Doppelte Session ausgeschlossen: ${id}`)],
+    sessionDiagnostics: {
+      range: { start: period.start.toISOString(), end: period.end.toISOString() },
+      sessionIds: coverageSessions.map((session) => session.id),
+      duplicateSessionIds: sessionGate.duplicateSessionIds,
+      draftIdsIncluded: coverageSessions.filter((session) => session.status === "draft" || session.isDraft).map((session) => session.id),
+      incompleteSessionsIncluded: coverageSessions.filter((session) => session.status === "draft" || session.status === "cancelled").map((session) => session.id)
+    },
+    cacheKey: `${context}|${todayIsoDate()}|${coverageSessions.map((session) => session.id).join(",")}|${MUSCLE_MAPPING_VERSION}|${MUSCLE_COVERAGE_CALCULATION_VERSION}`
   };
 }
 
@@ -3130,7 +3259,11 @@ function premiumCoverageForSessions(sessions) {
     muscleId: item.muscleId,
     name: item.label,
     points: item.weightedSetScore,
+    rawLoad: item.rawLoad,
+    referenceLoad: item.referenceLoad,
+    level: item.level,
     percent: item.coveragePercent,
+    colorBand: item.colorBand,
     isTarget: item.weightedSetScore > 0,
     group: item.group,
     view: item.view,
@@ -3145,7 +3278,11 @@ function coverageForSessions(sessions) {
     muscleId: item.muscleId,
     name: item.label,
     points: item.weightedSetScore,
+    rawLoad: item.rawLoad,
+    referenceLoad: item.referenceLoad,
+    level: item.level,
     percent: item.coveragePercent,
+    colorBand: item.colorBand,
     isTarget: targetMuscles.has(item.muscleId),
     sourceExerciseIds: item.sourceExerciseIds
   })).sort((a, b) => Number(b.isTarget) - Number(a.isTarget) || b.percent - a.percent || a.name.localeCompare(b.name));
@@ -3156,26 +3293,129 @@ function canonicalCoverageDiagnosticsForMode(mode = state.coverageMode || "week"
   const coverage = getCanonicalMuscleCoverage({ sessions, context: mode });
   return {
     version: "6.17.3",
+    calculationVersion: MUSCLE_COVERAGE_CALCULATION_VERSION,
     mappingVersion: MUSCLE_MAPPING_VERSION,
     context: mode,
+    period: coverage.period,
     sessionIds: sessions.map((session) => session.id),
+    sessionDiagnostics: coverage.sessionDiagnostics,
     cacheKey: coverage.cacheKey,
+    referenceLoads: coverage.referenceLoads,
     warnings: coverage.warnings,
     diagnostics: coverage.diagnostics,
+    duplicateContributions: coverage.duplicateContributions,
     groups: Object.values(coverage.muscleGroups).map((item) => ({
       muscleId: item.muscleId,
       label: item.label,
+      level: item.level,
       rawScore: Number(item.weightedSetScore.toFixed(3)),
+      rawLoad: item.rawLoad,
+      referenceLoad: item.referenceLoad,
       percent: item.coveragePercent,
+      colorBand: item.colorBand,
       sourceExerciseIds: item.sourceExerciseIds
     })),
     premiumRegions: Object.values(coverage.premiumRegions).filter((item) => item.weightedSetScore > 0).map((item) => ({
       muscleId: item.muscleId,
       label: item.label,
+      level: item.level,
       rawScore: Number(item.weightedSetScore.toFixed(3)),
+      rawLoad: item.rawLoad,
+      referenceLoad: item.referenceLoad,
       percent: item.coveragePercent,
+      colorBand: item.colorBand,
       sourceExerciseIds: item.sourceExerciseIds
     }))
+  };
+}
+
+function canonicalCoverageExportForMode(mode = state.coverageMode || "week") {
+  const sessions = sessionsForCoverageMode(mode);
+  const coverage = getCanonicalMuscleCoverage({ sessions, context: mode });
+  const muscles = [
+    ...Object.values(coverage.muscleGroups),
+    ...Object.values(coverage.premiumRegions).filter((item) => item.weightedSetScore > 0)
+  ].map((item) => ({
+    muscleId: item.muscleId,
+    label: item.label,
+    level: item.level,
+    rawLoad: item.rawLoad,
+    referenceLoad: item.referenceLoad,
+    percent: item.coveragePercent,
+    colorBand: item.colorBand,
+    contributions: coverage.diagnostics.filter((row) =>
+      row.groupTargets.some((target) => target.muscleId === item.muscleId) ||
+      row.regionTargets.some((target) => target.muscleId === item.muscleId)
+    ).map((row) => {
+      const target = [...row.groupTargets, ...row.regionTargets].find((entry) => entry.muscleId === item.muscleId);
+      return {
+        sessionId: row.sessionId,
+        sessionDate: row.sessionDate,
+        exerciseId: row.exerciseId,
+        exerciseName: row.exerciseName,
+        completedSetCount: row.completedSetCount,
+        role: target?.role || "",
+        weightFactor: target?.weight || 0,
+        contribution: Number((row.rawSetScore * (target?.weight || 0)).toFixed(3))
+      };
+    })
+  }));
+  return {
+    mappingVersion: coverage.mappingVersion,
+    calculationVersion: coverage.calculationVersion,
+    period: coverage.period,
+    sessions: coverage.sessionDiagnostics.sessionIds.map((id) => {
+      const session = sessions.find((item) => item.id === id) || {};
+      return {
+        sessionId: id,
+        date: session.startedAt || session.completedAt || "",
+        dayName: session.dayName || session.dayNameSnapshot || "",
+        exerciseCount: (session.completedExercises || []).length,
+        completedSetCount: sessionSetCount(session)
+      };
+    }),
+    referenceLoads: coverage.referenceLoads,
+    sessionDiagnostics: coverage.sessionDiagnostics,
+    duplicateContributions: coverage.duplicateContributions,
+    muscles
+  };
+}
+
+function tricepsCoverageDiagnostic(mode = state.coverageMode || "week", expectedPercent = 224) {
+  const exportData = canonicalCoverageExportForMode(mode);
+  const group = exportData.muscles.find((item) => item.muscleId === "mg_triceps") || null;
+  const region = exportData.muscles.find((item) => item.muscleId === "mg_triceps_long") || null;
+  const target = group || region || null;
+  const percent = target?.percent || 0;
+  const duplicateContributions = exportData.duplicateContributions.filter((item) =>
+    item.muscleId === "mg_triceps" || item.muscleId === "mg_triceps_long"
+  );
+  return {
+    muscle: "Trizeps",
+    displayPercent: percent,
+    expectedObservedPercent: expectedPercent,
+    rawLoad: target?.rawLoad || 0,
+    referenceLoad: target?.referenceLoad || 0,
+    formula: target ? `${target.rawLoad} / ${target.referenceLoad} * 100 = ${percent}%` : "nicht berechenbar, keine Trizeps-Coverage im Zeitraum",
+    period: exportData.period,
+    sessions: exportData.sessions,
+    contributions: target?.contributions || [],
+    duplicateContributions,
+    conclusion: percent === expectedPercent && !duplicateContributions.length ? "correct" : percent === expectedPercent ? "incorrect" : "not_reproducible"
+  };
+}
+
+function allSurfacesCoverageComparison(mode = state.coverageMode || "week", muscleId = "mg_triceps") {
+  const standard = coverageItemByMuscle(coverageForSessions(sessionsForCoverageMode(mode)), muscleId);
+  const region = coverageItemByPremiumMuscle(premiumCoverageForSessions(sessionsForCoverageMode(mode)), "mg_triceps_long");
+  const selected = standard.percent ? standard : region;
+  return {
+    context: mode === "week" ? "Diese Woche" : mode,
+    surfaces: [
+      { surface: "Muscle Map", muscle: selected.name || "Trizeps", percent: selected.percent || 0, colorBand: selected.colorBand || getCoverageColorBand(selected.percent || 0) },
+      { surface: "Tracking-Liste", muscle: standard.name || "Trizeps", percent: standard.percent || 0, colorBand: standard.colorBand || getCoverageColorBand(standard.percent || 0) },
+      { surface: "Session Coach", muscle: "Trizeps", percent: standard.percent || 0, colorBand: standard.colorBand || getCoverageColorBand(standard.percent || 0), status: "uses_canonical_coverageForSessions" }
+    ]
   };
 }
 
@@ -3194,6 +3434,17 @@ function coverageStatus(percent) {
   if (percent < 70) return "moderate";
   if (percent <= 120) return "target";
   return "over_target";
+}
+
+function coverageRowTone(percent) {
+  return {
+    neutral: "empty",
+    yellow: "low",
+    yellow_orange: "low",
+    orange: "ok",
+    red: "over",
+    dark_red: "over"
+  }[getCoverageColorBand(percent)] || "empty";
 }
 
 function coverageCoachTextFor(percent) {
@@ -4636,10 +4887,10 @@ function renderProductionMuscleMap(view, mode, items, visibleItems) {
 }
 
 function renderCoverageRow(item) {
-  const color = item.percent > 120 ? "over" : item.percent === 0 ? "empty" : item.percent < 70 ? "low" : "ok";
-  const width = Math.min(item.percent, 140);
+  const color = coverageRowTone(item.percent);
+  const width = Math.min(item.percent, 100);
   return `
-    <button class="coverage-row ${color} ${state.selectedMuscleId === item.muscleId ? "selected" : ""}" data-select-coverage-muscle="${htmlesc(item.muscleId)}">
+    <button class="coverage-row ${color} ${state.selectedMuscleId === item.muscleId ? "selected" : ""}" data-select-coverage-muscle="${htmlesc(item.muscleId)}" data-coverage-color-band="${htmlesc(item.colorBand || getCoverageColorBand(item.percent))}">
       <div class="row">
         <strong class="grow">${htmlesc(item.name)}</strong>
         <span>${item.percent}%</span>
@@ -4936,9 +5187,10 @@ function renderCoverageDetail(muscleId) {
       </div>
       <div class="coverage-target-row">
         <span>Zielwert</span>
-        <div class="coverage-bar"><span style="width:${Math.min(detail.weekCoveragePercent, 140)}%; background:${coverageColorFor(detail.weekCoveragePercent)}"></span></div>
+        <div class="coverage-bar"><span style="width:${Math.min(detail.weekCoveragePercent, 100)}%; background:${coverageColorFor(detail.weekCoveragePercent)}"></span></div>
         <strong>${detail.targetPercent}%</strong>
       </div>
+      <p class="quiet">100 % entspricht deinem hinterlegten Wochenziel für diesen Muskel. Werte über 100 % bedeuten Über Ziel; die Balkenfüllung endet optisch bei 100 %.</p>
       ${detail.subregions.length ? `<div class="chip-row">${detail.subregions.map((name) => `<span class="muscle-chip">${htmlesc(name)}</span>`).join("")}</div>` : ""}
       <p class="muted">${htmlesc(detail.coachText)}</p>
       <div class="muscle-detail-columns">
@@ -9869,12 +10121,16 @@ function renderDeviceValidationPanel() {
 }
 
 function exportMuscleCoverageDiagnostics() {
-  const diagnostics = canonicalCoverageDiagnosticsForMode(state.coverageMode || "week");
+  const diagnostics = {
+    ...canonicalCoverageExportForMode(state.coverageMode || "week"),
+    triceps224: tricepsCoverageDiagnostic(state.coverageMode || "week"),
+    surfaces: allSurfacesCoverageComparison(state.coverageMode || "week")
+  };
   const blob = new Blob([JSON.stringify(diagnostics, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "DCoach_v6.17.3_MuscleCoverage_Diagnostics.json";
+  link.download = "DCoach_MuscleCoverage_Diagnostics.json";
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -9889,7 +10145,7 @@ function renderMuscleCoverageDiagnosticsPanel() {
         <h3 class="grow">Muscle Coverage Diagnostics</h3>
         <span class="badge blue">${htmlesc(diagnostics.mappingVersion)}</span>
       </div>
-      <p class="quiet">Kontext: ${htmlesc(diagnostics.context)} | Cache-Key: ${htmlesc(diagnostics.cacheKey)}</p>
+      <p class="quiet">Kontext: ${htmlesc(diagnostics.context)} | 100 % = ${MUSCLE_GROUP_REFERENCE_LOAD} gewichtete Gruppensätze oder ${MUSCLE_REGION_REFERENCE_LOAD} gewichtete Regionssätze | Cache-Key: ${htmlesc(diagnostics.cacheKey)}</p>
       <div class="storage-table">
         ${diagnostics.groups.slice(0, 8).map((item) => `<div><span>${htmlesc(item.label)}</span><strong>${item.percent}%</strong></div>`).join("")}
       </div>
