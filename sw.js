@@ -1,4 +1,4 @@
-const CACHE_NAME = "dcoach-pwa-v74";
+const CACHE_NAME = "dcoach-pwa-v75";
 const ASSETS = [
   "./",
   "./index.html",
@@ -175,6 +175,13 @@ const ASSETS = [
   "./data/production_muscle_map_config_v6.9.0.json",
   "./data/production_muscle_map_adapter_rules_v6.9.0.json",
   "./data/production_muscle_detail_schema_v6.9.0.json",
+  "./data/life_fitness_scanner_config_v6.11.0.json",
+  "./data/coach_plan_proposal_schema_v6.12.0.json",
+  "./data/coach_proposal_apply_rules_v6.12.0.json",
+  "./data/coach_proposal_review_ui_v6.12.0.json",
+  "./data/daily_checkin_schema_v6.13.0.json",
+  "./data/daily_checkin_startup_rules_v6.13.0.json",
+  "./data/daily_pain_regions_v6.13.0.json",
   "./production/production_muscle_map_release_gate_v6.9.0.json",
   "./production/production-muscle-map.js",
   "./prototype/musclemapjs_prototype_config_v6.8.0.json",
