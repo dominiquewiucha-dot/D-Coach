@@ -211,8 +211,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v83";
-const APP_CACHE_VERSION = "dcoach-pwa-v83";
+const APP_VERSION = "pwa-v84";
+const APP_CACHE_VERSION = "dcoach-pwa-v84";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -8589,7 +8589,11 @@ function renderWorkout() {
   const exercise = exerciseById(entry.exerciseId);
   const last = lastCompletedExercise(entry.exerciseId);
   const progress = Math.round(((workout.index + 1) / workout.entries.length) * 100);
-  const alternatives = alternativeCandidatesForExercise(exercise);
+  const alternatives = filterUniqueExerciseAlternatives({
+    draft: workout,
+    replacementIndex: workout.index,
+    candidates: alternativeCandidatesForExercise(exercise)
+  });
   const machineSetting = latestMachineSetting(exercise.id);
   const scannedMapping = latestScannedEquipmentMappingForExercise(exercise.id);
   return `
@@ -8825,6 +8829,46 @@ function emptySetsForReplacement(entry) {
   }));
 }
 
+function getPlannedExerciseId(entry) {
+  return entry?.plannedExerciseId || entry?.alternativeForExerciseId || entry?.exerciseId || "";
+}
+
+function canonicalExerciseId(exerciseId) {
+  return String(exerciseId || "").trim();
+}
+
+function getOccupiedExerciseIds(draft, replacementIndex) {
+  return new Set(
+    (draft?.entries || [])
+      .map((entry, index) => ({ entry, index }))
+      .filter(({ index }) => index !== replacementIndex)
+      .map(({ entry }) => canonicalExerciseId(entry?.exerciseId))
+      .filter(Boolean)
+  );
+}
+
+function replacementCandidateId(candidate) {
+  return canonicalExerciseId(candidate?.exercise?.id || candidate?.id || "");
+}
+
+function filterUniqueExerciseAlternatives({ draft, replacementIndex, candidates }) {
+  const occupied = getOccupiedExerciseIds(draft, replacementIndex);
+  const currentId = canonicalExerciseId(draft?.entries?.[replacementIndex]?.exerciseId);
+  return (candidates || []).filter((candidate) => {
+    const candidateId = replacementCandidateId(candidate);
+    return Boolean(candidateId) && candidateId !== currentId && !occupied.has(candidateId);
+  });
+}
+
+function validateReplacementCandidate({ draft, replacementIndex, replacementExerciseId }) {
+  const replacementId = canonicalExerciseId(replacementExerciseId);
+  if (!replacementId) return { ok: false, reason: "missing_replacement_exercise" };
+  if (getOccupiedExerciseIds(draft, replacementIndex).has(replacementId)) {
+    return { ok: false, reason: "duplicate_exercise_in_workout" };
+  }
+  return { ok: true };
+}
+
 function validateDraftExerciseReplacement({ originalDraft, candidate, entryIndex }) {
   if (!originalDraft || !candidate) return { ok: false, reason: "missing_draft" };
   if (candidate.planId !== originalDraft.planId) return { ok: false, reason: "plan_changed" };
@@ -8845,19 +8889,30 @@ function replaceDraftExercise({ draft, entryIndex, replacementExerciseId, confir
   if (!draft || !selected || !Array.isArray(draft.entries) || entryIndex < 0 || entryIndex >= draft.entries.length) {
     return { ok: false, originalDraft, message: "Austausch konnte nicht sicher übernommen werden. Dein ursprüngliches Training wurde wiederhergestellt." };
   }
+  const candidateValidation = validateReplacementCandidate({ draft, replacementIndex: entryIndex, replacementExerciseId: selected.id });
+  if (!candidateValidation.ok) {
+    return {
+      ok: false,
+      originalDraft,
+      reason: candidateValidation.reason,
+      message: "Diese Übung ist in deinem aktuellen Training bereits enthalten. Bitte wähle eine andere Alternative."
+    };
+  }
   const originalEntry = draft.entries[entryIndex];
   if (entryHasRecordedTrainingData(originalEntry) && !confirmStartedReplacement(originalEntry)) {
     return { ok: false, cancelled: true, originalDraft, message: "" };
   }
   const candidate = cloneWorkoutDraft(draft);
   const currentEntry = candidate.entries[entryIndex];
+  const plannedExerciseId = getPlannedExerciseId(currentEntry);
   candidate.entries[entryIndex] = {
     ...currentEntry,
+    plannedExerciseId,
     exerciseId: selected.id,
     exerciseNameSnapshot: selected.displayName || selected.id,
     sourceDayId: candidate.dayId,
     sortOrder: currentEntry.sortOrder,
-    alternativeForExerciseId: currentEntry.exerciseId,
+    alternativeForExerciseId: plannedExerciseId,
     alternativeAppliedAt: new Date().toISOString(),
     sets: emptySetsForReplacement(currentEntry)
   };

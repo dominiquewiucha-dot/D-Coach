@@ -39,6 +39,10 @@ vm.createContext(sandbox);
   "cloneWorkoutDraft",
   "entryHasRecordedTrainingData",
   "emptySetsForReplacement",
+  "getPlannedExerciseId",
+  "canonicalExerciseId",
+  "getOccupiedExerciseIds",
+  "validateReplacementCandidate",
   "validateDraftExerciseReplacement",
   "replaceDraftExercise"
 ].forEach((name) => vm.runInContext(extractFunctionSource(name), sandbox));
