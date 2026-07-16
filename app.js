@@ -211,8 +211,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v81";
-const APP_CACHE_VERSION = "dcoach-pwa-v81";
+const APP_VERSION = "pwa-v82";
+const APP_CACHE_VERSION = "dcoach-pwa-v82";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -1862,6 +1862,22 @@ function workoutDraftIntegrity(workout, plan = activePlan()) {
 
 function repairWorkoutDraftDayLabel(workout, integrity) {
   if (integrity.action !== "wrong_day_label" || !integrity.actualDay) return null;
+  const sourceOnlyMismatch = workout?.dayId &&
+    integrity.expectedDay &&
+    integrity.expectedDay.id === workout.dayId &&
+    (workout.entries || []).every((entry) => exerciseById(entry.exerciseId)) &&
+    (workout.entries || []).some((entry) => entry.sourceDayId && entry.sourceDayId !== workout.dayId);
+  if (sourceOnlyMismatch) {
+    return {
+      ...workout,
+      integrityRepair: {
+        repairedAt: new Date().toISOString(),
+        reason: "source_day_id_mismatch",
+        previousSourceDayIds: [...new Set((workout.entries || []).map((entry) => entry.sourceDayId || ""))]
+      },
+      entries: (workout.entries || []).map((entry) => ({ ...entry, sourceDayId: workout.dayId }))
+    };
+  }
   return {
     ...workout,
     dayId: integrity.actualDay.id,
@@ -1910,8 +1926,7 @@ function ensureActiveWorkoutIntegrity() {
     return true;
   }
 
-  clearWorkoutDraft();
-  state.activeWorkout = null;
+  storage.activeWorkoutDraft = workout;
   state.pendingWorkoutReview = null;
   state.trainingDayError = buildWorkoutDraftIntegrityError(workout, integrity, "blocked");
   state.tab = "training";
@@ -8768,22 +8783,89 @@ function lwsWarning(exercise) {
 }
 
 function selectAlternative(exerciseId) {
-  const workout = state.activeWorkout;
-  const entry = workout.entries[workout.index];
-  const selected = exerciseById(exerciseId);
-  if (!selected) return;
-  entry.exerciseId = selected.id;
-  const last = lastCompletedExercise(selected.id);
-  entry.sets.forEach((set) => {
-    const previous = last?.exercise?.sets?.find((item) => item.setNumber === set.setNumber);
-    set.weightText = previous?.actualWeightKg ? String(previous.actualWeightKg).replace(".", ",") : "";
-    set.repsText = "";
-    set.rirText = "";
-    set.completed = false;
+  const result = replaceDraftExercise({
+    draft: state.activeWorkout,
+    entryIndex: state.activeWorkout?.index ?? -1,
+    replacementExerciseId: exerciseId,
+    confirmStartedReplacement: (entry) => confirm(`Für diese Übung wurden bereits Daten eingetragen.\n\n${exerciseById(entry.exerciseId)?.displayName || entry.exerciseId}\n\nOK = Übung ersetzen und Eingaben verwerfen\nAbbrechen = Austausch abbrechen`)
   });
+  if (!result.ok) {
+    if (result.originalDraft) {
+      state.activeWorkout = result.originalDraft;
+      storage.activeWorkoutDraft = result.originalDraft;
+    }
+    alert(result.message || "Austausch konnte nicht sicher übernommen werden. Dein ursprüngliches Training wurde wiederhergestellt.");
+    render();
+    return;
+  }
+  state.activeWorkout = result.draft;
   state.showAlternatives = false;
   persistWorkoutDraft();
   render();
+}
+
+function cloneWorkoutDraft(draft) {
+  return JSON.parse(JSON.stringify(draft));
+}
+
+function entryHasRecordedTrainingData(entry) {
+  return Boolean(
+    (entry?.sets || []).some((set) => set.completed || String(set.weightText || "").trim() || String(set.repsText || "").trim() || String(set.rirText || "").trim()) ||
+    String(entry?.exerciseNote || "").trim()
+  );
+}
+
+function emptySetsForReplacement(entry) {
+  return Array.from({ length: Math.max(Number(entry?.plannedSets) || Number(entry?.sets?.length) || 1, 1) }, (_, index) => ({
+    setNumber: index + 1,
+    weightText: "",
+    repsText: "",
+    rirText: "",
+    completed: false
+  }));
+}
+
+function validateDraftExerciseReplacement({ originalDraft, candidate, entryIndex }) {
+  if (!originalDraft || !candidate) return { ok: false, reason: "missing_draft" };
+  if (candidate.planId !== originalDraft.planId) return { ok: false, reason: "plan_changed" };
+  if (candidate.dayId !== originalDraft.dayId) return { ok: false, reason: "day_changed" };
+  if ((candidate.entries || []).length !== (originalDraft.entries || []).length) return { ok: false, reason: "entry_count_changed" };
+  if (!(candidate.entries || []).every((entry) => entry.sourceDayId === candidate.dayId)) return { ok: false, reason: "source_day_mismatch" };
+  for (let index = 0; index < originalDraft.entries.length; index += 1) {
+    if (index !== entryIndex && JSON.stringify(originalDraft.entries[index]) !== JSON.stringify(candidate.entries[index])) {
+      return { ok: false, reason: "unrelated_entry_changed" };
+    }
+  }
+  return { ok: true };
+}
+
+function replaceDraftExercise({ draft, entryIndex, replacementExerciseId, confirmStartedReplacement = () => false }) {
+  const originalDraft = cloneWorkoutDraft(draft);
+  const selected = exerciseById(replacementExerciseId);
+  if (!draft || !selected || !Array.isArray(draft.entries) || entryIndex < 0 || entryIndex >= draft.entries.length) {
+    return { ok: false, originalDraft, message: "Austausch konnte nicht sicher übernommen werden. Dein ursprüngliches Training wurde wiederhergestellt." };
+  }
+  const originalEntry = draft.entries[entryIndex];
+  if (entryHasRecordedTrainingData(originalEntry) && !confirmStartedReplacement(originalEntry)) {
+    return { ok: false, cancelled: true, originalDraft, message: "" };
+  }
+  const candidate = cloneWorkoutDraft(draft);
+  const currentEntry = candidate.entries[entryIndex];
+  candidate.entries[entryIndex] = {
+    ...currentEntry,
+    exerciseId: selected.id,
+    exerciseNameSnapshot: selected.displayName || selected.id,
+    sourceDayId: candidate.dayId,
+    sortOrder: currentEntry.sortOrder,
+    alternativeForExerciseId: currentEntry.exerciseId,
+    alternativeAppliedAt: new Date().toISOString(),
+    sets: emptySetsForReplacement(currentEntry)
+  };
+  const validation = validateDraftExerciseReplacement({ originalDraft, candidate, entryIndex });
+  if (!validation.ok) {
+    return { ok: false, originalDraft, reason: validation.reason, message: "Austausch konnte nicht sicher übernommen werden. Dein ursprüngliches Training wurde wiederhergestellt." };
+  }
+  return { ok: true, draft: candidate, originalDraft };
 }
 
 function setHasAnyInput(set) {
@@ -10895,6 +10977,7 @@ function bindEvents() {
     render();
   });
   document.querySelector("[data-toggle-alternatives]")?.addEventListener("click", () => {
+    if (state.activeWorkout && !state.showAlternatives) persistWorkoutDraft();
     state.showAlternatives = !state.showAlternatives;
     render();
   });
