@@ -31,7 +31,7 @@ assert(css.includes("min-height: 100dvh;"), "dynamic viewport height missing");
 assert(css.includes("env(safe-area-inset-bottom)"), "safe area inset missing");
 assert(css.includes("overflow-x: hidden;"), "content overflow boundary missing");
 assert(css.includes(".tab-center-logo"), "center dashboard D styling missing");
-assert(css.includes("--nav-center-size: 54px;"), "center tab size token missing");
+assert(css.includes("--nav-center-size: 46px;"), "center tab size token missing");
 assert(!/\.app-shell\s*\{[^}]*overflow\s*:\s*(auto|scroll)/s.test(css), "app shell must not scroll internally");
 const bottomNavBlock = css.match(/\.bottom-nav,\n\.tabs\s*\{[^}]*\}/s)?.[0] || "";
 assert(!bottomNavBlock.includes("position: sticky"), "bottom navigation must not be sticky");

@@ -23,7 +23,9 @@ assert(app.includes("${renderProfileShortcuts()}"), "tracking shortcuts must ren
 assert(css.includes(".profile-shortcut-grid"), "profile shortcut grid styles missing");
 assert(css.includes(".profile-shortcut-icon"), "profile shortcut icon styles missing");
 assert(css.includes(".profile-shortcut > span:last-child"), "profile shortcut text column must be shrinkable");
-assert(css.includes("overflow-wrap: anywhere"), "long tracking shortcut labels must wrap on iPhone");
+assert(css.includes("@media (max-width: 430px)"), "iPhone tracking shortcut breakpoint missing");
+assert(css.includes(".profile-shortcut-grid { grid-template-columns: 1fr; }"), "tracking shortcuts must become one column on iPhone");
+assert(css.includes("hyphens: auto"), "long tracking shortcut labels must hyphenate cleanly on iPhone");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

@@ -27,10 +27,10 @@
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
-  --bottom-nav-height: 82px;
+  --bottom-nav-height: 72px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --nav-icon-size: 23px;
-  --nav-center-size: 54px;
+  --nav-icon-size: 22px;
+  --nav-center-size: 46px;
 }
 
 * { box-sizing: border-box; }
@@ -86,7 +86,7 @@ select:focus-visible {
 .app-content {
   min-height: 100dvh;
   touch-action: pan-y pinch-zoom;
-  padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 24px);
+  padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 32px);
 }
 
 .screen {
@@ -505,8 +505,9 @@ select:focus-visible {
   z-index: 1000;
   display: flex;
   gap: 4px;
-  min-height: var(--bottom-nav-height);
-  padding: 8px 10px calc(8px + var(--safe-bottom));
+  height: calc(var(--bottom-nav-height) + var(--safe-bottom));
+  min-height: 0;
+  padding: 6px 10px calc(6px + var(--safe-bottom));
   top: auto;
   transform: none;
   translate: none;
@@ -534,7 +535,8 @@ select:focus-visible {
   gap: 4px;
   flex: 1 1 0;
   min-width: 0;
-  min-height: 58px;
+  min-height: 0;
+  height: 60px;
   border-radius: var(--radius-sm);
   padding: 0;
   color: var(--quiet);
@@ -575,7 +577,7 @@ select:focus-visible {
 
 .tab--center {
   gap: 3px;
-  transform: translateY(-5px);
+  transform: translateY(-3px);
 }
 
 .tab-center-logo {
@@ -685,9 +687,9 @@ select:focus-visible {
 }
 
 .profile-shortcut {
-  min-height: 92px;
+  min-height: 88px;
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
+  grid-template-columns: 38px minmax(0, 1fr);
   align-items: center;
   gap: 10px;
   text-align: left;
@@ -699,8 +701,8 @@ select:focus-visible {
 }
 
 .profile-shortcut-icon {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   display: grid;
   place-items: center;
   border-radius: 12px;
@@ -721,8 +723,9 @@ select:focus-visible {
 
 .profile-shortcut strong,
 .profile-shortcut small {
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
   word-break: normal;
+  hyphens: auto;
 }
 
 .profile-shortcut small {
@@ -1936,6 +1939,11 @@ select:focus-visible {
 }
 
 @media (max-width: 430px) {
+  .profile-shortcut-grid { grid-template-columns: 1fr; }
+  .profile-shortcut {
+    grid-template-columns: 40px minmax(0, 1fr);
+    min-height: 76px;
+  }
   .coach-action-row { grid-template-columns: 1fr; }
   .coach-hero-v54 .secondary,
   .coach-hero-v54 .primary {
