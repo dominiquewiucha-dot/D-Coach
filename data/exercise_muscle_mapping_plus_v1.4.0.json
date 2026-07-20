@@ -559,28 +559,6 @@
       "movementPattern": "Push"
     },
     {
-      "exerciseId": "ex_leg_extension_var_011",
-      "exerciseName": "Beinstrecker Maschine",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
       "exerciseId": "ex_seated_leg_curl_var_012",
       "exerciseName": "Beinbeuger sitzend kontrolliert",
       "primaryMuscle": "mg_hamstrings",
@@ -592,28 +570,6 @@
         }
       ],
       "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_incline_chest_press_machine_var_013",
-      "exerciseName": "Schrägbank Brustpresse Maschine neutraler Griff",
-      "primaryMuscle": "mg_chest_upper",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
     },
     {
       "exerciseId": "ex_leg_extension_var_014",
@@ -873,28 +829,6 @@
       "movementPattern": "Push"
     },
     {
-      "exerciseId": "ex_chest_supported_row_var_028",
-      "exerciseName": "Brustgestütztes Rudern kontrolliert",
-      "primaryMuscle": "mg_upper_back",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_biceps",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_rear_delts",
-          "intensityWeight": 0.25
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Pull"
-    },
-    {
       "exerciseId": "ex_seated_leg_curl_var_029",
       "exerciseName": "Beinbeuger sitzend Kabel",
       "primaryMuscle": "mg_hamstrings",
@@ -951,49 +885,6 @@
       "movementPattern": "Core"
     },
     {
-      "exerciseId": "ex_seated_leg_curl_var_033",
-      "exerciseName": "Beinbeuger sitzend kontrolliert",
-      "primaryMuscle": "mg_hamstrings",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_seated_row_var_034",
-      "exerciseName": "Rudern sitzend neutraler Griff",
-      "primaryMuscle": "mg_upper_back",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_biceps",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_rear_delts",
-          "intensityWeight": 0.25
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Pull"
-    },
-    {
-      "exerciseId": "ex_pallof_press_var_035",
-      "exerciseName": "Pallof Press einarmig",
-      "primaryMuscle": "mg_deep_core",
-      "secondaryMuscles": [],
-      "stabilizers": [],
-      "movementPattern": "Core"
-    },
-    {
       "exerciseId": "ex_seated_leg_curl_var_036",
       "exerciseName": "Beinbeuger sitzend einarmig",
       "primaryMuscle": "mg_hamstrings",
@@ -1033,28 +924,6 @@
       "exerciseName": "Wadenheben Maschine einarmig",
       "primaryMuscle": "mg_calves",
       "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_leg_extension_var_039",
-      "exerciseName": "Beinstrecker neutraler Griff",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
       "stabilizers": [
         {
           "muscleId": "mg_abs",
@@ -1116,50 +985,6 @@
       "movementPattern": "Core"
     },
     {
-      "exerciseId": "ex_bulgarian_split_squat_var_043",
-      "exerciseName": "Bulgarian Split Squat stehend",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_seated_row_var_044",
-      "exerciseName": "Rudern sitzend neutraler Griff",
-      "primaryMuscle": "mg_upper_back",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_biceps",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_rear_delts",
-          "intensityWeight": 0.25
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Pull"
-    },
-    {
       "exerciseId": "ex_lateral_raise_var_045",
       "exerciseName": "Seitheben kontrolliert",
       "primaryMuscle": "mg_side_delts",
@@ -1184,14 +1009,6 @@
         }
       ],
       "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_pallof_press_var_047",
-      "exerciseName": "Pallof Press einarmig",
-      "primaryMuscle": "mg_deep_core",
-      "secondaryMuscles": [],
-      "stabilizers": [],
-      "movementPattern": "Core"
     },
     {
       "exerciseId": "ex_triceps_pushdown_var_048",
@@ -1294,28 +1111,6 @@
       "movementPattern": "Push"
     },
     {
-      "exerciseId": "ex_bulgarian_split_squat_var_054",
-      "exerciseName": "Bulgarian Split Squat weiter Griff",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
       "exerciseId": "ex_cable_biceps_curl_var_055",
       "exerciseName": "Bizepscurls Kabel kontrolliert",
       "primaryMuscle": "mg_biceps",
@@ -1340,28 +1135,6 @@
         }
       ],
       "movementPattern": "Pull"
-    },
-    {
-      "exerciseId": "ex_cable_fly_var_057",
-      "exerciseName": "Kabel-Flys Kabel",
-      "primaryMuscle": "mg_chest_middle",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
     },
     {
       "exerciseId": "ex_leg_extension_var_058",
@@ -1430,50 +1203,6 @@
       "movementPattern": "Push"
     },
     {
-      "exerciseId": "ex_barbell_bench_press_var_061",
-      "exerciseName": "Langhantel Bankdrücken weiter Griff",
-      "primaryMuscle": "mg_chest_middle",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_chest_press_machine_var_062",
-      "exerciseName": "Brustpresse Maschine Maschine",
-      "primaryMuscle": "mg_chest_middle",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
       "exerciseId": "ex_cable_fly_var_063",
       "exerciseName": "Kabel-Flys sitzend",
       "primaryMuscle": "mg_chest_middle",
@@ -1496,41 +1225,6 @@
       "movementPattern": "Push"
     },
     {
-      "exerciseId": "ex_lateral_raise_var_064",
-      "exerciseName": "Seitheben Kabel",
-      "primaryMuscle": "mg_side_delts",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_bulgarian_split_squat_var_065",
-      "exerciseName": "Bulgarian Split Squat Kabel",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
       "exerciseId": "ex_leg_press_var_066",
       "exerciseName": "Beinpresse stehend",
       "primaryMuscle": "mg_quads",
@@ -1544,89 +1238,6 @@
           "intensityWeight": 0.2
         }
       ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_triceps_pushdown_var_067",
-      "exerciseName": "Trizepsdrücken Kabel Kabel",
-      "primaryMuscle": "mg_triceps",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_cable_fly_var_068",
-      "exerciseName": "Kabel-Flys sitzend",
-      "primaryMuscle": "mg_chest_middle",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_face_pull_var_069",
-      "exerciseName": "Face Pulls weiter Griff",
-      "primaryMuscle": "mg_rear_delts",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Pull"
-    },
-    {
-      "exerciseId": "ex_chest_press_machine_var_070",
-      "exerciseName": "Brustpresse Maschine neutraler Griff",
-      "primaryMuscle": "mg_chest_middle",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_calf_raise_machine_var_071",
-      "exerciseName": "Wadenheben Maschine einarmig",
-      "primaryMuscle": "mg_calves",
-      "secondaryMuscles": [],
       "stabilizers": [
         {
           "muscleId": "mg_abs",
@@ -1732,41 +1343,6 @@
       "movementPattern": "Push"
     },
     {
-      "exerciseId": "ex_face_pull_var_077",
-      "exerciseName": "Face Pulls weiter Griff",
-      "primaryMuscle": "mg_rear_delts",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Pull"
-    },
-    {
-      "exerciseId": "ex_lat_pulldown_var_078",
-      "exerciseName": "Latziehen Maschine",
-      "primaryMuscle": "mg_lats",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_biceps",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_rear_delts",
-          "intensityWeight": 0.25
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Pull"
-    },
-    {
       "exerciseId": "ex_face_pull_var_079",
       "exerciseName": "Face Pulls kontrolliert",
       "primaryMuscle": "mg_rear_delts",
@@ -1826,28 +1402,6 @@
     {
       "exerciseId": "ex_leg_press_var_082",
       "exerciseName": "Beinpresse einarmig",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_bulgarian_split_squat_var_083",
-      "exerciseName": "Bulgarian Split Squat Maschine",
       "primaryMuscle": "mg_quads",
       "secondaryMuscles": [
         {
@@ -2016,28 +1570,6 @@
       "movementPattern": "Push"
     },
     {
-      "exerciseId": "ex_chest_press_machine_var_092",
-      "exerciseName": "Brustpresse Maschine Kabel",
-      "primaryMuscle": "mg_chest_middle",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
       "exerciseId": "ex_reverse_pec_deck_var_093",
       "exerciseName": "Reverse Butterfly Maschine",
       "primaryMuscle": "mg_rear_delts",
@@ -2173,41 +1705,6 @@
       "movementPattern": "Pull"
     },
     {
-      "exerciseId": "ex_calf_raise_machine_var_102",
-      "exerciseName": "Wadenheben Maschine enger Griff",
-      "primaryMuscle": "mg_calves",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_incline_chest_press_machine_var_103",
-      "exerciseName": "Schrägbank Brustpresse Maschine neutraler Griff",
-      "primaryMuscle": "mg_chest_upper",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
       "exerciseId": "ex_leg_extension_var_104",
       "exerciseName": "Beinstrecker Kurzhantel",
       "primaryMuscle": "mg_quads",
@@ -2230,65 +1727,8 @@
       "movementPattern": "Legs"
     },
     {
-      "exerciseId": "ex_chest_press_machine_var_105",
-      "exerciseName": "Brustpresse Maschine sitzend",
-      "primaryMuscle": "mg_chest_middle",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_calf_raise_machine_var_106",
-      "exerciseName": "Wadenheben Maschine stehend",
-      "primaryMuscle": "mg_calves",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
       "exerciseId": "ex_cable_fly_var_107",
       "exerciseName": "Kabel-Flys weiter Griff",
-      "primaryMuscle": "mg_chest_middle",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_barbell_bench_press_var_108",
-      "exerciseName": "Langhantel Bankdrücken neutraler Griff",
       "primaryMuscle": "mg_chest_middle",
       "secondaryMuscles": [
         {
@@ -2357,35 +1797,9 @@
       "movementPattern": "Legs"
     },
     {
-      "exerciseId": "ex_seated_leg_curl_var_112",
-      "exerciseName": "Beinbeuger sitzend neutraler Griff",
-      "primaryMuscle": "mg_hamstrings",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
       "exerciseId": "ex_lateral_raise_var_113",
       "exerciseName": "Seitheben neutraler Griff",
       "primaryMuscle": "mg_side_delts",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_triceps_pushdown_var_114",
-      "exerciseName": "Trizepsdrücken Kabel Kabel",
-      "primaryMuscle": "mg_triceps",
       "secondaryMuscles": [],
       "stabilizers": [
         {
@@ -2418,19 +1832,6 @@
       "movementPattern": "Legs"
     },
     {
-      "exerciseId": "ex_shoulder_press_machine_var_116",
-      "exerciseName": "Schulterpresse Maschine Maschine",
-      "primaryMuscle": "mg_front_delts",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
       "exerciseId": "ex_leg_extension_var_117",
       "exerciseName": "Beinstrecker kontrolliert",
       "primaryMuscle": "mg_quads",
@@ -2444,89 +1845,6 @@
           "intensityWeight": 0.2
         }
       ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_face_pull_var_118",
-      "exerciseName": "Face Pulls Kabel",
-      "primaryMuscle": "mg_rear_delts",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Pull"
-    },
-    {
-      "exerciseId": "ex_leg_extension_var_119",
-      "exerciseName": "Beinstrecker Kurzhantel",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_shoulder_press_machine_var_120",
-      "exerciseName": "Schulterpresse Maschine enger Griff",
-      "primaryMuscle": "mg_front_delts",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_incline_chest_press_machine_var_121",
-      "exerciseName": "Schrägbank Brustpresse Maschine Kurzhantel",
-      "primaryMuscle": "mg_chest_upper",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_seated_leg_curl_var_122",
-      "exerciseName": "Beinbeuger sitzend Kurzhantel",
-      "primaryMuscle": "mg_hamstrings",
-      "secondaryMuscles": [],
       "stabilizers": [
         {
           "muscleId": "mg_abs",
@@ -2580,98 +1898,6 @@
       "movementPattern": "Push"
     },
     {
-      "exerciseId": "ex_seated_leg_curl_var_125",
-      "exerciseName": "Beinbeuger sitzend einarmig",
-      "primaryMuscle": "mg_hamstrings",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_cable_fly_var_126",
-      "exerciseName": "Kabel-Flys Kabel",
-      "primaryMuscle": "mg_chest_middle",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_bulgarian_split_squat_var_127",
-      "exerciseName": "Bulgarian Split Squat stehend",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_seated_leg_curl_var_128",
-      "exerciseName": "Beinbeuger sitzend neutraler Griff",
-      "primaryMuscle": "mg_hamstrings",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_leg_extension_var_129",
-      "exerciseName": "Beinstrecker Maschine",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
       "exerciseId": "ex_cable_fly_var_130",
       "exerciseName": "Kabel-Flys enger Griff",
       "primaryMuscle": "mg_chest_middle",
@@ -2692,137 +1918,6 @@
         }
       ],
       "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_triceps_pushdown_var_131",
-      "exerciseName": "Trizepsdrücken Kabel Kurzhantel",
-      "primaryMuscle": "mg_triceps",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_face_pull_var_132",
-      "exerciseName": "Face Pulls neutraler Griff",
-      "primaryMuscle": "mg_rear_delts",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Pull"
-    },
-    {
-      "exerciseId": "ex_cable_biceps_curl_var_133",
-      "exerciseName": "Bizepscurls Kabel weiter Griff",
-      "primaryMuscle": "mg_biceps",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Pull"
-    },
-    {
-      "exerciseId": "ex_incline_chest_press_machine_var_134",
-      "exerciseName": "Schrägbank Brustpresse Maschine Maschine",
-      "primaryMuscle": "mg_chest_upper",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_calf_raise_machine_var_135",
-      "exerciseName": "Wadenheben Maschine kontrolliert",
-      "primaryMuscle": "mg_calves",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_chest_supported_row_var_136",
-      "exerciseName": "Brustgestütztes Rudern Maschine",
-      "primaryMuscle": "mg_upper_back",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_biceps",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_rear_delts",
-          "intensityWeight": 0.25
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Pull"
-    },
-    {
-      "exerciseId": "ex_leg_extension_var_137",
-      "exerciseName": "Beinstrecker enger Griff",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_seated_leg_curl_var_138",
-      "exerciseName": "Beinbeuger sitzend neutraler Griff",
-      "primaryMuscle": "mg_hamstrings",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
     },
     {
       "exerciseId": "ex_cable_fly_var_139",
@@ -2847,19 +1942,6 @@
       "movementPattern": "Push"
     },
     {
-      "exerciseId": "ex_lateral_raise_var_140",
-      "exerciseName": "Seitheben enger Griff",
-      "primaryMuscle": "mg_side_delts",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
       "exerciseId": "ex_reverse_pec_deck_var_141",
       "exerciseName": "Reverse Butterfly kontrolliert",
       "primaryMuscle": "mg_rear_delts",
@@ -2873,176 +1955,9 @@
       "movementPattern": "Pull"
     },
     {
-      "exerciseId": "ex_barbell_bench_press_var_142",
-      "exerciseName": "Langhantel Bankdrücken einarmig",
-      "primaryMuscle": "mg_chest_middle",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_leg_press_var_143",
-      "exerciseName": "Beinpresse Kabel",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_triceps_pushdown_var_144",
-      "exerciseName": "Trizepsdrücken Kabel Kurzhantel",
-      "primaryMuscle": "mg_triceps",
-      "secondaryMuscles": [],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_leg_press_var_145",
-      "exerciseName": "Beinpresse einarmig",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
       "exerciseId": "ex_incline_chest_press_machine_var_146",
       "exerciseName": "Schrägbank Brustpresse Maschine Kabel",
       "primaryMuscle": "mg_chest_upper",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
-          "muscleId": "mg_front_delts",
-          "intensityWeight": 0.4
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Push"
-    },
-    {
-      "exerciseId": "ex_leg_extension_var_147",
-      "exerciseName": "Beinstrecker neutraler Griff",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_seated_row_var_148",
-      "exerciseName": "Rudern sitzend Kabel",
-      "primaryMuscle": "mg_upper_back",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_biceps",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_rear_delts",
-          "intensityWeight": 0.25
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Pull"
-    },
-    {
-      "exerciseId": "ex_leg_press_var_149",
-      "exerciseName": "Beinpresse einarmig",
-      "primaryMuscle": "mg_quads",
-      "secondaryMuscles": [
-        {
-          "muscleId": "mg_glutes",
-          "intensityWeight": 0.4
-        },
-        {
-          "muscleId": "mg_hamstrings",
-          "intensityWeight": 0.2
-        }
-      ],
-      "stabilizers": [
-        {
-          "muscleId": "mg_abs",
-          "intensityWeight": 0.1
-        }
-      ],
-      "movementPattern": "Legs"
-    },
-    {
-      "exerciseId": "ex_chest_press_machine_var_150",
-      "exerciseName": "Brustpresse Maschine Kabel",
-      "primaryMuscle": "mg_chest_middle",
       "secondaryMuscles": [
         {
           "muscleId": "mg_triceps",

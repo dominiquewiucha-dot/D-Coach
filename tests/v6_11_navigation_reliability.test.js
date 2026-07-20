@@ -3,7 +3,7 @@ const app = fs.readFileSync("app.js", "utf8");
 const css = fs.readFileSync("styles.css", "utf8");
 
 assert(app.includes("function navigateTo(tab, options = {})"), "v6.11 requires a central navigateTo function");
-assert(app.includes("const {\n    scroll = \"top\",\n    updateHash = true,\n    resetSelection = true"), "navigateTo options missing");
+assert(/function navigateTo\(tab, options = \{\}\)\s*\{\s*const \{\s*scroll = "top",\s*updateHash = true,\s*resetSelection = true\s*\} = options;/s.test(app), "navigateTo options missing");
 assert(app.includes("requestAnimationFrame(() => requestAnimationFrame(reset))"), "scroll reset must run after the final render frame");
 assert(app.includes("window.history.scrollRestoration = \"manual\""), "Safari/browser scroll restoration must be disabled");
 assert(app.includes('<main id="app-content" class="app-content">'), "app content needs a deterministic scroll target");

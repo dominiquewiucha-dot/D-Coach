@@ -25,12 +25,12 @@ assert(app.includes("{ ...existing, resumeAction: null, status: \"draft\""), "ma
 
 assert(app.includes('document.querySelectorAll("[data-open-scanned-exercise]")'), "all scanner open buttons must be bound");
 assert(!app.includes('document.querySelector("[data-open-scanned-exercise]")?.addEventListener'), "single scanner open binding must be removed");
-assert(app.includes("persistWorkoutDraft();\n      stopEquipmentScannerCamera();"), "scanner navigation must preserve workout draft");
+assert(/persistWorkoutDraft\(\);\s*stopEquipmentScannerCamera\(\);/.test(app), "scanner navigation must preserve workout draft");
 assert(app.includes("Diese Übung ist nicht mehr in der Übungsdatenbank vorhanden."), "missing scanner exercise warning missing");
 
 assert(!/function renderDashboard\(\)[\s\S]*?\$\{renderCoachDashboardV54\(\)\}[\s\S]*?function renderCoach\(\)/.test(app), "dashboard must not contain old coach dashboard block");
 assert(app.includes('const APP_VERSION = "pwa-v85";'), "app version must be pwa-v85");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v86";'), "service worker cache must be pwa-v86");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v87";'), "service worker cache must be pwa-v87");
 assert(html.includes("app.js?v=pwa-v85"), "index app cache buster must be pwa-v85");
 assert(html.includes("styles.css?v=pwa-v85"), "index style cache buster must be pwa-v85");
 

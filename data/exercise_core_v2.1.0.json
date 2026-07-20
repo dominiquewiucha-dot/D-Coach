@@ -1259,7 +1259,7 @@
     {
       "id": "ex_lateral_raise_cable",
       "displayName": "Seitheben Kabel",
-      "englishName": "Cable Lateral Raise",
+      "englishName": "Cable Side Raise",
       "category": "Push",
       "equipmentId": "eq_cable",
       "primaryMuscleHint": "mg_side_delts",
@@ -3245,7 +3245,7 @@
     },
     {
       "id": "ex_biceps_curl_cable",
-      "displayName": "Bizepscurls Kabel",
+      "displayName": "Bizepscurls am Kabelzug",
       "englishName": "Cable Biceps Curl",
       "category": "Pull",
       "equipmentId": "eq_cable",
@@ -3397,7 +3397,7 @@
     },
     {
       "id": "ex_hammer_curl_dumbbell",
-      "displayName": "Hammer Curls",
+      "displayName": "Hammer Curls Kurzhantel",
       "englishName": "Dumbbell Hammer Curl",
       "category": "Pull",
       "equipmentId": "eq_dumbbell",
@@ -3585,7 +3585,6 @@
       },
       "source": "D-Coach Content Release v2.1.0",
       "aliases": [
-        "45-Grad-Beinpresse",
         "45 Degree Leg Press",
         "Schräge Beinpresse"
       ],
@@ -4137,8 +4136,8 @@
     },
     {
       "id": "ex_seated_leg_curl_machine",
-      "displayName": "Beinbeuger sitzend",
-      "englishName": "Seated Leg Curl",
+      "displayName": "Beinbeuger sitzend Maschine",
+      "englishName": "Seated Leg Curl Machine",
       "category": "Legs",
       "equipmentId": "eq_machine",
       "primaryMuscleHint": "mg_hamstrings",
@@ -4251,8 +4250,8 @@
     },
     {
       "id": "ex_lying_leg_curl_machine",
-      "displayName": "Beinbeuger liegend",
-      "englishName": "Lying Leg Curl",
+      "displayName": "Beinbeuger liegend Maschine",
+      "englishName": "Lying Leg Curl Machine",
       "category": "Legs",
       "equipmentId": "eq_machine",
       "primaryMuscleHint": "mg_hamstrings",
@@ -4479,7 +4478,7 @@
     },
     {
       "id": "ex_glute_bridge_bodyweight",
-      "displayName": "Glute Bridge",
+      "displayName": "Glute Bridge Körpergewicht",
       "englishName": "Bodyweight Glute Bridge",
       "category": "Legs",
       "equipmentId": "eq_bodyweight",
@@ -5248,7 +5247,7 @@
     },
     {
       "id": "ex_plank_forearm",
-      "displayName": "Unterarmstütz",
+      "displayName": "Forearm Plank",
       "englishName": "Forearm Plank",
       "category": "Core",
       "equipmentId": "eq_bodyweight",

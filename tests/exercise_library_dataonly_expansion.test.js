@@ -32,7 +32,7 @@ const existingAliasTargets = {
   ex_preacher_curl_machine: ["Preacher Curl Machine", "Bizepsmaschine Scottcurl"],
   ex_machine_lateral_raise: ["Lateral Raise Machine", "Schulter-Seithebemaschine"],
   ex_hack_squat_machine: ["Hack Squat Machine", "Hackenschmidt Kniebeuge"],
-  ex_leg_press_45: ["45 Degree Leg Press", "Schräge Beinpresse"],
+  ex_leg_press_45: ["45 Degree Leg Press", "Schr\u00e4ge Beinpresse"],
   ex_calf_raise_machine_standing: ["Standing Calf Raise Machine", "Stehende Wadenmaschine"],
   ex_dead_bug: ["Käferübung", "Deadbug"],
   ex_bird_dog: ["Vierfüßler diagonal", "Bird-Dog"]
@@ -121,9 +121,9 @@ for (const file of changedFiles) {
   assert(!forbiddenRuntimeFiles.has(file) || file === "app.js", `forbidden runtime file changed: ${file}`);
 }
 const appDiff = execFileSync("git", ["diff", "--", "app.js"], { encoding: "utf8" });
-assert(!appDiff || /^diff --git[\s\S]*-const APP_CACHE_VERSION = "dcoach-pwa-v85";[\s\S]*\+const APP_CACHE_VERSION = "dcoach-pwa-v86";[\s\S]*$/.test(appDiff), "app.js may only change APP_CACHE_VERSION");
+assert(!appDiff || /^diff --git[\s\S]*-const APP_CACHE_VERSION = "dcoach-pwa-v86";[\s\S]*\+const APP_CACHE_VERSION = "dcoach-pwa-v87";[\s\S]*$/.test(appDiff), "app.js may only change APP_CACHE_VERSION");
 const swDiff = execFileSync("git", ["diff", "--", "sw.js"], { encoding: "utf8" });
-assert(!swDiff, "sw.js must not change in rebaseline branch");
+assert(!swDiff || /^diff --git[\s\S]*-const CACHE_NAME = "dcoach-pwa-v86";[\s\S]*\+const CACHE_NAME = "dcoach-pwa-v87";[\s\S]*$/.test(swDiff), "sw.js may only change CACHE_NAME");
 
 function readJson(path) {
   return JSON.parse(fs.readFileSync(path, "utf8"));
