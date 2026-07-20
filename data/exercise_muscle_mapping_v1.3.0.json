@@ -225,25 +225,21 @@
     },
     {
       "exerciseId": "ex_pec_deck",
-      "exerciseName": "Pec Deck",
+      "exerciseName": "Butterfly Maschine",
       "primaryMuscle": "mg_chest_middle",
       "secondaryMuscles": [
         {
-          "muscleId": "mg_triceps",
-          "intensityWeight": 0.45
-        },
-        {
           "muscleId": "mg_front_delts",
-          "intensityWeight": 0.45
+          "intensityWeight": 0.2
         }
       ],
       "stabilizers": [
         {
           "muscleId": "mg_abs",
-          "intensityWeight": 0.1
+          "intensityWeight": 0.05
         }
       ],
-      "movementPattern": "Isolation"
+      "movementPattern": "horizontale Schulteradduktion"
     },
     {
       "exerciseId": "ex_machine_dip",

@@ -332,10 +332,16 @@
     },
     {
       "id": "ex_pec_deck",
-      "displayName": "Pec Deck",
+      "displayName": "Butterfly Maschine",
       "aliases": [
         "Butterfly Maschine",
-        "Pec Fly"
+        "Pec Fly",
+        "Butterfly",
+        "Pec Deck",
+        "Pec-Deck",
+        "Brust-Fly Maschine",
+        "Chest Fly Machine",
+        "Machine Fly"
       ],
       "primaryMuscleGroups": [
         "Brust"
@@ -343,26 +349,35 @@
       "secondaryMuscleGroups": [
         "vordere Schulter"
       ],
-      "movementPattern": "Isolation",
+      "movementPattern": "horizontale Schulteradduktion",
       "equipment": [
-        "Maschine"
+        "Maschine",
+        "Butterfly-/Pec-Deck-Maschine"
       ],
-      "category": "Isolation",
+      "category": "Brust-Isolation",
       "difficulty": "einfach",
       "spineLoadLevel": "veryLow",
       "lumbarDiscSuitability": "suitable",
       "defaultSets": 2,
       "defaultRepRange": "10-15",
-      "defaultRestSeconds": 60,
-      "techniqueNotes": "Rücken am Polster, Brust aktiv zusammenführen.",
+      "defaultRestSeconds": 75,
+      "techniqueNotes": "Rücken am Polster halten, Schulterblätter stabilisieren und die Griffe kontrolliert vor der Brust zusammenführen.",
       "commonMistakes": [
         "zu weit nach hinten starten",
-        "Schultern hochziehen"
+        "Schultern hochziehen",
+        "zu schwer wählen",
+        "Schwung nutzen"
       ],
       "tags": [
         "push",
         "brust",
-        "maschine"
+        "maschine",
+        "chest",
+        "chest_isolation",
+        "machine",
+        "lws_friendly",
+        "lws-freundlich",
+        "hypertrophy"
       ],
       "alternatives": [
         "ex_cable_fly",

@@ -417,6 +417,24 @@
       ],
       "stabilizers": [],
       "movementPattern": "Core Anti-Extension"
+    },
+    {
+      "exerciseId": "ex_pec_deck",
+      "exerciseName": "Butterfly Maschine",
+      "primaryMuscle": "mg_chest_middle",
+      "secondaryMuscles": [
+        {
+          "muscleId": "mg_front_delts",
+          "intensityWeight": 0.2
+        }
+      ],
+      "stabilizers": [
+        {
+          "muscleId": "mg_abs",
+          "intensityWeight": 0.05
+        }
+      ],
+      "movementPattern": "horizontale Schulteradduktion"
     }
   ]
 }

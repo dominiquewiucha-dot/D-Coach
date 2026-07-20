@@ -310,25 +310,26 @@
     },
     {
       "id": "ex_pec_deck",
-      "displayName": "Pec Deck",
+      "displayName": "Butterfly Maschine",
       "englishName": "Pec Deck",
-      "category": "Push",
+      "category": "Brust-Isolation",
       "equipmentId": "eq_machine",
       "primaryMuscleHint": "mg_chest_middle",
-      "movementPattern": "Chest Isolation",
+      "movementPattern": "horizontale Schulteradduktion",
       "lumbarDiscSuitability": "suitable",
       "spineLoadLevel": "veryLow",
       "shoulderStressLevel": "low",
       "kneeStressLevel": "low",
       "defaultSets": 2,
       "defaultRepRange": "10-15",
-      "defaultRestSeconds": 90,
+      "defaultRestSeconds": 75,
       "difficulty": "einfach",
-      "techniqueNotes": "Schulterblätter stabil halten, kontrolliert drücken, keine erzwungene Endposition.",
+      "techniqueNotes": "Rücken am Polster halten, Schulterblätter stabilisieren und die Griffe kontrolliert vor der Brust zusammenführen.",
       "commonMistakes": [
         "zu schwer wählen",
         "Schultern nach vorne fallen lassen",
-        "Schwung nutzen"
+        "Schwung nutzen",
+        "Schultern hochziehen"
       ],
       "trainingModeVisibility": {
         "show": [
@@ -344,7 +345,42 @@
           "longHistory"
         ]
       },
-      "source": "D-Coach Content Release v2.1.0"
+      "source": "D-Coach Content Release v2.1.0",
+      "aliases": [
+        "Butterfly",
+        "Butterfly Maschine",
+        "Pec Deck",
+        "Pec-Deck",
+        "Brust-Fly Maschine",
+        "Chest Fly Machine",
+        "Machine Fly",
+        "Pec Fly"
+      ],
+      "primaryMuscleGroups": [
+        "Brust"
+      ],
+      "secondaryMuscleGroups": [
+        "vordere Schulter"
+      ],
+      "equipment": [
+        "Butterfly-/Pec-Deck-Maschine",
+        "Maschine"
+      ],
+      "tags": [
+        "push",
+        "chest",
+        "brust",
+        "chest_isolation",
+        "machine",
+        "maschine",
+        "lws_friendly",
+        "lws-freundlich",
+        "hypertrophy"
+      ],
+      "alternatives": [
+        "ex_cable_fly",
+        "ex_chest_press_machine"
+      ]
     },
     {
       "id": "ex_pec_deck_neutral",

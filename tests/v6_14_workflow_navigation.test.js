@@ -3,10 +3,10 @@ const app = fs.readFileSync("app.js", "utf8");
 const sw = fs.readFileSync("sw.js", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v84";'), "app version must be pwa-v84");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v84";'), "service worker cache must be pwa-v84");
-assert(html.includes("app.js?v=pwa-v84"), "index must load pwa-v84 app bundle");
-assert(html.includes("styles.css?v=pwa-v84"), "index must load pwa-v84 css");
+assert(app.includes('const APP_VERSION = "pwa-v85";'), "app version must be pwa-v85");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v85";'), "service worker cache must be pwa-v85");
+assert(html.includes("app.js?v=pwa-v85"), "index must load pwa-v85 app bundle");
+assert(html.includes("styles.css?v=pwa-v85"), "index must load pwa-v85 css");
 assert(app.includes("function startTrainingFlow(dayIdOrName = \"\", options = {})"), "central training start flow missing");
 assert(app.includes("data-start-training-flow"), "training start buttons must use central flow");
 assert(app.includes("createTrainingResumeCheckinDraft(existingDraft, dayIdOrName, skipReview)"), "training flow must open resumable daily check-in with selected day");
