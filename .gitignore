@@ -11,3 +11,6 @@ vendor/MuscleMapJS/pnpm-lock.yaml
 vendor/MuscleMapJS/pnpm-workspace.yaml
 Dateien von ChatGPT/
 handoff/
+
+# Local screenshots and visual review material
+docs/**/screenshots/
