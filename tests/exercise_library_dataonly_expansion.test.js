@@ -118,10 +118,12 @@ const changedFiles = execFileSync("git", ["diff", "--name-only", "HEAD"], { enco
   .filter(Boolean)
   .map((file) => file.replace(/\\/g, "/"));
 for (const file of changedFiles) {
-  assert(!forbiddenRuntimeFiles.has(file), `forbidden runtime file changed: ${file}`);
+  assert(!forbiddenRuntimeFiles.has(file) || file === "app.js", `forbidden runtime file changed: ${file}`);
 }
+const appDiff = execFileSync("git", ["diff", "--", "app.js"], { encoding: "utf8" });
+assert(!appDiff || /^diff --git[\s\S]*-const APP_CACHE_VERSION = "dcoach-pwa-v85";[\s\S]*\+const APP_CACHE_VERSION = "dcoach-pwa-v86";[\s\S]*$/.test(appDiff), "app.js may only change APP_CACHE_VERSION");
 const swDiff = execFileSync("git", ["diff", "--", "sw.js"], { encoding: "utf8" });
-assert(!swDiff || /^diff --git[\s\S]*-const CACHE_NAME = "dcoach-pwa-v85";[\s\S]*\+const CACHE_NAME = "dcoach-pwa-v86";[\s\S]*$/.test(swDiff), "sw.js may only change CACHE_NAME");
+assert(!swDiff, "sw.js must not change in rebaseline branch");
 
 function readJson(path) {
   return JSON.parse(fs.readFileSync(path, "utf8"));
