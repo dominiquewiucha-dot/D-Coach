@@ -49,7 +49,21 @@
       "isCustom": false,
       "isArchived": false,
       "source": "ChatGPT v1.1.0",
-      "notes": ""
+      "notes": "",
+      "aliases": [
+        "Butterfly Maschine",
+        "Butterfly",
+        "Pec Deck",
+        "Pec-Deck",
+        "Chest Fly Machine",
+        "Machine Fly"
+      ],
+      "tags": [
+        "push",
+        "machine",
+        "lws_friendly",
+        "hypertrophy"
+      ]
     },
     {
       "id": "ex_dumbbell_bench_press",
@@ -349,7 +363,17 @@
       "isCustom": false,
       "isArchived": false,
       "source": "ChatGPT v1.1.0",
-      "notes": ""
+      "notes": "",
+      "aliases": [
+        "Scott-Curl Maschine",
+        "Preacher Curl Machine",
+        "Bizepsmaschine Scottcurl"
+      ],
+      "tags": [
+        "pull",
+        "machine",
+        "lws_friendly"
+      ]
     },
     {
       "id": "ex_leg_press",
@@ -625,7 +649,17 @@
       "isCustom": false,
       "isArchived": false,
       "source": "ChatGPT v1.1.0",
-      "notes": ""
+      "notes": "",
+      "aliases": [
+        "Dead Bug",
+        "Käferübung",
+        "Deadbug"
+      ],
+      "tags": [
+        "core",
+        "bodyweight",
+        "lws_friendly"
+      ]
     },
     {
       "id": "ex_bird_dog",
@@ -637,7 +671,17 @@
       "isCustom": false,
       "isArchived": false,
       "source": "ChatGPT v1.1.0",
-      "notes": ""
+      "notes": "",
+      "aliases": [
+        "Bird Dog",
+        "Vierfüßler diagonal",
+        "Bird-Dog"
+      ],
+      "tags": [
+        "core",
+        "bodyweight",
+        "lws_friendly"
+      ]
     },
     {
       "id": "ex_cable_crunch",

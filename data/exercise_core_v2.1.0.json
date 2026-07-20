@@ -2204,7 +2204,18 @@
           "longHistory"
         ]
       },
-      "source": "D-Coach Content Release v2.1.0"
+      "source": "D-Coach Content Release v2.1.0",
+      "aliases": [
+        "Latziehen mit gestreckten Armen",
+        "Straight Arm Pulldown",
+        "Lat Prayer",
+        "Kabel-Pullover"
+      ],
+      "tags": [
+        "pull",
+        "cable",
+        "lws_friendly"
+      ]
     },
     {
       "id": "ex_straight_arm_pulldown_neutral",
@@ -3572,7 +3583,16 @@
           "longHistory"
         ]
       },
-      "source": "D-Coach Content Release v2.1.0"
+      "source": "D-Coach Content Release v2.1.0",
+      "aliases": [
+        "45-Grad-Beinpresse",
+        "45 Degree Leg Press",
+        "Schräge Beinpresse"
+      ],
+      "tags": [
+        "legs",
+        "machine"
+      ]
     },
     {
       "id": "ex_leg_press_45_neutral",
@@ -3800,7 +3820,16 @@
           "longHistory"
         ]
       },
-      "source": "D-Coach Content Release v2.1.0"
+      "source": "D-Coach Content Release v2.1.0",
+      "aliases": [
+        "Hackenschmidt-Maschine",
+        "Hack Squat Machine",
+        "Hackenschmidt Kniebeuge"
+      ],
+      "tags": [
+        "legs",
+        "machine"
+      ]
     },
     {
       "id": "ex_hack_squat_machine_neutral",
@@ -5130,7 +5159,16 @@
           "longHistory"
         ]
       },
-      "source": "D-Coach Content Release v2.1.0"
+      "source": "D-Coach Content Release v2.1.0",
+      "aliases": [
+        "Wadenheben stehend Maschine",
+        "Standing Calf Raise Machine",
+        "Stehende Wadenmaschine"
+      ],
+      "tags": [
+        "legs",
+        "machine"
+      ]
     },
     {
       "id": "ex_seated_calf_raise",
@@ -5320,7 +5358,17 @@
           "longHistory"
         ]
       },
-      "source": "D-Coach Content Release v2.1.0"
+      "source": "D-Coach Content Release v2.1.0",
+      "aliases": [
+        "Dead Bug",
+        "Käferübung",
+        "Deadbug"
+      ],
+      "tags": [
+        "core",
+        "bodyweight",
+        "lws_friendly"
+      ]
     },
     {
       "id": "ex_bird_dog",
@@ -5358,7 +5406,17 @@
           "longHistory"
         ]
       },
-      "source": "D-Coach Content Release v2.1.0"
+      "source": "D-Coach Content Release v2.1.0",
+      "aliases": [
+        "Bird Dog",
+        "Vierfüßler diagonal",
+        "Bird-Dog"
+      ],
+      "tags": [
+        "core",
+        "bodyweight",
+        "lws_friendly"
+      ]
     },
     {
       "id": "ex_bike_warmup",
@@ -5431,6 +5489,1236 @@
         ]
       },
       "source": "D-Coach Content Release v2.1.0"
+    },
+    {
+      "id": "ex_single_arm_chest_press_machine",
+      "displayName": "Einarmige Brustpresse Maschine",
+      "englishName": "Single Arm Chest Press Machine",
+      "category": "Brustpresse",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_chest_middle",
+      "movementPattern": "Horizontal Push",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Single Arm Chest Press Machine",
+        "Unilaterale Brustpresse"
+      ],
+      "primaryMuscleGroups": [
+        "Brust"
+      ],
+      "secondaryMuscleGroups": [
+        "Trizeps",
+        "vordere Schulter"
+      ],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "push",
+        "machine",
+        "unilateral",
+        "lws_friendly",
+        "chest_press",
+        "horizontal_push"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_high_row_machine",
+      "displayName": "High Row Maschine",
+      "englishName": "High Row",
+      "category": "Rudern",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_upper_back",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "High Row",
+        "Hohe Rudermaschine"
+      ],
+      "primaryMuscleGroups": [
+        "oberer Rücken",
+        "Latissimus"
+      ],
+      "secondaryMuscleGroups": [
+        "hintere Schulter",
+        "Bizeps"
+      ],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "pull",
+        "machine",
+        "chest_supported",
+        "lws_friendly",
+        "row",
+        "horizontal_pull"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_low_row_machine",
+      "displayName": "Low Row Maschine",
+      "englishName": "Low Row",
+      "category": "Rudern",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Low Row",
+        "Tiefe Rudermaschine"
+      ],
+      "primaryMuscleGroups": [
+        "Latissimus",
+        "oberer Rücken"
+      ],
+      "secondaryMuscleGroups": [
+        "Bizeps",
+        "hintere Schulter"
+      ],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "pull",
+        "machine",
+        "lws_friendly",
+        "row",
+        "horizontal_pull"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_iso_lateral_row_machine",
+      "displayName": "Iso-Lateral Rudermaschine",
+      "englishName": "Iso Lateral Row",
+      "category": "Rudern",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Horizontal Pull",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Iso Lateral Row",
+        "Einarmige Rudermaschine"
+      ],
+      "primaryMuscleGroups": [
+        "Latissimus",
+        "oberer Rücken"
+      ],
+      "secondaryMuscleGroups": [
+        "Bizeps",
+        "hintere Schulter"
+      ],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "pull",
+        "machine",
+        "unilateral",
+        "lws_friendly",
+        "row",
+        "horizontal_pull"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_pullover_machine",
+      "displayName": "Pullover Maschine",
+      "englishName": "Machine Pullover",
+      "category": "Lat-Isolation",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_lats",
+      "movementPattern": "Schulterextension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 75,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Machine Pullover",
+        "Überzugmaschine"
+      ],
+      "primaryMuscleGroups": [
+        "Latissimus"
+      ],
+      "secondaryMuscleGroups": [
+        "Brust",
+        "Trizeps"
+      ],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "pull",
+        "machine",
+        "lws_friendly",
+        "lat_isolation",
+        "shoulder_extension"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_hammer_curl_cable_rope",
+      "displayName": "Hammercurls am Kabel",
+      "englishName": "Cable Rope Hammer Curl",
+      "category": "Bizeps-Curl",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_biceps",
+      "movementPattern": "Ellenbogenflexion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 60,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Cable Rope Hammer Curl",
+        "Seil-Hammercurls"
+      ],
+      "primaryMuscleGroups": [
+        "Bizeps"
+      ],
+      "secondaryMuscleGroups": [
+        "Unterarme"
+      ],
+      "equipment": [
+        "Kabelzug"
+      ],
+      "tags": [
+        "pull",
+        "cable",
+        "lws_friendly",
+        "biceps_curl",
+        "elbow_flexion"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_cable_lateral_raise_single_arm",
+      "displayName": "Einarmiges Seitheben am Kabel",
+      "englishName": "Single Arm Cable Lateral Raise",
+      "category": "Schulter-Isolation",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_side_delts",
+      "movementPattern": "Schulterabduktion",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "medium",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 60,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Single Arm Cable Lateral Raise",
+        "Kabel-Seitheben einarmig"
+      ],
+      "primaryMuscleGroups": [
+        "seitliche Schulter"
+      ],
+      "secondaryMuscleGroups": [],
+      "equipment": [
+        "Kabelzug"
+      ],
+      "tags": [
+        "push",
+        "cable",
+        "unilateral",
+        "shoulder_isolation",
+        "shoulder_abduction"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_overhead_triceps_extension_cable_rope",
+      "displayName": "Überkopf-Trizepsstrecken am Kabel",
+      "englishName": "Overhead Cable Triceps Extension",
+      "category": "Trizeps-Isolation",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_triceps",
+      "movementPattern": "Ellenbogenextension",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 60,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Overhead Cable Triceps Extension",
+        "Trizeps über Kopf am Seil"
+      ],
+      "primaryMuscleGroups": [
+        "Trizeps"
+      ],
+      "secondaryMuscleGroups": [],
+      "equipment": [
+        "Kabelzug"
+      ],
+      "tags": [
+        "push",
+        "cable",
+        "triceps_extension",
+        "elbow_extension"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_triceps_extension_machine",
+      "displayName": "Trizepsmaschine",
+      "englishName": "Triceps Extension Machine",
+      "category": "Trizeps-Isolation",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_triceps",
+      "movementPattern": "Ellenbogenextension",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 60,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Triceps Extension Machine",
+        "Machine Triceps Extension"
+      ],
+      "primaryMuscleGroups": [
+        "Trizeps"
+      ],
+      "secondaryMuscleGroups": [],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "push",
+        "machine",
+        "lws_friendly",
+        "triceps_extension",
+        "elbow_extension"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_pendulum_squat_machine",
+      "displayName": "Pendulum Squat Maschine",
+      "englishName": "Pendulum Squat",
+      "category": "Kniebeuge",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "kniedominant",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 120,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Pendulum Squat",
+        "Pendelkniebeuge Maschine"
+      ],
+      "primaryMuscleGroups": [
+        "Quadrizeps",
+        "Gesäß"
+      ],
+      "secondaryMuscleGroups": [
+        "Adduktoren"
+      ],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "legs",
+        "machine",
+        "squat",
+        "knee_dominant"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_belt_squat_machine",
+      "displayName": "Belt Squat Maschine",
+      "englishName": "Belt Squat",
+      "category": "Kniebeuge",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "kniedominant",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "8-12",
+      "defaultRestSeconds": 120,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Belt Squat",
+        "Gürtelkniebeuge"
+      ],
+      "primaryMuscleGroups": [
+        "Quadrizeps",
+        "Gesäß"
+      ],
+      "secondaryMuscleGroups": [
+        "Adduktoren"
+      ],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "legs",
+        "machine",
+        "lws_friendly",
+        "squat",
+        "knee_dominant"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_single_leg_press",
+      "displayName": "Einbeinige Beinpresse",
+      "englishName": "Single Leg Press",
+      "category": "Beinpresse",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "kniedominant",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15 je Seite",
+      "defaultRestSeconds": 90,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Single Leg Press",
+        "Unilaterale Beinpresse"
+      ],
+      "primaryMuscleGroups": [
+        "Quadrizeps",
+        "Gesäß"
+      ],
+      "secondaryMuscleGroups": [
+        "Adduktoren"
+      ],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "legs",
+        "machine",
+        "unilateral",
+        "lws_friendly",
+        "leg_press",
+        "knee_dominant"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_leg_extension_single_leg",
+      "displayName": "Einbeiniger Beinstrecker",
+      "englishName": "Single Leg Extension",
+      "category": "Beinstrecker",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_quads",
+      "movementPattern": "Kniestreckung",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "medium",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15 je Seite",
+      "defaultRestSeconds": 75,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Single Leg Extension",
+        "Beinstrecker unilateral"
+      ],
+      "primaryMuscleGroups": [
+        "Quadrizeps"
+      ],
+      "secondaryMuscleGroups": [],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "legs",
+        "machine",
+        "unilateral",
+        "lws_friendly",
+        "leg_extension",
+        "knee_extension"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_leg_curl_single_leg_seated",
+      "displayName": "Einbeiniger Beinbeuger sitzend",
+      "englishName": "Single Leg Seated Curl",
+      "category": "Beinbeuger",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_hamstrings",
+      "movementPattern": "Kniebeugung",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15 je Seite",
+      "defaultRestSeconds": 75,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Single Leg Seated Curl",
+        "Beinbeuger sitzend unilateral"
+      ],
+      "primaryMuscleGroups": [
+        "Beinbeuger"
+      ],
+      "secondaryMuscleGroups": [
+        "Waden"
+      ],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "legs",
+        "machine",
+        "unilateral",
+        "lws_friendly",
+        "leg_curl",
+        "knee_flexion"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_hip_abduction_machine",
+      "displayName": "Abduktorenmaschine",
+      "englishName": "Hip Abduction Machine",
+      "category": "Abduktion",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_abductors",
+      "movementPattern": "Hüftabduktion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 60,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Hip Abduction Machine",
+        "Abduktor Maschine"
+      ],
+      "primaryMuscleGroups": [
+        "Abduktoren"
+      ],
+      "secondaryMuscleGroups": [],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "legs",
+        "machine",
+        "lws_friendly",
+        "hip_abduction"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_hip_adduction_machine",
+      "displayName": "Adduktorenmaschine",
+      "englishName": "Hip Adduction Machine",
+      "category": "Adduktion",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_adductors",
+      "movementPattern": "Hüftadduktion",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 60,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Hip Adduction Machine",
+        "Adduktor Maschine"
+      ],
+      "primaryMuscleGroups": [
+        "Adduktoren"
+      ],
+      "secondaryMuscleGroups": [],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "legs",
+        "machine",
+        "lws_friendly",
+        "hip_adduction"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_glute_kickback_machine",
+      "displayName": "Glute Kickback Maschine",
+      "englishName": "Glute Kickback Machine",
+      "category": "Hüftstreckung",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_glutes",
+      "movementPattern": "Hüftstreckung",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "veryLow",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15 je Seite",
+      "defaultRestSeconds": 75,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Glute Kickback Machine",
+        "Gesäß-Kickback Maschine"
+      ],
+      "primaryMuscleGroups": [
+        "Gesäß"
+      ],
+      "secondaryMuscleGroups": [
+        "Beinbeuger"
+      ],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "legs",
+        "machine",
+        "unilateral",
+        "lws_friendly",
+        "hip_extension"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_tibialis_raise_machine",
+      "displayName": "Tibialisheben Maschine",
+      "englishName": "Tibialis Raise Machine",
+      "category": "Tibialisheben",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_calves",
+      "movementPattern": "Dorsalflexion",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "15-25",
+      "defaultRestSeconds": 60,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Tibialis Raise Machine",
+        "Schienbeinheben Maschine"
+      ],
+      "primaryMuscleGroups": [
+        "Waden"
+      ],
+      "secondaryMuscleGroups": [],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "legs",
+        "machine",
+        "tibialis_raise",
+        "dorsiflexion"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_ab_crunch_machine",
+      "displayName": "Bauchmaschine",
+      "englishName": "Ab Crunch Machine",
+      "category": "Core-Flexion",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_abs",
+      "movementPattern": "Rumpfflexion",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 60,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Ab Crunch Machine",
+        "Crunch Maschine"
+      ],
+      "primaryMuscleGroups": [
+        "Bauch"
+      ],
+      "secondaryMuscleGroups": [],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "core",
+        "machine",
+        "core_flexion",
+        "trunk_flexion"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_rotary_torso_machine",
+      "displayName": "Rotationsmaschine Rumpf",
+      "englishName": "Rotary Torso Machine",
+      "category": "Core-Rotation",
+      "equipmentId": "eq_machine",
+      "primaryMuscleHint": "mg_obliques",
+      "movementPattern": "Rumpfrotation",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "10-15 je Seite",
+      "defaultRestSeconds": 60,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Rotary Torso Machine",
+        "Rumpfrotation Maschine"
+      ],
+      "primaryMuscleGroups": [
+        "seitliche Bauchmuskulatur"
+      ],
+      "secondaryMuscleGroups": [
+        "tiefe Rumpfmuskulatur"
+      ],
+      "equipment": [
+        "Maschine"
+      ],
+      "tags": [
+        "core",
+        "machine",
+        "core_rotation",
+        "trunk_rotation"
+      ],
+      "alternatives": []
+    },
+    {
+      "id": "ex_cable_crunch_kneeling",
+      "displayName": "Kabel-Crunch kniend",
+      "englishName": "Kneeling Cable Crunch",
+      "category": "Core-Flexion",
+      "equipmentId": "eq_cable",
+      "primaryMuscleHint": "mg_abs",
+      "movementPattern": "Rumpfflexion",
+      "lumbarDiscSuitability": "conditionallySuitable",
+      "spineLoadLevel": "low",
+      "shoulderStressLevel": "low",
+      "kneeStressLevel": "low",
+      "defaultSets": 2,
+      "defaultRepRange": "12-20",
+      "defaultRestSeconds": 60,
+      "difficulty": "mittel",
+      "techniqueNotes": "Kontrolliert ausführen, Bewegungsradius sauber halten und ohne Schwung arbeiten.",
+      "commonMistakes": [
+        "zu viel Schwung",
+        "zu schwer wählen",
+        "Bewegung zu schnell ausführen"
+      ],
+      "trainingModeVisibility": {
+        "show": [
+          "displayName",
+          "lastPerformance",
+          "todaySets",
+          "compactLwsHint"
+        ],
+        "hide": [
+          "techniqueNotes",
+          "commonMistakes",
+          "fullMuscleMap",
+          "longHistory"
+        ]
+      },
+      "source": "candidate_catalog",
+      "aliases": [
+        "Kneeling Cable Crunch",
+        "Kabel Bauchcrunch"
+      ],
+      "primaryMuscleGroups": [
+        "Bauch"
+      ],
+      "secondaryMuscleGroups": [],
+      "equipment": [
+        "Kabelzug"
+      ],
+      "tags": [
+        "core",
+        "cable",
+        "core_flexion",
+        "trunk_flexion"
+      ],
+      "alternatives": []
     }
   ]
 }

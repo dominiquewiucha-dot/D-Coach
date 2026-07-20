@@ -4,7 +4,7 @@ const sw = fs.readFileSync("sw.js", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
 
 assert(app.includes('const APP_VERSION = "pwa-v85";'), "app version must be pwa-v85");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v85";'), "service worker cache must be pwa-v85");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v86";'), "service worker cache must be pwa-v86");
 assert(html.includes("app.js?v=pwa-v85"), "index must load pwa-v85 app bundle");
 assert(html.includes("styles.css?v=pwa-v85"), "index must load pwa-v85 css");
 assert(app.includes("function startTrainingFlow(dayIdOrName = \"\", options = {})"), "central training start flow missing");

@@ -57,7 +57,21 @@
       "source": "ChatGPT v1.2.0",
       "defaultSets": 2,
       "defaultRepRange": "8-12",
-      "defaultRestSeconds": 90
+      "defaultRestSeconds": 90,
+      "aliases": [
+        "Butterfly Maschine",
+        "Butterfly",
+        "Pec Deck",
+        "Pec-Deck",
+        "Chest Fly Machine",
+        "Machine Fly"
+      ],
+      "tags": [
+        "push",
+        "machine",
+        "lws_friendly",
+        "hypertrophy"
+      ]
     },
     {
       "id": "ex_dumbbell_bench_press",
@@ -337,7 +351,18 @@
       "source": "ChatGPT v1.2.0",
       "defaultSets": 2,
       "defaultRepRange": "8-12",
-      "defaultRestSeconds": 90
+      "defaultRestSeconds": 90,
+      "aliases": [
+        "Latziehen mit gestreckten Armen",
+        "Straight Arm Pulldown",
+        "Lat Prayer",
+        "Kabel-Pullover"
+      ],
+      "tags": [
+        "pull",
+        "cable",
+        "lws_friendly"
+      ]
     },
     {
       "id": "ex_assisted_pullup",
@@ -547,7 +572,17 @@
       "source": "ChatGPT v1.2.0",
       "defaultSets": 2,
       "defaultRepRange": "8-12",
-      "defaultRestSeconds": 90
+      "defaultRestSeconds": 90,
+      "aliases": [
+        "Scott-Curl Maschine",
+        "Preacher Curl Machine",
+        "Bizepsmaschine Scottcurl"
+      ],
+      "tags": [
+        "pull",
+        "machine",
+        "lws_friendly"
+      ]
     },
     {
       "id": "ex_concentration_curl",
@@ -953,7 +988,17 @@
       "source": "ChatGPT v1.2.0",
       "defaultSets": 2,
       "defaultRepRange": "30-60 Sekunden",
-      "defaultRestSeconds": 45
+      "defaultRestSeconds": 45,
+      "aliases": [
+        "Dead Bug",
+        "Käferübung",
+        "Deadbug"
+      ],
+      "tags": [
+        "core",
+        "bodyweight",
+        "lws_friendly"
+      ]
     },
     {
       "id": "ex_bird_dog",
@@ -967,7 +1012,17 @@
       "source": "ChatGPT v1.2.0",
       "defaultSets": 2,
       "defaultRepRange": "30-60 Sekunden",
-      "defaultRestSeconds": 45
+      "defaultRestSeconds": 45,
+      "aliases": [
+        "Bird Dog",
+        "Vierfüßler diagonal",
+        "Bird-Dog"
+      ],
+      "tags": [
+        "core",
+        "bodyweight",
+        "lws_friendly"
+      ]
     },
     {
       "id": "ex_cable_crunch",

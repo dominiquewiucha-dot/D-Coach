@@ -30,7 +30,7 @@ assert(app.includes("Diese Übung ist nicht mehr in der Übungsdatenbank vorhand
 
 assert(!/function renderDashboard\(\)[\s\S]*?\$\{renderCoachDashboardV54\(\)\}[\s\S]*?function renderCoach\(\)/.test(app), "dashboard must not contain old coach dashboard block");
 assert(app.includes('const APP_VERSION = "pwa-v85";'), "app version must be pwa-v85");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v85";'), "service worker cache must be pwa-v85");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v86";'), "service worker cache must be pwa-v86");
 assert(html.includes("app.js?v=pwa-v85"), "index app cache buster must be pwa-v85");
 assert(html.includes("styles.css?v=pwa-v85"), "index style cache buster must be pwa-v85");
 

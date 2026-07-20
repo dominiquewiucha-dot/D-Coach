@@ -1,0 +1,440 @@
+{
+  "generatedAt": "2026-07-20T05:36:06.403Z",
+  "candidatesChecked": 31,
+  "alreadyPresent": 6,
+  "presentUnderOtherIdAliasUpdated": 4,
+  "newlyAdded": 21,
+  "skipped": 0,
+  "candidateStatus": [
+    {
+      "preferredId": "ex_pec_deck_machine",
+      "canonicalId": "ex_pec_deck",
+      "name": "Butterfly Maschine",
+      "status": "present_under_other_id_alias_updated"
+    },
+    {
+      "preferredId": "ex_decline_chest_press_machine",
+      "canonicalId": "ex_decline_chest_press_machine",
+      "name": "Negativ-Brustpresse Maschine",
+      "status": "already_present"
+    },
+    {
+      "preferredId": "ex_single_arm_chest_press_machine",
+      "canonicalId": "ex_single_arm_chest_press_machine",
+      "name": "Einarmige Brustpresse Maschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_high_row_machine",
+      "canonicalId": "ex_high_row_machine",
+      "name": "High Row Maschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_low_row_machine",
+      "canonicalId": "ex_low_row_machine",
+      "name": "Low Row Maschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_iso_lateral_row_machine",
+      "canonicalId": "ex_iso_lateral_row_machine",
+      "name": "Iso-Lateral Rudermaschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_pullover_machine",
+      "canonicalId": "ex_pullover_machine",
+      "name": "Pullover Maschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_straight_arm_pulldown",
+      "canonicalId": "ex_straight_arm_pulldown",
+      "name": "Latziehen mit gestreckten Armen",
+      "status": "already_present"
+    },
+    {
+      "preferredId": "ex_preacher_curl_machine",
+      "canonicalId": "ex_preacher_curl_machine",
+      "name": "Scott-Curl Maschine",
+      "status": "already_present"
+    },
+    {
+      "preferredId": "ex_hammer_curl_cable_rope",
+      "canonicalId": "ex_hammer_curl_cable_rope",
+      "name": "Hammercurls am Kabel",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_lateral_raise_machine",
+      "canonicalId": "ex_machine_lateral_raise",
+      "name": "Seitheben Maschine",
+      "status": "present_under_other_id_alias_updated"
+    },
+    {
+      "preferredId": "ex_cable_lateral_raise_single_arm",
+      "canonicalId": "ex_cable_lateral_raise_single_arm",
+      "name": "Einarmiges Seitheben am Kabel",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_overhead_triceps_extension_cable_rope",
+      "canonicalId": "ex_overhead_triceps_extension_cable_rope",
+      "name": "Überkopf-Trizepsstrecken am Kabel",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_triceps_extension_machine",
+      "canonicalId": "ex_triceps_extension_machine",
+      "name": "Trizepsmaschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_hack_squat_machine",
+      "canonicalId": "ex_hack_squat_machine",
+      "name": "Hackenschmidt-Maschine",
+      "status": "already_present"
+    },
+    {
+      "preferredId": "ex_pendulum_squat_machine",
+      "canonicalId": "ex_pendulum_squat_machine",
+      "name": "Pendulum Squat Maschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_belt_squat_machine",
+      "canonicalId": "ex_belt_squat_machine",
+      "name": "Belt Squat Maschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_leg_press_45_degree",
+      "canonicalId": "ex_leg_press_45",
+      "name": "45-Grad-Beinpresse",
+      "status": "present_under_other_id_alias_updated"
+    },
+    {
+      "preferredId": "ex_single_leg_press",
+      "canonicalId": "ex_single_leg_press",
+      "name": "Einbeinige Beinpresse",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_leg_extension_single_leg",
+      "canonicalId": "ex_leg_extension_single_leg",
+      "name": "Einbeiniger Beinstrecker",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_leg_curl_single_leg_seated",
+      "canonicalId": "ex_leg_curl_single_leg_seated",
+      "name": "Einbeiniger Beinbeuger sitzend",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_hip_abduction_machine",
+      "canonicalId": "ex_hip_abduction_machine",
+      "name": "Abduktorenmaschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_hip_adduction_machine",
+      "canonicalId": "ex_hip_adduction_machine",
+      "name": "Adduktorenmaschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_glute_kickback_machine",
+      "canonicalId": "ex_glute_kickback_machine",
+      "name": "Glute Kickback Maschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_standing_calf_raise_machine",
+      "canonicalId": "ex_calf_raise_machine_standing",
+      "name": "Wadenheben stehend Maschine",
+      "status": "present_under_other_id_alias_updated"
+    },
+    {
+      "preferredId": "ex_tibialis_raise_machine",
+      "canonicalId": "ex_tibialis_raise_machine",
+      "name": "Tibialisheben Maschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_ab_crunch_machine",
+      "canonicalId": "ex_ab_crunch_machine",
+      "name": "Bauchmaschine",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_rotary_torso_machine",
+      "canonicalId": "ex_rotary_torso_machine",
+      "name": "Rotationsmaschine Rumpf",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_cable_crunch_kneeling",
+      "canonicalId": "ex_cable_crunch_kneeling",
+      "name": "Kabel-Crunch kniend",
+      "status": "newly_added"
+    },
+    {
+      "preferredId": "ex_dead_bug",
+      "canonicalId": "ex_dead_bug",
+      "name": "Dead Bug",
+      "status": "already_present"
+    },
+    {
+      "preferredId": "ex_bird_dog",
+      "canonicalId": "ex_bird_dog",
+      "name": "Bird Dog",
+      "status": "already_present"
+    }
+  ],
+  "aliasUpdates": [
+    {
+      "file": "seed_training_database.json",
+      "candidateId": "ex_pec_deck_machine",
+      "canonicalId": "ex_pec_deck",
+      "aliases": [
+        "Butterfly",
+        "Pec Deck",
+        "Pec-Deck",
+        "Chest Fly Machine",
+        "Machine Fly"
+      ]
+    },
+    {
+      "file": "data/exercises_extended_v1.1.0.json",
+      "candidateId": "ex_pec_deck_machine",
+      "canonicalId": "ex_pec_deck",
+      "aliases": [
+        "Butterfly",
+        "Pec Deck",
+        "Pec-Deck",
+        "Chest Fly Machine",
+        "Machine Fly"
+      ]
+    },
+    {
+      "file": "data/exercises_extended_v1.1.0.json",
+      "candidateId": "ex_preacher_curl_machine",
+      "canonicalId": "ex_preacher_curl_machine",
+      "aliases": [
+        "Preacher Curl Machine",
+        "Bizepsmaschine Scottcurl"
+      ]
+    },
+    {
+      "file": "data/exercises_extended_v1.1.0.json",
+      "candidateId": "ex_dead_bug",
+      "canonicalId": "ex_dead_bug",
+      "aliases": [
+        "Käferübung",
+        "Deadbug"
+      ]
+    },
+    {
+      "file": "data/exercises_extended_v1.1.0.json",
+      "candidateId": "ex_bird_dog",
+      "canonicalId": "ex_bird_dog",
+      "aliases": [
+        "Vierfüßler diagonal",
+        "Bird-Dog"
+      ]
+    },
+    {
+      "file": "data/exercises_large_v1.2.0.json",
+      "candidateId": "ex_pec_deck_machine",
+      "canonicalId": "ex_pec_deck",
+      "aliases": [
+        "Butterfly",
+        "Pec Deck",
+        "Pec-Deck",
+        "Chest Fly Machine",
+        "Machine Fly"
+      ]
+    },
+    {
+      "file": "data/exercises_large_v1.2.0.json",
+      "candidateId": "ex_straight_arm_pulldown",
+      "canonicalId": "ex_straight_arm_pulldown",
+      "aliases": [
+        "Straight Arm Pulldown",
+        "Lat Prayer",
+        "Kabel-Pullover"
+      ]
+    },
+    {
+      "file": "data/exercises_large_v1.2.0.json",
+      "candidateId": "ex_preacher_curl_machine",
+      "canonicalId": "ex_preacher_curl_machine",
+      "aliases": [
+        "Preacher Curl Machine",
+        "Bizepsmaschine Scottcurl"
+      ]
+    },
+    {
+      "file": "data/exercises_large_v1.2.0.json",
+      "candidateId": "ex_dead_bug",
+      "canonicalId": "ex_dead_bug",
+      "aliases": [
+        "Käferübung",
+        "Deadbug"
+      ]
+    },
+    {
+      "file": "data/exercises_large_v1.2.0.json",
+      "candidateId": "ex_bird_dog",
+      "canonicalId": "ex_bird_dog",
+      "aliases": [
+        "Vierfüßler diagonal",
+        "Bird-Dog"
+      ]
+    },
+    {
+      "file": "data/exercises_knowledge_v1.3.0.json",
+      "candidateId": "ex_pec_deck_machine",
+      "canonicalId": "ex_pec_deck",
+      "aliases": [
+        "Butterfly",
+        "Pec Deck",
+        "Pec-Deck",
+        "Chest Fly Machine",
+        "Machine Fly"
+      ]
+    },
+    {
+      "file": "data/exercises_knowledge_v1.3.0.json",
+      "candidateId": "ex_decline_chest_press_machine",
+      "canonicalId": "ex_decline_chest_press_machine",
+      "aliases": [
+        "Decline Chest Press Machine",
+        "Brustpresse negativ"
+      ]
+    },
+    {
+      "file": "data/exercises_knowledge_v1.3.0.json",
+      "candidateId": "ex_straight_arm_pulldown",
+      "canonicalId": "ex_straight_arm_pulldown",
+      "aliases": [
+        "Straight Arm Pulldown",
+        "Lat Prayer",
+        "Kabel-Pullover"
+      ]
+    },
+    {
+      "file": "data/exercises_knowledge_v1.3.0.json",
+      "candidateId": "ex_preacher_curl_machine",
+      "canonicalId": "ex_preacher_curl_machine",
+      "aliases": [
+        "Preacher Curl Machine",
+        "Bizepsmaschine Scottcurl"
+      ]
+    },
+    {
+      "file": "data/exercises_knowledge_v1.3.0.json",
+      "candidateId": "ex_lateral_raise_machine",
+      "canonicalId": "ex_machine_lateral_raise",
+      "aliases": [
+        "Lateral Raise Machine",
+        "Schulter-Seithebemaschine"
+      ]
+    },
+    {
+      "file": "data/exercises_knowledge_v1.3.0.json",
+      "candidateId": "ex_dead_bug",
+      "canonicalId": "ex_dead_bug",
+      "aliases": [
+        "Käferübung",
+        "Deadbug"
+      ]
+    },
+    {
+      "file": "data/exercises_knowledge_v1.3.0.json",
+      "candidateId": "ex_bird_dog",
+      "canonicalId": "ex_bird_dog",
+      "aliases": [
+        "Vierfüßler diagonal",
+        "Bird-Dog"
+      ]
+    },
+    {
+      "file": "data/exercise_core_v2.1.0.json",
+      "candidateId": "ex_pec_deck_machine",
+      "canonicalId": "ex_pec_deck",
+      "aliases": [
+        "Butterfly",
+        "Pec Deck",
+        "Pec-Deck",
+        "Chest Fly Machine",
+        "Machine Fly"
+      ]
+    },
+    {
+      "file": "data/exercise_core_v2.1.0.json",
+      "candidateId": "ex_straight_arm_pulldown",
+      "canonicalId": "ex_straight_arm_pulldown",
+      "aliases": [
+        "Straight Arm Pulldown",
+        "Lat Prayer",
+        "Kabel-Pullover"
+      ]
+    },
+    {
+      "file": "data/exercise_core_v2.1.0.json",
+      "candidateId": "ex_hack_squat_machine",
+      "canonicalId": "ex_hack_squat_machine",
+      "aliases": [
+        "Hack Squat Machine",
+        "Hackenschmidt Kniebeuge"
+      ]
+    },
+    {
+      "file": "data/exercise_core_v2.1.0.json",
+      "candidateId": "ex_leg_press_45_degree",
+      "canonicalId": "ex_leg_press_45",
+      "aliases": [
+        "45 Degree Leg Press",
+        "Schräge Beinpresse"
+      ]
+    },
+    {
+      "file": "data/exercise_core_v2.1.0.json",
+      "candidateId": "ex_standing_calf_raise_machine",
+      "canonicalId": "ex_calf_raise_machine_standing",
+      "aliases": [
+        "Standing Calf Raise Machine",
+        "Stehende Wadenmaschine"
+      ]
+    },
+    {
+      "file": "data/exercise_core_v2.1.0.json",
+      "candidateId": "ex_dead_bug",
+      "canonicalId": "ex_dead_bug",
+      "aliases": [
+        "Käferübung",
+        "Deadbug"
+      ]
+    },
+    {
+      "file": "data/exercise_core_v2.1.0.json",
+      "candidateId": "ex_bird_dog",
+      "canonicalId": "ex_bird_dog",
+      "aliases": [
+        "Vierfüßler diagonal",
+        "Bird-Dog"
+      ]
+    }
+  ],
+  "duplicateCollisions": {
+    "seed": [],
+    "core": []
+  },
+  "notes": [
+    "ex_pec_deck_machine wurde nicht neu angelegt, weil ex_pec_deck bereits die normale Butterfly Maschine ist.",
+    "tibialis_anterior wurde mangels eigener kanonischer Muskel-ID auf vorhandene untere-Bein/Waden-ID mg_calves gemappt."
+  ]
+}

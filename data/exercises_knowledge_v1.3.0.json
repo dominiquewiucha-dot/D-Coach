@@ -79,10 +79,17 @@
       "tags": [
         "push",
         "horizontal_push",
-        "suitable"
+        "suitable",
+        "machine",
+        "lws_friendly"
       ],
       "isCustom": false,
-      "isArchived": false
+      "isArchived": false,
+      "aliases": [
+        "Negativ-Brustpresse Maschine",
+        "Decline Chest Press Machine",
+        "Brustpresse negativ"
+      ]
     },
     {
       "id": "ex_barbell_bench_press",
@@ -545,10 +552,17 @@
       "tags": [
         "push",
         "isolation",
-        "suitable"
+        "suitable",
+        "machine",
+        "lws_friendly"
       ],
       "isCustom": false,
-      "isArchived": false
+      "isArchived": false,
+      "aliases": [
+        "Seitheben Maschine",
+        "Lateral Raise Machine",
+        "Schulter-Seithebemaschine"
+      ]
     },
     {
       "id": "ex_front_raise",
@@ -815,10 +829,18 @@
       "tags": [
         "pull",
         "shoulder_extension",
-        "suitable"
+        "suitable",
+        "cable",
+        "lws_friendly"
       ],
       "isCustom": false,
-      "isArchived": false
+      "isArchived": false,
+      "aliases": [
+        "Latziehen mit gestreckten Armen",
+        "Straight Arm Pulldown",
+        "Lat Prayer",
+        "Kabel-Pullover"
+      ]
     },
     {
       "id": "ex_assisted_pullup",
@@ -1247,10 +1269,17 @@
       "tags": [
         "pull",
         "isolation",
-        "suitable"
+        "suitable",
+        "machine",
+        "lws_friendly"
       ],
       "isCustom": false,
-      "isArchived": false
+      "isArchived": false,
+      "aliases": [
+        "Scott-Curl Maschine",
+        "Preacher Curl Machine",
+        "Bizepsmaschine Scottcurl"
+      ]
     },
     {
       "id": "ex_concentration_curl",
@@ -2030,10 +2059,17 @@
       "tags": [
         "core",
         "core_anti-extension",
-        "suitable"
+        "suitable",
+        "bodyweight",
+        "lws_friendly"
       ],
       "isCustom": false,
-      "isArchived": false
+      "isArchived": false,
+      "aliases": [
+        "Dead Bug",
+        "Käferübung",
+        "Deadbug"
+      ]
     },
     {
       "id": "ex_bird_dog",
@@ -2057,10 +2093,17 @@
       "tags": [
         "core",
         "core_stability",
-        "suitable"
+        "suitable",
+        "bodyweight",
+        "lws_friendly"
       ],
       "isCustom": false,
-      "isArchived": false
+      "isArchived": false,
+      "aliases": [
+        "Bird Dog",
+        "Vierfüßler diagonal",
+        "Bird-Dog"
+      ]
     },
     {
       "id": "ex_cable_crunch",
