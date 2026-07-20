@@ -8,7 +8,7 @@ const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
 assert(app.includes('const APP_VERSION = "pwa-v85";'), "app version must be pwa-v85");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v87";'), "service worker cache must be pwa-v87");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v88";'), "service worker cache must be pwa-v88");
 assert(html.includes("app.js?v=pwa-v85"), "index app cache buster must be pwa-v85");
 assert(html.includes("styles.css?v=pwa-v85"), "index style cache buster must be pwa-v85");
 

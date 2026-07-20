@@ -32,6 +32,7 @@ const exercises = {
 const sandbox = {
   JSON,
   Date,
+  Map,
   exerciseById: (id) => exercises[id] || null
 };
 vm.createContext(sandbox);
@@ -42,8 +43,13 @@ vm.createContext(sandbox);
   "getPlannedExerciseId",
   "canonicalExerciseId",
   "getOccupiedExerciseIds",
+  "exerciseExistsInDatabase",
+  "selectedExerciseFromDatabase",
+  "planExerciseIdsForDraftDay",
+  "preservedSetChecksum",
   "validateReplacementCandidate",
   "validateDraftExerciseReplacement",
+  "replaceExerciseInActiveWorkout",
   "replaceDraftExercise"
 ].forEach((name) => vm.runInContext(extractFunctionSource(name), sandbox));
 
