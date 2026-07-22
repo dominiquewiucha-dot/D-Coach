@@ -9,11 +9,11 @@ const app = read("app.js");
 const html = read("index.html");
 const sw = read("sw.js");
 
-assert(app.includes('const APP_VERSION = "pwa-v89";'), "app version must be pwa-v89");
+assert(app.includes('const APP_VERSION = "pwa-v90";'), "app version must be pwa-v90");
 assert(app.includes('const BACKUP_FORMAT_VERSION = "6.18.0";'), "backup format must stay 6.18.0");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v89";'), "cache must be pwa-v89");
-assert(html.includes("styles.css?v=pwa-v89"), "style cache buster must be pwa-v89");
-assert(html.includes("app.js?v=pwa-v89"), "app cache buster must be pwa-v89");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v90";'), "cache must be pwa-v90");
+assert(html.includes("styles.css?v=pwa-v90"), "style cache buster must be pwa-v90");
+assert(html.includes("app.js?v=pwa-v90"), "app cache buster must be pwa-v90");
 assert(html.toLowerCase().indexOf('<meta charset="utf-8">') >= 0, "UTF-8 meta charset missing");
 assert(Buffer.byteLength(html.slice(0, html.toLowerCase().indexOf('<meta charset="utf-8">') + 22), "utf8") <= 1024, "charset must be inside first 1024 bytes");
 

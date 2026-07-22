@@ -7,11 +7,11 @@ const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
 const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v89";'), "app version must be pwa-v89");
+assert(app.includes('const APP_VERSION = "pwa-v90";'), "app version must be pwa-v90");
 assert(app.includes('const BACKUP_FORMAT_VERSION = "6.18.0";'), "backup version must be 6.18.0");
 assert(app.includes('const OUTCOME_EVALUATOR_VERSION = "v6.17.0";'), "outcome evaluator version missing");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v89";'), "cache version must be pwa-v89");
-assert(html.includes("app.js?v=pwa-v89"), "app cache buster must be pwa-v89");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v90";'), "cache version must be pwa-v90");
+assert(html.includes("app.js?v=pwa-v90"), "app cache buster must be pwa-v90");
 
 assert(app.includes("function coachRecommendationApplicationState"), "application state helper missing");
 assert(app.includes("function recommendationOutcomeEligible"), "outcome eligibility helper missing");

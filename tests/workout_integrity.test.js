@@ -19,6 +19,8 @@ assert(app.includes("function askWarmupBeforeWorkout()"), "warmup start prompt m
 assert(app.includes("warmups: warmup ? [warmup] : []"), "warmup must be stored on active workout");
 assert(app.includes("renderWorkoutWarmupSummary(workout)"), "warmup summary missing in workout");
 assert(app.includes('data-entry-field="seatPosition"'), "seat position field missing");
+assert(app.includes('<details class="disclosure-card stack exercise-setup-dropdown">'), "setup fields must render as dropdown");
+assert(app.includes("<summary><span>Sitz, Griff und Notizen</span>"), "setup dropdown summary missing");
 assert(app.includes('data-entry-field="gripPosition"'), "grip position field missing");
 assert(app.includes('data-entry-field="gripWidth"'), "grip width field missing");
 assert(app.includes('data-entry-field="attachment"'), "attachment field missing");

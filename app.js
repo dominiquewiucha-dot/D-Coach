@@ -211,8 +211,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v89";
-const APP_CACHE_VERSION = "dcoach-pwa-v89";
+const APP_VERSION = "pwa-v90";
+const APP_CACHE_VERSION = "dcoach-pwa-v90";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -8785,8 +8785,8 @@ function renderWorkoutScannerPanel() {
 
 function renderExerciseSetupFields(entry) {
   return `
-    <article class="card stack">
-      <h3>Sitz, Griff und Notizen</h3>
+    <details class="disclosure-card stack exercise-setup-dropdown">
+      <summary><span>Sitz, Griff und Notizen</span><span class="badge blue">Setup</span></summary>
       <div class="form-grid">
         <label>Sitzposition<input class="input" value="${htmlesc(entry.seatPosition || "")}" placeholder="z.B. Stufe 4" data-entry-field="seatPosition"></label>
         <label>Griff<input class="input" value="${htmlesc(entry.gripPosition || "")}" placeholder="neutral, proniert, oberer Griff" data-entry-field="gripPosition"></label>
@@ -8797,7 +8797,7 @@ function renderExerciseSetupFields(entry) {
       </div>
       <textarea class="input area" placeholder="Notiz zu Übung oder Training ..." data-entry-field="exerciseNote">${htmlesc(entry.exerciseNote || "")}</textarea>
       <textarea class="input area" placeholder="Notiz zum Training ..." data-workout-field="sessionNote">${htmlesc(state.activeWorkout?.sessionNote || "")}</textarea>
-    </article>
+    </details>
   `;
 }
 
