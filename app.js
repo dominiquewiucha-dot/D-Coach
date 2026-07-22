@@ -212,7 +212,7 @@ const state = {
 };
 
 const APP_VERSION = "pwa-v85";
-const APP_CACHE_VERSION = "dcoach-pwa-v88";
+const APP_CACHE_VERSION = "dcoach-pwa-v89";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -792,7 +792,7 @@ function importPlanPayload(text) {
   plan.id = `${plan.id || "plan_import"}_${Date.now()}`;
   plan.planName = nextName;
   storage.customPlans = [...storage.customPlans, plan];
-  storage.activePlanName = plan.planName;
+  activatePlan(plan);
 }
 
 const PULL_LWS_TEMPLATE_V618 = [
@@ -1499,10 +1499,7 @@ async function boot() {
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
   mergeAlternativeRules(alternativesV21);
   runStorageMigrations();
-  const plan = activePlan();
-  if (plan && storage.activePlanName !== plan.planName) {
-    storage.activePlanName = plan.planName;
-  }
+  normalizeActivePlanIntegrity();
   registerServiceWorker();
   bindPwaEvents();
   bindWorkoutIntegrityEvents();
@@ -1688,7 +1685,62 @@ function navigateToTab(tab, options = {}) {
 
 function activePlan() {
   const plans = availablePlans().filter((plan) => !isPlanArchived(plan.planName));
-  return plans.find((plan) => plan.planName === storage.activePlanName) || plans[0] || null;
+  const activeId = storage.activePlanName;
+  return plans.find((plan) => stablePlanId(plan) === activeId) ||
+    plans.find((plan) => plan.planName === activeId) ||
+    plans[0] ||
+    null;
+}
+
+function planByIdOrName(identifier) {
+  const value = String(identifier || "");
+  if (!value) return null;
+  const plans = availablePlans();
+  return plans.find((plan) => stablePlanId(plan) === value) ||
+    plans.find((plan) => plan.planName === value) ||
+    null;
+}
+
+function planForWorkoutDraft(draft) {
+  return planByIdOrName(draft?.planId) || null;
+}
+
+function activatePlan(planOrIdentifier) {
+  const plan = typeof planOrIdentifier === "string" ? planByIdOrName(planOrIdentifier) : planOrIdentifier;
+  if (!plan) return null;
+  const selectedId = stablePlanId(plan);
+  storage.customPlans = storage.customPlans.map((customPlan) => ({
+    ...customPlan,
+    active: stablePlanId(customPlan) === selectedId,
+    isActive: false,
+    activeAt: stablePlanId(customPlan) === selectedId ? new Date().toISOString() : customPlan.activeAt || ""
+  }));
+  storage.archivedPlanNames = storage.archivedPlanNames.filter((name) => name !== plan.planName);
+  storage.activePlanName = selectedId;
+  return plan;
+}
+
+function activeFlagTimestamp(plan) {
+  return Date.parse(plan?.activeAt || plan?.activatedAt || plan?.updatedAt || plan?.createdAt || "") || 0;
+}
+
+function normalizeActivePlanIntegrity() {
+  const plans = availablePlans().filter((plan) => !isPlanArchived(plan.planName));
+  if (!plans.length) {
+    storage.activePlanName = "";
+    return { selectedPlanId: "", duplicatePlanIds: [], activeFlagCount: 0 };
+  }
+  const duplicatePlanIds = [...new Set(plans.map(stablePlanId).filter((id, index, ids) => ids.indexOf(id) !== index))];
+  const flagged = plans.filter((plan) => plan.active === true || plan.isActive === true);
+  const stored = activePlan();
+  const latestFlagged = flagged.slice().sort((a, b) => activeFlagTimestamp(b) - activeFlagTimestamp(a))[0] || null;
+  const selected = latestFlagged || stored || plans[0];
+  activatePlan(selected);
+  return {
+    selectedPlanId: stablePlanId(selected),
+    duplicatePlanIds,
+    activeFlagCount: flagged.length
+  };
 }
 
 function explicitDayTypeFromName(value) {
@@ -1827,7 +1879,7 @@ function workoutDayExerciseMatchCount(day, workout) {
   return workoutDraftPlanMatchIds(workout).reduce((count, exerciseId) => count + (plannedIds.has(exerciseId) ? 1 : 0), 0);
 }
 
-function workoutDraftIntegrity(workout, plan = activePlan()) {
+function workoutDraftIntegrity(workout, plan = planForWorkoutDraft(workout)) {
   if (!isValidActiveWorkoutDraft(workout)) return { valid: false, action: "invalid" };
   const days = normalizedPlanDays(plan);
   if (!days.length) return { valid: true, action: "no_plan" };
@@ -2047,13 +2099,14 @@ function isPlanArchived(planName) {
 
 function planStatus(plan) {
   if (isPlanArchived(plan.planName)) return "Archiviert";
-  if (activePlan()?.planName === plan.planName) return "Aktiv";
+  if (stablePlanId(activePlan()) === stablePlanId(plan)) return "Aktiv";
   return "Bibliothek";
 }
 
 function ensureActivePlan() {
   const plan = activePlan();
-  storage.activePlanName = plan?.planName || "";
+  if (plan) activatePlan(plan);
+  else storage.activePlanName = "";
 }
 
 function duplicatePlan(planName) {
@@ -2072,7 +2125,7 @@ function duplicatePlan(planName) {
   copy.planName = nextName;
   copy.description = `${plan.description || ""} Lokale Kopie.`.trim();
   storage.customPlans = [...storage.customPlans, copy];
-  storage.activePlanName = copy.planName;
+  activatePlan(copy);
 }
 
 function customExerciseFromForm(existing = null) {
@@ -6635,7 +6688,7 @@ function applyCoachPlanProposal() {
   }
   nextPlan.description = `${nextPlan.description || ""} Coach-Anpassung v6.12.`.trim();
   storage.customPlans = [...storage.customPlans.filter((plan) => plan.planName !== nextPlan.planName), nextPlan];
-  storage.activePlanName = nextPlan.planName;
+  activatePlan(nextPlan);
   storage.coachPlanUndo = previous;
   const appliedAt = new Date().toISOString();
   const appliedPlanChangeId = previous.id;
@@ -7330,7 +7383,8 @@ function renderSessionCoachPreWorkoutCard(day) {
 }
 
 function sessionCoachDuringSummary(workout, entry, exercise) {
-  const planDay = activePlan()?.days?.find((day) => day.name === workout.dayName);
+  const workoutPlan = planForWorkoutDraft(workout);
+  const planDay = workoutPlan?.days?.find((day, index) => stablePlanDayId(workoutPlan, day, index) === workout.dayId || day.id === workout.dayId || day.name === workout.dayName);
   const maxMinutes = Number(planDay?.maxDurationMinutes) || Number(currentPersonalProfile().maxSessionMinutes) || 60;
   const elapsedMinutes = Math.max(0, Math.round((Date.now() - new Date(workout.startedAt).getTime()) / 60000));
   const remainingEntries = workout.entries.slice(workout.index + 1);
@@ -8453,7 +8507,7 @@ function startWorkoutFromReview(review) {
     overviewOpen: false,
     entries: review.exercises.map(workoutEntryFromPlanned)
   };
-  const integrity = workoutDraftIntegrity(nextWorkout, activePlan());
+  const integrity = workoutDraftIntegrity(nextWorkout, planByIdOrName(nextWorkout.planId));
   if (!integrity.valid) {
     state.trainingDayError = buildWorkoutDraftIntegrityError(nextWorkout, integrity, "blocked");
     state.pendingWorkoutReview = null;
@@ -8914,7 +8968,7 @@ function selectedExerciseFromDatabase(exerciseId, exerciseDatabase = null) {
 }
 
 function planExerciseIdsForDraftDay(draft) {
-  const plan = typeof activePlan === "function" ? activePlan() : null;
+  const plan = typeof planForWorkoutDraft === "function" ? planForWorkoutDraft(draft) : null;
   const day = plan ? findPlanDayByStableId(plan, draft?.dayId || draft?.dayName) : null;
   const ids = day?.exercises?.length ? day.exercises.map((entry) => entry.exerciseId) : (draft?.entries || []).map(getPlannedExerciseId);
   return new Set(ids.filter(Boolean));
@@ -9118,7 +9172,7 @@ function finishOrNext() {
   const completedAt = new Date().toISOString();
   const session = {
     id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-    planId: activePlan()?.id || workout.planName,
+    planId: workout.planId || workout.planName,
     planName: workout.planName,
     planNameSnapshot: workout.planName,
     dayId: workout.dayId || "",
@@ -9439,7 +9493,7 @@ function saveCustomBuilderPlan({ activate = false } = {}) {
   }
   const plan = planFromCustomBuilderDraft(draft);
   storage.customPlans = [...storage.customPlans.filter((item) => item.planName !== plan.planName), plan];
-  if (activate) storage.activePlanName = plan.planName;
+  if (activate) activatePlan(plan);
   state.customPlanBuilderOpen = false;
   alert(activate ? "Eigener Plan gespeichert und aktiviert." : "Eigener Plan gespeichert.");
   render();
@@ -9628,7 +9682,7 @@ function renderPlans() {
           <p>${plan.days.length} Tage · ${Math.max(...plan.days.map((day) => day.maxDurationMinutes))} Minuten</p>
           <span class="badge ${planStatus(plan) === "Aktiv" ? "green" : isPlanArchived(plan.planName) ? "amber" : ""}">${planStatus(plan)}</span>
           <div class="button-row">
-            ${!isPlanArchived(plan.planName) ? `<button class="secondary" data-activate-plan="${htmlesc(plan.planName)}">Aktivieren</button>` : ""}
+            ${!isPlanArchived(plan.planName) ? `<button class="secondary" data-activate-plan="${htmlesc(stablePlanId(plan))}">Aktivieren</button>` : ""}
             ${isPlanArchived(plan.planName)
               ? `<button class="secondary" data-unarchive-plan="${htmlesc(plan.planName)}">Wiederherstellen</button>`
               : `<button class="secondary" data-archive-plan="${htmlesc(plan.planName)}">Archivieren</button>`}
@@ -11127,8 +11181,7 @@ function bindEvents() {
 
   document.querySelectorAll("[data-activate-plan]").forEach((button) => {
     button.addEventListener("click", () => {
-      storage.archivedPlanNames = storage.archivedPlanNames.filter((name) => name !== button.dataset.activatePlan);
-      storage.activePlanName = button.dataset.activatePlan;
+      activatePlan(button.dataset.activatePlan);
       render();
     });
   });
@@ -11137,7 +11190,7 @@ function bindEvents() {
     button.addEventListener("click", () => {
       const planName = button.dataset.archivePlan;
       storage.archivedPlanNames = [...new Set([...storage.archivedPlanNames, planName])];
-      if (storage.activePlanName === planName) ensureActivePlan();
+      if (!activePlan()) ensureActivePlan();
       render();
     });
   });
@@ -11146,7 +11199,7 @@ function bindEvents() {
     button.addEventListener("click", () => {
       const planName = button.dataset.unarchivePlan;
       storage.archivedPlanNames = storage.archivedPlanNames.filter((name) => name !== planName);
-      if (!activePlan()) storage.activePlanName = planName;
+      if (!activePlan()) activatePlan(planName);
       render();
     });
   });
@@ -11253,7 +11306,7 @@ function bindEvents() {
       return;
     }
     storage.customPlans = [...storage.customPlans, plan];
-    storage.activePlanName = plan.planName;
+    activatePlan(plan);
     alert(appText("plan.generated", "Planvorschlag erstellt. Bitte prüfen und aktivieren."));
     render();
   });
@@ -11269,9 +11322,10 @@ function bindEvents() {
     button.addEventListener("click", () => {
       const planName = button.dataset.deletePlan;
       if (!confirm("Trainingsplan wirklich löschen? Deine gespeicherten Trainingseinheiten bleiben erhalten.")) return;
+      const deletedWasActive = activePlan()?.planName === planName;
       storage.deletedPlanNames = [...new Set([...storage.deletedPlanNames, planName])];
       storage.archivedPlanNames = storage.archivedPlanNames.filter((name) => name !== planName);
-      if (storage.activePlanName === planName) ensureActivePlan();
+      if (deletedWasActive) ensureActivePlan();
       render();
     });
   });
