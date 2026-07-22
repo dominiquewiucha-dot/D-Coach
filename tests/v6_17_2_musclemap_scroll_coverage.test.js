@@ -9,11 +9,11 @@ const production = fs.readFileSync(path.join(root, "production", "production-mus
 const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v91";'), "app version must be pwa-v91");
+assert(app.includes('const APP_VERSION = "pwa-v92";'), "app version must be pwa-v92");
 assert(app.includes('const BACKUP_FORMAT_VERSION = "6.18.0";'), "backup version must be 6.18.0");
 assert(app.includes('const MUSCLE_MAPPING_VERSION = "muscle-mapping-v3";'), "mapping version missing");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v91";'), "cache must be pwa-v91");
-assert(html.includes("app.js?v=pwa-v91"), "app cache buster must be pwa-v91");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v92";'), "cache must be pwa-v92");
+assert(html.includes("app.js?v=pwa-v92"), "app cache buster must be pwa-v92");
 
 assert(app.includes("function getCanonicalMuscleCoverage"), "canonical coverage API missing");
 assert(app.includes("function canonicalizeMuscleRegionId"), "region normalizer missing");

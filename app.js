@@ -211,8 +211,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v91";
-const APP_CACHE_VERSION = "dcoach-pwa-v91";
+const APP_VERSION = "pwa-v92";
+const APP_CACHE_VERSION = "dcoach-pwa-v92";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -596,10 +596,69 @@ function uniqueValues(...lists) {
   return [...new Set(lists.flat().filter(Boolean))];
 }
 
+const EXERCISE_TRACKING_TYPES = {
+  strength_weight_reps: {
+    label: "Gewicht + Wiederholungen",
+    fields: ["weightText", "repsText", "rirText"],
+    summary: "kg · Wdh. · RIR"
+  },
+  bodyweight_reps: {
+    label: "Körpergewicht + Wiederholungen",
+    fields: ["repsText", "rirText"],
+    summary: "Wdh. · RIR"
+  },
+  bodyweight_time: {
+    label: "Zeit",
+    fields: ["durationSecondsText", "addedWeightText"],
+    summary: "Zeit · optional Zusatzgewicht"
+  },
+  weighted_time: {
+    label: "Gewicht + Zeit",
+    fields: ["weightText", "durationSecondsText", "rirText"],
+    summary: "kg · Zeit · RIR"
+  },
+  distance_time: {
+    label: "Distanz + Zeit",
+    fields: ["distanceText", "durationSecondsText"],
+    summary: "Distanz · Zeit"
+  },
+  cardio_time: {
+    label: "Cardio",
+    fields: ["durationSecondsText", "distanceText"],
+    summary: "Zeit · Distanz"
+  },
+  weighted_distance_time: {
+    label: "Gewicht + Distanz/Zeit",
+    fields: ["weightText", "distanceText", "durationSecondsText"],
+    summary: "kg · Distanz · Zeit"
+  }
+};
+
+function inferTrackingType(raw = {}, existing = null) {
+  const text = [
+    raw.trackingType,
+    existing?.trackingType,
+    raw.displayName,
+    raw.englishName,
+    raw.category,
+    raw.movementPattern,
+    ...(raw.tags || []),
+    ...(existing?.tags || [])
+  ].join(" ").toLowerCase();
+  if (EXERCISE_TRACKING_TYPES[raw.trackingType]) return raw.trackingType;
+  if (EXERCISE_TRACKING_TYPES[existing?.trackingType]) return existing.trackingType;
+  if (/laufband|treadmill|fahrrad|bike|ergometer|rudern|rowing|crosstrainer|elliptical/.test(text)) return "cardio_time";
+  if (/farmer|carry|walk/.test(text)) return "weighted_distance_time";
+  if (/plank|wall sit|hold|isometr/.test(text)) return "bodyweight_time";
+  if (/bodyweight|körpergewicht|push up|pull up|dip/.test(text)) return "bodyweight_reps";
+  return "strength_weight_reps";
+}
+
 function normalizeExercise(raw, existing = null) {
   const primaryMuscleGroups = raw.primaryMuscleGroups || existing?.primaryMuscleGroups || [];
   const secondaryMuscleGroups = raw.secondaryMuscleGroups || existing?.secondaryMuscleGroups || [];
   const equipmentName = raw.equipment || (raw.equipmentId ? [equipmentNameById(raw.equipmentId)] : existing?.equipment || []);
+  const trackingType = inferTrackingType(raw, existing);
   return {
     ...raw,
     ...existing,
@@ -613,6 +672,10 @@ function normalizeExercise(raw, existing = null) {
     difficulty: raw.difficulty || existing?.difficulty || "mittel",
     spineLoadLevel: raw.spineLoadLevel || existing?.spineLoadLevel || "medium",
     lumbarDiscSuitability: raw.lumbarDiscSuitability || existing?.lumbarDiscSuitability || "conditionallySuitable",
+    trackingType,
+    unilateral: Boolean(raw.unilateral ?? existing?.unilateral ?? false),
+    split: raw.split || existing?.split || raw.category || existing?.category || "",
+    muscleRoles: raw.muscleRoles || existing?.muscleRoles || [],
     defaultSets: raw.defaultSets || existing?.defaultSets || 2,
     defaultRepRange: raw.defaultRepRange || existing?.defaultRepRange || "8-12",
     defaultRestSeconds: raw.defaultRestSeconds || existing?.defaultRestSeconds || 90,
@@ -924,9 +987,8 @@ function generatePlanCandidate() {
     ["Beine + Core", ["bein", "quad", "glute", "hamstring", "core", "bauch"]]
   ];
   const days = groups.map(([name, needles], dayIndex) => {
-    if (name === "Pull") return generatedPullDayV618();
     const chosen = exercises.filter((exercise) => {
-      const text = `${exercise.displayName} ${exercise.category} ${exercise.movementPattern} ${exercise.tags.join(" ")} ${exercise.primaryMuscleGroups.join(" ")}`.toLowerCase();
+      const text = `${exercise.displayName} ${exercise.englishName || ""} ${(exercise.aliases || []).join(" ")} ${exercise.category} ${exercise.split || ""} ${exercise.movementPattern} ${(exercise.tags || []).join(" ")} ${(exercise.primaryMuscleGroups || []).join(" ")}`.toLowerCase();
       return needles.some((needle) => text.includes(needle));
     }).slice(0, 6);
     return {
@@ -1145,7 +1207,8 @@ async function boot() {
     dailyPainRegions,
     premiumNavigationSpec,
     dashboardPrioritySpec,
-    trackingInformationArchitecture
+    trackingInformationArchitecture,
+    exerciseLibraryExpansionV2
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -1325,7 +1388,8 @@ async function boot() {
     fetchOptionalJson("./data/daily_pain_regions_v6.13.0.json"),
     fetchOptionalJson("./data/premium_navigation_v6.14.0.json"),
     fetchOptionalJson("./data/dashboard_priority_v6.14.0.json"),
-    fetchOptionalJson("./data/tracking_information_architecture_v6.14.0.json")
+    fetchOptionalJson("./data/tracking_information_architecture_v6.14.0.json"),
+    fetchOptionalJson("./data/exercise_library_expansion_v2.0.0.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -1497,7 +1561,9 @@ async function boot() {
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
+  mergeKnowledgeBaseData({ knowledgeExercises: exerciseLibraryExpansionV2, knowledgeMuscleMap: exerciseLibraryExpansionV2, trainingPlanPresets: null });
   mergeAlternativeRules(alternativesV21);
+  mergeAlternativeRules(exerciseLibraryExpansionV2);
   runStorageMigrations();
   normalizeActivePlanIntegrity();
   registerServiceWorker();
@@ -2093,6 +2159,36 @@ function allExercises() {
   return [...state.seed.exercises, ...storage.customExercises];
 }
 
+function trackingConfigForExercise(exercise) {
+  return EXERCISE_TRACKING_TYPES[exercise?.trackingType] || EXERCISE_TRACKING_TYPES.strength_weight_reps;
+}
+
+function trackingFieldsForExercise(exercise) {
+  const fields = [...trackingConfigForExercise(exercise).fields];
+  if (exercise?.unilateral && !fields.includes("sideText")) fields.unshift("sideText");
+  return fields;
+}
+
+function plannedRepTextForExercise(entry, exercise) {
+  const config = trackingConfigForExercise(exercise);
+  if (config.fields.includes("repsText")) return `${htmlesc(entry.reps)} Wdh.`;
+  if (config.fields.includes("durationSecondsText")) return "Zeit";
+  if (config.fields.includes("distanceText")) return "Distanz/Zeit";
+  return htmlesc(entry.reps);
+}
+
+function trackingSummaryForExercise(exercise) {
+  return trackingConfigForExercise(exercise).summary;
+}
+
+function setFieldHasInput(set, field) {
+  return Boolean(String(set?.[field] || "").trim());
+}
+
+function setInputFieldsForEntry(entry) {
+  return trackingFieldsForExercise(exerciseById(entry?.exerciseId));
+}
+
 function isPlanArchived(planName) {
   return storage.archivedPlanNames.includes(planName);
 }
@@ -2257,6 +2353,33 @@ function kg(value) {
 function parseNumber(value) {
   const parsed = Number(String(value ?? "").replace(",", "."));
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parseDurationSeconds(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return null;
+  if (raw.includes(":")) {
+    const parts = raw.split(":").map((part) => Number.parseInt(part, 10));
+    if (parts.some((part) => !Number.isFinite(part))) return null;
+    if (parts.length === 2) return Math.max(0, parts[0] * 60 + parts[1]);
+    if (parts.length === 3) return Math.max(0, parts[0] * 3600 + parts[1] * 60 + parts[2]);
+  }
+  const parsed = parseNumber(raw);
+  return parsed && parsed > 0 ? Math.round(parsed) : null;
+}
+
+function durationText(seconds) {
+  const value = Number(seconds);
+  if (!Number.isFinite(value) || value <= 0) return "-";
+  const mins = Math.floor(value / 60);
+  const secs = Math.round(value % 60);
+  return mins ? `${mins}:${String(secs).padStart(2, "0")} min` : `${secs} s`;
+}
+
+function distanceText(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) return "-";
+  return parsed >= 1000 ? `${String(Math.round((parsed / 1000) * 10) / 10).replace(".", ",")} km` : `${Math.round(parsed)} m`;
 }
 
 function parseWeightKg(value) {
@@ -3060,6 +3183,12 @@ function activePlanTargetMuscles() {
 
 function completedSetCoverageFactor(set) {
   if (set.completed !== true) return 0;
+  if (Number(set.actualDurationSeconds) > 0 && !(Number(set.actualReps) > 0)) {
+    return Math.max(0.5, Math.min(1.5, Number(set.actualDurationSeconds) / 45));
+  }
+  if (Number(set.actualDistance) > 0 && !(Number(set.actualReps) > 0)) {
+    return Math.max(0.5, Math.min(1.5, Number(set.actualDistance) / 400));
+  }
   const reps = Number(set.actualReps) || 10;
   const weight = Number(set.actualWeightKg) || 0;
   const repsFactor = Math.min(1.4, Math.max(0.6, reps / 10));
@@ -4592,6 +4721,27 @@ function alternativeCandidatesForExercise(exercise) {
       source: "fallback"
     });
   });
+
+  const sourceTargets = new Set([...(exercise.primaryMuscleGroups || []), muscleMappingForExercise(exercise.id)?.primaryMuscle].filter(Boolean));
+  allExercises()
+    .filter((candidate) => candidate.id !== exercise.id && !candidate.isArchived && !avoidIds.has(candidate.id) && !byId.has(candidate.id))
+    .filter((candidate) => {
+      const candidateTargets = new Set([...(candidate.primaryMuscleGroups || []), muscleMappingForExercise(candidate.id)?.primaryMuscle].filter(Boolean));
+      const sharedTarget = [...sourceTargets].some((target) => candidateTargets.has(target));
+      const sameTrackingFamily = trackingConfigForExercise(candidate).fields.some((field) => trackingConfigForExercise(exercise).fields.includes(field));
+      return sharedTarget && sameTrackingFamily;
+    })
+    .slice(0, 16)
+    .forEach((candidate) => {
+      byId.set(candidate.id, {
+        exercise: candidate,
+        score: alternativeCandidateScore(exercise, candidate, 0.55, preferredIds.has(candidate.id)),
+        note: "gleiche Zielregion aus erweiterter Bibliothek",
+        explanation: alternativeExplanation(exercise, candidate),
+        reason: "generischer Muskel- und Tracking-Match",
+        source: "library"
+      });
+    });
 
   return [...byId.values()].sort((a, b) => {
     const scoreDelta = b.score - a.score;
@@ -8161,7 +8311,7 @@ function renderPlannedExerciseList(exercises = []) {
         const exercise = exerciseById(entry.exerciseId);
         return `<li>
           <strong>${htmlesc(exercise?.displayName || entry.exerciseId)}</strong>
-          <span>${entry.sets} Sätze · ${htmlesc(entry.reps)} · ${entry.restSeconds} s Pause · ${htmlesc(entry.priority || "important")}</span>
+          <span>${entry.sets} Sätze · ${exercise ? plannedRepTextForExercise(entry, exercise) : htmlesc(entry.reps)} · ${entry.restSeconds} s Pause · ${htmlesc(entry.priority || "important")}</span>
         </li>`;
       }).join("")}
     </ol>
@@ -8370,10 +8520,12 @@ function askWarmupBeforeWorkout() {
 
 function workoutEntryFromPlanned(planned) {
   const last = lastCompletedExercise(planned.exerciseId);
+  const exercise = exerciseById(planned.exerciseId);
   const setting = latestMachineSetting(planned.exerciseId);
   const scannedMapping = latestScannedEquipmentMappingForExercise(planned.exerciseId);
   return {
     exerciseId: planned.exerciseId,
+    trackingType: exercise?.trackingType || "strength_weight_reps",
     plannedSets: Math.max(Number(planned.sets) || 1, 1),
     reps: planned.reps,
     restSeconds: planned.restSeconds,
@@ -8391,9 +8543,13 @@ function workoutEntryFromPlanned(planned) {
       const previous = last?.exercise?.sets?.find((set) => set.setNumber === index + 1);
       return {
         setNumber: index + 1,
-        weightText: previous?.actualWeightKg ? String(previous.actualWeightKg).replace(".", ",") : "",
-        repsText: "",
+        weightText: trackingFieldsForExercise(exercise).includes("weightText") && previous?.actualWeightKg ? String(previous.actualWeightKg).replace(".", ",") : "",
+        repsText: trackingFieldsForExercise(exercise).includes("repsText") && previous?.actualReps ? String(previous.actualReps) : "",
         rirText: "",
+        durationSecondsText: previous?.actualDurationSeconds ? String(previous.actualDurationSeconds) : "",
+        distanceText: previous?.actualDistance ? String(previous.actualDistance).replace(".", ",") : "",
+        addedWeightText: previous?.actualAddedWeightKg ? String(previous.actualAddedWeightKg).replace(".", ",") : "",
+        sideText: previous?.side || "",
         completed: false
       };
     })
@@ -8685,7 +8841,7 @@ function renderWorkout() {
       <article class="card stack">
         <h2>${htmlesc(exercise.displayName)}</h2>
         <p class="muted">${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].slice(0, 3).join(" · "))}</p>
-        <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} <span class="badge blue">${htmlesc(entry.reps)} Wdh.</span> <span class="badge">${entry.restSeconds} s Pause</span></div>
+        <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} <span class="badge blue">${plannedRepTextForExercise(entry, exercise)}</span> <span class="badge">${entry.restSeconds} s Pause</span></div>
         ${machineSetting ? `<p class="quiet">Setup: Sitz ${htmlesc(machineSetting.seatPosition || "-")} · Griff ${htmlesc(machineSetting.handlePosition || "-")} · Rücken ${htmlesc(machineSetting.backrestPosition || "-")}</p>` : ""}
         ${scannedMapping ? `<p class="quiet">Life Fitness: ${htmlesc(scannedMapping.machineLabel || scannedMapping.machineSerial || "Zuordnung gespeichert")} - Sitz ${htmlesc(entry.seatPosition || "-")} - Griff ${htmlesc(entry.gripPosition || "-")}</p>` : ""}
         ${exerciseIsCritical(exercise) ? `<p class="warning compact-warning">${lwsWarning(exercise)}</p>` : ""}
@@ -8698,12 +8854,12 @@ function renderWorkout() {
       <article class="card stack">
         <h3>Letzte Leistung</h3>
         ${last ? `
-          <p class="last-performance">${last.exercise.sets.map((set) => `${kg(set.actualWeightKg)} x ${set.actualReps || "-"}`).join(" / ")}</p>
+          <p class="last-performance">${last.exercise.sets.map((set) => setPerformanceText(set, exercise)).join(" / ")}</p>
         ` : `<p class="muted">Noch keine vorherige Leistung vorhanden. Starte moderat.</p>`}
       </article>
       <article class="card stack">
-        <div class="row"><h3 class="grow">Sätze</h3><span class="quiet">kg · Wdh. · RIR</span></div>
-        ${entry.sets.map((set, index) => renderSetRow(set, index)).join("")}
+        <div class="row"><h3 class="grow">Sätze</h3><span class="quiet">${htmlesc(trackingSummaryForExercise(exercise))}</span></div>
+        ${entry.sets.map((set, index) => renderSetRow(set, index, entry, exercise)).join("")}
       </article>
       ${renderExerciseSetupFields(entry)}
       <p class="quiet">Dieses Training wird automatisch auf diesem Gerät gesichert.</p>
@@ -8733,7 +8889,7 @@ function renderWorkoutOverview(workout) {
               <article class="card row compact-training-day">
                 <div class="grow">
                   <h3>${index + 1}. ${htmlesc(exercise?.displayName || entry.exerciseId)}</h3>
-                  <p class="muted">${completed}/${entry.sets.length} Sätze · ${htmlesc(entry.reps)} · ${entry.restSeconds} s</p>
+                  <p class="muted">${completed}/${entry.sets.length} Sätze · ${plannedRepTextForExercise(entry, exercise)} · ${entry.restSeconds} s</p>
                 </div>
                 <span class="badge ${active ? "green" : completed === entry.sets.length ? "blue" : ""}">${active ? "aktuell" : completed === entry.sets.length ? "fertig" : "offen"}</span>
               </article>
@@ -8840,18 +8996,48 @@ function renderAlternativePicker(alternatives) {
   `;
 }
 
-function renderSetRow(set, index) {
+function workoutSetField(field, set, index) {
+  const common = `value="${htmlesc(set[field] || "")}" data-set="${index}" data-field="${field}"`;
+  if (field === "weightText") return `<input inputmode="decimal" placeholder="kg" ${common}>`;
+  if (field === "addedWeightText") return `<input inputmode="decimal" placeholder="+ kg" ${common}>`;
+  if (field === "repsText") return `<input inputmode="numeric" placeholder="Wdh." ${common}>`;
+  if (field === "rirText") return `<input inputmode="numeric" placeholder="RIR" ${common}>`;
+  if (field === "durationSecondsText") return `<input inputmode="numeric" placeholder="Sek." ${common}>`;
+  if (field === "distanceText") return `<input inputmode="decimal" placeholder="m/km" ${common}>`;
+  if (field === "sideText") {
+    return `
+      <select class="input" data-set="${index}" data-field="sideText">
+        <option value="" ${!set.sideText ? "selected" : ""}>Seite</option>
+        <option value="left" ${set.sideText === "left" ? "selected" : ""}>links</option>
+        <option value="right" ${set.sideText === "right" ? "selected" : ""}>rechts</option>
+      </select>
+    `;
+  }
+  return `<input ${common}>`;
+}
+
+function setPerformanceText(set, exercise = null) {
+  const fields = trackingFieldsForExercise(exercise);
+  const parts = [];
+  if (fields.includes("weightText") && Number(set.actualWeightKg) > 0) parts.push(kg(set.actualWeightKg));
+  if (fields.includes("addedWeightText") && Number(set.actualAddedWeightKg) > 0) parts.push(`+${kg(set.actualAddedWeightKg)}`);
+  if (fields.includes("repsText") && Number(set.actualReps) > 0) parts.push(`${set.actualReps} Wdh.`);
+  if (fields.includes("durationSecondsText") && Number(set.actualDurationSeconds) > 0) parts.push(durationText(set.actualDurationSeconds));
+  if (fields.includes("distanceText") && Number(set.actualDistance) > 0) parts.push(distanceText(set.actualDistance));
+  if (set.side) parts.push(set.side === "left" ? "links" : set.side === "right" ? "rechts" : set.side);
+  return parts.length ? parts.join(" x ") : "-";
+}
+
+function renderSetRow(set, index, entry = null, exercise = null) {
+  const fields = entry ? setInputFieldsForEntry(entry) : trackingFieldsForExercise(exercise);
   return `
     <div class="set-row ${set.completed ? "done" : ""}">
       <strong>${set.setNumber}</strong>
-      <input inputmode="decimal" placeholder="kg" value="${htmlesc(set.weightText)}" data-set="${index}" data-field="weightText">
-      <input inputmode="numeric" placeholder="Wdh." value="${htmlesc(set.repsText)}" data-set="${index}" data-field="repsText">
-      <input inputmode="numeric" placeholder="RIR" value="${htmlesc(set.rirText)}" data-set="${index}" data-field="rirText">
-      <button class="check ${set.completed ? "done" : ""}" data-check-set="${index}">${set.completed ? "✓" : ""}</button>
+      ${fields.map((field) => workoutSetField(field, set, index)).join("")}
+      <button class="check ${set.completed ? "done" : ""}" data-check-set="${index}">${set.completed ? "?" : ""}</button>
     </div>
   `;
 }
-
 function exerciseIsCritical(exercise) {
   return ["conditionallySuitable", "notRecommended", "avoidInitially"].includes(exercise.lumbarDiscSuitability);
 }
@@ -8894,10 +9080,17 @@ function cloneWorkoutDraft(draft) {
 }
 
 function entryHasRecordedTrainingData(entry) {
-  return Boolean(
-    (entry?.sets || []).some((set) => set.completed || String(set.weightText || "").trim() || String(set.repsText || "").trim() || String(set.rirText || "").trim()) ||
-    String(entry?.exerciseNote || "").trim()
+  const hasSetData = (entry?.sets || []).some((set) =>
+    set.completed ||
+    String(set.weightText || "").trim() ||
+    String(set.repsText || "").trim() ||
+    String(set.rirText || "").trim() ||
+    String(set.durationSecondsText || "").trim() ||
+    String(set.distanceText || "").trim() ||
+    String(set.addedWeightText || "").trim() ||
+    String(set.sideText || "").trim()
   );
+  return Boolean(hasSetData || String(entry?.exerciseNote || "").trim());
 }
 
 function emptySetsForReplacement(entry) {
@@ -8906,6 +9099,10 @@ function emptySetsForReplacement(entry) {
     weightText: "",
     repsText: "",
     rirText: "",
+    durationSecondsText: "",
+    distanceText: "",
+    addedWeightText: "",
+    sideText: "",
     completed: false
   }));
 }
@@ -8977,7 +9174,7 @@ function planExerciseIdsForDraftDay(draft) {
 function preservedSetChecksum(draft, excludedEntryIndex) {
   return JSON.stringify((draft?.entries || []).flatMap((entry, index) => {
     if (index === excludedEntryIndex) return [];
-    return (entry.sets || []).map((set) => [index, entry.exerciseId, set.setNumber, set.weightText || "", set.repsText || "", set.rirText || "", set.completed === true]);
+    return (entry.sets || []).map((set) => [index, entry.exerciseId, set.setNumber, set.weightText || "", set.repsText || "", set.rirText || "", set.durationSecondsText || "", set.distanceText || "", set.addedWeightText || "", set.sideText || "", set.completed === true]);
   }));
 }
 
@@ -9043,16 +9240,20 @@ function replaceDraftExercise(options) {
   return replaceExerciseInActiveWorkout(options);
 }
 
-function setHasAnyInput(set) {
-  return Boolean(String(set.weightText || "").trim() || String(set.repsText || "").trim() || String(set.rirText || "").trim());
+function setHasAnyInput(set, entry = null) {
+  const hasLegacyInput = Boolean(String(set.weightText || "").trim() || String(set.repsText || "").trim() || String(set.rirText || "").trim());
+  if (hasLegacyInput) return true;
+  const fields = entry ? setInputFieldsForEntry(entry) : ["durationSecondsText", "distanceText", "addedWeightText", "sideText"];
+  return fields.some((field) => setFieldHasInput(set, field));
 }
 
 function setIsIncomplete(set) {
-  return set.completed !== true && setHasAnyInput(set);
+  const entry = arguments[1] || null;
+  return set.completed !== true && setHasAnyInput(set, entry);
 }
 
 function incompleteSetsForEntry(entry) {
-  return (entry?.sets || []).filter(setIsIncomplete);
+  return (entry?.sets || []).filter((set) => setIsIncomplete(set, entry));
 }
 
 function handleIncompleteSetsBeforeLeaving(entry) {
@@ -9061,7 +9262,11 @@ function handleIncompleteSetsBeforeLeaving(entry) {
   const first = incomplete[0];
   const filled = [
     first.weightText ? `${first.weightText} kg` : "",
+    first.addedWeightText ? `+${first.addedWeightText} kg` : "",
     first.repsText ? `${first.repsText} Wdh.` : "",
+    first.durationSecondsText ? `${first.durationSecondsText} Sek.` : "",
+    first.distanceText ? `${first.distanceText} Distanz` : "",
+    first.sideText ? `${first.sideText === "left" ? "links" : first.sideText === "right" ? "rechts" : first.sideText}` : "",
     first.rirText ? `RIR ${first.rirText}` : ""
   ].filter(Boolean).join(", ");
   const choice = window.prompt(
@@ -9082,6 +9287,10 @@ function handleIncompleteSetsBeforeLeaving(entry) {
       set.weightText = "";
       set.repsText = "";
       set.rirText = "";
+      set.durationSecondsText = "";
+      set.distanceText = "";
+      set.addedWeightText = "";
+      set.sideText = "";
       set.completed = false;
     });
     persistWorkoutDraft();
@@ -9192,6 +9401,7 @@ function finishOrNext() {
       return {
         exerciseId: entry.exerciseId,
         exerciseNameSnapshot: exercise?.displayName || entry.exerciseId,
+        trackingType: exercise?.trackingType || entry.trackingType || "strength_weight_reps",
         plannedSets: entry.sets.length,
         completedSets,
         sortOrder: entry.sortOrder,
@@ -9205,6 +9415,10 @@ function finishOrNext() {
           actualWeightKg: parseNumber(set.weightText),
           plannedReps: entry.reps,
           actualReps: parseInteger(set.repsText),
+          actualDurationSeconds: parseDurationSeconds(set.durationSecondsText),
+          actualDistance: parseNumber(set.distanceText),
+          actualAddedWeightKg: parseNumber(set.addedWeightText),
+          side: set.sideText || "",
           rir: parseInteger(set.rirText),
           completed: set.completed
         }))
@@ -11104,11 +11318,13 @@ function bindEvents() {
   document.querySelector("[data-resume-workout]")?.addEventListener("click", resumeWorkoutDraft);
 
   document.querySelectorAll("[data-set]").forEach((input) => {
-    input.addEventListener("input", () => {
+    const updateSetField = () => {
       const entry = state.activeWorkout.entries[state.activeWorkout.index];
       entry.sets[Number(input.dataset.set)][input.dataset.field] = input.value;
       persistWorkoutDraft();
-    });
+    };
+    input.addEventListener("input", updateSetField);
+    input.addEventListener("change", updateSetField);
   });
 
   document.querySelectorAll("[data-entry-field]").forEach((input) => {
