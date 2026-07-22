@@ -211,8 +211,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v90";
-const APP_CACHE_VERSION = "dcoach-pwa-v90";
+const APP_VERSION = "pwa-v91";
+const APP_CACHE_VERSION = "dcoach-pwa-v91";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -9323,6 +9323,9 @@ function openCustomPlanBuilder() {
   state.customPlanBuilderSelectedDayId = state.customPlanBuilderSelectedDayId || draft.days[0]?.id || "";
   state.tab = "plans";
   render();
+  requestAnimationFrame(() => {
+    document.querySelector("[data-custom-plan-builder]")?.scrollIntoView({ block: "start", behavior: "smooth" });
+  });
 }
 
 function customPlanBuilderSteps() {
@@ -9644,7 +9647,6 @@ function renderPlans() {
         <div class="button-row">
           <button class="primary" ${active ? "data-start-training-flow" : "data-tab=\"training\""}>${active ? "Training starten" : "Plan ansehen"}</button>
           <button class="secondary" data-open-custom-plan-builder>Eigenen Plan erstellen</button>
-          <button class="secondary" data-generate-plan>Coach-Plan erstellen</button>
         </div>
         <details class="disclosure-card stack">
           <summary>
@@ -11238,7 +11240,9 @@ function bindEvents() {
     }
   });
 
-  document.querySelector("[data-open-custom-plan-builder]")?.addEventListener("click", openCustomPlanBuilder);
+  document.querySelectorAll("[data-open-custom-plan-builder]").forEach((button) => {
+    button.addEventListener("click", openCustomPlanBuilder);
+  });
   document.querySelector("[data-close-custom-plan-builder]")?.addEventListener("click", () => {
     state.customPlanBuilderOpen = false;
     render();
@@ -11299,16 +11303,18 @@ function bindEvents() {
     render();
   });
 
-  document.querySelector("[data-generate-plan]")?.addEventListener("click", () => {
-    const plan = generatePlanCandidate();
-    if (!plan.days.length) {
-      alert("Kein Planvorschlag möglich. Es fehlen passende Übungen.");
-      return;
-    }
-    storage.customPlans = [...storage.customPlans, plan];
-    activatePlan(plan);
-    alert(appText("plan.generated", "Planvorschlag erstellt. Bitte prüfen und aktivieren."));
-    render();
+  document.querySelectorAll("[data-generate-plan]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const plan = generatePlanCandidate();
+      if (!plan.days.length) {
+        alert("Kein Planvorschlag möglich. Es fehlen passende Übungen.");
+        return;
+      }
+      storage.customPlans = [...storage.customPlans, plan];
+      activatePlan(plan);
+      alert(appText("plan.generated", "Planvorschlag erstellt. Bitte prüfen und aktivieren."));
+      render();
+    });
   });
 
   document.querySelectorAll("[data-duplicate-plan]").forEach((button) => {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "dcoach-pwa-v90";
+const CACHE_NAME = "dcoach-pwa-v91";
 const ASSETS = [
   "./",
   "./index.html",

@@ -7,11 +7,11 @@ const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
 const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v90";'), "app version must be pwa-v90");
+assert(app.includes('const APP_VERSION = "pwa-v91";'), "app version must be pwa-v91");
 assert(app.includes('const BACKUP_FORMAT_VERSION = "6.18.0";'), "backup format must be 6.18.0");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v90";'), "service worker cache must be pwa-v90");
-assert(html.includes("app.js?v=pwa-v90"), "app cache buster must be pwa-v90");
-assert(html.includes("styles.css?v=pwa-v90"), "style cache buster must be pwa-v90");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v91";'), "service worker cache must be pwa-v91");
+assert(html.includes("app.js?v=pwa-v91"), "app cache buster must be pwa-v91");
+assert(html.includes("styles.css?v=pwa-v91"), "style cache buster must be pwa-v91");
 
 [
   "function resolveTrainingDay(",
@@ -53,5 +53,10 @@ assert(app.includes("storage.coachPlanProposals = [...storage.coachPlanProposals
   "customPlanBuilderDraft: storage.customPlanBuilderDraft",
   "storage.customPlanBuilderDraft = backup.customPlanBuilderDraft"
 ].forEach((needle) => assert(app.includes(needle), `${needle} missing`));
+
+assert(app.includes('document.querySelectorAll("[data-open-custom-plan-builder]")'), "custom plan builder trigger must bind all matching buttons");
+assert(app.includes('document.querySelector("[data-custom-plan-builder]")?.scrollIntoView'), "custom plan builder trigger must scroll to the opened builder");
+assert(!app.includes("Coach-Plan erstellen</button>"), "active plan card must not duplicate the lower plan generator");
+assert(app.includes('document.querySelectorAll("[data-generate-plan]")'), "plan generator handler must support all generator buttons");
 
 console.log("v6.18 plan day integrity and builder tests passed");
