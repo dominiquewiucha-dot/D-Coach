@@ -211,7 +211,7 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v85";
+const APP_VERSION = "pwa-v89";
 const APP_CACHE_VERSION = "dcoach-pwa-v89";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
