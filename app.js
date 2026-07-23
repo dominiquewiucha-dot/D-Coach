@@ -171,6 +171,10 @@ const state = {
   activeWorkout: null,
   exerciseSearch: "",
   exerciseFilter: "all",
+  workoutExercisePickerOpen: false,
+  workoutExerciseSearch: "",
+  workoutExerciseMuscleFilter: "all",
+  workoutExerciseEquipmentFilter: "all",
   selectedExerciseId: null,
   selectedSessionId: null,
   planImportText: "",
@@ -211,8 +215,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v92";
-const APP_CACHE_VERSION = "dcoach-pwa-v92";
+const APP_VERSION = "pwa-v93";
+const APP_CACHE_VERSION = "dcoach-pwa-v93";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -2187,6 +2191,95 @@ function setFieldHasInput(set, field) {
 
 function setInputFieldsForEntry(entry) {
   return trackingFieldsForExercise(exerciseById(entry?.exerciseId));
+}
+
+function blankWorkoutSet(setNumber = 1) {
+  return {
+    setNumber,
+    weightText: "",
+    repsText: "",
+    rirText: "",
+    durationSecondsText: "",
+    distanceText: "",
+    addedWeightText: "",
+    sideText: "",
+    completed: false
+  };
+}
+
+function recordedWorkoutSets(entry) {
+  return (entry?.sets || []).filter((set) => setHasAnyInput(set, entry));
+}
+
+function completedWorkoutSets(entry) {
+  return recordedWorkoutSets(entry).filter((set) => set.completed === true);
+}
+
+function workoutExerciseHaystack(exercise) {
+  return [
+    exercise?.displayName,
+    exercise?.englishName,
+    exercise?.category,
+    exercise?.split,
+    exercise?.movementPattern,
+    ...(exercise?.aliases || []),
+    ...(exercise?.tags || []),
+    ...(exercise?.primaryMuscleGroups || []),
+    ...(exercise?.secondaryMuscleGroups || []),
+    ...(exercise?.equipment || [])
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+function workoutExerciseMatchesDay(exercise, workout) {
+  const dayType = explicitDayTypeFromName(`${workout?.dayName || ""} ${workout?.dayNameSnapshot || ""}`);
+  if (!dayType) return true;
+  const text = workoutExerciseHaystack(exercise);
+  if (dayType === "Push") return /push|brust|chest|schulter|shoulder|trizeps|triceps|press|drücken/.test(text);
+  if (dayType === "Pull") return /pull|rücken|ruecken|back|lat|rudern|row|bizeps|biceps|curl/.test(text);
+  if (dayType === "Legs") return /leg|bein|quad|hamstring|glute|wade|calf|adduktor|core|bauch|plank/.test(text);
+  return true;
+}
+
+function workoutExerciseFilterOptions(type) {
+  const values = new Set();
+  allExercises().forEach((exercise) => {
+    if (type === "muscle") {
+      [...(exercise.primaryMuscleGroups || []), ...(exercise.secondaryMuscleGroups || [])].forEach((item) => {
+        if (item) values.add(item);
+      });
+    }
+    if (type === "equipment") {
+      (exercise.equipment || []).forEach((item) => {
+        if (item) values.add(item);
+      });
+    }
+  });
+  return [...values].sort((a, b) => a.localeCompare(b, "de")).slice(0, 120);
+}
+
+function workoutExercisePickerCandidates(workout) {
+  const query = state.workoutExerciseSearch.trim().toLowerCase();
+  const muscleFilter = state.workoutExerciseMuscleFilter;
+  const equipmentFilter = state.workoutExerciseEquipmentFilter;
+  const occupied = new Set((workout?.entries || []).map((entry) => entry.exerciseId).filter(Boolean));
+  return allExercises()
+    .filter((exercise) => !exercise.isArchived && !occupied.has(exercise.id))
+    .filter((exercise) => !query || workoutExerciseHaystack(exercise).includes(query))
+    .filter((exercise) => muscleFilter === "all" || [...(exercise.primaryMuscleGroups || []), ...(exercise.secondaryMuscleGroups || [])].includes(muscleFilter))
+    .filter((exercise) => equipmentFilter === "all" || (exercise.equipment || []).includes(equipmentFilter))
+    .sort((a, b) => {
+      const typicalDelta = Number(workoutExerciseMatchesDay(b, workout)) - Number(workoutExerciseMatchesDay(a, workout));
+      if (typicalDelta) return typicalDelta;
+      return a.displayName.localeCompare(b.displayName, "de");
+    })
+    .slice(0, 80);
+}
+
+function resetWorkoutExercisePicker() {
+  state.workoutExercisePickerOpen = false;
+  state.workoutExerciseSearch = "";
+  state.workoutExerciseMuscleFilter = "all";
+  state.workoutExerciseEquipmentFilter = "all";
 }
 
 function isPlanArchived(planName) {
@@ -8652,6 +8745,7 @@ function startWorkoutFromReview(review) {
     return false;
   }
   state.showAlternatives = false;
+  resetWorkoutExercisePicker();
   state.restTimer.remaining = 0;
   state.restTimer.running = false;
   const draftCore = createLockedWorkoutDraftCore(review);
@@ -8800,6 +8894,7 @@ function startSmartDay(dayName) {
   const plan = activePlan();
   const warmup = askWarmupBeforeWorkout();
   state.showAlternatives = false;
+  resetWorkoutExercisePicker();
   state.restTimer.remaining = 0;
   state.restTimer.running = false;
   state.activeWorkout = {
@@ -8859,14 +8954,18 @@ function renderWorkout() {
       </article>
       <article class="card stack">
         <div class="row"><h3 class="grow">Sätze</h3><span class="quiet">${htmlesc(trackingSummaryForExercise(exercise))}</span></div>
-        ${entry.sets.map((set, index) => renderSetRow(set, index, entry, exercise)).join("")}
+        ${entry.sets.length ? entry.sets.map((set, index) => renderSetRow(set, index, entry, exercise)).join("") : `<p class="muted">Keine Sätze eingetragen.</p>`}
+        <button class="secondary" data-add-workout-set>+ Satz hinzufügen</button>
       </article>
       ${renderExerciseSetupFields(entry)}
       <p class="quiet">Dieses Training wird automatisch auf diesem Gerät gesichert.</p>
       ${state.restTimer.remaining > 0 || state.restTimer.running ? renderRestTimer() : ""}
       ${state.showAlternatives ? renderAlternativePicker(alternatives) : ""}
+      ${state.workoutExercisePickerOpen ? renderWorkoutExercisePicker(workout) : ""}
       <div class="actions">
         <button class="secondary" data-toggle-alternatives>${state.showAlternatives ? "Alternativen ausblenden" : machineText("device_occupied", "Gerät besetzt? Alternative anzeigen.")}</button>
+        <button class="secondary" data-toggle-workout-exercise-picker>${state.workoutExercisePickerOpen ? "Übung hinzufügen schliessen" : "+ Übung hinzufügen"}</button>
+        ${entry.addedDuringWorkout ? `<button class="secondary danger" data-remove-workout-exercise="${workout.index}">Hinzugefügte Übung entfernen</button>` : ""}
         ${workout.index > 0 ? `<button class="secondary" data-prev-exercise>Vorherige Übung</button>` : ""}
         <button class="primary" data-next-exercise>${workout.index < workout.entries.length - 1 ? "Nächste Übung" : "Training speichern"}</button>
         <button class="secondary" data-cancel-workout>Training abbrechen</button>
@@ -8882,16 +8981,18 @@ function renderWorkoutOverview(workout) {
       <div class="workout-overview-list">
         ${workout.entries.map((entry, index) => {
           const exercise = exerciseById(entry.exerciseId);
-          const completed = (entry.sets || []).filter((set) => set.completed).length;
+          const recorded = recordedWorkoutSets(entry);
+          const completed = completedWorkoutSets(entry).length;
           const active = index === workout.index;
+          const done = recorded.length > 0 && completed === recorded.length;
           return `
             <button class="list-button ${active ? "active" : ""}" data-jump-workout-exercise="${index}">
               <article class="card row compact-training-day">
                 <div class="grow">
-                  <h3>${index + 1}. ${htmlesc(exercise?.displayName || entry.exerciseId)}</h3>
-                  <p class="muted">${completed}/${entry.sets.length} Sätze · ${plannedRepTextForExercise(entry, exercise)} · ${entry.restSeconds} s</p>
+                  <h3>${index + 1}. ${htmlesc(exercise?.displayName || entry.exerciseId)}${entry.addedDuringWorkout ? ` <span class="badge blue">extra</span>` : ""}</h3>
+                  <p class="muted">${completed}/${recorded.length || entry.sets.length} Sätze · ${plannedRepTextForExercise(entry, exercise)} · ${entry.restSeconds} s</p>
                 </div>
-                <span class="badge ${active ? "green" : completed === entry.sets.length ? "blue" : ""}">${active ? "aktuell" : completed === entry.sets.length ? "fertig" : "offen"}</span>
+                <span class="badge ${active ? "green" : done ? "blue" : ""}">${active ? "aktuell" : done ? "fertig" : "offen"}</span>
               </article>
             </button>
           `;
@@ -8996,6 +9097,51 @@ function renderAlternativePicker(alternatives) {
   `;
 }
 
+function renderWorkoutExercisePicker(workout) {
+  const muscleOptions = workoutExerciseFilterOptions("muscle");
+  const equipmentOptions = workoutExerciseFilterOptions("equipment");
+  const candidates = workoutExercisePickerCandidates(workout);
+  return `
+    <article class="card stack workout-exercise-picker">
+      <div class="row">
+        <h3 class="grow">Übung hinzufügen</h3>
+        <span class="badge blue">${candidates.length}</span>
+      </div>
+      <input class="input" placeholder="Übung suchen" value="${htmlesc(state.workoutExerciseSearch)}" data-workout-exercise-search>
+      <div class="form-grid">
+        <label>Muskel
+          <select class="input" data-workout-exercise-muscle-filter>
+            <option value="all" ${state.workoutExerciseMuscleFilter === "all" ? "selected" : ""}>Alle Muskeln</option>
+            ${muscleOptions.map((item) => `<option value="${htmlesc(item)}" ${state.workoutExerciseMuscleFilter === item ? "selected" : ""}>${htmlesc(item)}</option>`).join("")}
+          </select>
+        </label>
+        <label>Equipment
+          <select class="input" data-workout-exercise-equipment-filter>
+            <option value="all" ${state.workoutExerciseEquipmentFilter === "all" ? "selected" : ""}>Alles Equipment</option>
+            ${equipmentOptions.map((item) => `<option value="${htmlesc(item)}" ${state.workoutExerciseEquipmentFilter === item ? "selected" : ""}>${htmlesc(item)}</option>`).join("")}
+          </select>
+        </label>
+      </div>
+      <div class="workout-overview-list">
+        ${candidates.length ? candidates.map((exercise) => {
+          const typical = workoutExerciseMatchesDay(exercise, workout);
+          return `
+            <button class="list-button" data-add-workout-exercise="${htmlesc(exercise.id)}">
+              <article class="card row compact-training-day">
+                <div class="grow">
+                  <h3>${htmlesc(exercise.displayName)}</h3>
+                  <p class="muted">${htmlesc(exerciseListMuscleText(exercise))} · ${htmlesc(trackingSummaryForExercise(exercise))}</p>
+                </div>
+                <span class="badge ${typical ? "green" : ""}">${typical ? "passt" : "taguntypisch"}</span>
+              </article>
+            </button>
+          `;
+        }).join("") : `<p class="muted">Keine Übung gefunden.</p>`}
+      </div>
+    </article>
+  `;
+}
+
 function workoutSetField(field, set, index) {
   const common = `value="${htmlesc(set[field] || "")}" data-set="${index}" data-field="${field}"`;
   if (field === "weightText") return `<input inputmode="decimal" placeholder="kg" ${common}>`;
@@ -9028,6 +9174,28 @@ function setPerformanceText(set, exercise = null) {
   return parts.length ? parts.join(" x ") : "-";
 }
 
+function addWorkoutSet() {
+  const workout = state.activeWorkout;
+  const entry = workout?.entries?.[workout.index];
+  if (!entry) return;
+  entry.sets = [...(entry.sets || []), blankWorkoutSet((entry.sets || []).length + 1)];
+  persistWorkoutDraft();
+  render();
+}
+
+function deleteWorkoutSet(index) {
+  const workout = state.activeWorkout;
+  const entry = workout?.entries?.[workout.index];
+  const setIndex = Number(index);
+  if (!entry || !Number.isInteger(setIndex) || setIndex < 0 || setIndex >= (entry.sets || []).length) return;
+  const set = entry.sets[setIndex];
+  if ((set.completed || setHasAnyInput(set, entry)) && !confirm("Diesen ausgefüllten Satz wirklich löschen?")) return;
+  entry.sets.splice(setIndex, 1);
+  entry.sets.forEach((item, itemIndex) => { item.setNumber = itemIndex + 1; });
+  persistWorkoutDraft();
+  render();
+}
+
 function renderSetRow(set, index, entry = null, exercise = null) {
   const fields = entry ? setInputFieldsForEntry(entry) : trackingFieldsForExercise(exercise);
   return `
@@ -9035,9 +9203,58 @@ function renderSetRow(set, index, entry = null, exercise = null) {
       <strong>${set.setNumber}</strong>
       ${fields.map((field) => workoutSetField(field, set, index)).join("")}
       <button class="check ${set.completed ? "done" : ""}" data-check-set="${index}">${set.completed ? "?" : ""}</button>
+      <button class="secondary compact-button" data-delete-workout-set="${index}" title="Satz löschen">Löschen</button>
     </div>
   `;
 }
+
+function addExerciseToActiveWorkout(exerciseId) {
+  const workout = state.activeWorkout;
+  const exercise = exerciseById(exerciseId);
+  if (!workout || !exercise) return;
+  if ((workout.entries || []).some((entry) => entry.exerciseId === exercise.id)) {
+    alert("Diese Übung ist im aktuellen Training bereits enthalten.");
+    return;
+  }
+  if (!workoutExerciseMatchesDay(exercise, workout) && !confirm("Diese Übung passt nicht typisch zu diesem Trainingstag. Trotzdem hinzufügen?")) return;
+  const entry = {
+    ...workoutEntryFromPlanned({
+      exerciseId: exercise.id,
+      sets: exercise.defaultSets || 2,
+      reps: exercise.defaultRepRange || "8-12",
+      restSeconds: exercise.defaultRestSeconds || 90,
+      priority: "added",
+      sortOrder: (workout.entries || []).length + 1,
+      sourceDayId: workout.dayId || ""
+    }),
+    addedDuringWorkout: true,
+    addedAt: new Date().toISOString(),
+    sourceDayId: workout.dayId || ""
+  };
+  workout.entries.push(entry);
+  workout.index = workout.entries.length - 1;
+  workout.overviewOpen = true;
+  state.workoutExercisePickerOpen = false;
+  state.showAlternatives = false;
+  persistWorkoutDraft();
+  render();
+}
+
+function removeAddedWorkoutExercise(index) {
+  const workout = state.activeWorkout;
+  const entryIndex = Number(index);
+  if (!workout || !Number.isInteger(entryIndex) || entryIndex < 0 || entryIndex >= workout.entries.length) return;
+  const entry = workout.entries[entryIndex];
+  if (!entry.addedDuringWorkout) return;
+  if (entryHasRecordedTrainingData(entry) && !confirm("Diese hinzugefügte Übung enthält bereits Eingaben. Wirklich entfernen?")) return;
+  workout.entries.splice(entryIndex, 1);
+  workout.entries.forEach((item, itemIndex) => { item.sortOrder = itemIndex + 1; });
+  workout.index = Math.max(0, Math.min(workout.index, workout.entries.length - 1));
+  state.workoutExercisePickerOpen = false;
+  persistWorkoutDraft();
+  render();
+}
+
 function exerciseIsCritical(exercise) {
   return ["conditionallySuitable", "notRecommended", "avoidInitially"].includes(exercise.lumbarDiscSuitability);
 }
@@ -9396,13 +9613,14 @@ function finishOrNext() {
     sessionNote: workout.sessionNote || "",
     completedExercises: workout.entries.map((entry) => {
       const exercise = exerciseById(entry.exerciseId);
-      const completedSets = entry.sets.filter((set) => set.completed).length;
+      const recordedSets = recordedWorkoutSets(entry);
+      const completedSets = recordedSets.filter((set) => set.completed === true).length;
       rememberExerciseSetup(entry);
       return {
         exerciseId: entry.exerciseId,
         exerciseNameSnapshot: exercise?.displayName || entry.exerciseId,
         trackingType: exercise?.trackingType || entry.trackingType || "strength_weight_reps",
-        plannedSets: entry.sets.length,
+        plannedSets: recordedSets.length,
         completedSets,
         sortOrder: entry.sortOrder,
         seatPosition: entry.seatPosition || "",
@@ -9410,7 +9628,7 @@ function finishOrNext() {
         gripWidth: entry.gripWidth || "",
         attachment: entry.attachment || "",
         exerciseNote: entry.exerciseNote || "",
-        sets: entry.sets.map((set) => ({
+        sets: recordedSets.map((set) => ({
           setNumber: set.setNumber,
           actualWeightKg: parseNumber(set.weightText),
           plannedReps: entry.reps,
@@ -11349,6 +11567,35 @@ function bindEvents() {
       persistWorkoutDraft();
       render();
     });
+  });
+
+  document.querySelector("[data-add-workout-set]")?.addEventListener("click", addWorkoutSet);
+  document.querySelectorAll("[data-delete-workout-set]").forEach((button) => {
+    button.addEventListener("click", () => deleteWorkoutSet(button.dataset.deleteWorkoutSet));
+  });
+  document.querySelector("[data-toggle-workout-exercise-picker]")?.addEventListener("click", () => {
+    state.workoutExercisePickerOpen = !state.workoutExercisePickerOpen;
+    state.showAlternatives = false;
+    persistWorkoutDraft();
+    render();
+  });
+  document.querySelector("[data-workout-exercise-search]")?.addEventListener("input", (event) => {
+    state.workoutExerciseSearch = event.target.value;
+    render();
+  });
+  document.querySelector("[data-workout-exercise-muscle-filter]")?.addEventListener("change", (event) => {
+    state.workoutExerciseMuscleFilter = event.target.value;
+    render();
+  });
+  document.querySelector("[data-workout-exercise-equipment-filter]")?.addEventListener("change", (event) => {
+    state.workoutExerciseEquipmentFilter = event.target.value;
+    render();
+  });
+  document.querySelectorAll("[data-add-workout-exercise]").forEach((button) => {
+    button.addEventListener("click", () => addExerciseToActiveWorkout(button.dataset.addWorkoutExercise));
+  });
+  document.querySelector("[data-remove-workout-exercise]")?.addEventListener("click", (event) => {
+    removeAddedWorkoutExercise(event.currentTarget.dataset.removeWorkoutExercise);
   });
 
   document.querySelector("[data-prev-exercise]")?.addEventListener("click", goToPreviousExercise);
