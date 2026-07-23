@@ -12,7 +12,7 @@ assert(app.includes("window.history.scrollRestoration = \"manual\""), "browser s
 assert(app.includes("document.activeElement?.blur?.()"), "tab navigation must release focused/touch target");
 assert(app.includes("navigateToTab(button.dataset.tab)"), "data-tab buttons must use central navigation");
 assert(app.includes("navigateTo(tab, { updateHash: false })"), "hash navigation must use central navigation");
-assert(css.includes(".muscle-map-screen {\n  padding-bottom"), "muscle map screen rule missing");
+assert(/\.muscle-map-screen\s*\{\r?\n\s*padding-bottom/.test(css), "muscle map screen rule missing");
 assert(!/\.app-content\s*\{[^}]*overflow\s*:\s*(auto|scroll|hidden)/s.test(css), "app content must not become a nested iOS scroll container");
 assert(!/\.app-content\s*\{[^}]*100vh/s.test(css), "app content must not use static 100vh");
 assert(css.includes("touch-action: pan-y;"), "vertical touch pan must be enabled");

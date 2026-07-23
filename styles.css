@@ -438,6 +438,23 @@ select:focus-visible {
   border-top: 0;
 }
 
+.compact-info-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.compact-info-list span {
+  overflow-wrap: anywhere;
+}
+
+.extra-workout-card .workout-overview-list,
+.exercise-preference-card .form-grid {
+  margin-top: 4px;
+}
+
 .storage-table {
   display: grid;
   gap: 8px;

@@ -9,7 +9,7 @@ assert(app.includes("window.history.scrollRestoration = \"manual\""), "Safari/br
 assert(app.includes('<main id="app-content" class="app-content">'), "app content needs a deterministic scroll target");
 assert(app.includes('<nav id="bottom-nav" class="bottom-nav tabs"'), "bottom nav needs a stable viewport target");
 assert(!/\.app-content\s*\{[^}]*overflow\s*:\s*(auto|scroll|hidden)/s.test(css), "app content must not create a nested vertical scroll container");
-assert(/\.bottom-nav,\n\.tabs\s*\{[^}]*position:\s*fixed;[^}]*z-index:\s*1000;[^}]*transform:\s*none;[^}]*translate:\s*none;/s.test(css), "bottom navigation must be fixed and transform-free");
+assert(/\.bottom-nav,\r?\n\.tabs\s*\{[^}]*position:\s*fixed;[^}]*z-index:\s*1000;[^}]*transform:\s*none;[^}]*translate:\s*none;/s.test(css), "bottom navigation must be fixed and transform-free");
 assert(!/\.app-shell\s*\{[^}]*transform\s*:/s.test(css), "app shell must not transform fixed navigation");
 assert(!/\.app-shell\s*\{[^}]*contain:\s*paint/s.test(css), "app shell must not contain fixed navigation painting");
 

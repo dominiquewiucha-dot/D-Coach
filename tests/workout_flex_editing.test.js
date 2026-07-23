@@ -27,7 +27,7 @@ assert(app.includes("addedDuringWorkout: true"), "added workout exercise marker 
 assert(app.includes("function removeAddedWorkoutExercise(index)"), "added exercise remove handler missing");
 assert(app.includes("data-remove-workout-exercise"), "added exercise remove button missing");
 
-assert(app.includes("persistWorkoutDraft();\n  render();"), "editing actions must persist draft before render");
+assert(/persistWorkoutDraft\(\);\r?\n\s*render\(\);/.test(app), "editing actions must persist draft before render");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

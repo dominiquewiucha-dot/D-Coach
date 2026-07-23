@@ -5,13 +5,13 @@ const app = fs.readFileSync("app.js", "utf8");
 const sw = fs.readFileSync("sw.js", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
 
-assert(app.includes('const APP_VERSION = "pwa-v93";'), "app version must be pwa-v93");
-assert(app.includes('const APP_CACHE_VERSION = "dcoach-pwa-v93";'), "app cache version must be dcoach-pwa-v93");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v93";'), "service worker cache must be pwa-v93");
-assert(html.includes("app.js?v=pwa-v93"), "index app cache buster must be pwa-v93");
+assert(app.includes('const APP_VERSION = "pwa-v94";'), "app version must be pwa-v94");
+assert(app.includes('const APP_CACHE_VERSION = "dcoach-pwa-v94";'), "app cache version must be dcoach-pwa-v94");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v94";'), "service worker cache must be pwa-v94");
+assert(html.includes("app.js?v=pwa-v94"), "index app cache buster must be pwa-v94");
 
 [
-  'const MUSCLE_COVERAGE_CALCULATION_VERSION = "muscle-coverage-v6.19.0";',
+  'const MUSCLE_COVERAGE_CALCULATION_VERSION = "muscle-coverage-v6.20.0";',
   "const MUSCLE_GROUP_REFERENCE_LOAD = 8;",
   "const MUSCLE_REGION_REFERENCE_LOAD = 3;",
   "function getCoverageColorBand(percent)",

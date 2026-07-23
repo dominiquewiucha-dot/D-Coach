@@ -112,7 +112,7 @@ assert(sandbox.workoutDraftIntegrity(draft).valid === true, "draft must stay val
 const appSelectAlternative = extractFunctionSource("selectAlternative");
 assert(!appSelectAlternative.includes("activePlan("), "exercise swap apply must not read global activePlan");
 assert(app.includes("const integrity = workoutDraftIntegrity(nextWorkout, planByIdOrName(nextWorkout.planId));"), "workout start integrity must use locked draft plan id");
-assert(app.includes("planId: workout.planId || workout.planName"), "workout completion must persist draft plan id");
+assert(app.includes('planId: workout.sessionType === "extra_workout" ? "" : (workout.planId || workout.planName)'), "workout completion must persist draft plan id for regular sessions and keep extra workouts plan-free");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

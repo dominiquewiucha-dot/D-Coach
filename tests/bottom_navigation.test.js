@@ -22,7 +22,7 @@ assert(app.includes("registerServiceWorker();"), "service worker update registra
 assert(app.includes('updateViaCache: "none"'), "service worker must bypass stale update cache");
 assert(sw.includes('event.request.mode === "navigate"'), "service worker must use network-first app shell handling");
 assert(sw.includes("SKIP_WAITING"), "service worker skip-waiting update path missing");
-assert(css.includes(".bottom-nav,\n.tabs"), "bottom navigation selector missing");
+assert(/\.bottom-nav,\r?\n\.tabs/.test(css), "bottom navigation selector missing");
 assert(css.includes("position: fixed;"), "bottom navigation must be fixed");
 assert(css.includes("z-index: 1000;"), "bottom navigation must stay above content");
 assert(css.includes("transform: none;"), "bottom navigation transform must be disabled");
@@ -33,7 +33,7 @@ assert(css.includes("overflow-x: hidden;"), "content overflow boundary missing")
 assert(css.includes(".tab-center-logo"), "center dashboard D styling missing");
 assert(css.includes("--nav-center-size: 46px;"), "center tab size token missing");
 assert(!/\.app-shell\s*\{[^}]*overflow\s*:\s*(auto|scroll)/s.test(css), "app shell must not scroll internally");
-const bottomNavBlock = css.match(/\.bottom-nav,\n\.tabs\s*\{[^}]*\}/s)?.[0] || "";
+const bottomNavBlock = css.match(/\.bottom-nav,\r?\n\.tabs\s*\{[^}]*\}/s)?.[0] || "";
 assert(!bottomNavBlock.includes("position: sticky"), "bottom navigation must not be sticky");
 
 function assert(condition, message) {

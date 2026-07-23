@@ -175,6 +175,14 @@ const state = {
   workoutExerciseSearch: "",
   workoutExerciseMuscleFilter: "all",
   workoutExerciseEquipmentFilter: "all",
+  sessionEditId: "",
+  sessionEditDraft: null,
+  extraWorkout: {
+    active: false,
+    muscleId: "",
+    exerciseId: "",
+    setCount: 3
+  },
   selectedExerciseId: null,
   selectedSessionId: null,
   planImportText: "",
@@ -215,13 +223,21 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v93";
-const APP_CACHE_VERSION = "dcoach-pwa-v93";
+const APP_VERSION = "pwa-v94";
+const APP_CACHE_VERSION = "dcoach-pwa-v94";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
 const MUSCLE_MAPPING_VERSION = "muscle-mapping-v3";
-const MUSCLE_COVERAGE_CALCULATION_VERSION = "muscle-coverage-v6.19.0";
+const MUSCLE_COVERAGE_CALCULATION_VERSION = "muscle-coverage-v6.20.0";
+const MUSCLE_LOAD_MODEL_VERSION = "muscle-load-v2.0.0";
+const MUSCLE_LOAD_ROLE_WEIGHTS = {
+  primary: 1,
+  primary_region: 1,
+  secondary: 0.4,
+  secondary_region: 0.4,
+  stabilizer: 0.15
+};
 const MUSCLE_GROUP_REFERENCE_LOAD = 8;
 const MUSCLE_REGION_REFERENCE_LOAD = 3;
 const STORAGE_KEYS = [
@@ -235,6 +251,7 @@ const STORAGE_KEYS = [
   { key: "dcoach.deletedPlanNames", label: "Geloeschte Pläne", type: "array" },
   { key: "dcoach.customPlans", label: "Eigene Pläne", type: "array" },
   { key: "dcoach.customExercises", label: "Eigene Übungen", type: "array" },
+  { key: "dcoach.exercisePreferences", label: "Übungsprofile", type: "object" },
   { key: "dcoach.customPlanBuilderDraft", label: "Eigener Planentwurf", type: "object" },
   { key: "dcoach.userSettings", label: "Einstellungen", type: "object" },
   { key: "dcoach.personalProfile", label: "Persönliche Daten", type: "object" },
@@ -317,6 +334,12 @@ const storage = {
   },
   set customExercises(value) {
     writeJson("dcoach.customExercises", value);
+  },
+  get exercisePreferences() {
+    return readJson("dcoach.exercisePreferences", {});
+  },
+  set exercisePreferences(value) {
+    writeJson("dcoach.exercisePreferences", value && typeof value === "object" ? value : {});
   },
   get customPlanBuilderDraft() {
     return readJson("dcoach.customPlanBuilderDraft", null);
@@ -544,7 +567,7 @@ function openDCoachIndexedDb() {
     const request = indexedDB.open("DCoachLocal", 1);
     request.onupgradeneeded = () => {
       const db = request.result;
-      ["sessions", "weights", "journalEntries", "machineSettings", "scannedEquipmentMappings", "meta"].forEach((name) => {
+      ["sessions", "weights", "journalEntries", "machineSettings", "scannedEquipmentMappings", "exercisePreferences", "meta"].forEach((name) => {
         if (!db.objectStoreNames.contains(name)) {
           db.createObjectStore(name, { keyPath: "id" });
         }
@@ -594,6 +617,13 @@ function mergeScannedEquipmentMappings(existing = [], incoming = []) {
     map.set(key, { ...(map.get(key) || {}), ...item, normalizedCode: item.normalizedCode || normalizeScannedEquipmentCode(item.rawCode) });
   });
   return [...map.values()];
+}
+
+function mergeExercisePreferences(existing = {}, incoming = {}) {
+  return {
+    ...(incoming && typeof incoming === "object" ? incoming : {}),
+    ...(existing && typeof existing === "object" ? existing : {})
+  };
 }
 
 function uniqueValues(...lists) {
@@ -2448,6 +2478,18 @@ function parseNumber(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function parseOptionalNumber(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return null;
+  return parseNumber(raw);
+}
+
+function parseOptionalInteger(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return null;
+  return parseInteger(raw);
+}
+
 function parseDurationSeconds(value) {
   const raw = String(value ?? "").trim();
   if (!raw) return null;
@@ -2972,6 +3014,42 @@ function latestMachineSetting(exerciseId) {
   return machineSettingsForExercise(exerciseId)[0] || null;
 }
 
+function exercisePreferenceFor(exerciseId) {
+  const preferences = storage.exercisePreferences || {};
+  const preference = preferences[exerciseId];
+  return preference && typeof preference === "object" ? preference : {};
+}
+
+function exercisePreferenceHasData(preference) {
+  return [
+    "seatPosition",
+    "backrestPosition",
+    "gripPosition",
+    "footPosition",
+    "machinePin",
+    "machineNumber",
+    "preferredStartWeight",
+    "rangeOfMotion",
+    "personalNote",
+    "photo"
+  ].some((field) => String(preference?.[field] ?? "").trim());
+}
+
+function saveExercisePreference(exerciseId, fields) {
+  const current = exercisePreferenceFor(exerciseId);
+  const next = {
+    ...current,
+    ...fields,
+    exerciseId,
+    updatedAt: new Date().toISOString()
+  };
+  storage.exercisePreferences = {
+    ...(storage.exercisePreferences || {}),
+    [exerciseId]: next
+  };
+  return next;
+}
+
 function latestScannedEquipmentMappingForExercise(exerciseId) {
   return storage.scannedEquipmentMappings
     .filter((item) => item.exerciseId === exerciseId)
@@ -3274,19 +3352,57 @@ function activePlanTargetMuscles() {
   return ids;
 }
 
-function completedSetCoverageFactor(set) {
+function muscleLoadRoleWeight(role) {
+  return MUSCLE_LOAD_ROLE_WEIGHTS[role] ?? MUSCLE_LOAD_ROLE_WEIGHTS[String(role || "").toLowerCase()] ?? 0.4;
+}
+
+function completedSetEffectiveSets(set, completedExercise = null) {
   if (set.completed !== true) return 0;
-  if (Number(set.actualDurationSeconds) > 0 && !(Number(set.actualReps) > 0)) {
+  const exercise = exerciseById(completedExercise?.exerciseId) || completedExercise || {};
+  const trackingType = exercise.trackingType || completedExercise?.trackingType || "strength_weight_reps";
+  if (/time/.test(trackingType) && Number(set.actualDurationSeconds) > 0 && !(Number(set.actualReps) > 0)) {
     return Math.max(0.5, Math.min(1.5, Number(set.actualDurationSeconds) / 45));
   }
-  if (Number(set.actualDistance) > 0 && !(Number(set.actualReps) > 0)) {
+  if (/distance|cardio/.test(trackingType) && Number(set.actualDistance) > 0 && !(Number(set.actualReps) > 0)) {
     return Math.max(0.5, Math.min(1.5, Number(set.actualDistance) / 400));
   }
+  return 1;
+}
+
+function completedSetIntensityFactor(set, completedExercise = null) {
   const reps = Number(set.actualReps) || 10;
   const weight = Number(set.actualWeightKg) || 0;
-  const repsFactor = Math.min(1.4, Math.max(0.6, reps / 10));
-  const weightFactor = weight > 0 ? 1 + Math.min(0.08, Math.log10(weight + 1) * 0.03) : 1;
+  const addedWeight = Number(set.actualAddedWeightKg) || 0;
+  const exercise = exerciseById(completedExercise?.exerciseId) || completedExercise || {};
+  const trackingType = exercise.trackingType || completedExercise?.trackingType || "strength_weight_reps";
+  if (/time/.test(trackingType) && Number(set.actualDurationSeconds) > 0 && !(Number(set.actualReps) > 0)) {
+    return Math.max(0.75, Math.min(1.3, Number(set.actualDurationSeconds) / 45));
+  }
+  if (/distance|cardio/.test(trackingType) && Number(set.actualDistance) > 0 && !(Number(set.actualReps) > 0)) {
+    return Math.max(0.75, Math.min(1.25, Number(set.actualDistance) / 400));
+  }
+  const repsFactor = Math.min(1.25, Math.max(0.75, reps / 10));
+  const load = weight + addedWeight;
+  const weightFactor = load > 0 ? 1 + Math.min(0.12, Math.log10(load + 1) * 0.04) : 1;
   return repsFactor * weightFactor;
+}
+
+function completedSetRpeFactor(set) {
+  const hasRpe = String(set?.rpe ?? "").trim() !== "";
+  const rpe = hasRpe ? Number(set.rpe) : NaN;
+  if (Number.isFinite(rpe) && rpe > 0) return Math.max(0.75, Math.min(1.25, 0.7 + (rpe / 10) * 0.45));
+  const hasRir = String(set?.rir ?? "").trim() !== "";
+  const rir = hasRir ? Number(set.rir) : NaN;
+  if (Number.isFinite(rir) && rir >= 0) return Math.max(0.82, Math.min(1.18, 1.12 - Math.min(rir, 5) * 0.06));
+  return 1;
+}
+
+function completedSetCoverageFactor(set, completedExercise = null) {
+  if (set.completed !== true) return 0;
+  const effectiveSets = completedSetEffectiveSets(set, completedExercise);
+  const intensityFactor = completedSetIntensityFactor(set, completedExercise);
+  const rpeFactor = completedSetRpeFactor(set);
+  return effectiveSets * intensityFactor * rpeFactor;
 }
 
 function premiumRegionsForView(view) {
@@ -3383,20 +3499,28 @@ function canonicalCoverageContributionTargets(exercise, mapping) {
     if (!id || !Number.isFinite(weight) || weight <= 0) return;
     addTarget(regionTargets, id, weight, role, "region");
   };
-  addGroup(mapping?.primaryMuscle, 1, "primary");
-  (mapping?.secondaryMuscles || []).forEach((item) => addGroup(item.muscleId, Number(item.intensityWeight) || 0, "secondary"));
-  (mapping?.stabilizers || []).forEach((item) => {
-    const group = canonicalizeMuscleGroup(item.muscleId);
-    if (group === "mg_abs" || group === "mg_obliques") return;
-    addGroup(group, (Number(item.intensityWeight) || 0) * 0.25, "stabilizer");
-  });
+  const explicitRoles = (exercise?.muscleRoles || []).filter((item) => item?.muscleId);
+  if (explicitRoles.length) {
+    explicitRoles.forEach((item) => addGroup(item.muscleId, muscleLoadRoleWeight(item.role), item.role || "secondary"));
+  } else {
+    addGroup(mapping?.primaryMuscle, muscleLoadRoleWeight("primary"), "primary");
+    (mapping?.secondaryMuscles || []).forEach((item) => addGroup(item.muscleId, muscleLoadRoleWeight("secondary"), "secondary"));
+    (mapping?.stabilizers || []).forEach((item) => {
+      const group = canonicalizeMuscleGroup(item.muscleId);
+      if (group === "mg_abs" || group === "mg_obliques") return;
+      addGroup(group, muscleLoadRoleWeight("stabilizer"), "stabilizer");
+    });
+  }
   const primaryRegions = premiumSubregionsForExercise(exercise, mapping);
   primaryRegions.forEach((muscleId) => addRegion(muscleId, 1 / Math.max(1, primaryRegions.length), "primary_region"));
-  (mapping?.secondaryMuscles || []).forEach((item) => {
+  const secondaryRegionRoles = explicitRoles.length
+    ? explicitRoles.filter((item) => (item.role || "").toLowerCase() !== "primary").map((item) => ({ muscleId: item.muscleId, role: item.role || "secondary" }))
+    : (mapping?.secondaryMuscles || []).map((item) => ({ muscleId: item.muscleId, role: "secondary" }));
+  secondaryRegionRoles.forEach((item) => {
     const group = canonicalizeMuscleGroup(item.muscleId);
     if (group === "mg_abs" || group === "mg_obliques") return;
     const regions = premiumSubregionsForExercise(null, { primaryMuscle: group, secondaryMuscles: [] });
-    regions.forEach((muscleId) => addRegion(muscleId, (Number(item.intensityWeight) || 0) / Math.max(1, regions.length), "secondary_region"));
+    regions.forEach((muscleId) => addRegion(muscleId, muscleLoadRoleWeight(item.role || "secondary") / Math.max(1, regions.length), "secondary_region"));
   });
   return {
     groupTargets: [...groupTargets.values()],
@@ -3487,7 +3611,7 @@ function getCanonicalMuscleCoverage({ sessions, context = "week", referenceDate 
         warnings.push(`Mapping fehlt: ${completedExercise.exerciseId}`);
         return;
       }
-      const setPoints = (completedExercise.sets || []).reduce((sum, set) => sum + completedSetCoverageFactor(set), 0);
+      const setPoints = (completedExercise.sets || []).reduce((sum, set) => sum + completedSetCoverageFactor(set, completedExercise), 0);
       const targets = canonicalCoverageContributionTargets(exercise, mapping);
       targets.groupTargets.forEach((target) => add(groupPoints, target.muscleId, setPoints * target.weight));
       targets.regionTargets.forEach((target) => add(regionPoints, target.muscleId, setPoints * target.weight));
@@ -3541,6 +3665,7 @@ function getCanonicalMuscleCoverage({ sessions, context = "week", referenceDate 
   return {
     context,
     calculationVersion: MUSCLE_COVERAGE_CALCULATION_VERSION,
+    loadModelVersion: MUSCLE_LOAD_MODEL_VERSION,
     generatedAt: new Date().toISOString(),
     referenceDate: new Date(referenceDate).toISOString(),
     period: { start: period.start.toISOString(), end: period.end.toISOString() },
@@ -3549,6 +3674,9 @@ function getCanonicalMuscleCoverage({ sessions, context = "week", referenceDate 
     referenceLoads: {
       group: MUSCLE_GROUP_REFERENCE_LOAD,
       region: MUSCLE_REGION_REFERENCE_LOAD,
+      loadModelVersion: MUSCLE_LOAD_MODEL_VERSION,
+      roleWeights: MUSCLE_LOAD_ROLE_WEIGHTS,
+      formula: "muscleLoad = muscleWeight x effectiveSets x intensityFactor x rpeFactor",
       explanation: "100 % entspricht dem hinterlegten Wochenziel gewichteter Sätze: 8 für Muskelgruppen, 3 für Unterregionen. Werte über 100 % bedeuten Über Ziel."
     },
     muscleGroups: Object.fromEntries(groupItems.map((item) => [item.muscleId, item])),
@@ -3600,6 +3728,204 @@ function coverageForSessions(sessions) {
     isTarget: targetMuscles.has(item.muscleId),
     sourceExerciseIds: item.sourceExerciseIds
   })).sort((a, b) => Number(b.isTarget) - Number(a.isTarget) || b.percent - a.percent || a.name.localeCompare(b.name));
+}
+
+function muscleLoadCandidateScore(exercise, context = {}) {
+  const mapping = muscleMappingForExercise(exercise?.id);
+  if (!exercise || !mapping) {
+    return { candidateScore: -99, coverageGain: 0, overloadPenalty: 0, redundancyPenalty: 0, jointRiskPenalty: 10 };
+  }
+  const weekSessions = context.weekSessions || sessionsSince(7);
+  const coverage = context.coverage || getCanonicalMuscleCoverage({ sessions: weekSessions, context: "week" });
+  const coverageById = coverage.muscleGroups || {};
+  const targets = canonicalCoverageContributionTargets(exercise, mapping).groupTargets;
+  const wanted = new Set(context.targetMuscleIds || []);
+  const recentExerciseIds = context.recentExerciseIds || new Set(weekSessions.flatMap((session) => (session.completedExercises || []).map((item) => item.exerciseId)));
+  const coverageGain = targets.reduce((sum, target) => {
+    const current = coverageById[target.muscleId]?.coveragePercent || 0;
+    const wantedBonus = wanted.has(target.muscleId) ? 1.4 : 1;
+    return sum + Math.max(0, 100 - current) / 100 * target.weight * wantedBonus;
+  }, 0);
+  const overloadPenalty = targets.reduce((sum, target) => {
+    const current = coverageById[target.muscleId]?.coveragePercent || 0;
+    return sum + Math.max(0, current - 110) / 100 * target.weight;
+  }, 0);
+  const redundancyPenalty = recentExerciseIds.has(exercise.id) ? 0.45 : 0;
+  const jointRiskPenalty = lwsRank(exercise.lumbarDiscSuitability) * 0.18;
+  const candidateScore = coverageGain - overloadPenalty - redundancyPenalty - jointRiskPenalty;
+  return {
+    candidateScore,
+    coverageGain,
+    overloadPenalty,
+    redundancyPenalty,
+    jointRiskPenalty
+  };
+}
+
+function extraWorkoutTargetIds(muscleId) {
+  const region = premiumRegionByMuscleId(muscleId);
+  return [...new Set([muscleId, region?.group, canonicalizeMuscleGroup(muscleId)].filter(Boolean))];
+}
+
+function extraWorkoutTargetContribution(exercise, muscleId) {
+  const mapping = muscleMappingForExercise(exercise?.id);
+  if (!exercise || !mapping || !muscleId) return null;
+  const targetIds = extraWorkoutTargetIds(muscleId);
+  const targets = canonicalCoverageContributionTargets(exercise, mapping);
+  return [...targets.regionTargets, ...targets.groupTargets]
+    .filter((target) => targetIds.includes(target.muscleId))
+    .sort((a, b) => b.weight - a.weight)[0] || null;
+}
+
+function extraWorkoutProjectionForExercise(exercise, muscleId, setCount = 3, context = {}) {
+  const contribution = extraWorkoutTargetContribution(exercise, muscleId);
+  const items = context.weekPremiumItems || productionCoverageItemsForMode("week");
+  const groupItems = context.weekGroupItems || coverageForSessions(sessionsSince(7));
+  const current = premiumRegionByMuscleId(muscleId)
+    ? coverageItemByPremiumMuscle(items, muscleId)
+    : coverageItemByMuscle(groupItems, muscleId);
+  const referenceLoad = premiumRegionByMuscleId(muscleId) ? MUSCLE_REGION_REFERENCE_LOAD : MUSCLE_GROUP_REFERENCE_LOAD;
+  const gain = contribution ? Math.round(((Number(setCount) || 3) * contribution.weight / referenceLoad) * 100) : 0;
+  return {
+    currentPercent: current.percent || 0,
+    projectedPercent: Math.min(220, (current.percent || 0) + gain),
+    gain,
+    contribution
+  };
+}
+
+function extraWorkoutHelperLoadText(exercise, muscleId, setCount = 3, context = {}) {
+  const mapping = muscleMappingForExercise(exercise?.id);
+  if (!mapping) return [];
+  const selectedIds = new Set(extraWorkoutTargetIds(muscleId));
+  const week = context.weekGroupItems || coverageForSessions(sessionsSince(7));
+  const targets = canonicalCoverageContributionTargets(exercise, mapping).groupTargets
+    .filter((target) => !selectedIds.has(target.muscleId))
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 3);
+  return targets.map((target) => {
+    const current = coverageItemByMuscle(week, target.muscleId).percent || 0;
+    const projected = Math.round(current + (((Number(setCount) || 3) * target.weight / MUSCLE_GROUP_REFERENCE_LOAD) * 100));
+    return `${muscleName(target.muscleId)}: ${current}% -> ${projected}%`;
+  });
+}
+
+function extraWorkoutCandidates(muscleId, setCount = 3) {
+  const targetGroupIds = extraWorkoutTargetIds(muscleId).map(canonicalizeMuscleGroup);
+  const weekSessions = sessionsSince(7);
+  const coverage = getCanonicalMuscleCoverage({ sessions: weekSessions, context: "week" });
+  const context = {
+    weekSessions,
+    coverage,
+    weekPremiumItems: Object.values(coverage.premiumRegions).map((item) => ({
+      muscleId: item.muscleId,
+      name: item.label,
+      points: item.weightedSetScore,
+      rawLoad: item.rawLoad,
+      referenceLoad: item.referenceLoad,
+      level: item.level,
+      percent: item.coveragePercent,
+      colorBand: item.colorBand,
+      isTarget: item.weightedSetScore > 0,
+      group: item.group,
+      view: item.view,
+      sourceExerciseIds: item.sourceExerciseIds
+    })),
+    weekGroupItems: Object.values(coverage.muscleGroups).map((item) => ({
+      muscleId: item.muscleId,
+      name: item.label,
+      points: item.weightedSetScore,
+      rawLoad: item.rawLoad,
+      referenceLoad: item.referenceLoad,
+      level: item.level,
+      percent: item.coveragePercent,
+      colorBand: item.colorBand,
+      isTarget: activePlanTargetMuscles().has(item.muscleId),
+      sourceExerciseIds: item.sourceExerciseIds
+    })),
+    recentExerciseIds: new Set(weekSessions.flatMap((session) => (session.completedExercises || []).map((item) => item.exerciseId)))
+  };
+  return allExercises()
+    .filter((exercise) => !exercise.isArchived)
+    .map((exercise) => {
+      const projection = extraWorkoutProjectionForExercise(exercise, muscleId, setCount, context);
+      if (!projection.contribution) return null;
+      const loadScore = muscleLoadCandidateScore(exercise, { ...context, targetMuscleIds: targetGroupIds });
+      const recentPenalty = exerciseHasHistory(exercise.id) ? 0.15 : 0;
+      const helperWarnings = extraWorkoutHelperLoadText(exercise, muscleId, setCount, context);
+      const score = loadScore.candidateScore + projection.gain / 100 - recentPenalty;
+      return { exercise, score, projection, helperWarnings };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score || lwsRank(a.exercise.lumbarDiscSuitability) - lwsRank(b.exercise.lumbarDiscSuitability));
+}
+
+function defaultExtraWorkoutMuscleId() {
+  const items = productionCoverageItemsForMode("week");
+  const visible = items.filter((item) => item.percent < 85).sort((a, b) => a.percent - b.percent);
+  return visible[0]?.muscleId || state.selectedMuscleId || premiumRegionsForView(state.coverageView || "front")[0]?.muscleId || "";
+}
+
+function activateExtraWorkoutMuscle(muscleId) {
+  state.selectedMuscleId = muscleId;
+  if (state.extraWorkout?.active) state.extraWorkout = { ...state.extraWorkout, muscleId, exerciseId: "" };
+}
+
+function startGuidedExtraWorkout() {
+  const muscleId = state.selectedMuscleId || defaultExtraWorkoutMuscleId();
+  state.coverageMode = "week";
+  state.extraWorkout = {
+    active: true,
+    muscleId,
+    exerciseId: "",
+    setCount: Math.max(1, Number(state.extraWorkout?.setCount) || 3)
+  };
+  render();
+}
+
+function cancelGuidedExtraWorkout() {
+  state.extraWorkout = { active: false, muscleId: "", exerciseId: "", setCount: 3 };
+  render();
+}
+
+function startExtraWorkoutFromSelection() {
+  const extra = state.extraWorkout || {};
+  const muscleId = extra.muscleId || state.selectedMuscleId || defaultExtraWorkoutMuscleId();
+  const candidates = extraWorkoutCandidates(muscleId, extra.setCount);
+  const exercise = exerciseById(extra.exerciseId) || candidates[0]?.exercise || null;
+  if (!exercise) {
+    alert("Keine passende Übung für diesen Muskel gefunden.");
+    return;
+  }
+  const setCount = Math.max(1, Math.min(12, Number(extra.setCount) || 3));
+  const planned = {
+    exerciseId: exercise.id,
+    sets: setCount,
+    reps: exercise.defaultRepRange || trackingSummaryForExercise(exercise),
+    restSeconds: exercise.defaultRestSeconds || 90,
+    priority: "extra",
+    sortOrder: 1,
+    sourceDayId: ""
+  };
+  resetWorkoutExercisePicker();
+  state.showAlternatives = false;
+  state.restTimer.remaining = 0;
+  state.restTimer.running = false;
+  state.activeWorkout = {
+    sessionType: "extra_workout",
+    planId: "",
+    planName: "Zusatztraining",
+    dayId: "",
+    dayName: `Zusatztraining: ${muscleName(muscleId)}`,
+    startedAt: new Date().toISOString(),
+    warmups: [],
+    sessionNote: `Zusatztraining aus der MuscleMap: ${muscleName(muscleId)}`,
+    index: 0,
+    entries: [workoutEntryFromPlanned(planned)]
+  };
+  state.extraWorkout = { active: false, muscleId: "", exerciseId: "", setCount: 3 };
+  persistWorkoutDraft();
+  navigateTo("training", { resetSelection: false });
 }
 
 function canonicalCoverageDiagnosticsForMode(mode = state.coverageMode || "week") {
@@ -3735,19 +4061,48 @@ function allSurfacesCoverageComparison(mode = state.coverageMode || "week", musc
 
 function coverageCoachHints(items) {
   return items.filter((item) => item.isTarget).map((item) => {
-    if (item.percent > 120) return `${item.name}: Diese Muskelgruppe wurde diese Woche bereits überdurchschnittlich belastet.`;
+    if (item.percent > 125) return `${item.name}: Überlastungsrisiko, keine unnötige Zusatzbelastung.`;
     if (item.percent === 0) return `${item.name}: Noch nicht trainiert.`;
-    if (item.percent < 70 && sessionsSince(7).length >= 2) return `${item.name}: Diese Muskelgruppe wurde diese Woche wenig trainiert.`;
+    if (item.percent < 85 && sessionsSince(7).length >= 2) return `${item.name}: Diese Muskelgruppe liegt unter dem Wochenziel.`;
     return null;
   }).filter(Boolean).slice(0, 3);
 }
 
 function coverageStatus(percent) {
   if (percent <= 0) return "not_trained";
-  if (percent < 40) return "low";
-  if (percent < 70) return "moderate";
-  if (percent <= 120) return "target";
-  return "over_target";
+  if (percent < 85) return "undertrained";
+  if (percent < 95) return "slightly_under";
+  if (percent <= 110) return "target";
+  if (percent <= 125) return "elevated";
+  return "overload_risk";
+}
+
+function legacyCoverageStatusFallback(status) {
+  return {
+    undertrained: "low",
+    slightly_under: "moderate",
+    elevated: "over_target",
+    overload_risk: "over_target"
+  }[status] || status;
+}
+
+function coverageStatusText(status) {
+  return {
+    not_trained: "Diese Muskelgruppe wurde diese Woche noch nicht trainiert.",
+    undertrained: "Diese Muskelgruppe ist noch unter dem Wochenziel.",
+    slightly_under: "Diese Muskelgruppe liegt leicht unter dem Zielbereich.",
+    target: "Diese Muskelgruppe liegt im Zielbereich.",
+    elevated: "Diese Muskelgruppe ist erhöht belastet. Weiter im Blick behalten.",
+    overload_risk: "Diese Muskelgruppe hat ein Überlastungsrisiko. Zusatzvolumen vermeiden."
+  }[status] || "Coverage wird ausgewertet.";
+}
+
+function coverageStatusBand(percent) {
+  if (percent < 85) return "untertrainiert";
+  if (percent < 95) return "leicht unter Ziel";
+  if (percent <= 110) return "Zielbereich";
+  if (percent <= 125) return "erhöht";
+  return "Überlastungsrisiko";
 }
 
 function coverageRowTone(percent) {
@@ -3763,13 +4118,9 @@ function coverageRowTone(percent) {
 
 function coverageCoachTextFor(percent) {
   const status = coverageStatus(percent);
-  return state.muscleCoverageCoachTexts?.texts?.[status] || {
-    not_trained: "Diese Muskelgruppe wurde diese Woche noch nicht trainiert.",
-    low: "Diese Muskelgruppe ist diese Woche noch deutlich unter dem Ziel.",
-    moderate: "Diese Muskelgruppe wurde bereits teilweise belastet.",
-    target: "Diese Muskelgruppe liegt im Zielbereich.",
-    over_target: "Diese Muskelgruppe wurde diese Woche bereits deutlich über dem Ziel belastet."
-  }[status];
+  return state.muscleCoverageCoachTexts?.texts?.[status]
+    || state.muscleCoverageCoachTexts?.texts?.[legacyCoverageStatusFallback(status)]
+    || coverageStatusText(status);
 }
 
 function coverageColorFor(percent) {
@@ -3835,11 +4186,11 @@ function coverageItemByPremiumMuscle(items, muscleId) {
 }
 
 function muscleContributionWeight(mapping, muscleId) {
-  if (mapping?.primaryMuscle === muscleId) return 1;
+  if (mapping?.primaryMuscle === muscleId) return muscleLoadRoleWeight("primary");
   const secondary = (mapping?.secondaryMuscles || []).find((item) => item.muscleId === muscleId);
-  if (secondary) return Number(secondary.intensityWeight) || 0;
+  if (secondary) return muscleLoadRoleWeight("secondary");
   const stabilizer = (mapping?.stabilizers || []).find((item) => item.muscleId === muscleId);
-  if (stabilizer) return (Number(stabilizer.intensityWeight) || 0) * 0.5;
+  if (stabilizer) return muscleLoadRoleWeight("stabilizer");
   return 0;
 }
 
@@ -3847,16 +4198,18 @@ function coverageContributors(muscleId, sessions) {
   const contributors = new Map();
   sessions.forEach((session) => {
     (session.completedExercises || []).forEach((completedExercise) => {
+      const exercise = exerciseById(completedExercise.exerciseId);
       const mapping = muscleMappingForExercise(completedExercise.exerciseId);
-      const weight = muscleContributionWeight(mapping, muscleId);
-      if (!weight) return;
-      const points = (completedExercise.sets || []).reduce((sum, set) => sum + completedSetCoverageFactor(set), 0) * weight;
+      const targets = canonicalCoverageContributionTargets(exercise, mapping);
+      const target = targets.groupTargets.find((item) => item.muscleId === muscleId);
+      if (!target) return;
+      const points = (completedExercise.sets || []).reduce((sum, set) => sum + completedSetCoverageFactor(set, completedExercise), 0) * target.weight;
       if (points <= 0) return;
       const existing = contributors.get(completedExercise.exerciseId) || {
         exerciseId: completedExercise.exerciseId,
-        name: completedExercise.exerciseNameSnapshot || exerciseById(completedExercise.exerciseId)?.displayName || completedExercise.exerciseId,
+        name: completedExercise.exerciseNameSnapshot || exercise?.displayName || completedExercise.exerciseId,
         points: 0,
-        role: mapping.primaryMuscle === muscleId ? "Zielmuskel" : "Hilfsmuskel"
+        role: target.role === "primary" ? "Zielmuskel" : target.role === "stabilizer" ? "Stabilisator" : "Hilfsmuskel"
       };
       existing.points += points;
       contributors.set(completedExercise.exerciseId, existing);
@@ -3912,13 +4265,15 @@ function coverageContributorsForPremiumMuscle(muscleId, sessions) {
     (session.completedExercises || []).forEach((completedExercise) => {
       const exercise = exerciseById(completedExercise.exerciseId);
       const mapping = muscleMappingForExercise(completedExercise.exerciseId);
-      if (!premiumSubregionsForExercise(exercise, mapping).includes(muscleId)) return;
-      const points = (completedExercise.sets || []).reduce((sum, set) => sum + completedSetCoverageFactor(set), 0);
+      const targets = canonicalCoverageContributionTargets(exercise, mapping);
+      const target = targets.regionTargets.find((item) => item.muscleId === muscleId);
+      if (!target) return;
+      const points = (completedExercise.sets || []).reduce((sum, set) => sum + completedSetCoverageFactor(set, completedExercise), 0) * target.weight;
       const existing = contributors.get(completedExercise.exerciseId) || {
         exerciseId: completedExercise.exerciseId,
         name: completedExercise.exerciseNameSnapshot || exercise?.displayName || completedExercise.exerciseId,
         points: 0,
-        role: "Zielbereich"
+        role: target.role === "primary_region" ? "Zielbereich" : "Hilfsbereich"
       };
       existing.points += points;
       contributors.set(completedExercise.exerciseId, existing);
@@ -4318,10 +4673,12 @@ function smartWorkoutCandidateForSlot(slot, usedIds, profile) {
     .filter((exercise) => exerciseMatchesSlot(exercise, slot))
     .filter((exercise) => !(profile.lumbarDiscHistory && exercise.lumbarDiscSuitability === "avoidInitially"))
     .map((exercise) => {
+      const loadScore = muscleLoadCandidateScore(exercise, { targetMuscleIds: [slot.primaryMuscle].filter(Boolean) });
       const score = personalExerciseQualityScore(exercise)
         + (preferredIds.has(exercise.id) ? 2 : 0)
         + (exerciseHasHistory(exercise.id) ? 0.8 : 0)
-        - lwsRank(exercise.lumbarDiscSuitability) * 0.2;
+        - lwsRank(exercise.lumbarDiscSuitability) * 0.2
+        + loadScore.candidateScore * 2;
       return { exercise, score };
     })
     .sort((a, b) => b.score - a.score)[0]?.exercise || null;
@@ -4785,15 +5142,18 @@ function alternativeCandidatesForExercise(exercise) {
   const profile = currentPersonalProfile();
   const avoidIds = new Set(profile.avoidExerciseIds || []);
   const preferredIds = new Set(profile.preferredExerciseIds || []);
+  const sourceTargets = new Set([...(exercise.primaryMuscleGroups || []), muscleMappingForExercise(exercise.id)?.primaryMuscle].filter(Boolean));
+  const targetMuscleIds = [...sourceTargets].map(canonicalizeMuscleGroup);
   const byId = new Map();
 
   if (rule) {
     rule.alternatives.forEach((item) => {
       const candidate = exerciseById(item.exerciseId);
       if (!candidate || avoidIds.has(candidate.id)) return;
+      const loadScore = muscleLoadCandidateScore(candidate, { targetMuscleIds });
       byId.set(candidate.id, {
         exercise: candidate,
-        score: alternativeCandidateScore(exercise, candidate, item.matchScore, preferredIds.has(candidate.id)),
+        score: alternativeCandidateScore(exercise, candidate, item.matchScore, preferredIds.has(candidate.id)) + loadScore.candidateScore,
         note: item.note || item.reason || "",
         explanation: alternativeExplanation(exercise, candidate),
         reason: rule.reason || "",
@@ -4805,9 +5165,10 @@ function alternativeCandidatesForExercise(exercise) {
   exercise.alternatives.map(exerciseById).filter(Boolean).forEach((candidate) => {
     if (avoidIds.has(candidate.id)) return;
     if (byId.has(candidate.id)) return;
+    const loadScore = muscleLoadCandidateScore(candidate, { targetMuscleIds });
     byId.set(candidate.id, {
       exercise: candidate,
-      score: alternativeCandidateScore(exercise, candidate, 0, preferredIds.has(candidate.id)),
+      score: alternativeCandidateScore(exercise, candidate, 0, preferredIds.has(candidate.id)) + loadScore.candidateScore,
       note: "",
       explanation: alternativeExplanation(exercise, candidate),
       reason: "",
@@ -4815,7 +5176,6 @@ function alternativeCandidatesForExercise(exercise) {
     });
   });
 
-  const sourceTargets = new Set([...(exercise.primaryMuscleGroups || []), muscleMappingForExercise(exercise.id)?.primaryMuscle].filter(Boolean));
   allExercises()
     .filter((candidate) => candidate.id !== exercise.id && !candidate.isArchived && !avoidIds.has(candidate.id) && !byId.has(candidate.id))
     .filter((candidate) => {
@@ -4824,13 +5184,18 @@ function alternativeCandidatesForExercise(exercise) {
       const sameTrackingFamily = trackingConfigForExercise(candidate).fields.some((field) => trackingConfigForExercise(exercise).fields.includes(field));
       return sharedTarget && sameTrackingFamily;
     })
-    .slice(0, 16)
+    .map((candidate) => {
+      const loadScore = muscleLoadCandidateScore(candidate, { targetMuscleIds });
+      return { candidate, loadScore };
+    })
+    .sort((a, b) => b.loadScore.candidateScore - a.loadScore.candidateScore)
+    .slice(0, 24)
     .forEach((candidate) => {
-      byId.set(candidate.id, {
-        exercise: candidate,
-        score: alternativeCandidateScore(exercise, candidate, 0.55, preferredIds.has(candidate.id)),
+      byId.set(candidate.candidate.id, {
+        exercise: candidate.candidate,
+        score: alternativeCandidateScore(exercise, candidate.candidate, 0.55, preferredIds.has(candidate.candidate.id)) + candidate.loadScore.candidateScore,
         note: "gleiche Zielregion aus erweiterter Bibliothek",
-        explanation: alternativeExplanation(exercise, candidate),
+        explanation: alternativeExplanation(exercise, candidate.candidate),
         reason: "generischer Muskel- und Tracking-Match",
         source: "library"
       });
@@ -5158,6 +5523,10 @@ function renderMuscleMapScreen() {
       <div class="coverage-switch compact">
         ${[["front", "Vorne"], ["back", "Hinten"]].map(([id, label]) => `<button class="${view === id ? "active" : ""}" data-coverage-view="${id}">${label}</button>`).join("")}
       </div>
+      <div class="button-grid">
+        <button class="secondary" data-start-extra-workout>Zusatztraining starten</button>
+      </div>
+      ${renderGuidedExtraWorkoutPanel()}
       <article class="muscle-map-stage">
         ${productionMuscleMapEnabled() ? renderProductionMuscleMap(view, mode, items, visibleItems) : regions.length ? renderPremiumMuscleSvg(view, items, regions) : `<p class="muted">Muskelkarte konnte nicht geladen werden.</p>`}
       </article>
@@ -5204,6 +5573,68 @@ function premiumTrendCoverageItems() {
       trendDelta: last - previous
     };
   }).sort((a, b) => b.percent - a.percent || a.name.localeCompare(b.name));
+}
+
+function renderGuidedExtraWorkoutPanel() {
+  const extra = state.extraWorkout || {};
+  if (!extra.active) return "";
+  const muscleId = extra.muscleId || state.selectedMuscleId || defaultExtraWorkoutMuscleId();
+  const setCount = Math.max(1, Math.min(12, Number(extra.setCount) || 3));
+  const item = premiumRegionByMuscleId(muscleId)
+    ? coverageItemByPremiumMuscle(productionCoverageItemsForMode("week"), muscleId)
+    : coverageItemByMuscle(coverageForSessions(sessionsSince(7)), muscleId);
+  const candidates = extraWorkoutCandidates(muscleId, setCount);
+  const selectedExerciseId = extra.exerciseId || candidates[0]?.exercise.id || "";
+  const selected = candidates.find((candidate) => candidate.exercise.id === selectedExerciseId) || candidates[0] || null;
+  return `
+    <article class="card stack extra-workout-card">
+      <div class="row">
+        <div class="grow">
+          <h3>Zusatztraining</h3>
+          <p class="muted">${htmlesc(item.name)}: ${item.percent || 0}% · ${htmlesc(coverageStatusBand(item.percent || 0))}</p>
+        </div>
+        <button class="secondary compact-button" data-cancel-extra-workout>Schliessen</button>
+      </div>
+      <div class="form-grid">
+        <label>Sätze
+          <input class="input" type="number" min="1" max="12" inputmode="numeric" value="${setCount}" data-extra-workout-sets>
+        </label>
+        <label>Andere Übung auswählen
+          <select class="input" data-extra-workout-exercise>
+            ${candidates.length ? candidates.map((candidate) => `<option value="${htmlesc(candidate.exercise.id)}" ${candidate.exercise.id === selectedExerciseId ? "selected" : ""}>${htmlesc(candidate.exercise.displayName)}</option>`).join("") : `<option value="">Keine passende Übung</option>`}
+          </select>
+        </label>
+      </div>
+      ${selected ? `
+        <div class="history-row">
+          <div>
+            <strong>${htmlesc(selected.exercise.displayName)}</strong>
+            <p class="muted">${htmlesc(item.name)}: ${selected.projection.currentPercent}% -> ${selected.projection.projectedPercent}% bei ${setCount} Sätzen</p>
+            ${selected.helperWarnings.length ? `<p class="quiet">Hilfsmuskeln: ${htmlesc(selected.helperWarnings.join(" · "))}</p>` : ""}
+            <p class="quiet">${htmlesc((selected.exercise.equipment || []).join(" · "))} · ${htmlesc(trackingSummaryForExercise(selected.exercise))}</p>
+          </div>
+          <div class="badge-stack">
+            ${lwsBadge(selected.exercise.lumbarDiscSuitability)}
+            <span class="badge blue">${Math.round(selected.score * 100)}%</span>
+          </div>
+        </div>
+        <div class="workout-overview-list">
+          ${candidates.slice(0, 5).map((candidate) => `
+            <button class="list-button" data-extra-select-exercise="${htmlesc(candidate.exercise.id)}">
+              <article class="card row compact-training-day ${candidate.exercise.id === selectedExerciseId ? "active" : ""}">
+                <div class="grow">
+                  <h3>${htmlesc(candidate.exercise.displayName)}</h3>
+                  <p class="muted">${htmlesc(item.name)}: ${candidate.projection.currentPercent}% -> ${candidate.projection.projectedPercent}%</p>
+                </div>
+                ${lwsBadge(candidate.exercise.lumbarDiscSuitability)}
+              </article>
+            </button>
+          `).join("")}
+        </div>
+        <button class="primary" data-start-extra-workout-session>Zusatztraining in Trainingsmaske starten</button>
+      ` : `<p class="muted">Wähle einen anderen Muskel oder ergänze die Bibliothek mit einer passenden Übung.</p>`}
+    </article>
+  `;
 }
 
 function productionMuscleMapPayload(view, mode, items, visibleItems) {
@@ -7577,12 +8008,12 @@ function coverageForPlannedEntries(entries = []) {
     points.set(muscleId, (points.get(muscleId) || 0) + value);
   };
   entries.forEach((entry) => {
+    const exercise = exerciseById(entry.exerciseId);
     const mapping = muscleMappingForExercise(entry.exerciseId);
     if (!mapping) return;
     const setPoints = Number(entry.plannedSets || entry.sets?.length || entry.sets || 0);
-    add(mapping.primaryMuscle, setPoints);
-    (mapping.secondaryMuscles || []).forEach((item) => add(item.muscleId, setPoints * (Number(item.intensityWeight) || 0)));
-    (mapping.stabilizers || []).forEach((item) => add(item.muscleId, setPoints * (Number(item.intensityWeight) || 0) * 0.5));
+    const targets = canonicalCoverageContributionTargets(exercise, mapping);
+    targets.groupTargets.forEach((target) => add(target.muscleId, setPoints * target.weight));
   });
   targetMuscles.forEach((muscleId) => {
     if (!points.has(muscleId)) points.set(muscleId, 0);
@@ -8616,6 +9047,8 @@ function workoutEntryFromPlanned(planned) {
   const exercise = exerciseById(planned.exerciseId);
   const setting = latestMachineSetting(planned.exerciseId);
   const scannedMapping = latestScannedEquipmentMappingForExercise(planned.exerciseId);
+  const preference = exercisePreferenceFor(planned.exerciseId);
+  const preferredStartWeight = String(preference.preferredStartWeight || "").trim();
   return {
     exerciseId: planned.exerciseId,
     trackingType: exercise?.trackingType || "strength_weight_reps",
@@ -8625,18 +9058,22 @@ function workoutEntryFromPlanned(planned) {
     priority: planned.priority,
     sortOrder: planned.sortOrder,
     sourceDayId: planned.sourceDayId || "",
-    seatPosition: scannedMapping?.seatPosition || setting?.seatPosition || "",
-    gripPosition: scannedMapping?.gripPosition || setting?.gripPosition || setting?.handlePosition || "",
+    seatPosition: scannedMapping?.seatPosition || preference.seatPosition || setting?.seatPosition || "",
+    backrestPosition: preference.backrestPosition || setting?.backrestPosition || "",
+    gripPosition: scannedMapping?.gripPosition || preference.gripPosition || setting?.gripPosition || setting?.handlePosition || "",
     gripWidth: scannedMapping?.gripWidth || setting?.gripWidth || "",
+    footPosition: preference.footPosition || "",
     attachment: scannedMapping?.attachment || setting?.attachment || "",
+    machinePin: preference.machinePin || "",
     machineLabel: scannedMapping?.machineLabel || "",
-    machineSerial: scannedMapping?.machineSerial || "",
-    exerciseNote: "",
+    machineSerial: scannedMapping?.machineSerial || preference.machineNumber || "",
+    rangeOfMotion: preference.rangeOfMotion || "",
+    exerciseNote: preference.personalNote || "",
     sets: Array.from({ length: Math.max(planned.sets, 1) }, (_, index) => {
       const previous = last?.exercise?.sets?.find((set) => set.setNumber === index + 1);
       return {
         setNumber: index + 1,
-        weightText: trackingFieldsForExercise(exercise).includes("weightText") && previous?.actualWeightKg ? String(previous.actualWeightKg).replace(".", ",") : "",
+        weightText: trackingFieldsForExercise(exercise).includes("weightText") ? (preferredStartWeight || (previous?.actualWeightKg ? String(previous.actualWeightKg).replace(".", ",") : "")) : "",
         repsText: trackingFieldsForExercise(exercise).includes("repsText") && previous?.actualReps ? String(previous.actualReps) : "",
         rirText: "",
         durationSecondsText: previous?.actualDurationSeconds ? String(previous.actualDurationSeconds) : "",
@@ -8939,6 +9376,7 @@ function renderWorkout() {
         <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} <span class="badge blue">${plannedRepTextForExercise(entry, exercise)}</span> <span class="badge">${entry.restSeconds} s Pause</span></div>
         ${machineSetting ? `<p class="quiet">Setup: Sitz ${htmlesc(machineSetting.seatPosition || "-")} · Griff ${htmlesc(machineSetting.handlePosition || "-")} · Rücken ${htmlesc(machineSetting.backrestPosition || "-")}</p>` : ""}
         ${scannedMapping ? `<p class="quiet">Life Fitness: ${htmlesc(scannedMapping.machineLabel || scannedMapping.machineSerial || "Zuordnung gespeichert")} - Sitz ${htmlesc(entry.seatPosition || "-")} - Griff ${htmlesc(entry.gripPosition || "-")}</p>` : ""}
+        ${renderExercisePreferenceSummary(exercise.id)}
         ${exerciseIsCritical(exercise) ? `<p class="warning compact-warning">${lwsWarning(exercise)}</p>` : ""}
         <div class="button-grid">
           <button class="secondary" data-workout-exercise-detail="${htmlesc(exercise.id)}">Details ansehen</button>
@@ -9013,6 +9451,27 @@ function renderWorkoutWarmupSummary(workout) {
   `;
 }
 
+function renderExercisePreferenceSummary(exerciseId) {
+  const preference = exercisePreferenceFor(exerciseId);
+  if (!exercisePreferenceHasData(preference)) return "";
+  const items = [
+    ["Sitz", preference.seatPosition],
+    ["Lehne", preference.backrestPosition],
+    ["Griff", preference.gripPosition],
+    ["Fuß", preference.footPosition],
+    ["Pin", preference.machinePin],
+    ["Gerät", preference.machineNumber],
+    ["Startgewicht", preference.preferredStartWeight ? kg(parseOptionalNumber(preference.preferredStartWeight)) : ""],
+    ["ROM", preference.rangeOfMotion],
+    ["Notiz", preference.personalNote]
+  ].filter(([, value]) => String(value || "").trim());
+  return `
+    <div class="compact-info-list">
+      ${items.slice(0, 6).map(([label, value]) => `<span><strong>${htmlesc(label)}:</strong> ${htmlesc(value)}</span>`).join("")}
+    </div>
+  `;
+}
+
 function renderWorkoutScannerPanel() {
   return `
     <article class="card stack equipment-scanner-card">
@@ -9046,11 +9505,15 @@ function renderExerciseSetupFields(entry) {
       <summary><span>Sitz, Griff und Notizen</span><span class="badge blue">Setup</span></summary>
       <div class="form-grid">
         <label>Sitzposition<input class="input" value="${htmlesc(entry.seatPosition || "")}" placeholder="z.B. Stufe 4" data-entry-field="seatPosition"></label>
+        <label>Rückenlehne<input class="input" value="${htmlesc(entry.backrestPosition || "")}" placeholder="z.B. Stufe 2" data-entry-field="backrestPosition"></label>
         <label>Griff<input class="input" value="${htmlesc(entry.gripPosition || "")}" placeholder="neutral, proniert, oberer Griff" data-entry-field="gripPosition"></label>
         <label>Griffbreite<input class="input" value="${htmlesc(entry.gripWidth || "")}" placeholder="eng, mittel, breit" data-entry-field="gripWidth"></label>
+        <label>Fußposition<input class="input" value="${htmlesc(entry.footPosition || "")}" placeholder="z.B. hoch, mittig, eng" data-entry-field="footPosition"></label>
         <label>Aufsatz<input class="input" value="${htmlesc(entry.attachment || "")}" placeholder="Seil, V-Griff, Stange" data-entry-field="attachment"></label>
+        <label>Geräte-Pin<input class="input" value="${htmlesc(entry.machinePin || "")}" placeholder="z.B. Pin 3" data-entry-field="machinePin"></label>
         <label>Gerät<input class="input" value="${htmlesc(entry.machineLabel || "")}" placeholder="z.B. Brustpresse Fenster" data-entry-field="machineLabel"></label>
         <label>Gerätenummer<input class="input" value="${htmlesc(entry.machineSerial || "")}" placeholder="z.B. 12" data-entry-field="machineSerial"></label>
+        <label>ROM<input class="input" value="${htmlesc(entry.rangeOfMotion || "")}" placeholder="z.B. nicht ganz strecken" data-entry-field="rangeOfMotion"></label>
       </div>
       <textarea class="input area" placeholder="Notiz zu Übung oder Training ..." data-entry-field="exerciseNote">${htmlesc(entry.exerciseNote || "")}</textarea>
       <textarea class="input area" placeholder="Notiz zum Training ..." data-workout-field="sessionNote">${htmlesc(state.activeWorkout?.sessionNote || "")}</textarea>
@@ -9549,7 +10012,7 @@ function jumpToWorkoutExercise(index) {
 
 function rememberExerciseSetup(entry) {
   if (!entry) return;
-  if (!entry.seatPosition && !entry.gripPosition && !entry.gripWidth && !entry.attachment) return;
+  if (!entry.seatPosition && !entry.backrestPosition && !entry.gripPosition && !entry.gripWidth && !entry.footPosition && !entry.attachment && !entry.machinePin && !entry.machineSerial) return;
   const current = latestMachineSetting(entry.exerciseId);
   const setting = {
     id: current?.id || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
@@ -9559,10 +10022,12 @@ function rememberExerciseSetup(entry) {
     handlePosition: entry.gripPosition || "",
     gripPosition: entry.gripPosition || "",
     gripWidth: entry.gripWidth || "",
+    footPosition: entry.footPosition || "",
     attachment: entry.attachment || "",
+    machinePin: entry.machinePin || "",
     machineLabel: entry.machineLabel || "",
     machineSerial: entry.machineSerial || "",
-    backrestPosition: current?.backrestPosition || "",
+    backrestPosition: entry.backrestPosition || current?.backrestPosition || "",
     note: current?.note || "",
     updatedAt: new Date().toISOString()
   };
@@ -9598,7 +10063,8 @@ function finishOrNext() {
   const completedAt = new Date().toISOString();
   const session = {
     id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-    planId: workout.planId || workout.planName,
+    sessionType: workout.sessionType || "planned_workout",
+    planId: workout.sessionType === "extra_workout" ? "" : (workout.planId || workout.planName),
     planName: workout.planName,
     planNameSnapshot: workout.planName,
     dayId: workout.dayId || "",
@@ -9624,9 +10090,14 @@ function finishOrNext() {
         completedSets,
         sortOrder: entry.sortOrder,
         seatPosition: entry.seatPosition || "",
+        backrestPosition: entry.backrestPosition || "",
         gripPosition: entry.gripPosition || "",
         gripWidth: entry.gripWidth || "",
+        footPosition: entry.footPosition || "",
         attachment: entry.attachment || "",
+        machinePin: entry.machinePin || "",
+        machineSerial: entry.machineSerial || "",
+        rangeOfMotion: entry.rangeOfMotion || "",
         exerciseNote: entry.exerciseNote || "",
         sets: recordedSets.map((set) => ({
           setNumber: set.setNumber,
@@ -9655,6 +10126,242 @@ function finishOrNext() {
   navigateTo("coach", { resetSelection: false });
 }
 
+function cloneSessionForEdit(session) {
+  return JSON.parse(JSON.stringify(session || {}));
+}
+
+function sessionEditFieldsForExercise(completedExercise) {
+  const exercise = exerciseById(completedExercise?.exerciseId) || { trackingType: completedExercise?.trackingType || "strength_weight_reps" };
+  const fields = trackingFieldsForExercise(exercise);
+  const mapped = [];
+  if (fields.includes("weightText")) mapped.push("actualWeightKg");
+  if (fields.includes("addedWeightText")) mapped.push("actualAddedWeightKg");
+  if (fields.includes("repsText")) mapped.push("actualReps");
+  if (fields.includes("durationSecondsText")) mapped.push("actualDurationSeconds");
+  if (fields.includes("distanceText")) mapped.push("actualDistance");
+  if (fields.includes("sideText")) mapped.push("side");
+  mapped.push("rir", "rpe");
+  return [...new Set(mapped)];
+}
+
+function sessionEditFieldLabel(field) {
+  return {
+    actualWeightKg: "kg",
+    actualAddedWeightKg: "+ kg",
+    actualReps: "Wdh.",
+    actualDurationSeconds: "Sek.",
+    actualDistance: "m/km",
+    side: "Seite",
+    rir: "RIR",
+    rpe: "RPE"
+  }[field] || field;
+}
+
+function sessionEditSetHasData(set) {
+  const hasRir = String(set?.rir ?? "").trim() !== "";
+  const hasRpe = String(set?.rpe ?? "").trim() !== "";
+  return Boolean(
+    Number(set.actualWeightKg) > 0 ||
+    Number(set.actualAddedWeightKg) > 0 ||
+    Number(set.actualReps) > 0 ||
+    Number(set.actualDurationSeconds) > 0 ||
+    Number(set.actualDistance) > 0 ||
+    hasRir ||
+    hasRpe ||
+    String(set.side || "").trim()
+  );
+}
+
+function blankCompletedSessionSet(setNumber = 1) {
+  return {
+    setNumber,
+    actualWeightKg: null,
+    plannedReps: "",
+    actualReps: null,
+    actualDurationSeconds: null,
+    actualDistance: null,
+    actualAddedWeightKg: null,
+    side: "",
+    rir: null,
+    rpe: null,
+    completed: true
+  };
+}
+
+function openSessionEditor(sessionId) {
+  const session = sessionById(sessionId);
+  if (!session) return;
+  state.sessionEditId = session.id;
+  state.sessionEditDraft = cloneSessionForEdit(session);
+  render();
+}
+
+function cancelSessionEditor() {
+  state.sessionEditId = "";
+  state.sessionEditDraft = null;
+  render();
+}
+
+function captureSessionEditDraftFromDom() {
+  const draft = state.sessionEditDraft;
+  if (!draft) return null;
+  const sessionNote = document.querySelector("[data-session-edit-note]");
+  if (sessionNote) draft.sessionNote = sessionNote.value;
+  document.querySelectorAll("[data-session-edit-exercise-note]").forEach((input) => {
+    const exercise = draft.completedExercises?.[Number(input.dataset.sessionEditExerciseNote)];
+    if (exercise) exercise.exerciseNote = input.value;
+  });
+  document.querySelectorAll("[data-session-edit-set-field]").forEach((input) => {
+    const exercise = draft.completedExercises?.[Number(input.dataset.sessionEditExerciseIndex)];
+    const set = exercise?.sets?.[Number(input.dataset.sessionEditSetIndex)];
+    if (!set) return;
+    const field = input.dataset.sessionEditSetField;
+    if (field === "completed") set.completed = input.checked;
+    else set[field] = input.value;
+  });
+  return draft;
+}
+
+function addSessionEditSet(exerciseIndex) {
+  const draft = captureSessionEditDraftFromDom();
+  const exercise = draft?.completedExercises?.[Number(exerciseIndex)];
+  if (!exercise) return;
+  exercise.sets = [...(exercise.sets || []), blankCompletedSessionSet((exercise.sets || []).length + 1)];
+  state.sessionEditDraft = draft;
+  render();
+}
+
+function deleteSessionEditSet(exerciseIndex, setIndex) {
+  const draft = captureSessionEditDraftFromDom();
+  const exercise = draft?.completedExercises?.[Number(exerciseIndex)];
+  const index = Number(setIndex);
+  if (!exercise || !Number.isInteger(index) || index < 0 || index >= (exercise.sets || []).length) return;
+  const set = exercise.sets[index];
+  if (sessionEditSetHasData(set) && !confirm("Diesen Satz aus dem gespeicherten Training löschen?")) return;
+  exercise.sets.splice(index, 1);
+  exercise.sets.forEach((item, itemIndex) => { item.setNumber = itemIndex + 1; });
+  state.sessionEditDraft = draft;
+  render();
+}
+
+function normalizeEditedSession(draft, original) {
+  const editedAt = new Date().toISOString();
+  return {
+    ...draft,
+    id: original.id,
+    planId: original.planId || "",
+    planName: original.planName || draft.planName || "",
+    planNameSnapshot: original.planNameSnapshot || original.planName || draft.planNameSnapshot || "",
+    dayId: original.dayId || "",
+    dayName: original.dayName || draft.dayName || "",
+    dayNameSnapshot: original.dayNameSnapshot || original.dayName || draft.dayNameSnapshot || "",
+    startedAt: original.startedAt,
+    trainingStartIntentId: original.trainingStartIntentId || "",
+    editedAt,
+    editCount: (Number(original.editCount) || 0) + 1,
+    completedExercises: (draft.completedExercises || []).map((completedExercise, exerciseIndex) => {
+      const exercise = exerciseById(completedExercise.exerciseId);
+      const sets = (completedExercise.sets || []).map((set, setIndex) => ({
+        setNumber: setIndex + 1,
+        actualWeightKg: parseOptionalNumber(set.actualWeightKg),
+        plannedReps: completedExercise.plannedReps || set.plannedReps || "",
+        actualReps: parseOptionalInteger(set.actualReps),
+        actualDurationSeconds: parseDurationSeconds(set.actualDurationSeconds),
+        actualDistance: parseOptionalNumber(set.actualDistance),
+        actualAddedWeightKg: parseOptionalNumber(set.actualAddedWeightKg),
+        side: String(set.side || "").trim(),
+        rir: parseOptionalInteger(set.rir),
+        rpe: parseOptionalNumber(set.rpe),
+        completed: set.completed !== false && sessionEditSetHasData(set)
+      })).filter(sessionEditSetHasData);
+      return {
+        ...completedExercise,
+        exerciseNameSnapshot: completedExercise.exerciseNameSnapshot || exercise?.displayName || completedExercise.exerciseId,
+        trackingType: completedExercise.trackingType || exercise?.trackingType || "strength_weight_reps",
+        plannedSets: sets.length,
+        completedSets: sets.filter((set) => set.completed === true).length,
+        sortOrder: Number(completedExercise.sortOrder) || exerciseIndex + 1,
+        exerciseNote: completedExercise.exerciseNote || "",
+        sets
+      };
+    }).filter((completedExercise) => (completedExercise.sets || []).length)
+  };
+}
+
+function saveSessionEditor() {
+  const draft = captureSessionEditDraftFromDom();
+  const original = sessionById(state.sessionEditId);
+  if (!draft || !original) return;
+  const edited = normalizeEditedSession(draft, original);
+  storage.sessions = storage.sessions.map((session) => session.id === original.id ? edited : session);
+  state.sessionEditId = "";
+  state.sessionEditDraft = null;
+  state.selectedSessionId = edited.id;
+  render();
+}
+
+function renderSessionEditSetField(field, set, exerciseIndex, setIndex) {
+  const common = `data-session-edit-set-field="${field}" data-session-edit-exercise-index="${exerciseIndex}" data-session-edit-set-index="${setIndex}"`;
+  if (field === "side") {
+    return `
+      <select class="input" ${common}>
+        <option value="" ${!set.side ? "selected" : ""}>Seite</option>
+        <option value="left" ${set.side === "left" ? "selected" : ""}>links</option>
+        <option value="right" ${set.side === "right" ? "selected" : ""}>rechts</option>
+      </select>
+    `;
+  }
+  const numeric = ["actualWeightKg", "actualAddedWeightKg", "actualReps", "actualDurationSeconds", "actualDistance", "rir", "rpe"].includes(field);
+  return `<input class="input" ${numeric ? `inputmode="decimal"` : ""} placeholder="${htmlesc(sessionEditFieldLabel(field))}" value="${htmlesc(set[field] ?? "")}" ${common}>`;
+}
+
+function renderSessionEditor(id) {
+  const original = sessionById(id);
+  const draft = state.sessionEditDraft || cloneSessionForEdit(original);
+  if (!original || !draft) return "";
+  state.sessionEditDraft = draft;
+  return `
+    <section class="screen stack">
+      <button class="secondary" data-cancel-session-edit>Zurück</button>
+      <header>
+        <h1 class="title">Training bearbeiten</h1>
+        <p class="subtitle">${htmlesc(original.dayName)} · ${dateText(original.startedAt)}</p>
+      </header>
+      <article class="card stack">
+        <h3>Session-Notiz</h3>
+        <textarea class="input area" data-session-edit-note>${htmlesc(draft.sessionNote || "")}</textarea>
+        <p class="quiet">Session-ID, Plan-ID, Tag-ID und Startzeit bleiben unverändert.</p>
+      </article>
+      ${(draft.completedExercises || []).sort((a, b) => a.sortOrder - b.sortOrder).map((completedExercise, exerciseIndex) => {
+        const exercise = exerciseById(completedExercise.exerciseId);
+        const fields = sessionEditFieldsForExercise(completedExercise);
+        return `
+          <article class="card stack">
+            <div class="row">
+              <h3 class="grow">${htmlesc(completedExercise.exerciseNameSnapshot || exercise?.displayName || completedExercise.exerciseId)}</h3>
+              <span class="badge blue">${htmlesc(trackingSummaryForExercise(exercise))}</span>
+            </div>
+            ${(completedExercise.sets || []).map((set, setIndex) => `
+              <div class="set-row ${set.completed ? "done" : ""}">
+                <strong>${setIndex + 1}</strong>
+                ${fields.map((field) => renderSessionEditSetField(field, set, exerciseIndex, setIndex)).join("")}
+                <label class="check-label"><input type="checkbox" ${set.completed !== false ? "checked" : ""} data-session-edit-set-field="completed" data-session-edit-exercise-index="${exerciseIndex}" data-session-edit-set-index="${setIndex}"> ok</label>
+                <button class="secondary compact-button" data-session-edit-delete-set="${setIndex}" data-session-edit-exercise="${exerciseIndex}">Löschen</button>
+              </div>
+            `).join("")}
+            <button class="secondary" data-session-edit-add-set="${exerciseIndex}">+ Satz hinzufügen</button>
+            <textarea class="input area" placeholder="Notiz zur Übung" data-session-edit-exercise-note="${exerciseIndex}">${htmlesc(completedExercise.exerciseNote || "")}</textarea>
+          </article>
+        `;
+      }).join("")}
+      <div class="actions">
+        <button class="primary" data-save-session-edit>Änderungen speichern</button>
+        <button class="secondary" data-cancel-session-edit>Abbrechen</button>
+      </div>
+    </section>
+  `;
+}
+
 function renderSessionDetail(id) {
   const session = sessionById(id);
   if (!session) {
@@ -9665,6 +10372,7 @@ function renderSessionDetail(id) {
       </section>
     `;
   }
+  if (state.sessionEditId === id) return renderSessionEditor(id);
   const improvements = sessionImprovements(session);
   return `
     <section class="screen stack">
@@ -9673,6 +10381,7 @@ function renderSessionDetail(id) {
         <h1 class="title">Auswertung</h1>
         <p class="subtitle">${htmlesc(session.dayName)} · ${dateText(session.startedAt)}</p>
       </header>
+      <button class="secondary" data-edit-session="${htmlesc(session.id)}">Bearbeiten</button>
       <div class="grid">
         ${metric(String(sessionDurationMinutes(session)), "Minuten")}
         ${metric(String(session.completedExercises.length), "Übungen")}
@@ -9699,7 +10408,12 @@ function renderSessionDetail(id) {
         <article class="card stack">
           <h3>${htmlesc(exercise.exerciseNameSnapshot)}</h3>
           <ul class="small-list">
-            ${exercise.sets.map((set) => `<li>Satz ${set.setNumber}: ${kg(set.actualWeightKg)} x ${set.actualReps || "-"}${set.rir !== null && set.rir !== undefined ? ` · RIR ${set.rir}` : ""}</li>`).join("")}
+            ${exercise.sets.map((set) => {
+              const parts = [setPerformanceText(set, exerciseById(exercise.exerciseId))];
+              if (set.rir !== null && set.rir !== undefined) parts.push(`RIR ${set.rir}`);
+              if (set.rpe !== null && set.rpe !== undefined) parts.push(`RPE ${set.rpe}`);
+              return `<li>Satz ${set.setNumber}: ${htmlesc(parts.filter(Boolean).join(" · "))}</li>`;
+            }).join("")}
           </ul>
           <p class="green">Volumen: ${Math.round(totalVolume(exercise))} kg</p>
           ${previousExerciseBefore(exercise.exerciseId, session.id) ? `<p class="muted">Vorher: ${Math.round(totalVolume(previousExerciseBefore(exercise.exerciseId, session.id).exercise))} kg</p>` : `<p class="muted">Erste gespeicherte Ausführung.</p>`}
@@ -10302,6 +11016,44 @@ function renderExerciseDetailPremium(exercise, last, history, alternatives) {
   `;
 }
 
+function renderExercisePreferenceCard(exercise) {
+  const preference = exercisePreferenceFor(exercise.id);
+  return `
+    <article class="card stack exercise-preference-card">
+      <div class="row">
+        <div class="grow">
+          <h3>Persönliches Übungsprofil</h3>
+          <p class="muted">${htmlesc(trackingSummaryForExercise(exercise))}</p>
+        </div>
+        ${preference.updatedAt ? `<span class="badge blue">${dateText(preference.updatedAt)}</span>` : ""}
+      </div>
+      <div class="form-grid">
+        <label>Sitzposition<input class="input" value="${htmlesc(preference.seatPosition || "")}" placeholder="z.B. Stufe 4" data-exercise-pref-field="seatPosition" data-exercise-pref-exercise="${htmlesc(exercise.id)}"></label>
+        <label>Rückenlehne<input class="input" value="${htmlesc(preference.backrestPosition || "")}" placeholder="z.B. Stufe 2" data-exercise-pref-field="backrestPosition" data-exercise-pref-exercise="${htmlesc(exercise.id)}"></label>
+        <label>Griffposition<input class="input" value="${htmlesc(preference.gripPosition || "")}" placeholder="neutral, breit, eng" data-exercise-pref-field="gripPosition" data-exercise-pref-exercise="${htmlesc(exercise.id)}"></label>
+        <label>Fußposition<input class="input" value="${htmlesc(preference.footPosition || "")}" placeholder="hoch, mittig, tief" data-exercise-pref-field="footPosition" data-exercise-pref-exercise="${htmlesc(exercise.id)}"></label>
+        <label>Geräte-Pin<input class="input" value="${htmlesc(preference.machinePin || "")}" placeholder="z.B. Pin 3" data-exercise-pref-field="machinePin" data-exercise-pref-exercise="${htmlesc(exercise.id)}"></label>
+        <label>Gerätenummer<input class="input" value="${htmlesc(preference.machineNumber || "")}" placeholder="z.B. Matrix 12" data-exercise-pref-field="machineNumber" data-exercise-pref-exercise="${htmlesc(exercise.id)}"></label>
+        <label>Startgewicht<input class="input" inputmode="decimal" value="${htmlesc(preference.preferredStartWeight || "")}" placeholder="z.B. 45" data-exercise-pref-field="preferredStartWeight" data-exercise-pref-exercise="${htmlesc(exercise.id)}"></label>
+        <label>Bewegungsumfang<input class="input" value="${htmlesc(preference.rangeOfMotion || "")}" placeholder="z.B. kontrolliert bis Schulterhöhe" data-exercise-pref-field="rangeOfMotion" data-exercise-pref-exercise="${htmlesc(exercise.id)}"></label>
+      </div>
+      <textarea class="input area" placeholder="Persönliche Notiz" data-exercise-pref-field="personalNote" data-exercise-pref-exercise="${htmlesc(exercise.id)}">${htmlesc(preference.personalNote || "")}</textarea>
+      <input class="input" placeholder="Foto-URL oder Dateiname optional" value="${htmlesc(preference.photo || "")}" data-exercise-pref-field="photo" data-exercise-pref-exercise="${htmlesc(exercise.id)}">
+      <button class="secondary" data-save-exercise-preference="${htmlesc(exercise.id)}">Übungsprofil speichern</button>
+    </article>
+  `;
+}
+
+function saveExercisePreferenceFromDetail(exerciseId) {
+  const fields = {};
+  document.querySelectorAll("[data-exercise-pref-field]").forEach((input) => {
+    if (input.dataset.exercisePrefExercise !== exerciseId) return;
+    fields[input.dataset.exercisePrefField] = input.value.trim();
+  });
+  saveExercisePreference(exerciseId, fields);
+  render();
+}
+
 function renderExerciseDetail(id) {
   const exercise = exerciseById(id);
   const last = lastCompletedExercise(id);
@@ -10322,6 +11074,7 @@ function renderExerciseDetail(id) {
         ${exercise.isCustom ? `<button class="danger" data-delete-custom-exercise="${htmlesc(exercise.id)}">Eigene Übung entfernen</button>` : ""}
       </article>
       ${renderExerciseDetailPremium(exercise, last, history, alternatives)}
+      ${renderExercisePreferenceCard(exercise)}
       ${renderMuscleMap(exercise)}
       <article class="card stack">
         <p>${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].join(" · "))}</p>
@@ -11177,6 +11930,7 @@ function createBackup() {
     scannedEquipmentMappings: storage.scannedEquipmentMappings,
     customPlans: storage.customPlans,
     customExercises: storage.customExercises,
+    exercisePreferences: storage.exercisePreferences,
     customPlanBuilderDraft: storage.customPlanBuilderDraft,
     personalProfile: storage.personalProfile,
     coachFeedback: storage.coachFeedback,
@@ -11289,6 +12043,7 @@ function importBackupFile(file) {
       storage.scannedEquipmentMappings = mergeScannedEquipmentMappings(storage.scannedEquipmentMappings, Array.isArray(backup.scannedEquipmentMappings) ? backup.scannedEquipmentMappings : []);
       storage.customPlans = mergeById(storage.customPlans, Array.isArray(backup.customPlans) ? backup.customPlans : []);
       storage.customExercises = mergeById(storage.customExercises, Array.isArray(backup.customExercises) ? backup.customExercises : []);
+      storage.exercisePreferences = mergeExercisePreferences(storage.exercisePreferences, backup.exercisePreferences);
       if (!storage.customPlanBuilderDraft && backup.customPlanBuilderDraft && typeof backup.customPlanBuilderDraft === "object") storage.customPlanBuilderDraft = backup.customPlanBuilderDraft;
       storage.coachFeedback = mergeById(storage.coachFeedback, Array.isArray(backup.coachFeedback) ? backup.coachFeedback : []);
       storage.coachPlanProposals = mergeById(storage.coachPlanProposals, Array.isArray(backup.coachPlanProposals) ? backup.coachPlanProposals : []);
@@ -11496,7 +12251,7 @@ function bindEvents() {
 
   document.querySelectorAll("[data-select-coverage-muscle]").forEach((button) => {
     button.addEventListener("click", () => {
-      state.selectedMuscleId = button.dataset.selectCoverageMuscle;
+      activateExtraWorkoutMuscle(button.dataset.selectCoverageMuscle);
       render();
     });
   });
@@ -11506,7 +12261,7 @@ function bindEvents() {
     button.addEventListener("click", () => {
       const gesture = muscleTapGestures.get(button);
       if (gesture?.moved) return;
-      state.selectedMuscleId = button.dataset.openCoverageMuscle;
+      activateExtraWorkoutMuscle(button.dataset.openCoverageMuscle);
       render();
     });
     button.addEventListener("pointerdown", (event) => {
@@ -11522,16 +12277,37 @@ function bindEvents() {
     button.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
-      state.selectedMuscleId = button.dataset.openCoverageMuscle;
+      activateExtraWorkoutMuscle(button.dataset.openCoverageMuscle);
       render();
     });
   });
 
   document.querySelector("[data-production-muscle-map]")?.addEventListener("dcoach-production-muscle-select", (event) => {
     if (!event.detail?.dcoachMuscleId) return;
-    state.selectedMuscleId = event.detail.dcoachMuscleId;
+    activateExtraWorkoutMuscle(event.detail.dcoachMuscleId);
     render();
   });
+
+  document.querySelector("[data-start-extra-workout]")?.addEventListener("click", startGuidedExtraWorkout);
+  document.querySelector("[data-cancel-extra-workout]")?.addEventListener("click", cancelGuidedExtraWorkout);
+  document.querySelector("[data-extra-workout-sets]")?.addEventListener("input", (event) => {
+    state.extraWorkout = { ...(state.extraWorkout || {}), setCount: event.target.value };
+  });
+  document.querySelector("[data-extra-workout-sets]")?.addEventListener("change", (event) => {
+    state.extraWorkout = { ...(state.extraWorkout || {}), setCount: event.target.value };
+    render();
+  });
+  document.querySelector("[data-extra-workout-exercise]")?.addEventListener("change", (event) => {
+    state.extraWorkout = { ...(state.extraWorkout || {}), exerciseId: event.target.value };
+    render();
+  });
+  document.querySelectorAll("[data-extra-select-exercise]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.extraWorkout = { ...(state.extraWorkout || {}), exerciseId: button.dataset.extraSelectExercise };
+      render();
+    });
+  });
+  document.querySelector("[data-start-extra-workout-session]")?.addEventListener("click", startExtraWorkoutFromSelection);
 
   document.querySelector("[data-resume-workout]")?.addEventListener("click", resumeWorkoutDraft);
 
@@ -11858,13 +12634,31 @@ function bindEvents() {
 
   document.querySelector("[data-back-dashboard]")?.addEventListener("click", () => {
     state.selectedSessionId = null;
+    state.sessionEditId = "";
+    state.sessionEditDraft = null;
     navigateTo("dashboard", { resetSelection: false });
+  });
+
+  document.querySelector("[data-edit-session]")?.addEventListener("click", (event) => {
+    openSessionEditor(event.currentTarget.dataset.editSession);
+  });
+  document.querySelectorAll("[data-cancel-session-edit]").forEach((button) => {
+    button.addEventListener("click", cancelSessionEditor);
+  });
+  document.querySelector("[data-save-session-edit]")?.addEventListener("click", saveSessionEditor);
+  document.querySelectorAll("[data-session-edit-add-set]").forEach((button) => {
+    button.addEventListener("click", () => addSessionEditSet(button.dataset.sessionEditAddSet));
+  });
+  document.querySelectorAll("[data-session-edit-delete-set]").forEach((button) => {
+    button.addEventListener("click", () => deleteSessionEditSet(button.dataset.sessionEditExercise, button.dataset.sessionEditDeleteSet));
   });
 
   document.querySelector("[data-delete-session]")?.addEventListener("click", (event) => {
     if (!confirm("Training wirklich löschen?")) return;
     storage.sessions = storage.sessions.filter((session) => session.id !== event.currentTarget.dataset.deleteSession);
     state.selectedSessionId = null;
+    state.sessionEditId = "";
+    state.sessionEditDraft = null;
     navigateTo("dashboard", { resetSelection: false });
   });
 
@@ -11954,6 +12748,10 @@ function bindEvents() {
     });
     storage.machineSettings = [...storage.machineSettings.filter((item) => item.id !== setting.id), setting];
     render();
+  });
+
+  document.querySelector("[data-save-exercise-preference]")?.addEventListener("click", (event) => {
+    saveExercisePreferenceFromDetail(event.currentTarget.dataset.saveExercisePreference);
   });
 
   document.querySelector("[data-start-equipment-scan]")?.addEventListener("click", () => {
