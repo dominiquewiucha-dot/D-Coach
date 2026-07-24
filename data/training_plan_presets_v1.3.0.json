@@ -129,6 +129,141 @@
           ]
         }
       ]
+    },
+    {
+      "id": "plan_upper_lower_bild_12_15_v2",
+      "name": "Oberkörper / Unterkörper - Bildplan 12-15",
+      "description": "Vollständiger Oberkörper-/Unterkörperplan nach der ursprünglichen Vorlage. Vier Trainingstage pro Woche: Oberkörper, Unterkörper, Pause, Oberkörper, Unterkörper.",
+      "goal": "Hypertrophie - Oberkörper / Unterkörper",
+      "maxDurationMinutes": 75,
+      "days": [
+        {
+          "id": "day_upper_lower_v2_upper",
+          "name": "Oberkörper",
+          "maxDurationMinutes": 75,
+          "exercises": [
+            {
+              "exerciseId": "ex_pec_deck",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 75,
+              "priority": "required",
+              "sortOrder": 1
+            },
+            {
+              "exerciseId": "ex_lat_pulldown",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 90,
+              "priority": "required",
+              "sortOrder": 2
+            },
+            {
+              "exerciseId": "ex_incline_chest_press_machine",
+              "sets": 2,
+              "reps": "12-15",
+              "restSeconds": 90,
+              "priority": "required",
+              "sortOrder": 3
+            },
+            {
+              "exerciseId": "ex_machine_row",
+              "sets": 2,
+              "reps": "12-15",
+              "restSeconds": 90,
+              "priority": "required",
+              "sortOrder": 4
+            },
+            {
+              "exerciseId": "ex_lateral_raise",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 60,
+              "priority": "important",
+              "sortOrder": 5
+            },
+            {
+              "exerciseId": "ex_reverse_pec_deck",
+              "sets": 4,
+              "reps": "12-15",
+              "restSeconds": 75,
+              "priority": "important",
+              "sortOrder": 6
+            },
+            {
+              "exerciseId": "ex_cable_biceps_curl",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 60,
+              "priority": "important",
+              "sortOrder": 7
+            },
+            {
+              "exerciseId": "ex_triceps_pushdown",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 60,
+              "priority": "important",
+              "sortOrder": 8
+            }
+          ]
+        },
+        {
+          "id": "day_upper_lower_v2_lower",
+          "name": "Unterkörper",
+          "maxDurationMinutes": 65,
+          "exercises": [
+            {
+              "exerciseId": "ex_lying_leg_curl",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 75,
+              "priority": "required",
+              "sortOrder": 1
+            },
+            {
+              "exerciseId": "ex_leg_extension",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 75,
+              "priority": "required",
+              "sortOrder": 2
+            },
+            {
+              "exerciseId": "ex_hack_squat",
+              "sets": 2,
+              "reps": "12-15",
+              "restSeconds": 120,
+              "priority": "required",
+              "sortOrder": 3
+            },
+            {
+              "exerciseId": "ex_seated_leg_curl",
+              "sets": 2,
+              "reps": "12-15",
+              "restSeconds": 75,
+              "priority": "required",
+              "sortOrder": 4
+            },
+            {
+              "exerciseId": "ex_adductor_machine",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 75,
+              "priority": "important",
+              "sortOrder": 5
+            },
+            {
+              "exerciseId": "ex_calf_raise_machine",
+              "sets": 3,
+              "reps": "12-15",
+              "restSeconds": 75,
+              "priority": "important",
+              "sortOrder": 6
+            }
+          ]
+        }
+      ]
     }
   ],
   "defaults": {
