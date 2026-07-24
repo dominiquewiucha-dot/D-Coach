@@ -10,9 +10,9 @@ const plus = readJson("data/exercises_plus_v1.4.0.json");
 const core = readJson("data/exercise_core_v2.1.0.json");
 const expansion = readJson("data/exercise_library_expansion_v2.0.0.json");
 
-assert(app.includes('const APP_VERSION = "pwa-v95";'), "app version must be pwa-v95");
-assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v95";'), "cache version must be pwa-v95");
-assert(html.includes("app.js?v=pwa-v95"), "index app cache buster must be pwa-v95");
+assert(app.includes('const APP_VERSION = "pwa-v96";'), "app version must be pwa-v96");
+assert(sw.includes('const CACHE_NAME = "dcoach-pwa-v96";'), "cache version must be pwa-v96");
+assert(html.includes("app.js?v=pwa-v96"), "index app cache buster must be pwa-v96");
 assert(sw.includes("./data/exercise_library_expansion_v2.0.0.json"), "service worker must cache V2 exercise library");
 
 [

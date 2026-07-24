@@ -1,0 +1,317 @@
+{
+  "type": "dcoach_exercise_image_manifest",
+  "version": "1.0.1",
+  "filenameConvention": "<exerciseId>__<readable_slug>.png",
+  "lookupPriority": [
+    "exact exerciseId in manifest",
+    "exact aliasExerciseId in manifest",
+    "no image"
+  ],
+  "rules": {
+    "neverMatchByDisplayNameAtRuntime": true,
+    "neverGuessExerciseId": true,
+    "hideInfoButtonWhenNoImageMapping": true,
+    "offlineRequired": true
+  },
+  "entries": [
+    {
+      "exerciseId": "ex_chest_press_machine",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/01_Brust/ex_chest_press_machine__brustpresse_maschine.png",
+      "sourceFilename": "brustpresse_maschine_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_incline_chest_press_machine",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/01_Brust/ex_incline_chest_press_machine__schraegbank_brustpresse_maschine.png",
+      "sourceFilename": "schrägbank_brustpresse_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_pec_deck",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/01_Brust/ex_pec_deck__butterfly_pec_deck.png",
+      "sourceFilename": "butterfly_übung_pec_deck_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_v2_incline_dumbbell_fly",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/01_Brust/ex_v2_incline_dumbbell_fly__schraegbank_kurzhantel_fly.png",
+      "sourceFilename": "schrägbank_kurzhantel_fly_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_lat_pulldown",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/02_Ruecken/ex_lat_pulldown__latzug_zur_brust.png",
+      "sourceFilename": "latzug_zur_brust_übungshinweise.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_seated_row",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/02_Ruecken/ex_seated_row__rudern_sitzend_am_kabel.png",
+      "sourceFilename": "rudern_sitzend_am_kabel_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_chest_supported_row",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/02_Ruecken/ex_chest_supported_row__45_grad_incline_dumbbell_row.png",
+      "sourceFilename": "45_incline_dumbbell_row_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_face_pull",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/02_Ruecken/ex_face_pull__face_pull.png",
+      "sourceFilename": "face_pull_übung_mit_muskelübersicht.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_machine_row",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/02_Ruecken/ex_machine_row__mid_row_maschine.png",
+      "sourceFilename": "mid_row_maschine_übungshinweise.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_lateral_raise_dumbbell",
+      "aliasExerciseIds": [
+        "ex_lateral_raise"
+      ],
+      "imagePath": "./assets/exercises/03_Schultern/ex_lateral_raise_dumbbell__seitheben_mit_kurzhanteln.png",
+      "sourceFilename": "seitheben_mit_kurzhanteln_übungsguide.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_dumbbell_shoulder_press",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/03_Schultern/ex_dumbbell_shoulder_press__schulterdruecken_mit_kurzhanteln.png",
+      "sourceFilename": "schulterdrücken_mit_kurzhanteln_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_reverse_pec_deck",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/03_Schultern/ex_reverse_pec_deck__butterfly_reverse.png",
+      "sourceFilename": "butterfly_reverse_hintere_schultern_stärken.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_cable_reverse_fly",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/03_Schultern/ex_cable_reverse_fly__cross_cable_rear_delt_flyes.png",
+      "sourceFilename": "cross_cable_rear_delt_flyes_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_dumbbell_biceps_curl",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/04_Arme/ex_dumbbell_biceps_curl__bizeps_curls_mit_kurzhanteln.png",
+      "sourceFilename": "bizeps_curls_mit_kurzhanteln_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_triceps_pushdown",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/04_Arme/ex_triceps_pushdown__trizepsdruecken_am_kabel.png",
+      "sourceFilename": "trizepsdrücken_am_kabel_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_hammer_curl_dumbbell",
+      "aliasExerciseIds": [
+        "ex_hammer_curl"
+      ],
+      "imagePath": "./assets/exercises/04_Arme/ex_hammer_curl_dumbbell__hammer_curls.png",
+      "sourceFilename": "hammer_curls_übungsguide.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_overhead_triceps_extension_cable_rope",
+      "aliasExerciseIds": [
+        "ex_overhead_triceps_extension",
+        "ex_overhead_triceps_rope"
+      ],
+      "imagePath": "./assets/exercises/04_Arme/ex_overhead_triceps_extension_cable_rope__overhead_trizepsdruecken.png",
+      "sourceFilename": "überkopf_trizepsdrücken_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_leg_press",
+      "aliasExerciseIds": [
+        "ex_leg_press_45"
+      ],
+      "imagePath": "./assets/exercises/05_Beine/ex_leg_press__beinpresse_45_grad.png",
+      "sourceFilename": "beinpresse_45_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_leg_extension",
+      "aliasExerciseIds": [
+        "ex_leg_extension_machine"
+      ],
+      "imagePath": "./assets/exercises/05_Beine/ex_leg_extension__beinstrecker_maschine.png",
+      "sourceFilename": "beinstrecker_maschine_übungshinweise.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_lying_leg_curl",
+      "aliasExerciseIds": [
+        "ex_lying_leg_curl_machine"
+      ],
+      "imagePath": "./assets/exercises/05_Beine/ex_lying_leg_curl__beinbeuger_liegend.png",
+      "sourceFilename": "beinbeuger_liegend_übungsausführung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_seated_leg_curl",
+      "aliasExerciseIds": [
+        "ex_seated_leg_curl_machine"
+      ],
+      "imagePath": "./assets/exercises/05_Beine/ex_seated_leg_curl__beinbeuger_sitzend.png",
+      "sourceFilename": "beinbeuger_sitzend_übungshinweise.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_hack_squat",
+      "aliasExerciseIds": [
+        "ex_hack_squat_machine"
+      ],
+      "imagePath": "./assets/exercises/05_Beine/ex_hack_squat__hack_squat.png",
+      "sourceFilename": "hack_squat_übungsgrafik.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_adductor_machine",
+      "aliasExerciseIds": [
+        "ex_hip_adduction_machine"
+      ],
+      "imagePath": "./assets/exercises/05_Beine/ex_adductor_machine__adduktorenmaschine.png",
+      "sourceFilename": "adduktorenmaschine_anleitung_zur_beinstärkung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_calf_raise_machine",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/05_Beine/ex_calf_raise_machine__wadenheben_maschine.png",
+      "sourceFilename": "wadenheben_maschine_anleitung_und_technik.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_bulgarian_split_squat",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/05_Beine/ex_bulgarian_split_squat__bulgarian_split_squat.png",
+      "sourceFilename": "bulgarian_split_squat_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_glute_bridge",
+      "aliasExerciseIds": [
+        "ex_glute_bridge_bodyweight"
+      ],
+      "imagePath": "./assets/exercises/05_Beine/ex_glute_bridge__glute_bridge.png",
+      "sourceFilename": "glute_bridge_übung_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_v2_lunge_dumbbell",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/05_Beine/ex_v2_lunge_dumbbell__ausfallschritte_mit_kurzhanteln.png",
+      "sourceFilename": "ausfallsschritte_mit_kurzhanteln_anleitung.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_pallof_press",
+      "aliasExerciseIds": [
+        "ex_pallof_press_cable"
+      ],
+      "imagePath": "./assets/exercises/06_Core/ex_pallof_press__pallof_press.png",
+      "sourceFilename": "pallof_press_übung_infografik.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_plank",
+      "aliasExerciseIds": [
+        "ex_plank_forearm"
+      ],
+      "imagePath": "./assets/exercises/06_Core/ex_plank__plank.png",
+      "sourceFilename": "plank_übung_anleitung_und_anatomie.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    },
+    {
+      "exerciseId": "ex_ab_crunch_machine",
+      "aliasExerciseIds": [],
+      "imagePath": "./assets/exercises/06_Core/ex_ab_crunch_machine__crunch_maschine.png",
+      "sourceFilename": "crunchmaschine_übungsanleitung_übersicht.png",
+      "idVerifiedAgainstKnownDCoachCatalog": true,
+      "integrationRule": "exact_exercise_id_or_alias_only",
+      "resolutionInstruction": null
+    }
+  ],
+  "blockerResolution": {
+    "newExerciseId": "ex_v2_incline_dumbbell_fly",
+    "resolvedExistingExerciseId": "ex_v2_lunge_dumbbell"
+  }
+}

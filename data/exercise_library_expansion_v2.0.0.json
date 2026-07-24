@@ -13,6 +13,97 @@
   ],
   "exercises": [
     {
+      "id": "ex_v2_incline_dumbbell_fly",
+      "displayName": "Schrägbank Kurzhantel Fly",
+      "englishName": "Incline Dumbbell Fly",
+      "aliases": [
+        "Schrägbank Fly",
+        "Schrägbank Fliegende",
+        "Incline Dumbbell Fly",
+        "Incline DB Fly",
+        "Schraegbank Kurzhantel Fly",
+        "Schragbank Kurzhantel Fly",
+        "Schraegbank Fly",
+        "Schragbank Fly",
+        "Schraegbank Fliegende",
+        "Schragbank Fliegende"
+      ],
+      "category": "Chest",
+      "split": "Push",
+      "equipmentId": "eq_dumbbell",
+      "equipment": [
+        "Kurzhanteln",
+        "Schrägbank"
+      ],
+      "primaryMuscleGroups": [
+        "Obere Brust"
+      ],
+      "secondaryMuscleGroups": [
+        "Mittlere Brust",
+        "Vordere Schulter"
+      ],
+      "muscleRoles": [
+        {
+          "muscleId": "mg_chest_upper",
+          "role": "primary",
+          "intensityWeight": 1
+        },
+        {
+          "muscleId": "mg_chest_middle",
+          "role": "secondary",
+          "intensityWeight": 0.55
+        },
+        {
+          "muscleId": "mg_front_delts",
+          "role": "secondary",
+          "intensityWeight": 0.3
+        }
+      ],
+      "trackingType": "strength_weight_reps",
+      "unilateral": false,
+      "movementPattern": "horizontal_adduction",
+      "pushPullLegs": "Push",
+      "splitTags": [
+        "push",
+        "upper"
+      ],
+      "difficulty": "mittel",
+      "lumbarDiscSuitability": "suitable",
+      "spineLoadLevel": "low",
+      "defaultSets": 3,
+      "defaultRepRange": "10-15",
+      "defaultRestSeconds": 90,
+      "techniqueNotes": "Bank etwa 30-45 Grad einstellen. Schulterblaetter stabil an der Bank halten, Ellbogen leicht gebeugt lassen und die Hanteln kontrolliert im Bogen oeffnen und schliessen. Keine uebermaessige Dehnung hinter der Koerperlinie und kein Schwung.",
+      "commonMistakes": [
+        "zu tiefe Dehnung hinter der Koerperlinie",
+        "Schulterblaetter loesen sich von der Bank",
+        "Ellbogen komplett strecken",
+        "mit Schwung arbeiten"
+      ],
+      "tags": [
+        "push",
+        "upper",
+        "chest",
+        "horizontal_adduction",
+        "strength_weight_reps",
+        "kurzhanteln",
+        "schraegbank",
+        "schraegbank fly",
+        "schraegbank fliegende",
+        "incline dumbbell fly",
+        "incline db fly",
+        "schragbank",
+        "schragbank fly",
+        "schragbank fliegende",
+        "schraegbank kurzhantel fly",
+        "schragbank kurzhantel fly"
+      ],
+      "alternatives": [
+        "ex_v2_chest_press_dumbbell"
+      ],
+      "source": "D-Coach Exercise Library Expansion v2.0.0"
+    },
+    {
       "id": "ex_plank",
       "displayName": "Plank",
       "englishName": "Plank",

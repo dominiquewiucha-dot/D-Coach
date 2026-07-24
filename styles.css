@@ -860,6 +860,74 @@ select:focus-visible {
   background: var(--input);
 }
 
+.workout-exercise-title-row {
+  align-items: flex-start;
+}
+
+.exercise-info-button,
+.exercise-info-close {
+  flex: 0 0 auto;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  background: var(--input);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.exercise-info-button {
+  color: white;
+  background: var(--selected);
+  border-color: var(--blue);
+}
+
+.exercise-info-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  display: grid;
+  align-items: end;
+  padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+  background: rgba(0,0,0,.72);
+}
+
+.exercise-info-sheet {
+  width: min(100%, 720px);
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px);
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  background: var(--card);
+  box-shadow: 0 24px 80px rgba(0,0,0,.55);
+}
+
+.exercise-info-image-frame {
+  min-height: min(70dvh, 620px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: #070b12;
+}
+
+.exercise-info-image-frame img {
+  display: block;
+  width: 100%;
+  max-height: min(70dvh, 620px);
+  object-fit: contain;
+}
+
 .compare-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -167,6 +167,9 @@ const state = {
   premiumNavigationSpec: null,
   dashboardPrioritySpec: null,
   trackingInformationArchitecture: null,
+  exerciseImageManifest: null,
+  exerciseImageLookup: new Map(),
+  exerciseInfoOverlay: null,
   tab: "dashboard",
   activeWorkout: null,
   exerciseSearch: "",
@@ -223,8 +226,8 @@ const state = {
   route: null
 };
 
-const APP_VERSION = "pwa-v95";
-const APP_CACHE_VERSION = "dcoach-pwa-v95";
+const APP_VERSION = "pwa-v96";
+const APP_CACHE_VERSION = "dcoach-pwa-v96";
 const BACKUP_FORMAT_VERSION = "6.18.0";
 const STORAGE_SCHEMA_VERSION = "6.7.0";
 const OUTCOME_EVALUATOR_VERSION = "v6.17.0";
@@ -1242,7 +1245,8 @@ async function boot() {
     premiumNavigationSpec,
     dashboardPrioritySpec,
     trackingInformationArchitecture,
-    exerciseLibraryExpansionV2
+    exerciseLibraryExpansionV2,
+    exerciseImageManifest
   ] = await Promise.all([
     fetchOptionalJson("./data/muscles.json"),
     fetchOptionalJson("./data/exercise_muscle_mapping.json"),
@@ -1423,7 +1427,8 @@ async function boot() {
     fetchOptionalJson("./data/premium_navigation_v6.14.0.json"),
     fetchOptionalJson("./data/dashboard_priority_v6.14.0.json"),
     fetchOptionalJson("./data/tracking_information_architecture_v6.14.0.json"),
-    fetchOptionalJson("./data/exercise_library_expansion_v2.0.0.json")
+    fetchOptionalJson("./data/exercise_library_expansion_v2.0.0.json"),
+    fetchOptionalJson("./data/exercise_image_manifest_v1.0.1.json")
   ]);
   state.muscles = muscles;
   state.exerciseMuscleMap = muscleMapLarge || exerciseMuscleMap;
@@ -1592,6 +1597,8 @@ async function boot() {
   state.premiumNavigationSpec = premiumNavigationSpec;
   state.dashboardPrioritySpec = dashboardPrioritySpec;
   state.trackingInformationArchitecture = trackingInformationArchitecture;
+  state.exerciseImageManifest = exerciseImageManifest;
+  state.exerciseImageLookup = buildExerciseImageLookup(exerciseImageManifest);
   mergeKnowledgeBaseData({ knowledgeExercises, knowledgeMuscleMap, trainingPlanPresets });
   mergeKnowledgeBaseData({ knowledgeExercises: exercisesPlus, knowledgeMuscleMap: muscleMappingPlus, trainingPlanPresets: null });
   mergeKnowledgeBaseData({ knowledgeExercises: exerciseCoreV21, knowledgeMuscleMap: muscleMappingV21, trainingPlanPresets: null });
@@ -2191,6 +2198,82 @@ function availablePlans() {
 
 function allExercises() {
   return [...state.seed.exercises, ...storage.customExercises];
+}
+
+function buildExerciseImageLookup(manifest) {
+  const lookup = new Map();
+  (manifest?.entries || []).forEach((entry) => {
+    if (!entry?.exerciseId || !entry?.imagePath) return;
+    const image = { exerciseId: entry.exerciseId, imagePath: entry.imagePath };
+    lookup.set(entry.exerciseId, image);
+    (entry.aliasExerciseIds || []).forEach((aliasId) => {
+      if (aliasId) lookup.set(aliasId, image);
+    });
+  });
+  return lookup;
+}
+
+function exerciseImageForId(exerciseId) {
+  if (!exerciseId) return null;
+  return state.exerciseImageLookup?.get(exerciseId) || null;
+}
+
+function openExerciseInfoOverlay(exerciseId, triggerElement = null) {
+  const image = exerciseImageForId(exerciseId);
+  if (!image) return;
+  state.exerciseInfoOverlay = {
+    exerciseId,
+    imagePath: image.imagePath,
+    triggerId: triggerElement?.id || "",
+    scrollY: window.scrollY || 0,
+    historyPushed: false
+  };
+  if (triggerElement && !triggerElement.id) {
+    triggerElement.id = `exercise-info-trigger-${exerciseId}`;
+    state.exerciseInfoOverlay.triggerId = triggerElement.id;
+  }
+  history.pushState({ dcoachOverlay: "exerciseInfo" }, "", window.location.href);
+  state.exerciseInfoOverlay.historyPushed = true;
+  render();
+}
+
+function closeExerciseInfoOverlay({ restoreFocus = true, fromPopState = false } = {}) {
+  const overlay = state.exerciseInfoOverlay;
+  state.exerciseInfoOverlay = null;
+  if (overlay?.historyPushed && !fromPopState && history.state?.dcoachOverlay === "exerciseInfo") history.back();
+  render();
+  requestAnimationFrame(() => {
+    if (Number.isFinite(overlay?.scrollY)) window.scrollTo(0, overlay.scrollY);
+    if (restoreFocus && overlay?.triggerId) document.getElementById(overlay.triggerId)?.focus();
+  });
+}
+
+function renderExerciseInfoButton(exercise) {
+  if (!exerciseImageForId(exercise?.id)) return "";
+  return `<button class="exercise-info-button" type="button" data-exercise-info="${htmlesc(exercise.id)}" aria-label="Übungsinfo zu ${htmlesc(exercise.displayName)} öffnen">i</button>`;
+}
+
+function renderExerciseInfoOverlay() {
+  const overlay = state.exerciseInfoOverlay;
+  if (!overlay) return "";
+  const exercise = exerciseById(overlay.exerciseId);
+  return `
+    <div class="exercise-info-overlay" data-exercise-info-backdrop role="dialog" aria-modal="true" aria-label="Übungsinfo">
+      <section class="exercise-info-sheet">
+        <header class="row">
+          <div class="grow">
+            <p class="quiet">Übungsinfo</p>
+            <h2>${htmlesc(exercise?.displayName || overlay.exerciseId)}</h2>
+          </div>
+          <button class="exercise-info-close" type="button" data-close-exercise-info aria-label="Übungsinfo schließen">×</button>
+        </header>
+        <div class="exercise-info-image-frame">
+          <img src="${htmlesc(overlay.imagePath)}" alt="Übungsanleitung ${htmlesc(exercise?.displayName || overlay.exerciseId)}" loading="eager">
+        </div>
+        <button class="secondary" type="button" data-close-exercise-info>Schließen</button>
+      </section>
+    </div>
+  `;
 }
 
 function trackingConfigForExercise(exercise) {
@@ -5302,6 +5385,7 @@ function render() {
         </main>
         ${renderPremiumTabs()}
         ${state.activeCoachProposalId ? renderCoachProposalReview() : ""}
+        ${renderExerciseInfoOverlay()}
       `}
     </div>
   `;
@@ -5321,6 +5405,7 @@ function renderActiveWorkoutView() {
       </main>
       ${renderPremiumTabs()}
       ${state.activeCoachProposalId ? renderCoachProposalReview() : ""}
+      ${renderExerciseInfoOverlay()}
     </div>
   `;
   bindEvents();
@@ -9371,7 +9456,10 @@ function renderWorkout() {
       ${renderWorkoutOverview(workout)}
       ${renderSessionCoachDuringCard(workout, entry, exercise)}
       <article class="card stack">
-        <h2>${htmlesc(exercise.displayName)}</h2>
+        <div class="row workout-exercise-title-row">
+          <h2 class="grow">${htmlesc(exercise.displayName)}</h2>
+          ${renderExerciseInfoButton(exercise)}
+        </div>
         <p class="muted">${htmlesc([...exercise.primaryMuscleGroups, ...exercise.secondaryMuscleGroups].slice(0, 3).join(" · "))}</p>
         <div class="row">${lwsBadge(exercise.lumbarDiscSuitability)} <span class="badge blue">${plannedRepTextForExercise(entry, exercise)}</span> <span class="badge">${entry.restSeconds} s Pause</span></div>
         ${machineSetting ? `<p class="quiet">Setup: Sitz ${htmlesc(machineSetting.seatPosition || "-")} · Griff ${htmlesc(machineSetting.handlePosition || "-")} · Rücken ${htmlesc(machineSetting.backrestPosition || "-")}</p>` : ""}
@@ -12387,6 +12475,19 @@ function bindEvents() {
     state.selectedExerciseId = event.currentTarget.dataset.workoutExerciseDetail;
     render();
   });
+  document.querySelectorAll("[data-exercise-info]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      openExerciseInfoOverlay(event.currentTarget.dataset.exerciseInfo, event.currentTarget);
+    });
+  });
+  document.querySelectorAll("[data-close-exercise-info]").forEach((button) => {
+    button.addEventListener("click", () => closeExerciseInfoOverlay());
+  });
+  document.querySelector("[data-exercise-info-backdrop]")?.addEventListener("click", (event) => {
+    if (event.target === event.currentTarget) closeExerciseInfoOverlay();
+  });
   document.querySelector("[data-workout-equipment-scan]")?.addEventListener("click", () => {
     persistWorkoutDraft();
     state.equipmentScanner = { ...state.equipmentScanner, active: true, status: "manual", error: "", rawCode: "", normalizedCode: "", mappingId: "" };
@@ -12989,6 +13090,14 @@ function mountProductionMuscleMap() {
       }
     });
 }
+
+window.addEventListener("popstate", () => {
+  if (state.exerciseInfoOverlay) closeExerciseInfoOverlay({ restoreFocus: false, fromPopState: true });
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && state.exerciseInfoOverlay) closeExerciseInfoOverlay();
+});
 
 boot().catch((error) => {
   document.getElementById("app").innerHTML = `<section class="screen"><h1 class="title">D-Coach</h1><p class="subtitle">Fehler: ${htmlesc(error.message)}</p></section>`;
